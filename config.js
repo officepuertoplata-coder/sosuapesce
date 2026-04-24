@@ -7,8 +7,9 @@ const SP_CONFIG = {
 
   // ── SUPABASE ──────────────────────────────────────────────
   // Get these from: supabase.com → your project → Settings → API
-  SUPABASE_URL:  'https://XXXXXXXXXXXX.supabase.co',   // ← paste your URL
-  SUPABASE_ANON: 'eyXXXXXXXXXXXXXXXXXXXXXXXXXX',     // ← paste anon/public key
+  SUPABASE_URL:  'https://oxybanupdrfopjionekk.supabase.co',   // ← paste your URL
+  SUPABASE_ANON: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im94eWJhbnVwZHJmb3BqaW9uZWtrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTg1MjMsImV4cCI6MjA5MjYzNDUyM30.vmssHhb5u2myX29SAPb496kOfYIEBmnus5ylpe-Z7Uc
+',     // ← paste anon/public key
   SUPABASE_SERVICE_KEY: 'eyXXXXXXXXXXXXXXXXXXXXXX',   // ← paste service_role key (admin only)
 
   // ── BUSINESS ──────────────────────────────────────────────
@@ -20,8 +21,8 @@ const SP_CONFIG = {
 
   // ── ADMIN ─────────────────────────────────────────────────
   // Change this password! Store it safely.
-  ADMIN_PASSWORD: 'sosuapesce2025',
+  ADMIN_PASSWORD: 'Austria714#',
 
   // ── SITE ──────────────────────────────────────────────────
-  SITE_URL: 'https://YOUR-USERNAME.github.io/sosuapesce',  // ← your GitHub Pages URL
+  SITE_URL: 'https://officepuertoplata-coder.github.io/sosuapesce',  // ← your GitHub Pages URL
 };
