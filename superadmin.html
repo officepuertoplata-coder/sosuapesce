@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Platform Superadmin</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--g:#3a7d5c;--g2:#4a9470;--glt:#f0f7f3;--red:#bf1a2a;--bg:#f1f5f2;--wh:#fff;--dk:#0d2a1f;--mu:#5a7268;--bd:#e2ebe6;--gold:#d4a017;--blue:#1a4a8f;--stripe:#635bff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--dk)}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-card{background:var(--wh);border:1.5px solid var(--bd);border-radius:18px;padding:40px 36px;max-width:360px;width:100%;box-shadow:0 8px 32px rgba(13,42,31,.1);text-align:center}
+.login-logo{font-family:'Fraunces',serif;font-size:1.8rem;color:var(--g);margin-bottom:4px}
+.login-sub{font-size:.78rem;color:var(--mu);margin-bottom:24px}
+.login-card input{width:100%;padding:11px 14px;border:1.5px solid var(--bd);border-radius:8px;font-size:.9rem;font-family:inherit;margin-bottom:12px}
+.login-card input:focus{outline:none;border-color:var(--g)}
+.btn-login{width:100%;background:var(--dk);color:#fff;font-weight:700;font-size:.95rem;padding:12px;border-radius:9px;border:none;cursor:pointer;font-family:inherit}
+.btn-login:hover{opacity:.9}
+.lerr{color:var(--red);font-size:.77rem;margin-top:8px;min-height:18px}
+.app{display:none}.app.show{display:block}
+.topbar{background:var(--dk);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--gold);flex-wrap:wrap;gap:8px}
+.topbar-brand{font-family:'Fraunces',serif;color:#fff;font-size:1.1rem;display:flex;align-items:center;gap:10px}
+.super-badge{background:var(--gold);color:var(--dk);font-size:.62rem;font-weight:700;padding:3px 8px;border-radius:4px;letter-spacing:.5px}
+.topbar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tbtn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:.76rem;font-weight:600;padding:6px 14px;border-radius:20px;cursor:pointer;font-family:inherit;transition:background .2s}
+.tbtn:hover{background:rgba(255,255,255,.2)}.tbtn.active{background:var(--g);border-color:var(--g)}
+.main{max-width:1200px;margin:0 auto;padding:28px 20px}
+.page{display:none}.page.active{display:block}
+.page-title{font-family:'Fraunces',serif;font-size:1.4rem;margin-bottom:20px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:28px}
+.stat{background:var(--wh);border:1.5px solid var(--bd);border-radius:13px;padding:20px;border-top:3px solid var(--g)}
+.stat-num{font-size:2rem;font-weight:700;color:var(--g);line-height:1;margin-bottom:4px}
+.stat-lbl{font-size:.73rem;color:var(--mu)}
+.stat.gold{border-top-color:var(--gold)}.stat.gold .stat-num{color:var(--gold)}
+.tbl-wrap{background:var(--wh);border:1.5px solid var(--bd);border-radius:14px;overflow:hidden;margin-bottom:24px}
+.tbl-head{background:linear-gradient(135deg,var(--dk),#1a4a2e);padding:14px 18px;display:flex;align-items:center;justify-content:space-between}
+.tbl-head h3{color:#fff;font-size:.92rem;font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+th{background:var(--glt);padding:10px 14px;text-align:left;font-size:.72rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px}
+td{padding:10px 14px;border-bottom:1px solid var(--bd)}
+tr:last-child td{border:none}tr:hover td{background:rgba(58,125,92,.03)}
+.badge{display:inline-block;font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:20px}
+.b-active{background:var(--glt);color:var(--g);border:1px solid rgba(58,125,92,.25)}
+.b-paused{background:#fff8e1;color:#a07800;border:1px solid rgba(160,120,0,.2)}
+.b-frozen{background:#e8f0ff;color:var(--blue);border:1px solid rgba(26,74,143,.2)}
+.b-pending{background:#f5f5f5;color:var(--mu);border:1px solid var(--bd)}
+.panel{background:var(--wh);border:1.5px solid var(--bd);border-radius:14px;padding:24px;margin-bottom:20px}
+.panel h3{font-size:.95rem;font-weight:700;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--bd)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px}
+@media(max-width:600px){.grid2,.grid3{grid-template-columns:1fr}}
+label{display:block;font-size:.74rem;font-weight:600;margin-bottom:4px}
+input[type=text],input[type=number],input[type=email],input[type=date],select,textarea{width:100%;padding:9px 12px;border:1.5px solid var(--bd);border-radius:7px;font-size:.85rem;font-family:inherit;background:var(--bg);color:var(--dk)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--g)}
+textarea{min-height:80px;resize:vertical}
+.btn-save{background:var(--g);color:#fff;font-weight:700;font-size:.9rem;padding:10px 22px;border-radius:8px;border:none;cursor:pointer;font-family:inherit}
+.btn-save:hover{opacity:.9}
+.btn-out{background:transparent;color:var(--g);font-weight:700;font-size:.84rem;padding:8px 16px;border-radius:8px;border:1.5px solid var(--g);cursor:pointer;font-family:inherit}
+.btn-out:hover{background:var(--glt)}
+.btn-red{background:var(--red);color:#fff;font-weight:700;font-size:.84rem;padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-family:inherit}
+.btn-sm{font-size:.7rem;padding:4px 10px}
+.form-section{margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--bd)}
+.form-section:last-child{border:none;margin:0;padding:0}
+.form-section-title{font-size:.8rem;font-weight:700;color:var(--g);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.codetag{font-family:monospace;font-size:.73rem;background:var(--glt);padding:2px 7px;border-radius:5px;color:var(--g)}
+.msg{font-size:.8rem;color:var(--mu);padding:20px;text-align:center}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--g);color:#fff;padding:10px 22px;border-radius:30px;font-size:.82rem;font-weight:600;z-index:999;transition:transform .3s;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.merchant-card{background:var(--wh);border:1.5px solid var(--bd);border-radius:14px;padding:18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;cursor:pointer;transition:border-color .2s}
+.merchant-card:hover{border-color:var(--g)}
+.merchant-card-left h3{font-size:.95rem;font-weight:700;margin-bottom:3px}
+.merchant-card-left p{font-size:.75rem;color:var(--mu)}
+.merchant-card-right{display:flex;align-items:center;gap:8px}
+.link-tag{font-family:monospace;font-size:.72rem;color:var(--mu);background:var(--bg);padding:3px 8px;border-radius:4px}
+</style>
+</head>
+<body>
+
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <div class="login-logo">&#9733; Superadmin</div>
+    <div class="login-sub">Referral Platform &mdash; YNHALD Corp.</div>
+    <input type="password" id="pwInput" placeholder="Superadmin-Passwort">
+    <button class="btn-login" onclick="doLogin()">Einloggen &rarr;</button>
+    <div class="lerr" id="lerr"></div>
+  </div>
+</div>
+
+<div class="app" id="app">
+  <div class="topbar">
+    <div class="topbar-brand">
+      &#9733; Referral Platform
+      <span class="super-badge">SUPERADMIN</span>
+    </div>
+    <div class="topbar-right">
+      <button class="tbtn active" onclick="showPage('overview',this)">&#128202; Übersicht</button>
+      <button class="tbtn" onclick="showPage('merchants',this)">&#127978; Händler</button>
+      <button class="tbtn" onclick="showPage('new-merchant',this)">&#10133; Neuer Händler</button>
+      <button class="tbtn" onclick="showPage('agents',this)">&#129309; Agenten</button>
+      <button class="tbtn" onclick="showPage('billing',this)">&#128197; Abrechnung</button>
+      <button class="tbtn" onclick="doLogout()" style="border-color:rgba(191,26,42,.5);color:#ff9999">Ausloggen</button>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- ÜBERSICHT -->
+    <div class="page active" id="page-overview">
+      <div class="page-title">&#128202; Plattform-Übersicht</div>
+      <div class="stats">
+        <div class="stat"><div class="stat-num" id="ov-merchants">-</div><div class="stat-lbl">Aktive Händler</div></div>
+        <div class="stat"><div class="stat-num" id="ov-agents">-</div><div class="stat-lbl">Aktive Agenten</div></div>
+        <div class="stat"><div class="stat-num" id="ov-sales">-</div><div class="stat-lbl">Verkäufe gesamt</div></div>
+        <div class="stat gold"><div class="stat-num" id="ov-platform">-</div><div class="stat-lbl">Plattform-Einnahmen</div></div>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-head"><h3>Händler-Übersicht</h3><button class="tbtn btn-sm" onclick="loadOverview()">Aktualisieren</button></div>
+        <div style="overflow-x:auto"><table>
+          <thead><tr><th>Händler</th><th>Slug</th><th>Agenten</th><th>Verkäufe</th><th>Umsatz</th><th>Plattform-Fee</th><th>Status</th></tr></thead>
+          <tbody id="overviewTable"><tr><td colspan="7" class="msg">Lade...</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- HÄNDLER LISTE -->
+    <div class="page" id="page-merchants">
+      <div class="page-title">&#127978; Händler verwalten</div>
+      <div id="merchantsList"><div class="msg">Lade...</div></div>
+    </div>
+
+    <!-- NEUER HÄNDLER -->
+    <div class="page" id="page-new-merchant">
+      <div class="page-title">&#10133; Neuer Händler einrichten</div>
+      <div class="panel">
+        <div class="form-section">
+          <div class="form-section-title">&#127978; Grunddaten</div>
+          <div class="grid2">
+            <div><label>Slug (URL-Name) *</label><input type="text" id="m-slug" placeholder="sosuapesce" style="text-transform:lowercase"><div style="font-size:.7rem;color:var(--mu);margin-top:3px">Wird zur URL: .../sosuapesce/</div></div>
+            <div><label>Name *</label><input type="text" id="m-name" placeholder="Sosua Pesce"></div>
+          </div>
+          <div class="grid2">
+            <div><label>Kategorie</label>
+              <select id="m-category">
+                <option value="fish">Fisch / Lebensmittel</option>
+                <option value="massage">Massage / Wellness</option>
+                <option value="handwerk">Handwerk / Reparatur</option>
+                <option value="delivery">Lieferservice</option>
+                <option value="retail">Einzelhandel</option>
+                <option value="other">Sonstiges</option>
+              </select>
+            </div>
+            <div><label>Sprache (Standard)</label>
+              <select id="m-language">
+                <option value="es">Spanisch (ES)</option>
+                <option value="en">Englisch (EN)</option>
+                <option value="de">Deutsch (DE)</option>
+              </select>
+            </div>
+          </div>
+          <div><label>Beschreibung</label><textarea id="m-desc" placeholder="Kurze Beschreibung des Händlers..."></textarea></div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">&#128222; Kontakt</div>
+          <div class="grid3">
+            <div><label>WhatsApp-Nummer</label><input type="text" id="m-wa" placeholder="18299758857"></div>
+            <div><label>E-Mail</label><input type="email" id="m-email" placeholder="name@example.com"></div>
+            <div><label>Telefon</label><input type="text" id="m-phone" placeholder="+1 829 000 0000"></div>
+          </div>
+          <div class="grid2">
+            <div><label>Adresse</label><input type="text" id="m-address" placeholder="Calle Principal 123"></div>
+            <div><label>Stadt</label><input type="text" id="m-city" placeholder="Sosua"></div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">&#128176; Zahlungen</div>
+          <div class="grid2">
+            <div><label>Währung</label>
+              <select id="m-currency">
+                <option value="RD$">Peso Dominicano (RD$)</option>
+                <option value="USD">US Dollar (USD)</option>
+                <option value="EUR">Euro (EUR)</option>
+              </select>
+            </div>
+            <div><label>Stripe Payment Link</label><input type="text" id="m-stripe" placeholder="https://buy.stripe.com/..."></div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">&#9733; Plattformgebühr</div>
+          <div class="grid3">
+            <div><label>Grundgebühr / Monat</label><input type="number" id="m-basefee" value="0" min="0"></div>
+            <div><label>Transaktionsgebühr-Typ</label>
+              <select id="m-feetype">
+                <option value="fixed">Fix pro Transaktion</option>
+                <option value="percentage">Prozent vom Umsatz</option>
+                <option value="none">Keine</option>
+              </select>
+            </div>
+            <div><label>Transaktionsgebühr-Wert</label><input type="number" id="m-feevalue" value="0" min="0" step="0.01"></div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">&#129309; Agenten-Provisionsregeln</div>
+          <div class="grid3">
+            <div><label>Neukunden/Monat (Minimum)</label><input type="number" id="m-minnew" value="1" min="0"></div>
+            <div><label>Freeze nach X Monaten Pause</label><input type="number" id="m-freeze" value="3" min="1"></div>
+            <div><label>Mindestbetrag Auszahlung</label><input type="number" id="m-minpayout" value="1000" min="0"></div>
+          </div>
+          <div class="grid2">
+            <div><label>Abrechnungsperiode</label>
+              <select id="m-schedule">
+                <option value="bimonthly">2× im Monat (15. + letzter)</option>
+                <option value="monthly">Monatlich</option>
+                <option value="weekly">Wöchentlich</option>
+              </select>
+            </div>
+            <div><label>Provisionen bei Pause</label>
+              <select id="m-pauseaction">
+                <option value="accumulate">Akkumulieren (Modell A)</option>
+                <option value="forfeit">Verfallen sofort (Modell B)</option>
+                <option value="forfeit_after_30">Verfallen nach 30 Tagen (Modell C)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">&#128274; Händler Admin-Passwort</div>
+          <div class="grid2">
+            <div><label>Passwort für Händler-Admin</label><input type="text" id="m-password" placeholder="SicheresPasswort123!"></div>
+            <div style="display:flex;align-items:flex-end"><button class="btn-out" onclick="genPassword()">Generieren</button></div>
+          </div>
+        </div>
+
+        <button class="btn-save" onclick="createMerchant()" style="width:100%;margin-top:8px">&#10003; Händler anlegen</button>
+      </div>
+
+      <div class="panel" id="merchantProductForm" style="display:none">
+        <h3>&#128230; Erstes Produkt anlegen</h3>
+        <div class="grid2">
+          <div><label>Produktname *</label><input type="text" id="p-name" placeholder="Entrega de Pescado Fresco"></div>
+          <div><label>Kategorie</label><input type="text" id="p-cat" placeholder="Fisch"></div>
+        </div>
+        <div><label>Beschreibung</label><textarea id="p-desc" placeholder="Produktbeschreibung..."></textarea></div>
+        <div class="grid3">
+          <div><label>Preistyp</label>
+            <select id="p-pricetype" onchange="updateProductForm()">
+              <option value="fixed">Fix</option>
+              <option value="per_unit">Pro Einheit</option>
+              <option value="variable">Variabel (min-max)</option>
+              <option value="negotiated">Verhandelbar</option>
+              <option value="free">Kostenlos</option>
+            </select>
+          </div>
+          <div><label>Preis</label><input type="number" id="p-price" value="0" min="0" step="0.01"></div>
+          <div><label>Einheit</label><input type="text" id="p-unit" placeholder="kg / Stunde / Stück"></div>
+        </div>
+        <div class="grid3">
+          <div><label>Service-Fee Typ</label>
+            <select id="p-feetype">
+              <option value="none">Keine</option>
+              <option value="fixed">Fix</option>
+              <option value="percentage">Prozent</option>
+            </select>
+          </div>
+          <div><label>Service-Fee Wert</label><input type="number" id="p-fee" value="0" min="0"></div>
+          <div><label>Zahlungsmethode</label>
+            <select id="p-payment">
+              <option value="hybrid">Hybrid (online + bar)</option>
+              <option value="online">Nur online</option>
+              <option value="cash">Nur bar</option>
+              <option value="any">Beliebig</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid3">
+          <div><label>Liefertyp</label>
+            <select id="p-fulfill">
+              <option value="delivery">Lieferung</option>
+              <option value="pickup">Abholung</option>
+              <option value="onsite">Vor Ort</option>
+              <option value="appointment">Termin</option>
+              <option value="digital">Digital</option>
+            </select>
+          </div>
+          <div><label>Provisions-Typ</label>
+            <select id="p-commtype">
+              <option value="fixed">Fix</option>
+              <option value="percentage">Prozent</option>
+              <option value="points">Punkte</option>
+              <option value="hybrid">Hybrid</option>
+              <option value="none">Keine</option>
+            </select>
+          </div>
+          <div><label>Provisions-Wert</label><input type="number" id="p-commval" value="0" min="0" step="0.01"></div>
+        </div>
+        <div class="grid2">
+          <div><label>Provisions-Basis</label>
+            <select id="p-commbase">
+              <option value="sale_amount">Auf Verkaufspreis</option>
+              <option value="service_fee">Auf Service-Fee</option>
+              <option value="total">Auf Gesamt</option>
+            </select>
+          </div>
+          <div><label>Hervorgehoben anzeigen?</label>
+            <select id="p-featured">
+              <option value="true">Ja</option>
+              <option value="false">Nein</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-save" onclick="createProduct()" style="width:100%;margin-top:8px">&#10003; Produkt anlegen</button>
+      </div>
+    </div>
+
+    <!-- AGENTEN -->
+    <div class="page" id="page-agents">
+      <div class="page-title">&#129309; Alle Agenten</div>
+      <div class="tbl-wrap">
+        <div class="tbl-head"><h3>Agenten (plattformübergreifend)</h3><button class="tbtn btn-sm" onclick="loadAllAgents()">Aktualisieren</button></div>
+        <div style="overflow-x:auto"><table>
+          <thead><tr><th>Name</th><th>Email</th><th>Telefon</th><th>Händler</th><th>Code</th><th>Status</th><th>Verkäufe</th><th>Verdient</th><th>Pause</th></tr></thead>
+          <tbody id="allAgentsTable"><tr><td colspan="9" class="msg">Lade...</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ABRECHNUNG -->
+    <div class="page" id="page-billing">
+      <div class="page-title">&#128197; Plattform-Abrechnung</div>
+      <div class="panel">
+        <h3>Plattformgebühren pro Händler</h3>
+        <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px">
+          <div><label>Von</label><input type="date" id="b-from" style="width:auto"></div>
+          <div><label>Bis</label><input type="date" id="b-to" style="width:auto"></div>
+          <button class="btn-save" onclick="genBilling()">Bericht erstellen</button>
+          <button class="btn-out" onclick="setHalf(1)">1–15</button>
+          <button class="btn-out" onclick="setHalf(2)">16–Ende</button>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-head"><h3 id="billingTitle">Bericht</h3><button class="tbtn btn-sm" onclick="window.print()">Drucken</button></div>
+        <div style="overflow-x:auto"><table>
+          <thead><tr><th>Händler</th><th>Slug</th><th>Transaktionen</th><th>Umsatz</th><th>Plattformgebühr</th><th>Grundgebühr</th><th>Gesamt</th></tr></thead>
+          <tbody id="billingTable"><tr><td colspan="7" class="msg">Zeitraum wählen und Bericht erstellen.</td></tr></tbody>
+        </table></div>
+        <div id="billingSummary" style="display:none;background:var(--glt);padding:14px 18px;display:none;gap:24px;flex-wrap:wrap;border-top:1px solid var(--bd)">
+          <span style="font-size:.82rem">Händler: <strong id="bs-m">0</strong></span>
+          <span style="font-size:.82rem">Transaktionen: <strong id="bs-t">0</strong></span>
+          <span style="font-size:.82rem">Gesamt-Plattformgebühren: <strong id="bs-total" style="color:var(--g)">0</strong></span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+var sb = null;
+var newMerchantId = null;
+
+window.addEventListener('load', function() {
+  try {
+    var cfg = window.SP_CONFIG;
+    if (cfg && cfg.SUPABASE_URL.indexOf('XXXX') === -1) {
+      sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_SERVICE_KEY);
+    }
+  } catch(e) { console.warn('Supabase:', e.message); }
+  document.getElementById('pwInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') doLogin();
+  });
+});
+
+function doLogin() {
+  var pw = document.getElementById('pwInput').value;
+  var cfg = window.SP_CONFIG;
+  if (!cfg) { document.getElementById('lerr').textContent = 'config.js nicht geladen'; return; }
+  if (pw === cfg.SUPERADMIN_PASSWORD) {
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('app').classList.add('show');
+    loadOverview();
+  } else {
+    document.getElementById('lerr').textContent = 'Falsches Passwort';
+  }
+}
+function doLogout() { location.reload(); }
+
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.tbtn').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'overview')  loadOverview();
+  if (id === 'merchants') loadMerchants();
+  if (id === 'agents')    loadAllAgents();
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2800);
+}
+
+function fmtDate(d) { return d ? new Date(d).toLocaleDateString('de-AT') : '-'; }
+function fmtNum(n, cur) { return (n||0).toLocaleString('de-AT') + ' ' + (cur||''); }
+
+function statusBadge(s) {
+  var map = { active:'b-active', paused:'b-paused', frozen:'b-frozen', pending:'b-pending', inactive:'b-paused' };
+  var label = { active:'Aktiv', paused:'Pausiert', frozen:'Eingefroren', pending:'Ausstehend', inactive:'Inaktiv' };
+  return '<span class="badge ' + (map[s]||'b-pending') + '">' + (label[s]||s) + '</span>';
+}
+
+// ── ÜBERSICHT ────────────────────────────────────────────
+function loadOverview() {
+  if (!sb) return;
+  Promise.all([
+    sb.from('platform_overview').select('*'),
+    sb.from('agents').select('id', {count:'exact'})
+  ]).then(function(res) {
+    var rows = res[0].data || [];
+    var totalAgents = res[1].count || 0;
+    var activeMerchants = rows.filter(function(r) { return r.status === 'active'; }).length;
+    var totalSales = rows.reduce(function(s,r) { return s + (r.total_sales||0); }, 0);
+    var totalPlatform = rows.reduce(function(s,r) { return s + (r.platform_earnings||0); }, 0);
+
+    document.getElementById('ov-merchants').textContent = activeMerchants;
+    document.getElementById('ov-agents').textContent = totalAgents;
+    document.getElementById('ov-sales').textContent = totalSales;
+    document.getElementById('ov-platform').textContent = totalPlatform.toLocaleString('de-AT');
+
+    document.getElementById('overviewTable').innerHTML = rows.length
+      ? rows.map(function(r) {
+          return '<tr><td><strong>' + r.name + '</strong></td><td><span class="codetag">' + r.slug + '</span></td><td>' + (r.active_agents||0) + '</td><td>' + (r.total_sales||0) + '</td><td>' + fmtNum(r.total_revenue) + '</td><td style="color:var(--gold);font-weight:700">' + fmtNum(r.platform_earnings) + '</td><td>' + statusBadge(r.status) + '</td></tr>';
+        }).join('')
+      : '<tr><td colspan="7" class="msg">Noch keine Händler.</td></tr>';
+  });
+}
+
+// ── HÄNDLER LISTE ────────────────────────────────────────
+function loadMerchants() {
+  if (!sb) return;
+  sb.from('merchants').select('*').order('created_at', {ascending:false}).then(function(r) {
+    var data = r.data || [];
+    var container = document.getElementById('merchantsList');
+    if (!data.length) { container.innerHTML = '<div class="msg">Noch keine Händler. Über "+ Neuer Händler" anlegen.</div>'; return; }
+    container.innerHTML = data.map(function(m) {
+      return '<div class="merchant-card"><div class="merchant-card-left"><h3>' + m.name + '</h3><p>' + (m.description||'') + '</p><p style="margin-top:4px;font-size:.72rem;color:var(--mu)">&#128222; ' + (m.whatsapp_number||'-') + ' &nbsp;&middot;&nbsp; &#128178; ' + m.currency + ' &nbsp;&middot;&nbsp; Platform-Fee: ' + m.platform_fee_value + (m.platform_fee_type==='percentage'?'%':' '+m.currency) + '/Transaktion</p></div><div class="merchant-card-right"><span class="link-tag">/' + m.slug + '/</span>' + statusBadge(m.status) + '<button class="btn-sm btn-out" onclick="toggleMerchant(\'' + m.id + '\',\'' + m.status + '\')">' + (m.status==='active'?'Pausieren':'Aktivieren') + '</button></div></div>';
+    }).join('');
+  });
+}
+
+function toggleMerchant(id, status) {
+  if (!sb) return;
+  var newStatus = status === 'active' ? 'paused' : 'active';
+  sb.from('merchants').update({status:newStatus}).eq('id',id).then(function() {
+    showToast('Status aktualisiert');
+    loadMerchants();
+  });
+}
+
+// ── NEUER HÄNDLER ────────────────────────────────────────
+function genPassword() {
+  var chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#';
+  var pw = '';
+  for (var i=0; i<12; i++) pw += chars[Math.floor(Math.random()*chars.length)];
+  document.getElementById('m-password').value = pw;
+}
+
+function createMerchant() {
+  if (!sb) { showToast('Supabase nicht verbunden'); return; }
+  var slug = document.getElementById('m-slug').value.trim().toLowerCase().replace(/[^a-z0-9-]/g,'');
+  var name = document.getElementById('m-name').value.trim();
+  if (!slug || !name) { showToast('Slug und Name sind Pflichtfelder'); return; }
+
+  var payload = {
+    slug: slug, name: name,
+    description: document.getElementById('m-desc').value.trim() || null,
+    category: document.getElementById('m-category').value,
+    language: document.getElementById('m-language').value,
+    whatsapp_number: document.getElementById('m-wa').value.trim() || null,
+    email: document.getElementById('m-email').value.trim() || null,
+    phone: document.getElementById('m-phone').value.trim() || null,
+    address: document.getElementById('m-address').value.trim() || null,
+    city: document.getElementById('m-city').value.trim() || null,
+    currency: document.getElementById('m-currency').value,
+    stripe_link: document.getElementById('m-stripe').value.trim() || null,
+    base_fee: parseFloat(document.getElementById('m-basefee').value)||0,
+    platform_fee_type: document.getElementById('m-feetype').value,
+    platform_fee_value: parseFloat(document.getElementById('m-feevalue').value)||0,
+    admin_password: document.getElementById('m-password').value.trim() || null
+  };
+
+  sb.from('merchants').insert(payload).select().then(function(r) {
+    if (r.error) { showToast('Fehler: ' + r.error.message); return; }
+    newMerchantId = r.data[0].id;
+
+    // Provisionsregeln anlegen
+    var rules = {
+      merchant_id: newMerchantId,
+      min_new_customers_per_month: parseInt(document.getElementById('m-minnew').value)||1,
+      freeze_after_months: parseInt(document.getElementById('m-freeze').value)||3,
+      min_payout_amount: parseFloat(document.getElementById('m-minpayout').value)||1000,
+      payout_schedule: document.getElementById('m-schedule').value,
+      pause_commission_action: document.getElementById('m-pauseaction').value
+    };
+
+    sb.from('merchant_commission_rules').insert(rules).then(function() {
+      showToast('Händler "' + name + '" angelegt! Jetzt erstes Produkt definieren.');
+      document.getElementById('merchantProductForm').style.display = 'block';
+      document.getElementById('merchantProductForm').scrollIntoView({behavior:'smooth'});
+    });
+  });
+}
+
+function createProduct() {
+  if (!sb || !newMerchantId) { showToast('Zuerst Händler anlegen'); return; }
+  var name = document.getElementById('p-name').value.trim();
+  if (!name) { showToast('Produktname ist Pflicht'); return; }
+
+  // Get merchant currency
+  sb.from('merchants').select('currency').eq('id',newMerchantId).single().then(function(mr) {
+    var cur = mr.data ? mr.data.currency : 'RD$';
+    var payload = {
+      merchant_id: newMerchantId,
+      name: name,
+      description: document.getElementById('p-desc').value.trim() || null,
+      category: document.getElementById('p-cat').value.trim() || null,
+      price_type: document.getElementById('p-pricetype').value,
+      price: parseFloat(document.getElementById('p-price').value)||0,
+      price_unit: document.getElementById('p-unit').value.trim() || null,
+      currency: cur,
+      service_fee_type: document.getElementById('p-feetype').value,
+      service_fee: parseFloat(document.getElementById('p-fee').value)||0,
+      payment_method: document.getElementById('p-payment').value,
+      fulfillment_type: document.getElementById('p-fulfill').value,
+      commission_type: document.getElementById('p-commtype').value,
+      commission_value: parseFloat(document.getElementById('p-commval').value)||0,
+      commission_base: document.getElementById('p-commbase').value,
+      is_featured: document.getElementById('p-featured').value === 'true',
+      status: 'active'
+    };
+
+    sb.from('merchant_products').insert(payload).then(function(r) {
+      if (r.error) { showToast('Fehler: ' + r.error.message); return; }
+      showToast('Produkt angelegt! Händler ist fertig eingerichtet.');
+      document.getElementById('merchantProductForm').style.display = 'none';
+      newMerchantId = null;
+    });
+  });
+}
+
+// ── ALLE AGENTEN ────────────────────────────────────────
+function loadAllAgents() {
+  if (!sb) return;
+  sb.from('agent_balances').select('*').order('total_earned', {ascending:false}).then(function(r) {
+    var data = r.data || [];
+    document.getElementById('allAgentsTable').innerHTML = data.length
+      ? data.map(function(a) {
+          return '<tr><td><strong>' + a.agent_name + '</strong></td><td style="font-size:.73rem">' + a.email + '</td><td>' + a.phone + '</td><td>' + a.merchant_name + '</td><td><span class="codetag">' + a.ref_code + '</span></td><td>' + statusBadge(a.status) + '</td><td>' + a.total_sales_count + '</td><td style="color:var(--g);font-weight:700">' + fmtNum(a.total_earned, a.currency) + '</td><td>' + (a.consecutive_pauses||0) + ' Mon.</td></tr>';
+        }).join('')
+      : '<tr><td colspan="9" class="msg">Noch keine Agenten registriert.</td></tr>';
+  });
+}
+
+// ── ABRECHNUNG ───────────────────────────────────────────
+function setHalf(half) {
+  var now = new Date();
+  var y = now.getFullYear();
+  var m = String(now.getMonth()+1).padStart(2,'0');
+  if (half===1) {
+    document.getElementById('b-from').value = y+'-'+m+'-01';
+    document.getElementById('b-to').value   = y+'-'+m+'-15';
+  } else {
+    var last = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+    document.getElementById('b-from').value = y+'-'+m+'-16';
+    document.getElementById('b-to').value   = y+'-'+m+'-'+String(last);
+  }
+}
+
+function genBilling() {
+  var from = document.getElementById('b-from').value;
+  var to   = document.getElementById('b-to').value;
+  if (!from || !to || !sb) { showToast('Zeitraum wählen'); return; }
+
+  Promise.all([
+    sb.from('sales').select('merchant_id,sale_amount,platform_fee,service_fee').eq('status','delivered').gte('created_at',from+'T00:00:00').lte('created_at',to+'T23:59:59'),
+    sb.from('merchants').select('id,name,slug,base_fee,currency')
+  ]).then(function(res) {
+    var sales = res[0].data || [];
+    var merchants = res[1].data || [];
+    var mMap = {};
+    merchants.forEach(function(m) { mMap[m.id] = m; });
+
+    var map = {};
+    sales.forEach(function(s) {
+      if (!map[s.merchant_id]) map[s.merchant_id] = {count:0, revenue:0, platformFee:0};
+      map[s.merchant_id].count++;
+      map[s.merchant_id].revenue += (s.sale_amount||0);
+      map[s.merchant_id].platformFee += (s.platform_fee||0);
+    });
+
+    var rows = Object.keys(map);
+    document.getElementById('billingTitle').textContent = 'Plattform-Abrechnung ' + from + ' bis ' + to;
+
+    if (!rows.length) {
+      document.getElementById('billingTable').innerHTML = '<tr><td colspan="7" class="msg">Keine Transaktionen in diesem Zeitraum.</td></tr>';
+      document.getElementById('billingSummary').style.display = 'none';
+      return;
+    }
+
+    document.getElementById('billingTable').innerHTML = rows.map(function(mid) {
+      var v = map[mid];
+      var m = mMap[mid] || {};
+      var baseFee = m.base_fee || 0;
+      var total = v.platformFee + baseFee;
+      return '<tr><td><strong>' + (m.name||'-') + '</strong></td><td><span class="codetag">' + (m.slug||'-') + '</span></td><td>' + v.count + '</td><td>' + fmtNum(v.revenue, m.currency) + '</td><td>' + fmtNum(v.platformFee, m.currency) + '</td><td>' + fmtNum(baseFee, m.currency) + '</td><td style="font-weight:700;color:var(--gold)">' + fmtNum(total, m.currency) + '</td></tr>';
+    }).join('');
+
+    var totT = rows.reduce(function(s,mid) { return s + map[mid].count; }, 0);
+    var totF = rows.reduce(function(s,mid) { return s + map[mid].platformFee; }, 0);
+    document.getElementById('bs-m').textContent = rows.length;
+    document.getElementById('bs-t').textContent = totT;
+    document.getElementById('bs-total').textContent = totF.toLocaleString('de-AT');
+    var bsum = document.getElementById('billingSummary');
+    bsum.style.display = 'flex';
+  });
+}
+</script>
+</body>
+</html>
