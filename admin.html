@@ -209,7 +209,37 @@ window.addEventListener('load', function() {
     if (e.key === 'Enter') { doLogin(); }
   });
 });
-
+function doLogin() {
+  var pw  = document.getElementById('pwInput').value;
+  var cfg = window.SP_CONFIG;
+  if (!cfg) { document.getElementById('lerr').textContent = 'config.js nicht geladen'; return; }
+  
+  // Get merchant slug from URL
+  var slug = new URLSearchParams(window.location.search).get('m') || 'sosuapesce';
+  
+  // Check against Supabase merchant password
+  if (sb) {
+    sb.from('merchants').select('admin_password,id,name,currency').eq('slug', slug).single().then(function(r) {
+      if (r.error || !r.data) { document.getElementById('lerr').textContent = 'Haendler nicht gefunden'; return; }
+      if (pw === r.data.admin_password || pw === cfg.ADMIN_PASSWORD) {
+        window.merchantData = r.data;
+        window.merchantSlug = slug;
+        document.getElementById('loginWrap').style.display = 'none';
+        document.getElementById('app').classList.add('show');
+        loadDashboard();
+      } else {
+        document.getElementById('lerr').textContent = 'Contrasena incorrecta';
+      }
+    });
+  } else if (pw === cfg.ADMIN_PASSWORD) {
+    window.merchantSlug = slug;
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('app').classList.add('show');
+    loadDashboard();
+  } else {
+    document.getElementById('lerr').textContent = 'Contrasena incorrecta';
+  }
+}
 function doLogin() {
   var pw  = document.getElementById('pwInput').value;
   var cfg = window.SP_CONFIG;
