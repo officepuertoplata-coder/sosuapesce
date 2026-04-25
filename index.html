@@ -3,87 +3,67 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title id="pageTitle">Loading...</title>
+<title id="pageTitle">Cargando...</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--g:#3a7d5c;--g2:#4a9470;--glt:#f0f7f3;--red:#bf1a2a;--rlt:#fdeaec;--bg:#f8faf9;--wh:#fff;--dk:#0d2a1f;--mu:#5a7268;--bd:#e2ebe6;--wa:#25d366;--stripe:#635bff}
+:root{--g:#3a7d5c;--g2:#4a9470;--glt:#f0f7f3;--red:#bf1a2a;--bg:#f8faf9;--wh:#fff;--dk:#0d2a1f;--mu:#5a7268;--bd:#e2ebe6;--wa:#25d366;--stripe:#635bff}
 *{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}
 body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--dk);overflow-x:hidden}
 .lb{background:var(--wh);border-bottom:1px solid var(--bd);padding:7px 28px;display:flex;justify-content:flex-end;gap:6px}
 .lbtn{background:transparent;border:1.5px solid var(--bd);color:var(--mu);font-size:.7rem;font-weight:700;padding:3px 12px;border-radius:20px;cursor:pointer;transition:all .18s;font-family:inherit}
 .lbtn.active,.lbtn:hover{background:var(--g);border-color:var(--g);color:#fff}
 header{background:var(--wh);border-bottom:3px solid var(--red);padding:12px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(13,42,31,.07)}
-.logo-area{display:flex;align-items:center;gap:12px}
 .logo-name{font-family:'Fraunces',serif;font-size:1.2rem;color:var(--dk)}
-.logo-sub{font-size:.65rem;color:var(--mu);display:block}
+.logo-sub{font-size:.65rem;color:var(--mu)}
 .header-btns{display:flex;align-items:center;gap:8px}
 .btn-wa-h{background:var(--wa);color:#fff;font-weight:700;font-size:.82rem;padding:9px 18px;border-radius:30px;border:none;cursor:pointer;display:flex;align-items:center;gap:7px;text-decoration:none;box-shadow:0 3px 12px rgba(37,211,102,.3);transition:opacity .2s;white-space:nowrap}
 .btn-wa-h:hover{opacity:.9}
 .btn-agent-h{background:transparent;border:1.5px solid var(--g);color:var(--g);font-weight:600;font-size:.78rem;padding:8px 14px;border-radius:20px;cursor:pointer;text-decoration:none;transition:background .2s;white-space:nowrap}
 .btn-agent-h:hover{background:var(--glt)}
-/* HERO */
-.hero{background:linear-gradient(135deg,var(--dk) 0%,#1a4a2e 100%);padding:56px 5% 0;display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center;overflow:hidden}
-@media(max-width:700px){.hero{grid-template-columns:1fr;padding:40px 5% 0;text-align:center}.hero-img{order:-1}.hero-btns{justify-content:center}}
-.hero-kicker{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.85);font-size:.67rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 13px;border-radius:20px;margin-bottom:14px}
+.hero{background:linear-gradient(135deg,var(--dk) 0%,#1a4a2e 100%);padding:56px 5%;text-align:center}
+.hero-kicker{display:inline-flex;align-items:center;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.85);font-size:.67rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 13px;border-radius:20px;margin-bottom:14px}
 .hero h1{font-family:'Fraunces',serif;font-size:clamp(2rem,4.5vw,3.4rem);color:#fff;line-height:1.08;margin-bottom:14px}
 .hero h1 em{font-style:italic;color:#f5a623}
-.hero p{font-size:.93rem;color:rgba(255,255,255,.78);line-height:1.8;margin-bottom:22px;max-width:420px}
-.hero-btns{display:flex;gap:12px;flex-wrap:wrap;padding-bottom:44px}
-.btn-wa-hero{background:var(--wa);color:#fff;font-weight:700;font-size:.95rem;padding:13px 22px;border-radius:10px;border:none;cursor:pointer;display:flex;align-items:center;gap:9px;text-decoration:none;transition:transform .2s,box-shadow .2s;box-shadow:0 5px 18px rgba(37,211,102,.38)}
-.btn-wa-hero:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(37,211,102,.48)}
-.btn-ghost{background:rgba(255,255,255,.1);color:#fff;font-weight:600;font-size:.88rem;padding:12px 20px;border-radius:10px;border:1px solid rgba(255,255,255,.25);cursor:pointer;text-decoration:none;transition:background .2s;white-space:nowrap}
+.hero p{font-size:.93rem;color:rgba(255,255,255,.78);line-height:1.8;margin-bottom:22px;max-width:520px;margin-left:auto;margin-right:auto}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;padding-bottom:44px}
+.btn-wa-hero{background:var(--wa);color:#fff;font-weight:700;font-size:.95rem;padding:13px 22px;border-radius:10px;border:none;cursor:pointer;display:flex;align-items:center;gap:9px;text-decoration:none;box-shadow:0 5px 18px rgba(37,211,102,.38);transition:opacity .2s}
+.btn-wa-hero:hover{opacity:.9}
+.btn-ghost{background:rgba(255,255,255,.1);color:#fff;font-weight:600;font-size:.88rem;padding:12px 20px;border-radius:10px;border:1px solid rgba(255,255,255,.25);cursor:pointer;text-decoration:none;transition:background .2s}
 .btn-ghost:hover{background:rgba(255,255,255,.18)}
-.hero-img{display:flex;align-items:flex-end;justify-content:center}
-.hero-img img{width:100%;max-width:440px;animation:fl 5s ease-in-out infinite;display:block}
-@keyframes fl{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-9px) rotate(1deg)}}
-/* TRUST */
 .trust{background:var(--g);padding:12px 5%;display:flex;gap:18px;flex-wrap:wrap;justify-content:center;align-items:center}
 .ti{display:flex;align-items:center;gap:6px;font-size:.76rem;color:rgba(255,255,255,.9);font-weight:500}
 .ts{width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,.3)}
-/* PRODUCTS */
-.products-sec{padding:64px 5%;background:var(--wh)}
+.sec{padding:64px 5%}
 .sec-in{max-width:900px;margin:0 auto}
 .sk{font-size:.67rem;letter-spacing:2px;text-transform:uppercase;color:var(--g2);font-weight:700;margin-bottom:7px}
 .st{font-family:'Fraunces',serif;font-size:clamp(1.6rem,3.5vw,2.3rem);line-height:1.15;margin-bottom:9px}
 .st em{font-style:italic;color:var(--red)}
-.sb-text{font-size:.87rem;color:var(--mu);line-height:1.75;margin-bottom:28px}
 .products-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
-.product-card{background:var(--bg);border:1.5px solid var(--bd);border-radius:16px;padding:24px;transition:border-color .2s,box-shadow .2s;cursor:pointer;position:relative}
-.product-card:hover{border-color:var(--g);box-shadow:0 4px 20px rgba(58,125,92,.1)}
-.product-card.featured{border-color:var(--g);border-width:2px}
+.pc{background:var(--bg);border:1.5px solid var(--bd);border-radius:16px;padding:24px;cursor:pointer;position:relative;transition:border-color .2s,box-shadow .2s}
+.pc:hover{border-color:var(--g);box-shadow:0 4px 20px rgba(58,125,92,.1)}
+.pc.featured{border-color:var(--g);border-width:2px}
 .feat-badge{position:absolute;top:14px;right:14px;background:var(--g);color:#fff;font-size:.62rem;font-weight:700;padding:3px 9px;border-radius:20px}
-.product-card .ico{font-size:2.4rem;margin-bottom:12px}
-.product-card h3{font-size:.95rem;font-weight:700;margin-bottom:6px}
-.product-card .desc{font-size:.77rem;color:var(--mu);line-height:1.6;margin-bottom:14px}
-.product-price{margin-bottom:14px}
-.price-main{font-size:1.6rem;font-weight:700;color:var(--dk)}
-.price-unit{font-size:.75rem;color:var(--mu);margin-left:3px}
-.price-badge{display:inline-block;font-size:.64rem;font-weight:700;padding:3px 9px;border-radius:20px;margin-top:4px}
-.pb-negotiated{background:var(--glt);color:var(--g);border:1px solid rgba(58,125,92,.25)}
-.pb-fixed{background:var(--rlt);color:var(--red);border:1px solid rgba(191,26,42,.2)}
-.pb-free{background:#e8f5e9;color:#2e7d32;border:1px solid rgba(46,125,50,.2)}
-.btn-order{width:100%;background:var(--wa);color:#fff;font-weight:700;font-size:.88rem;padding:11px;border-radius:9px;border:none;cursor:pointer;transition:opacity .2s;font-family:inherit}
+.pc .ico{font-size:2.4rem;margin-bottom:12px}
+.pc h3{font-size:.95rem;font-weight:700;margin-bottom:6px}
+.pc .pdesc{font-size:.77rem;color:var(--mu);line-height:1.6;margin-bottom:14px}
+.price-main{font-size:1.5rem;font-weight:700;color:var(--dk);margin-bottom:4px}
+.price-note{font-size:.72rem;color:var(--mu);margin-bottom:14px}
+.btn-order{width:100%;background:var(--wa);color:#fff;font-weight:700;font-size:.88rem;padding:11px;border-radius:9px;border:none;cursor:pointer;font-family:inherit;transition:opacity .2s}
 .btn-order:hover{opacity:.9}
-/* HOW */
-.how-sec{padding:64px 5%;background:var(--bg)}
 .how-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;margin-top:28px}
-.hstep{background:var(--wh);border:1.5px solid var(--bd);border-radius:14px;padding:22px;text-align:center;transition:border-color .2s}
-.hstep:hover{border-color:var(--g)}
-.hnum{width:40px;height:40px;border-radius:50%;background:var(--g);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:700;font-size:.95rem;margin:0 auto 12px}
+.hstep{background:var(--wh);border:1.5px solid var(--bd);border-radius:14px;padding:22px;text-align:center}
+.hnum{width:40px;height:40px;border-radius:50%;background:var(--g);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:700;margin:0 auto 12px}
 .hstep h3{font-size:.88rem;font-weight:700;margin-bottom:6px}
 .hstep p{font-size:.74rem;color:var(--mu);line-height:1.55}
-/* CTA */
 .cta-dark{padding:64px 5%;background:linear-gradient(135deg,var(--dk) 0%,#1a4a2e 100%);text-align:center}
 .cta-dark h2{font-family:'Fraunces',serif;font-size:clamp(1.8rem,4vw,2.8rem);color:#fff;margin-bottom:10px}
 .cta-dark h2 em{font-style:italic;color:#f5a623}
 .cta-dark p{color:rgba(255,255,255,.72);font-size:.88rem;margin-bottom:28px;max-width:460px;margin-left:auto;margin-right:auto;line-height:1.7}
-/* INFO */
-.info-sec{padding:64px 5%;background:var(--wh);border-top:1px solid var(--bd)}
+.cta-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
 .info-ph{background:var(--glt);border:2px dashed rgba(58,125,92,.28);border-radius:14px;padding:44px;text-align:center}
 .info-ph h3{font-family:'Fraunces',serif;font-size:1.25rem;color:var(--g);margin-bottom:7px}
-/* FOOTER */
 footer{background:var(--dk);padding:36px 5%;border-top:4px solid var(--red)}
 .fi{max-width:900px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:26px}
 @media(max-width:560px){.fi{grid-template-columns:1fr}}
@@ -97,30 +77,27 @@ footer{background:var(--dk);padding:36px 5%;border-top:4px solid var(--red)}
 span[data-lang]{display:none}
 .lang-es span[data-lang="es"],.lang-en span[data-lang="en"],.lang-de span[data-lang="de"]{display:inline}
 .loading{text-align:center;padding:80px;font-size:.9rem;color:var(--mu)}
+.error{text-align:center;padding:80px;font-size:.9rem;color:var(--red)}
 </style>
 </head>
 <body class="lang-es">
-
 <div class="lb">
   <button class="lbtn active" onclick="setLang('es',this)">ES</button>
   <button class="lbtn" onclick="setLang('en',this)">EN</button>
   <button class="lbtn" onclick="setLang('de',this)">DE</button>
 </div>
-
 <header>
-  <div class="logo-area">
-    <div>
-      <div class="logo-name" id="h-name">Cargando...</div>
-      <span class="logo-sub" id="h-city"></span>
-    </div>
+  <div>
+    <div class="logo-name" id="h-name">Cargando...</div>
+    <div class="logo-sub" id="h-city"></div>
   </div>
   <div class="header-btns">
-    <a class="btn-agent-h" id="agentLink" href="#">
+    <a class="btn-agent-h" id="agentLink" href="agentes.html">
       <span data-lang="es">Ser Agente</span>
       <span data-lang="en">Become Agent</span>
       <span data-lang="de">Agent werden</span>
     </a>
-    <a class="btn-wa-h" id="orderBtn" href="#" onclick="orderWA(event)">
+    <a class="btn-wa-h" href="#" onclick="orderWA(event,null)">
       &#128242;
       <span data-lang="es">Pedir</span>
       <span data-lang="en">Order</span>
@@ -128,213 +105,193 @@ span[data-lang]{display:none}
     </a>
   </div>
 </header>
-
-<div id="mainContent"><div class="loading">&#9679;&#9679;&#9679; Cargando...</div></div>
-
-<div class="toast" id="toast"></div>
+<div id="mainContent"><div class="loading">Cargando...</div></div>
 
 <script>
 var sb = null;
 var merchant = null;
 var products = [];
 var lang = 'es';
+var slug = 'sosuapesce';
 var refCode = null;
 
-// Get merchant slug from URL path
-function getSlug() {
-  var parts = window.location.pathname.split('/').filter(Boolean);
-  // URL: /sosuapesce/index.html → slug = sosuapesce
-  for (var i=0; i<parts.length; i++) {
-    if (parts[i] !== 'index.html' && parts[i] !== 'agentes.html') return parts[i];
-  }
-  return parts[0] || null;
-}
-
 window.addEventListener('load', function() {
-  try {
-    var cfg = window.SP_CONFIG;
-    if (cfg && cfg.SUPABASE_URL.indexOf('XXXX') === -1) {
+  var cfg = null;
+  try { cfg = window.SP_CONFIG; } catch(e) {}
+
+  if (cfg && cfg.SUPABASE_URL && cfg.SUPABASE_URL.indexOf('XXXX') === -1) {
+    try {
       sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON);
-    }
-  } catch(e) { console.warn('Supabase:', e.message); }
+    } catch(e) { console.warn('Supabase init:', e.message); }
+  }
 
-  // Read referral code
-  refCode = new URLSearchParams(window.location.search).get('ref');
-  if (refCode) localStorage.setItem('sp_ref_' + getSlug(), refCode);
-  else refCode = localStorage.getItem('sp_ref_' + getSlug());
+  var params = new URLSearchParams(window.location.search);
+  slug = params.get('m') || 'sosuapesce';
+  refCode = params.get('ref');
 
+  if (refCode) {
+    localStorage.setItem('ref_' + slug, refCode);
+  } else {
+    refCode = localStorage.getItem('ref_' + slug);
+  }
+
+  document.getElementById('agentLink').href = 'agentes.html?m=' + slug;
   loadMerchant();
 });
 
 function setLang(l, btn) {
   lang = l;
   document.body.className = 'lang-' + l;
-  document.documentElement.lang = l;
   document.querySelectorAll('.lbtn').forEach(function(b) { b.classList.remove('active'); });
   btn.classList.add('active');
 }
 
 function loadMerchant() {
-  var slug = getSlug();
-  if (!sb || !slug) { renderFallback(); return; }
+  if (!sb) {
+    renderError('Supabase no conectado. Verifica config.js');
+    return;
+  }
 
-  Promise.all([
-    sb.from('merchants').select('*').eq('slug', slug).eq('status','active').single(),
-    sb.from('merchant_products').select('*').eq('status','active').order('sort_order')
-  ]).then(function(res) {
-    if (res[0].error || !res[0].data) { renderFallback(); return; }
-    merchant = res[0].data;
-    products = res[1].data || [];
+  sb.from('merchants').select('*').eq('slug', slug).eq('status', 'active').then(function(r1) {
+    if (r1.error || !r1.data || r1.data.length === 0) {
+      renderError('Comerciante no encontrado: ' + slug);
+      return;
+    }
+    merchant = r1.data[0];
+    document.title = merchant.name;
+    document.getElementById('h-name').textContent = merchant.name;
+    document.getElementById('h-city').textContent = (merchant.city || '') + (merchant.country ? ' · ' + merchant.country : '');
 
-    // Filter products for this merchant
-    products = products.filter(function(p) { return p.merchant_id === merchant.id; });
-
-    renderPage();
+    sb.from('merchant_products').select('*').eq('merchant_id', merchant.id).eq('status', 'active').order('sort_order').then(function(r2) {
+      products = r2.data || [];
+      renderPage();
+    });
   });
 }
 
 function renderPage() {
-  document.title = merchant.name + ' – Entrega';
-  document.getElementById('h-name').textContent = merchant.name;
-  document.getElementById('h-city').textContent = (merchant.city || '') + ' · ' + (merchant.country || '');
-  document.getElementById('agentLink').href = 'agentes.html';
-
-  var wa = merchant.whatsapp_number || '';
   var cur = merchant.currency || 'RD$';
-  var slug = merchant.slug;
-
+  var wa = merchant.whatsapp_number || '';
   var html = '';
 
   // HERO
-  html += '<div class="hero"><div>';
-  html += '<div class="hero-kicker">&#127938; ' + (merchant.city||'') + ' &middot; ' + merchant.name + '</div>';
-  html += '<h1 data-lang="es">' + merchant.name + '</h1>';
-  html += '<h1 data-lang="en">' + merchant.name + '</h1>';
-  html += '<h1 data-lang="de">' + merchant.name + '</h1>';
-  html += '<p>' + (merchant.description||'') + '</p>';
+  html += '<div class="hero">';
+  html += '<div class="hero-kicker">&#127938; ' + (merchant.city || '') + ' &middot; ' + merchant.name + '</div>';
+  html += '<h1><em>' + merchant.name + '</em></h1>';
+  html += '<p>' + (merchant.description || '') + '</p>';
   html += '<div class="hero-btns">';
-  html += '<a class="btn-wa-hero" href="#" onclick="orderWA(event)"><span style="font-size:1.1rem">&#128242;</span> <span data-lang="es">Pedir por WhatsApp</span><span data-lang="en">Order via WhatsApp</span><span data-lang="de">Per WhatsApp bestellen</span></a>';
-  html += '<a class="btn-ghost" href="#productos"><span data-lang="es">Ver productos</span><span data-lang="en">View products</span><span data-lang="de">Produkte ansehen</span></a>';
-  html += '</div></div><div class="hero-img"><img src="../../Lieferung.png" alt="" onerror="this.style.display='none'"></div></div>';
+  html += '<a class="btn-wa-hero" href="#" onclick="orderWA(event,null)"><span style="font-size:1.1rem">&#128242;</span> <span data-lang="es">Pedir por WhatsApp</span><span data-lang="en">Order via WhatsApp</span><span data-lang="de">Per WhatsApp bestellen</span></a>';
+  html += '<a class="btn-ghost" href="#productos"><span data-lang="es">Ver servicios</span><span data-lang="en">View services</span><span data-lang="de">Leistungen ansehen</span></a>';
+  html += '</div></div>';
 
-  // TRUST
+  // TRUST BAR
   html += '<div class="trust">';
   html += '<div class="ti">&#9989; <span data-lang="es">Servicio verificado</span><span data-lang="en">Verified service</span><span data-lang="de">Verifizierter Service</span></div>';
   html += '<div class="ts"></div>';
-  html += '<div class="ti">&#128242; <span data-lang="es">Via WhatsApp</span><span data-lang="en">Via WhatsApp</span><span data-lang="de">Per WhatsApp</span></div>';
+  html += '<div class="ti">&#128242; WhatsApp</div>';
   html += '<div class="ts"></div>';
-  html += '<div class="ti">&#128181; ' + cur + ' &middot; <span data-lang="es">Pago facil</span><span data-lang="en">Easy payment</span><span data-lang="de">Einfache Zahlung</span></div>';
+  html += '<div class="ti">&#128181; ' + cur + '</div>';
   html += '</div>';
 
   // PRODUCTS
-  if (products.length) {
-    html += '<section class="products-sec" id="productos"><div class="sec-in">';
-    html += '<div class="sk" data-lang="es">Nuestros servicios</div>';
-    html += '<div class="sk" data-lang="en">Our services</div>';
-    html += '<div class="sk" data-lang="de">Unsere Leistungen</div>';
-    html += '<div class="st" data-lang="es">Lo que <em>ofrecemos.</em></div>';
-    html += '<div class="st" data-lang="en">What we <em>offer.</em></div>';
-    html += '<div class="st" data-lang="de">Was wir <em>anbieten.</em></div>';
+  if (products.length > 0) {
+    html += '<section class="sec" id="productos" style="background:var(--wh)"><div class="sec-in">';
+    html += '<div class="sk" data-lang="es">Nuestros servicios</div><div class="sk" data-lang="en">Our services</div><div class="sk" data-lang="de">Unsere Leistungen</div>';
+    html += '<div class="st" data-lang="es">Lo que <em>ofrecemos</em></div><div class="st" data-lang="en">What we <em>offer</em></div><div class="st" data-lang="de">Was wir <em>anbieten</em></div>';
     html += '<div class="products-grid">';
-    products.forEach(function(p) {
-      html += '<div class="product-card' + (p.is_featured?' featured':'') + '" onclick="orderWA(event,'' + p.name + '')">';
-      if (p.is_featured) html += '<span class="feat-badge">&#11088;</span>';
-      html += '<div class="ico">&#127020;</div>';
-      html += '<h3>' + p.name + '</h3>';
-      if (p.description) html += '<div class="desc">' + p.description + '</div>';
-      html += '<div class="product-price">';
+
+    for (var i = 0; i < products.length; i++) {
+      var p = products[i];
+      var pname = p.name || '';
+      var pnameEsc = pname.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+      var featured = p.is_featured ? ' featured' : '';
+      html += '<div class="pc' + featured + '">';
+      if (p.is_featured) { html += '<span class="feat-badge">&#11088;</span>'; }
+      html += '<div class="ico">&#127938;</div>';
+      html += '<h3>' + pname + '</h3>';
+      if (p.description) { html += '<div class="pdesc">' + p.description + '</div>'; }
+
+      // Price display
       if (p.price_type === 'negotiated') {
         html += '<div class="price-main" data-lang="es">Precio a convenir</div>';
         html += '<div class="price-main" data-lang="en">Price to agree</div>';
         html += '<div class="price-main" data-lang="de">Preis nach Absprache</div>';
-        html += '<span class="price-badge pb-negotiated">&#128172;</span>';
       } else if (p.price_type === 'free') {
         html += '<div class="price-main" data-lang="es">Gratis</div>';
         html += '<div class="price-main" data-lang="en">Free</div>';
         html += '<div class="price-main" data-lang="de">Kostenlos</div>';
-        html += '<span class="price-badge pb-free">&#10004;</span>';
       } else {
-        html += '<span class="price-main">' + (p.price||0).toLocaleString() + ' <small style="font-size:1rem">' + (p.currency||cur) + '</small></span>';
-        if (p.price_unit) html += '<span class="price-unit">/ ' + p.price_unit + '</span>';
+        html += '<div class="price-main">' + (p.price || 0).toLocaleString() + ' ' + (p.currency || cur) + '</div>';
       }
+
       if (p.service_fee && p.service_fee > 0) {
-        html += '<div style="font-size:.72rem;color:var(--mu);margin-top:4px">+ ' + p.service_fee + ' ' + cur + ' <span data-lang="es">servicio</span><span data-lang="en">service fee</span><span data-lang="de">Servicegebühr</span></div>';
+        html += '<div class="price-note">+ ' + p.service_fee + ' ' + cur + ' <span data-lang="es">servicio</span><span data-lang="en">service fee</span><span data-lang="de">Servicegebühr</span></div>';
       }
+
+      html += '<button class="btn-order" onclick="orderWA(event,\'' + pnameEsc + '\')">&#128242; <span data-lang="es">Pedir ahora</span><span data-lang="en">Order now</span><span data-lang="de">Jetzt bestellen</span></button>';
       html += '</div>';
-      html += '<button class="btn-order">&#128242; <span data-lang="es">Pedir ahora</span><span data-lang="en">Order now</span><span data-lang="de">Jetzt bestellen</span></button>';
-      html += '</div>';
-    });
+    }
+
     html += '</div></div></section>';
   }
 
   // HOW IT WORKS
-  html += '<section class="how-sec" id="como"><div class="sec-in">';
+  html += '<section class="sec" id="como"><div class="sec-in">';
   html += '<div class="sk" data-lang="es">Como funciona</div><div class="sk" data-lang="en">How it works</div><div class="sk" data-lang="de">Wie es funktioniert</div>';
-  html += '<div class="st" data-lang="es">Simple, rapido, <em>seguro.</em></div><div class="st" data-lang="en">Simple, fast, <em>secure.</em></div><div class="st" data-lang="de">Einfach, schnell, <em>sicher.</em></div>';
+  html += '<div class="st" data-lang="es">Simple, rapido, <em>seguro</em></div><div class="st" data-lang="en">Simple, fast, <em>secure</em></div><div class="st" data-lang="de">Einfach, schnell, <em>sicher</em></div>';
   html += '<div class="how-steps">';
-  html += '<div class="hstep"><div class="hnum">1</div><h3 data-lang="es">Escribeme</h3><h3 data-lang="en">Message me</h3><h3 data-lang="de">Schreib mir</h3><p data-lang="es">Cuéntame qué necesitas. Hablamos por WhatsApp.</p><p data-lang="en">Tell me what you need. We chat via WhatsApp.</p><p data-lang="de">Sag mir was du brauchst. Wir chatten per WhatsApp.</p></div>';
-  html += '<div class="hstep"><div class="hnum">2</div><h3 data-lang="es">Negociamos</h3><h3 data-lang="en">We negotiate</h3><h3 data-lang="de">Wir verhandeln</h3><p data-lang="es">Confirmo disponibilidad y precio. Sin sorpresas.</p><p data-lang="en">I confirm availability and price. No surprises.</p><p data-lang="de">Ich bestätige Verfügbarkeit und Preis. Keine Überraschungen.</p></div>';
-  if (merchant.stripe_link) {
-    html += '<div class="hstep"><div class="hnum">3</div><h3 data-lang="es">Pagas</h3><h3 data-lang="en">You pay</h3><h3 data-lang="de">Du zahlst</h3><p data-lang="es">Te envío link de pago seguro. Solo cuando pagas, empiezo.</p><p data-lang="en">I send you a secure payment link. Only after payment, I start.</p><p data-lang="de">Ich sende dir einen sicheren Zahlungslink. Erst nach Zahlung beginne ich.</p></div>';
-  }
-  html += '<div class="hstep"><div class="hnum">' + (merchant.stripe_link?'4':'3') + '</div><h3 data-lang="es">Listo!</h3><h3 data-lang="en">Done!</h3><h3 data-lang="de">Fertig!</h3><p data-lang="es">Coordino todo. Tú solo esperas.</p><p data-lang="en">I coordinate everything. You just wait.</p><p data-lang="de">Ich koordiniere alles. Du wartest.</p></div>';
-  html += '</div></div></section>';
-
-  // INFO PLACEHOLDER
-  html += '<section class="info-sec"><div class="sec-in">';
-  html += '<div class="sk" data-lang="es">Mas informacion</div><div class="sk" data-lang="en">More information</div><div class="sk" data-lang="de">Mehr Informationen</div>';
-  html += '<div class="info-ph"><div style="font-size:2rem;margin-bottom:10px">&#128712;</div>';
-  html += '<h3 data-lang="es">Informacion detallada del producto</h3><h3 data-lang="en">Detailed product information</h3><h3 data-lang="de">Detaillierte Produktinformationen</h3>';
-  html += '<p style="margin-top:8px;font-size:.8rem;color:var(--mu)" data-lang="es">Pronto: fotos, descripciones detalladas, precios de temporada.</p>';
-  html += '<p style="margin-top:8px;font-size:.8rem;color:var(--mu)" data-lang="en">Coming soon: photos, detailed descriptions, seasonal prices.</p>';
-  html += '<p style="margin-top:8px;font-size:.8rem;color:var(--mu)" data-lang="de">Bald: Fotos, detaillierte Beschreibungen, Saisonpreise.</p>';
+  html += '<div class="hstep"><div class="hnum">1</div><h3 data-lang="es">Escribeme</h3><h3 data-lang="en">Message me</h3><h3 data-lang="de">Schreib mir</h3><p data-lang="es">Cuéntame qué necesitas por WhatsApp.</p><p data-lang="en">Tell me what you need on WhatsApp.</p><p data-lang="de">Sag mir per WhatsApp was du brauchst.</p></div>';
+  html += '<div class="hstep"><div class="hnum">2</div><h3 data-lang="es">Negociamos</h3><h3 data-lang="en">We agree</h3><h3 data-lang="de">Wir einigen uns</h3><p data-lang="es">Confirmo disponibilidad y precio.</p><p data-lang="en">I confirm availability and price.</p><p data-lang="de">Ich bestätige Verfügbarkeit und Preis.</p></div>';
+  html += '<div class="hstep"><div class="hnum">3</div><h3 data-lang="es">Pagas</h3><h3 data-lang="en">You pay</h3><h3 data-lang="de">Du zahlst</h3><p data-lang="es">Link de pago seguro por Stripe.</p><p data-lang="en">Secure payment link via Stripe.</p><p data-lang="de">Sicherer Zahlungslink per Stripe.</p></div>';
+  html += '<div class="hstep"><div class="hnum">4</div><h3 data-lang="es">Listo!</h3><h3 data-lang="en">Done!</h3><h3 data-lang="de">Fertig!</h3><p data-lang="es">Coordino todo. Tu solo esperas.</p><p data-lang="en">I coordinate everything. You just wait.</p><p data-lang="de">Ich koordiniere alles. Du wartest.</p></div>';
   html += '</div></div></section>';
 
   // CTA
+  html += '<section class="cta-dark">';
+  html += '<h2 data-lang="es">Listo para <em>comenzar?</em></h2><h2 data-lang="en">Ready to <em>get started?</em></h2><h2 data-lang="de">Bereit <em>loszulegen?</em></h2>';
+  html += '<p data-lang="es">Escribeme ahora por WhatsApp.</p><p data-lang="en">Message me now on WhatsApp.</p><p data-lang="de">Schreib mir jetzt per WhatsApp.</p>';
+  html += '<div class="cta-btns">';
+  html += '<a href="#" onclick="orderWA(event,null)" style="display:inline-flex;align-items:center;gap:9px;background:var(--wa);color:#fff;font-weight:700;font-size:.95rem;padding:13px 24px;border-radius:10px;text-decoration:none">&#128242; <span data-lang="es">Pedir por WhatsApp</span><span data-lang="en">Order via WhatsApp</span><span data-lang="de">Per WhatsApp bestellen</span></a>';
   if (merchant.stripe_link) {
-    html += '<section class="cta-dark"><h2 data-lang="es">Listo para <em>comenzar?</em></h2><h2 data-lang="en">Ready to <em>get started?</em></h2><h2 data-lang="de">Bereit <em>loszulegen?</em></h2>';
-    html += '<p data-lang="es">Escribeme por WhatsApp ahora.</p><p data-lang="en">Message me on WhatsApp now.</p><p data-lang="de">Schreib mir jetzt per WhatsApp.</p>';
-    html += '<div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">';
-    html += '<a href="#" onclick="orderWA(event)" style="display:inline-flex;align-items:center;gap:9px;background:var(--wa);color:#fff;font-weight:700;font-size:.95rem;padding:13px 24px;border-radius:10px;text-decoration:none;box-shadow:0 5px 18px rgba(37,211,102,.35)">&#128242; <span data-lang="es">Pedir por WhatsApp</span><span data-lang="en">Order via WhatsApp</span><span data-lang="de">Per WhatsApp bestellen</span></a>';
-    html += '<a href="' + merchant.stripe_link + '" target="_blank" style="display:inline-flex;align-items:center;gap:9px;background:var(--stripe);color:#fff;font-weight:700;font-size:.95rem;padding:13px 24px;border-radius:10px;text-decoration:none">&#128179; <span data-lang="es">Pagar servicio</span><span data-lang="en">Pay service</span><span data-lang="de">Service zahlen</span></a>';
-    html += '</div></section>';
+    html += '<a href="' + merchant.stripe_link + '" target="_blank" style="display:inline-flex;align-items:center;gap:9px;background:var(--stripe);color:#fff;font-weight:700;font-size:.95rem;padding:13px 24px;border-radius:10px;text-decoration:none">&#128179; <span data-lang="es">Pagar servicio</span><span data-lang="en">Pay service fee</span><span data-lang="de">Service zahlen</span></a>';
   }
+  html += '</div></section>';
 
   // FOOTER
   html += '<footer><div class="fi">';
-  html += '<div class="fc"><div style="font-family:Fraunces,serif;font-size:1.1rem;color:#fff;margin-bottom:8px">' + merchant.name + '</div><p>' + (merchant.city||'') + (merchant.city&&merchant.country?' &middot; ':'') + (merchant.country||'') + '</p></div>';
+  html += '<div class="fc"><div style="font-family:Fraunces,serif;font-size:1.1rem;color:#fff;margin-bottom:8px">' + merchant.name + '</div><p>' + (merchant.city || '') + '</p></div>';
   html += '<div class="fc"><h4 data-lang="es">Contacto</h4><h4 data-lang="en">Contact</h4><h4 data-lang="de">Kontakt</h4>';
-  if (merchant.whatsapp_number) html += '<a href="https://wa.me/' + merchant.whatsapp_number + '" target="_blank">&#128242; WhatsApp</a>';
-  if (merchant.email) html += '<a href="mailto:' + merchant.email + '">&#9993;&#65039; ' + merchant.email + '</a>';
-  if (merchant.phone) html += '<a href="tel:' + merchant.phone + '">&#128222; ' + merchant.phone + '</a>';
+  if (merchant.whatsapp_number) { html += '<a href="https://wa.me/' + merchant.whatsapp_number + '" target="_blank">&#128242; WhatsApp</a>'; }
+  if (merchant.email) { html += '<a href="mailto:' + merchant.email + '">&#9993; ' + merchant.email + '</a>'; }
   html += '</div>';
   html += '<div class="fc"><h4 data-lang="es">Agentes</h4><h4 data-lang="en">Agents</h4><h4 data-lang="de">Agenten</h4>';
-  html += '<a href="agentes.html" data-lang="es">Programa de Agentes</a>';
-  html += '<a href="agentes.html" data-lang="en">Agent Program</a>';
-  html += '<a href="agentes.html" data-lang="de">Agentenprogramm</a>';
+  html += '<a href="agentes.html?m=' + slug + '" data-lang="es">Programa de Agentes</a>';
+  html += '<a href="agentes.html?m=' + slug + '" data-lang="en">Agent Program</a>';
+  html += '<a href="agentes.html?m=' + slug + '" data-lang="de">Agentenprogramm</a>';
   html += '</div></div>';
-  html += '<div class="fb"><p>&copy; 2025 ' + merchant.name + ' &middot; Powered by Referral Platform</p></div>';
+  html += '<div class="fb"><p>&copy; 2025 ' + merchant.name + ' &middot; Powered by Referral Platform</p><a href="admin.html?m=' + slug + '" style="font-size:.67rem;color:#3a5a4a;text-decoration:none">Admin</a></div>';
   html += '</footer>';
 
   document.getElementById('mainContent').innerHTML = html;
+  document.body.className = 'lang-' + lang;
 }
 
-function renderFallback() {
-  document.getElementById('mainContent').innerHTML = '<div class="loading" style="color:var(--red)">&#9888;&#65039; Händler nicht gefunden oder inaktiv.</div>';
+function renderError(msg) {
+  document.getElementById('mainContent').innerHTML = '<div class="error">&#9888; ' + msg + '</div>';
 }
 
 function orderWA(e, productName) {
-  if (e) e.preventDefault();
-  if (!merchant) return;
-  var wa = merchant.whatsapp_number;
-  if (!wa) return;
+  if (e) { e.preventDefault(); }
+  if (!merchant || !merchant.whatsapp_number) { return; }
   var ref = refCode ? '\n\n[ref: ' + refCode + ']' : '';
+  var what = productName || '';
   var msgs = {
-    es: 'Hola! Me interesa ' + (productName||'sus servicios') + '.\n\n¿Tienen disponibilidad hoy?' + ref,
-    en: 'Hi! I am interested in ' + (productName||'your services') + '.\n\nDo you have availability today?' + ref,
-    de: 'Hallo! Ich interessiere mich für ' + (productName||'Ihre Leistungen') + '.\n\nHaben Sie heute Verfügbarkeit?' + ref
+    es: 'Hola! Me interesa ' + (what || 'sus servicios') + '.\n\nTienen disponibilidad hoy?' + ref,
+    en: 'Hi! I am interested in ' + (what || 'your services') + '.\n\nDo you have availability today?' + ref,
+    de: 'Hallo! Ich interessiere mich fuer ' + (what || 'Ihre Leistungen') + '.\n\nHaben Sie heute Verfuegbarkeit?' + ref
   };
-  window.open('https://wa.me/' + wa + '?text=' + encodeURIComponent(msgs[lang]||msgs.es), '_blank');
+  var msg = msgs[lang] || msgs.es;
+  window.open('https://wa.me/' + merchant.whatsapp_number + '?text=' + encodeURIComponent(msg), '_blank');
 }
 </script>
 </body>
