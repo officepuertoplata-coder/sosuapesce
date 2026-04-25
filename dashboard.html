@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sosua Pescado – Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;1,600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g:#2e8b5a;--g2:#3aab6f;--glt:#e8f7ef;--bd:#c8e6d5;
+  --dk:#0d2a1f;--mu:#5a7a6a;--wh:#fff;--bg:#f5fcf8;
+  --wa:#25d366;--stripe:#635bff;--red:#bf1a2a;
+  --nav:#0d2a1f;--nav2:#1a3a2a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'DM Sans',sans-serif}
+body{display:flex;height:100vh;overflow:hidden;background:var(--bg)}
+
+/* SIDEBAR */
+.sidebar{width:220px;min-width:220px;background:var(--nav);display:flex;flex-direction:column;height:100vh;position:relative;z-index:10;box-shadow:4px 0 20px rgba(0,0,0,.15)}
+.sb-logo{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sb-logo img{height:52px;width:auto;border-radius:8px}
+.sb-logo-name{font-family:'Fraunces',serif;color:#fff;font-size:.95rem;margin-top:8px;line-height:1.2}
+.sb-logo-sub{font-size:.6rem;color:rgba(255,255,255,.4);letter-spacing:.5px;text-transform:uppercase}
+
+.sb-nav{flex:1;padding:12px 0;overflow-y:auto}
+.sb-section{font-size:.58rem;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.25);padding:14px 18px 6px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:10px 18px;color:rgba(255,255,255,.6);font-size:.82rem;font-weight:500;cursor:pointer;transition:all .18s;border-left:3px solid transparent;text-decoration:none}
+.sb-item:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.9)}
+.sb-item.active{background:rgba(46,139,90,.2);color:#fff;border-left-color:var(--g2)}
+.sb-item .ico{font-size:1rem;width:22px;text-align:center;flex-shrink:0}
+.sb-item .badge{margin-left:auto;background:var(--red);color:#fff;font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:10px}
+
+.sb-footer{padding:14px 18px;border-top:1px solid rgba(255,255,255,.07)}
+.sb-ext{display:flex;flex-direction:column;gap:6px}
+.sb-ext a{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.4);font-size:.74rem;text-decoration:none;padding:6px 0;transition:color .2s}
+.sb-ext a:hover{color:rgba(255,255,255,.75)}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* TOPBAR */
+.topbar{background:var(--wh);border-bottom:1px solid var(--bd);padding:12px 28px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.topbar-title{font-family:'Fraunces',serif;font-size:1.15rem;color:var(--dk)}
+.topbar-actions{display:flex;gap:10px;align-items:center}
+.btn-wa{background:var(--wa);color:#fff;font-weight:600;font-size:.78rem;padding:8px 16px;border-radius:20px;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;text-decoration:none;transition:opacity .2s}
+.btn-wa:hover{opacity:.9}
+.btn-stripe{background:var(--stripe);color:#fff;font-weight:600;font-size:.78rem;padding:8px 16px;border-radius:20px;border:none;cursor:pointer;text-decoration:none;transition:opacity .2s}
+.btn-stripe:hover{opacity:.9}
+.topbar-date{font-size:.75rem;color:var(--mu)}
+
+/* CONTENT */
+.content{flex:1;overflow-y:auto;padding:28px}
+.page{display:none}
+.page.active{display:block}
+
+/* DASHBOARD PAGE */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:28px}
+.stat-card{background:var(--wh);border:1.5px solid var(--bd);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:4px}
+.stat-label{font-size:.7rem;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.stat-val{font-family:'Fraunces',serif;font-size:2rem;color:var(--dk);font-weight:700;line-height:1}
+.stat-sub{font-size:.73rem;color:var(--mu)}
+.stat-card.green .stat-val{color:var(--g)}
+.stat-card.orange .stat-val{color:#e8733a}
+
+/* QUICK ACTIONS */
+.quick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:28px}
+.qcard{background:var(--wh);border:1.5px solid var(--bd);border-radius:16px;padding:20px;cursor:pointer;transition:all .2s;text-align:center}
+.qcard:hover{border-color:var(--g);box-shadow:0 4px 20px rgba(46,139,90,.1);transform:translateY(-2px)}
+.qcard .qico{font-size:1.8rem;margin-bottom:8px}
+.qcard h4{font-size:.82rem;font-weight:700;color:var(--dk);margin-bottom:3px}
+.qcard p{font-size:.72rem;color:var(--mu)}
+
+/* COTD FORM */
+.cotd-form{background:var(--wh);border:2px solid var(--bd);border-radius:20px;padding:28px;margin-bottom:24px}
+.cotd-form h3{font-family:'Fraunces',serif;font-size:1.2rem;color:var(--dk);margin-bottom:18px;display:flex;align-items:center;gap:8px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+@media(max-width:600px){.form-row{grid-template-columns:1fr}}
+.form-group label{display:block;font-size:.73rem;font-weight:600;color:var(--dk);margin-bottom:5px}
+.form-group input,.form-group textarea,.form-group select{width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:8px;font-size:.85rem;font-family:inherit;color:var(--dk);background:var(--bg);transition:border-color .2s}
+.form-group input:focus,.form-group textarea:focus{outline:none;border-color:var(--g);background:#fff}
+.cotd-preview{background:var(--glt);border:1.5px solid var(--bd);border-radius:12px;padding:16px;margin:16px 0;font-size:.82rem;color:var(--dk);white-space:pre-line;font-family:monospace;line-height:1.7;min-height:80px}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap}
+.btn-g{background:var(--g);color:#fff;font-weight:700;font-size:.85rem;padding:11px 20px;border-radius:10px;border:none;cursor:pointer;font-family:inherit;transition:opacity .2s;display:flex;align-items:center;gap:7px}
+.btn-g:hover{opacity:.9}
+.btn-wa2{background:var(--wa);color:#fff;font-weight:700;font-size:.85rem;padding:11px 20px;border-radius:10px;border:none;cursor:pointer;font-family:inherit;transition:opacity .2s;display:flex;align-items:center;gap:7px}
+.btn-stripe2{background:var(--stripe);color:#fff;font-weight:700;font-size:.85rem;padding:11px 20px;border-radius:10px;border:none;cursor:pointer;font-family:inherit;transition:opacity .2s;display:flex;align-items:center;gap:7px}
+.btn-outline{background:transparent;border:1.5px solid var(--bd);color:var(--mu);font-weight:600;font-size:.82rem;padding:10px 18px;border-radius:10px;cursor:pointer;font-family:inherit;transition:all .2s}
+.btn-outline:hover{border-color:var(--g);color:var(--g)}
+
+/* TABLE */
+.tbl-card{background:var(--wh);border:1.5px solid var(--bd);border-radius:16px;overflow:hidden;margin-bottom:24px}
+.tbl-hd{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bd)}
+.tbl-hd h3{font-family:'Fraunces',serif;font-size:1rem;color:var(--dk)}
+table{width:100%;border-collapse:collapse}
+th{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mu);padding:10px 16px;text-align:left;background:var(--bg);border-bottom:1px solid var(--bd)}
+td{font-size:.8rem;color:var(--dk);padding:11px 16px;border-bottom:1px solid rgba(200,230,213,.4)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(232,247,239,.4)}
+.badge{display:inline-block;font-size:.65rem;font-weight:700;padding:3px 8px;border-radius:10px}
+.b-active{background:var(--glt);color:var(--g)}
+.b-pending{background:#fff3cd;color:#856404}
+.b-paused{background:#f8d7da;color:#842029}
+
+/* SEND RESULT */
+.send-result{margin-top:10px;padding:10px 14px;border-radius:8px;font-size:.8rem;display:none}
+.send-result.ok{background:var(--glt);color:var(--g);border:1px solid var(--bd);display:block}
+.send-result.err{background:#f8d7da;color:#842029;border:1px solid #f5c2c7;display:block}
+
+/* MOBILE NAV */
+.mob-nav{display:none;background:var(--nav);padding:10px 16px;gap:6px;overflow-x:auto;flex-shrink:0}
+.mob-item{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);font-size:.72rem;font-weight:600;padding:7px 14px;border-radius:20px;border:none;cursor:pointer;white-space:nowrap;transition:all .2s}
+.mob-item.active,.mob-item:hover{background:var(--g);color:#fff}
+
+@media(max-width:700px){
+  .sidebar{display:none}
+  .mob-nav{display:flex}
+  .topbar{padding:10px 16px}
+  .content{padding:16px}
+  .stats-grid{grid-template-columns:1fr 1fr}
+}
+
+/* SECTION TITLE */
+.sec-title{font-family:'Fraunces',serif;font-size:1.4rem;color:var(--dk);margin-bottom:6px}
+.sec-sub{font-size:.82rem;color:var(--mu);margin-bottom:22px}
+
+/* SUBSCRIBERS COUNT BOX */
+.sub-stats{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.sub-stat{background:var(--wh);border:1.5px solid var(--bd);border-radius:12px;padding:14px 20px;text-align:center;min-width:110px}
+.sub-stat-num{font-family:'Fraunces',serif;font-size:1.6rem;color:var(--g);font-weight:700}
+.sub-stat-lbl{font-size:.68rem;color:var(--mu);margin-top:2px}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--dk);color:#fff;padding:12px 20px;border-radius:10px;font-size:.83rem;font-weight:500;z-index:9999;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none}
+.toast.show{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sb-logo">
+    <div style="font-family:'Fraunces',serif;color:#fff;font-size:1.1rem">&#127017; Sosua Pescado</div>
+    <div class="sb-logo-sub">Admin Dashboard</div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-section">Hauptmenü</div>
+    <div class="sb-item active" onclick="showPage('dashboard',this)"><span class="ico">&#128200;</span> Dashboard</div>
+    <div class="sb-item" onclick="showPage('cotd',this)"><span class="ico">&#127027;</span> Pesca del Día</div>
+    <div class="sb-item" onclick="showPage('subscribers',this)"><span class="ico">&#128101;</span> Abonnenten</div>
+
+    <div class="sb-section">Geschäft</div>
+    <div class="sb-item" onclick="showPage('sales',this)"><span class="ico">&#128179;</span> Verkäufe</div>
+    <div class="sb-item" onclick="showPage('agents',this)"><span class="ico">&#129309;</span> Agentes</div>
+    <div class="sb-item" onclick="showPage('billing',this)"><span class="ico">&#128197;</span> Abrechnung</div>
+
+    <div class="sb-section">Links</div>
+    <a class="sb-item" href="index.html?m=sosuapesce" target="_blank"><span class="ico">&#127760;</span> Landingpage</a>
+    <a class="sb-item" href="agentes.html?m=sosuapesce" target="_blank"><span class="ico">&#127919;</span> Agenten-Reg.</a>
+    <a class="sb-item" href="superadmin.html" target="_blank"><span class="ico">&#128274;</span> Superadmin</a>
+  </div>
+  <div class="sb-footer">
+    <div class="sb-ext">
+      <a href="https://supabase.com/dashboard/project/oxybanupdrfopjionekk" target="_blank">&#127760; Supabase</a>
+      <a href="https://dashboard.mailerlite.com" target="_blank">&#128231; MailerLite</a>
+      <a href="https://dashboard.stripe.com" target="_blank">&#128179; Stripe</a>
+    </div>
+  </div>
+</nav>
+
+<!-- MOBILE NAV -->
+<div class="mob-nav">
+  <button class="mob-item active" onclick="showPage('dashboard',this)">&#128200; Dashboard</button>
+  <button class="mob-item" onclick="showPage('cotd',this)">&#127027; Pesca del Día</button>
+  <button class="mob-item" onclick="showPage('subscribers',this)">&#128101; Abonnenten</button>
+  <button class="mob-item" onclick="showPage('sales',this)">&#128179; Verkäufe</button>
+  <button class="mob-item" onclick="showPage('agents',this)">&#129309; Agentes</button>
+  <button class="mob-item" onclick="showPage('billing',this)">&#128197; Abrechnung</button>
+</div>
+
+<div class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div>
+      <div class="topbar-title" id="pageTitle">Dashboard</div>
+      <div class="topbar-date" id="todayDate"></div>
+    </div>
+    <div class="topbar-actions">
+      <a class="btn-wa" href="https://wa.me/18299758857" target="_blank">&#128242; WhatsApp</a>
+      <a class="btn-stripe" href="https://buy.stripe.com/bJedRa0hL3kOg76fIy3Ru04" target="_blank">&#128179; Stripe</a>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ===== DASHBOARD ===== -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="stat-label">Abonnenten gesamt</div>
+          <div class="stat-val" id="dash-subs">–</div>
+          <div class="stat-sub">Pesca del Día</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Verkäufe heute</div>
+          <div class="stat-val" id="dash-sales">–</div>
+          <div class="stat-sub">bestätigte Lieferungen</div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-label">Aktive Agenten</div>
+          <div class="stat-val" id="dash-agents">–</div>
+          <div class="stat-sub">registriert</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Letzter COTD</div>
+          <div class="stat-val" id="dash-lastcotd" style="font-size:1rem;padding-top:4px">–</div>
+          <div class="stat-sub">Email-Versand</div>
+        </div>
+      </div>
+
+      <h3 style="font-family:'Fraunces',serif;font-size:1.1rem;color:var(--dk);margin-bottom:14px">Schnellzugriff</h3>
+      <div class="quick-grid">
+        <div class="qcard" onclick="showPage('cotd',document.querySelector('[onclick*=cotd]'))">
+          <div class="qico">&#127027;</div>
+          <h4>Pesca del Día senden</h4>
+          <p>Tagesfisch eintragen & versenden</p>
+        </div>
+        <div class="qcard" onclick="showPage('subscribers',document.querySelector('[onclick*=subscribers]'))">
+          <div class="qico">&#128101;</div>
+          <h4>Abonnenten</h4>
+          <p>Email & WhatsApp Liste</p>
+        </div>
+        <div class="qcard" onclick="showPage('agents',document.querySelector('[onclick*=agents]'))">
+          <div class="qico">&#129309;</div>
+          <h4>Agentes</h4>
+          <p>Provisionen verwalten</p>
+        </div>
+        <div class="qcard" onclick="window.open('index.html?m=sosuapesce','_blank')">
+          <div class="qico">&#127760;</div>
+          <h4>Landingpage</h4>
+          <p>Website öffnen</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PESCA DEL DÍA ===== -->
+    <div class="page" id="page-cotd">
+      <div class="sec-title">&#127027; Pesca del Día</div>
+      <div class="sec-sub">Tagesfisch eintragen und an alle Abonnenten versenden</div>
+
+      <div class="cotd-form">
+        <h3>&#128228; Heutigen Fisch eintragen</h3>
+        <div class="form-row">
+          <div class="form-group"><label>Fischart *</label><input type="text" id="cd-fish" placeholder="Dorado, Atún, Mahi-Mahi..."></div>
+          <div class="form-group"><label>Preis</label><input type="text" id="cd-price" placeholder="850 RD$/kg"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Verfügbare Menge</label><input type="text" id="cd-qty" placeholder="ca. 8 kg, 3 Stück..."></div>
+          <div class="form-group"><label>Zusatzinfo</label><input type="text" id="cd-note" placeholder="Sehr frisch, heute Morgen gefangen..."></div>
+        </div>
+
+        <div class="cotd-preview" id="cotdPreview">Felder ausfüllen → Vorschau erscheint hier...</div>
+
+        <div class="btn-row">
+          <button class="btn-outline" onclick="buildPreview()">&#128065; Vorschau</button>
+          <button class="btn-wa2" onclick="copyWA()">&#128242; WhatsApp kopieren</button>
+          <button class="btn-stripe2" onclick="sendEmail()">&#128229; Email via MailerLite</button>
+        </div>
+        <div class="send-result" id="sendResult"></div>
+      </div>
+
+      <div class="tbl-card">
+        <div class="tbl-hd"><h3>&#128203; Versandhistorie</h3></div>
+        <div style="overflow-x:auto"><table>
+          <thead><tr><th>Datum</th><th>Fischart</th><th>Preis</th><th>Menge</th><th>Email</th></tr></thead>
+          <tbody id="cotdHistoryTbl"><tr><td colspan="5" style="text-align:center;color:var(--mu);padding:24px">Lädt...</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ===== ABONNENTEN ===== -->
+    <div class="page" id="page-subscribers">
+      <div class="sec-title">&#128101; Abonnenten</div>
+      <div class="sec-sub">Alle Pesca del Día / Catch of the Day Abonnenten</div>
+      <div class="sub-stats">
+        <div class="sub-stat"><div class="sub-stat-num" id="subTotal">–</div><div class="sub-stat-lbl">Gesamt</div></div>
+        <div class="sub-stat"><div class="sub-stat-num" id="subEmail">–</div><div class="sub-stat-lbl">Email</div></div>
+        <div class="sub-stat"><div class="sub-stat-num" id="subWa">–</div><div class="sub-stat-lbl">WhatsApp</div></div>
+        <div class="sub-stat"><div class="sub-stat-num" id="subEs">–</div><div class="sub-stat-lbl">ES</div></div>
+        <div class="sub-stat"><div class="sub-stat-num" id="subEn">–</div><div class="sub-stat-lbl">EN</div></div>
+        <div class="sub-stat"><div class="sub-stat-num" id="subDe">–</div><div class="sub-stat-lbl">DE</div></div>
+      </div>
+      <div class="tbl-card">
+        <div class="tbl-hd"><h3>Abonnenten-Liste</h3><button class="btn-outline" onclick="loadSubscribers()">Aktualisieren</button></div>
+        <div style="overflow-x:auto"><table>
+          <thead><tr><th>Name</th><th>Email</th><th>WhatsApp</th><th>Sprache</th><th>Kanal</th><th>Datum</th></tr></thead>
+          <tbody id="subTable"><tr><td colspan="6" style="text-align:center;color:var(--mu);padding:24px">Lädt...</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ===== VERKÄUFE ===== -->
+    <div class="page" id="page-sales">
+      <div class="sec-title">&#128179; Verkäufe</div>
+      <div class="sec-sub">Alle bestätigten Lieferungen und Zahlungen</div>
+      <div class="tbl-card">
+        <div class="tbl-hd"><h3>Letzte Verkäufe</h3><button class="btn-outline" onclick="loadSales()">Aktualisieren</button></div>
+        <div style="overflow-x:auto"><table>
+          <thead><tr><th>Datum</th><th>Kunde</th><th>Betrag</th><th>Service</th><th>Ref. Agent</th><th>Status</th></tr></thead>
+          <tbody id="salesTable"><tr><td colspan="6" style="text-align:center;color:var(--mu);padding:24px">Lädt...</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ===== AGENTES ===== -->
+    <div class="page" id="page-agents">
+      <div class="sec-title">&#129309; Agentes</div>
+      <div class="sec-sub">Registrierte Agenten und ihre Provisionen</div>
+      <div class="tbl-card">
+        <div class="tbl-hd"><h3>Agenten-Liste</h3><button class="btn-outline" onclick="loadAgents()">Aktualisieren</button></div>
+        <div style="overflow-x:auto"><table>
+          <thead><tr><th>Name</th><th>Email</th><th>WhatsApp</th><th>Status</th><th>Verkäufe</th><th>Provision</th><th>Datum</th></tr></thead>
+          <tbody id="agentsTable"><tr><td colspan="7" style="text-align:center;color:var(--mu);padding:24px">Lädt...</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ===== ABRECHNUNG ===== -->
+    <div class="page" id="page-billing">
+      <div class="sec-title">&#128197; Abrechnung</div>
+      <div class="sec-sub">Ausstehende Provisionen und Auszahlungen</div>
+      <div class="tbl-card">
+        <div class="tbl-hd"><h3>Ausstehende Provisionen</h3></div>
+        <div style="overflow-x:auto"><table>
+          <thead><tr><th>Agent</th><th>Verkäufe</th><th>Ausstehend</th><th>Status</th></tr></thead>
+          <tbody id="billingTable"><tr><td colspan="4" style="text-align:center;color:var(--mu);padding:24px">Lädt...</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script>
+var ML_API_KEY = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI0IiwianRpIjoiYjZmOTE0OWY4OTFiZjhhYmZmOWI5MTU3MDQxMmRkYWZlYWE1MjQ2NzA5YjlmMGU2OWI1ZGQyZGFlNzc2NjZmMzg0Y2JhNzZjYjQ4MDZlNjUiLCJpYXQiOjE3NzcxNTY0MDQuMjkzMjgxLCJuYmYiOjE3NzcxNTY0MDQuMjkzMjg0LCJleHAiOjQ5MzI4MzAwMDQuMjg1NjA1LCJzdWIiOiIyMzEyOTUwIiwic2NvcGVzIjpbXX0.Bk9_KVhZv7Ipt0Qubg0sRMIcexZN5qHlceuVHofLOI2jvEEFYzpfcfF3_wBAP7-VWYTeooqbrxacy8Ulr6r03ZlRry0N5oxE6oIIpvVftNKiWar2vJkpYoU-4dskG5LCAdfsbFEqObsL5te4nMw2oZSfm5nfqlugAajW4X2BU-rvXw7PCDZpv2AV352lsGlIJcz3iTvi9aJvG3-q80HVq3W9fHDQh7EIc7XXvMlS32NSHd7gNUDpicKSq1RvDgyClsnwNPeS6vnyDqnQCSJywJ5FayIo9VcJWywKeQNCQu6m7LUswH70PeaDak82bK-o3JsdEs6rjlVPM9mxv9ewPBKh7ieYxtOt2jGFgjYsxHV9WcFO_iHy_P9lT0jD9PPI_cXUZvOHw05kYAr07EbHwTvWH_Sk-sJ8XwbRd_qQmQ2O5o06FDpLKLZjDT1N4j2jL2ki8IZapRHMRAOeSTet8fqhL1LYkfnzFiUO6DjbQIlpMFcec1UJ3inlBhm7H2IIe_3b1hYcx4HxvTTiG1LSp5nGtJP8tF_my6HMWQ7V3n1VF9gc1r0ccm_6RPSVg5_JX80W-kLWafvlbBEHfl3pspsCFPX4AEfr3qdzrAtKo-gZmMYGmNmhtQAKPuGcEWn71fS4lq8xwwlpF_U6S41MWwy4bO8tpUWbq6Q76_wS84w';
+var ML_GROUP_ID = '185762150664373856';
+
+var PAGE_TITLES = {
+  dashboard: 'Dashboard',
+  cotd: '🐟 Pesca del Día',
+  subscribers: '👥 Abonnenten',
+  sales: '💳 Verkäufe',
+  agents: '🤝 Agentes',
+  billing: '📅 Abrechnung'
+};
+
+// Date
+var days = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+var months = ['Jänner','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+var now = new Date();
+document.getElementById('todayDate').textContent = days[now.getDay()] + ', ' + now.getDate() + '. ' + months[now.getMonth()] + ' ' + now.getFullYear();
+
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.sb-item, .mob-item').forEach(function(i) { i.classList.remove('active'); });
+  if (el) el.classList.add('active');
+  document.getElementById('pageTitle').textContent = PAGE_TITLES[id] || id;
+  if (id === 'dashboard') loadDashboard();
+  if (id === 'cotd') loadCotdHistory();
+  if (id === 'subscribers') loadSubscribers();
+  if (id === 'sales') loadSales();
+  if (id === 'agents') loadAgents();
+  if (id === 'billing') loadBilling();
+}
+
+function sbFetch(table, params) {
+  var cfg = window.SP_CONFIG;
+  return fetch(cfg.SUPABASE_URL + '/rest/v1/' + table + '?' + params, {
+    headers: { 'apikey': cfg.SUPABASE_ANON, 'Authorization': 'Bearer ' + cfg.SUPABASE_ANON }
+  }).then(function(r) { return r.json(); });
+}
+
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 3000);
+}
+
+function loadDashboard() {
+  sbFetch('subscribers', 'status=eq.active&select=id').then(function(d) {
+    document.getElementById('dash-subs').textContent = (d||[]).length;
+  });
+  sbFetch('sales', 'select=id&limit=1').then(function(d) {
+    document.getElementById('dash-sales').textContent = (d||[]).length;
+  }).catch(function() { document.getElementById('dash-sales').textContent = '0'; });
+  sbFetch('agents', 'merchant_id=not.is.null&select=id').then(function(d) {
+    document.getElementById('dash-agents').textContent = (d||[]).length;
+  }).catch(function() { document.getElementById('dash-agents').textContent = '0'; });
+  sbFetch('catch_of_day', 'select=fish_type,created_at&order=created_at.desc&limit=1').then(function(d) {
+    if (d && d.length) {
+      var dt = new Date(d[0].created_at);
+      document.getElementById('dash-lastcotd').textContent = d[0].fish_type + ' (' + dt.toLocaleDateString('de-AT') + ')';
+    } else {
+      document.getElementById('dash-lastcotd').textContent = 'Noch keiner';
+    }
+  }).catch(function() {});
+}
+
+function buildPreview() {
+  var fish  = document.getElementById('cd-fish').value.trim();
+  var price = document.getElementById('cd-price').value.trim();
+  var qty   = document.getElementById('cd-qty').value.trim();
+  var note  = document.getElementById('cd-note').value.trim();
+  if (!fish) { toast('Bitte Fischart eingeben'); return null; }
+  var today = days[now.getDay()] + ', ' + now.getDate() + '. ' + months[now.getMonth()];
+  var msg = '🐟 PESCA DEL DÍA – Sosua Pescado\n📅 ' + today + '\n\n';
+  msg += '🎣 ' + fish + '\n';
+  if (qty)   msg += '📦 Menge: ' + qty + '\n';
+  if (price) msg += '💰 Preis: ' + price + '\n';
+  if (note)  msg += '\n📝 ' + note + '\n';
+  msg += '\n👉 Bestellen: wa.me/18299758857\n💳 Service: 550 RD$ via Stripe';
+  document.getElementById('cotdPreview').textContent = msg;
+  return msg;
+}
+
+function copyWA() {
+  var msg = buildPreview();
+  if (!msg) return;
+  navigator.clipboard.writeText(msg).then(function() {
+    toast('✅ Nachricht kopiert! In WhatsApp Broadcast-Liste einfügen.');
+  });
+}
+
+function sendEmail() {
+  var fish  = document.getElementById('cd-fish').value.trim();
+  var price = document.getElementById('cd-price').value.trim();
+  var qty   = document.getElementById('cd-qty').value.trim();
+  var note  = document.getElementById('cd-note').value.trim();
+  var res   = document.getElementById('sendResult');
+  if (!fish) { toast('Fischart eingeben'); return; }
+
+  res.className = 'send-result';
+  res.textContent = 'Wird gesendet...';
+  res.style.display = 'block';
+
+  var today = days[now.getDay()] + ', ' + now.getDate() + '. ' + months[now.getMonth()];
+  var html = '<div style="font-family:sans-serif;max-width:560px;margin:0 auto">'
+    + '<div style="background:#2e8b5a;padding:20px;text-align:center;border-radius:12px 12px 0 0">'
+    + '<h1 style="color:#fff;margin:0;font-size:1.4rem">🐟 Pesca del Día</h1>'
+    + '<p style="color:rgba(255,255,255,.8);margin:4px 0 0;font-size:.85rem">Sosua Pescado · ' + today + '</p></div>'
+    + '<div style="background:#f5fcf8;padding:24px;border-radius:0 0 12px 12px;border:1px solid #c8e6d5">'
+    + '<table style="width:100%;border-collapse:collapse">'
+    + '<tr><td style="padding:8px 0;font-weight:700">🎣 Fisch</td><td style="padding:8px 0;color:#2e8b5a;font-weight:700;font-size:1.1rem">' + fish + '</td></tr>'
+    + (qty   ? '<tr><td style="padding:8px 0;font-weight:700">📦 Menge</td><td>' + qty   + '</td></tr>' : '')
+    + (price ? '<tr><td style="padding:8px 0;font-weight:700">💰 Preis</td><td style="color:#2e8b5a;font-weight:700">' + price + '</td></tr>' : '')
+    + (note  ? '<tr><td colspan="2" style="padding:12px 0;color:#5a7a6a;font-style:italic">📝 ' + note + '</td></tr>' : '')
+    + '</table>'
+    + '<div style="margin-top:20px;text-align:center">'
+    + '<a href="https://wa.me/18299758857" style="display:inline-block;background:#25d366;color:#fff;padding:12px 22px;border-radius:10px;text-decoration:none;font-weight:700;margin-right:8px">📱 WhatsApp</a>'
+    + '<a href="https://buy.stripe.com/bJedRa0hL3kOg76fIy3Ru04" style="display:inline-block;background:#635bff;color:#fff;padding:12px 22px;border-radius:10px;text-decoration:none;font-weight:700">💳 550 RD$ zahlen</a>'
+    + '</div></div></div>';
+
+  fetch('https://connect.mailerlite.com/api/campaigns', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + ML_API_KEY, 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({
+      name: 'Pesca del Dia - ' + today,
+      type: 'regular',
+      status: 'draft',
+      emails: [{ subject: '🐟 Pesca del Día – ' + fish + ' heute verfügbar!', from_name: 'Sosua Pescado', from_email: 'office@ynhald.com', content: html }],
+      filter: { groups: [ML_GROUP_ID] }
+    })
+  }).then(function(r) { return r.json(); }).then(function(data) {
+    if (!data.data || !data.data.id) throw new Error(JSON.stringify(data));
+    return fetch('https://connect.mailerlite.com/api/campaigns/' + data.data.id + '/schedule', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + ML_API_KEY, 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ delivery: 'instant' })
+    });
+  }).then(function() {
+    res.className = 'send-result ok';
+    res.textContent = '✅ Email erfolgreich an alle Abonnenten gesendet!';
+    // Save to history
+    var cfg = window.SP_CONFIG;
+    fetch(cfg.SUPABASE_URL + '/rest/v1/catch_of_day', {
+      method: 'POST',
+      headers: { 'apikey': cfg.SUPABASE_ANON, 'Authorization': 'Bearer ' + cfg.SUPABASE_ANON, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ fish_type: fish, quantity: qty||null, price: price||null, notes: note||null, sent_email: true, sent_at: new Date().toISOString() })
+    });
+    loadCotdHistory();
+    loadDashboard();
+  }).catch(function(err) {
+    res.className = 'send-result err';
+    res.textContent = 'Fehler: ' + err.message;
+  });
+}
+
+function loadCotdHistory() {
+  sbFetch('catch_of_day', 'select=*&order=created_at.desc&limit=15').then(function(d) {
+    var el = document.getElementById('cotdHistoryTbl');
+    if (!d || !d.length) { el.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--mu);padding:24px">Noch keine Versendungen</td></tr>'; return; }
+    el.innerHTML = d.map(function(c) {
+      return '<tr><td>' + new Date(c.created_at).toLocaleDateString('de-AT') + '</td>'
+        + '<td><strong>' + c.fish_type + '</strong></td>'
+        + '<td>' + (c.price||'–') + '</td>'
+        + '<td>' + (c.quantity||'–') + '</td>'
+        + '<td>' + (c.sent_email ? '<span class="badge b-active">✅ Gesendet</span>' : '–') + '</td></tr>';
+    }).join('');
+  });
+}
+
+function loadSubscribers() {
+  sbFetch('subscribers', 'status=eq.active&order=created_at.desc').then(function(d) {
+    d = d || [];
+    document.getElementById('subTotal').textContent = d.length;
+    document.getElementById('subEmail').textContent = d.filter(function(s){ return s.email; }).length;
+    document.getElementById('subWa').textContent    = d.filter(function(s){ return s.whatsapp; }).length;
+    document.getElementById('subEs').textContent    = d.filter(function(s){ return s.language==='es'; }).length;
+    document.getElementById('subEn').textContent    = d.filter(function(s){ return s.language==='en'; }).length;
+    document.getElementById('subDe').textContent    = d.filter(function(s){ return s.language==='de'; }).length;
+    var el = document.getElementById('subTable');
+    if (!d.length) { el.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--mu);padding:24px">Noch keine Abonnenten</td></tr>'; return; }
+    el.innerHTML = d.map(function(s) {
+      var ch = s.channel==='both' ? '📧+📱' : (s.channel==='email' ? '📧' : '📱');
+      return '<tr><td><strong>' + s.name + '</strong></td>'
+        + '<td>' + (s.email||'–') + '</td>'
+        + '<td>' + (s.whatsapp||'–') + '</td>'
+        + '<td>' + (s.language||'es').toUpperCase() + '</td>'
+        + '<td>' + ch + '</td>'
+        + '<td>' + new Date(s.created_at).toLocaleDateString('de-AT') + '</td></tr>';
+    }).join('');
+  });
+}
+
+function loadSales() {
+  sbFetch('sales', 'select=*&order=created_at.desc&limit=20').then(function(d) {
+    var el = document.getElementById('salesTable');
+    if (!d || !d.length) { el.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--mu);padding:24px">Noch keine Verkäufe</td></tr>'; return; }
+    el.innerHTML = d.map(function(s) {
+      return '<tr><td>' + new Date(s.created_at).toLocaleDateString('de-AT') + '</td>'
+        + '<td>' + (s.customer_name||'–') + '</td>'
+        + '<td><strong>' + (s.amount||0) + ' RD$</strong></td>'
+        + '<td>' + (s.service_fee||550) + ' RD$</td>'
+        + '<td>' + (s.ref_code||'–') + '</td>'
+        + '<td><span class="badge b-active">' + (s.status||'ok') + '</span></td></tr>';
+    }).join('');
+  }).catch(function() {
+    document.getElementById('salesTable').innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--mu);padding:24px">Noch keine Verkäufe</td></tr>';
+  });
+}
+
+function loadAgents() {
+  sbFetch('agents', 'select=*&order=created_at.desc').then(function(d) {
+    var el = document.getElementById('agentsTable');
+    if (!d || !d.length) { el.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--mu);padding:24px">Noch keine Agenten</td></tr>'; return; }
+    el.innerHTML = d.map(function(a) {
+      var st = a.status==='active' ? 'b-active' : (a.status==='pending' ? 'b-pending' : 'b-paused');
+      return '<tr><td><strong>' + a.name + '</strong></td>'
+        + '<td>' + (a.email||'–') + '</td>'
+        + '<td>' + (a.whatsapp||'–') + '</td>'
+        + '<td><span class="badge ' + st + '">' + (a.status||'–') + '</span></td>'
+        + '<td>0</td><td>0 RD$</td>'
+        + '<td>' + new Date(a.created_at).toLocaleDateString('de-AT') + '</td></tr>';
+    }).join('');
+  });
+}
+
+function loadBilling() {
+  document.getElementById('billingTable').innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--mu);padding:24px">Keine ausstehenden Provisionen</td></tr>';
+}
+
+// Init
+loadDashboard();
+</script>
+</body>
+</html>
