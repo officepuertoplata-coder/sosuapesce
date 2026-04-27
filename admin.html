@@ -564,7 +564,20 @@ function loadAgents() {
     var data = r.data || [];
     document.getElementById('agentsList').innerHTML = data.length
       ? data.map(function(a){
-          return '<tr><td><strong>'+(a.name||'—')+'</strong><br><small style="color:var(--mu)">'+(a.email||'')+'</small></td><td><span class="codetag">'+(a.referral_code||'—')+'</span></td><td>'+(a.phone||'—')+'</td><td>'+(a.total_sales||0)+'</td><td style="color:var(--g3);font-weight:600">'+fmtNum(a.total_commission)+' '+(merchant.currency||'RD$')+'</td><td>'+statusBadge(a.status)+'</td><td>'+fmtDate(a.created_at)+'</td></tr>';
+          var aid = a.id; var aname = (a.name||'').replace(/'/g,''); var astatus = a.status;
+          return '<tr>' +
+            '<td><strong>'+(a.name||'—')+'</strong><br><small style="color:var(--mu)">'+(a.email||'')+'</small></td>' +
+            '<td><span class="codetag">'+(a.referral_code||'—')+'</span></td>' +
+            '<td>'+(a.phone||'—')+'</td>' +
+            '<td>'+(a.total_sales||0)+'</td>' +
+            '<td style="color:var(--g3);font-weight:600">'+fmtNum(a.total_commission)+' '+(merchant.currency||'RD$')+'</td>' +
+            '<td>'+statusBadge(astatus)+'</td>' +
+            '<td>'+fmtDate(a.created_at)+'</td>' +
+            '<td style="white-space:nowrap">' +
+              '<button class="btn btn-outline" style="padding:4px 10px;font-size:.75rem;margin-right:4px" onclick="toggleAgent(''+aid+'',''+astatus+'')">'+(astatus==='active'?'⏸ Pause':'▶ Aktiv')+'</button>' +
+              '<button class="btn btn-danger" style="padding:4px 10px;font-size:.75rem" onclick="deleteAgent(''+aid+'',''+aname+'')">🗑️</button>' +
+            '</td>' +
+          '</tr>';
         }).join('')
       : '<tr><td colspan="7" class="msg">Noch keine Agenten registriert. Teile den Registrierungslink!</td></tr>';
   });
