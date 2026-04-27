@@ -1,182 +1,277 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Sosua Pesce – Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Händler-Admin</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="../config.js"></script>
 <style>
-:root{--g:#3a7d5c;--g2:#4a9470;--glt:#f0f7f3;--red:#bf1a2a;--bg:#f1f5f2;--wh:#fff;--dk:#0d2a1f;--mu:#5a7268;--bd:#e2ebe6}
+:root{
+  --g:#2d6a4f;--g2:#1b4332;--g3:#40916c;--g4:#52b788;
+  --gold:#f4a100;--bg:#f0f2f0;--card:#fff;
+  --txt:#1a1a1a;--mu:#6b7280;--red:#dc2626;
+  --border:#e5e7eb;--r:10px;
+}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--dk)}
-.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-.login-card{background:var(--wh);border:1.5px solid var(--bd);border-radius:18px;padding:40px 36px;max-width:360px;width:100%;box-shadow:0 8px 32px rgba(13,42,31,.1);text-align:center}
-.login-logo{font-family:'Fraunces',serif;font-size:1.8rem;color:var(--g);margin-bottom:4px}
-.login-sub{font-size:.8rem;color:var(--mu);margin-bottom:24px}
-.login-card h2{font-size:1.15rem;margin-bottom:16px;font-family:'Fraunces',serif}
-.login-card input{width:100%;padding:11px 14px;border:1.5px solid var(--bd);border-radius:8px;font-size:.9rem;font-family:inherit;margin-bottom:12px}
-.login-card input:focus{outline:none;border-color:var(--g)}
-.btn-login{width:100%;background:var(--g);color:#fff;font-weight:700;font-size:.95rem;padding:12px;border-radius:9px;border:none;cursor:pointer;font-family:inherit}
-.btn-login:hover{opacity:.9}
-.lerr{color:var(--red);font-size:.77rem;margin-top:8px;min-height:18px}
-.app{display:none}.app.show{display:block}
-.topbar{background:var(--dk);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--red);flex-wrap:wrap;gap:10px}
-.topbar-brand{font-family:'Fraunces',serif;color:#fff;font-size:1.1rem}
-.topbar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.tbtn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:.76rem;font-weight:600;padding:6px 14px;border-radius:20px;cursor:pointer;font-family:inherit;transition:background .2s}
-.tbtn:hover{background:rgba(255,255,255,.2)}.tbtn.active{background:var(--g);border-color:var(--g)}
-.main{max-width:1100px;margin:0 auto;padding:28px 20px}
+body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh}
+.nav{background:var(--g2);color:#fff;display:flex;align-items:center;gap:8px;padding:0 20px;height:52px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.nav-brand{font-weight:700;font-size:1rem;margin-right:12px;display:flex;align-items:center;gap:8px}
+.nav-slug{background:var(--gold);color:#000;font-size:.65rem;font-weight:800;padding:2px 8px;border-radius:4px}
+.tbtn{background:none;border:none;color:rgba(255,255,255,.75);cursor:pointer;padding:6px 13px;border-radius:6px;font-size:.85rem;font-weight:500;transition:all .15s}
+.tbtn:hover,.tbtn.active{background:rgba(255,255,255,.15);color:#fff}
+.tbtn-out{color:var(--gold)!important;margin-left:auto}
+#loginWrap{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--g2)}
+.login-card{background:#fff;border-radius:14px;padding:40px 36px;width:340px;box-shadow:0 8px 32px rgba(0,0,0,.3);text-align:center}
+.login-card h2{color:var(--g2);margin-bottom:4px;font-size:1.3rem}
+.login-card p{color:var(--mu);font-size:.83rem;margin-bottom:22px}
+.login-card input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:1rem;outline:none;margin-bottom:10px;transition:border-color .2s}
+.login-card input:focus{border-color:var(--g3)}
+.login-card button{width:100%;background:var(--g2);color:#fff;border:none;padding:11px;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer}
+.login-card button:hover{background:var(--g)}
+.lerr{color:var(--red);font-size:.82rem;min-height:18px;margin-top:2px}
+#app{display:none}
+#app.show{display:block}
+.main{max-width:1100px;margin:0 auto;padding:24px 20px}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat-card{background:var(--card);border-radius:var(--r);padding:20px;border-top:4px solid var(--g3);box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.stat-card.gold{border-top-color:var(--gold)}
+.stat-card.blue{border-top-color:#3b82f6}
+.stat-val{font-size:1.7rem;font-weight:800;color:var(--g2);line-height:1}
+.stat-lbl{font-size:.78rem;color:var(--mu);margin-top:5px}
 .page{display:none}.page.active{display:block}
-.page-title{font-family:'Fraunces',serif;font-size:1.4rem;margin-bottom:20px}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:28px}
-.stat{background:var(--wh);border:1.5px solid var(--bd);border-radius:13px;padding:20px;border-top:3px solid var(--g)}
-.stat-num{font-size:2rem;font-weight:700;color:var(--g);line-height:1;margin-bottom:4px}
-.stat-lbl{font-size:.73rem;color:var(--mu)}
-.tbl-wrap{background:var(--wh);border:1.5px solid var(--bd);border-radius:14px;overflow:hidden;margin-bottom:24px}
-.tbl-head{background:linear-gradient(135deg,var(--g),var(--g2));padding:14px 18px;display:flex;align-items:center;justify-content:space-between}
-.tbl-head h3{color:#fff;font-size:.92rem;font-weight:700}
-table{width:100%;border-collapse:collapse;font-size:.8rem}
-th{background:var(--glt);padding:10px 14px;text-align:left;font-size:.72rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px}
-td{padding:10px 14px;border-bottom:1px solid var(--bd)}
-tr:last-child td{border:none}tr:hover td{background:rgba(58,125,92,.03)}
-.badge{display:inline-block;font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:20px}
-.b-active{background:var(--glt);color:var(--g);border:1px solid rgba(58,125,92,.25)}
-.b-paused{background:#fff8e1;color:#a07800;border:1px solid rgba(160,120,0,.2)}
-.panel{background:var(--wh);border:1.5px solid var(--bd);border-radius:14px;padding:22px;margin-bottom:20px}
-.panel h3{font-size:.95rem;font-weight:700;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--bd)}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
-@media(max-width:560px){.grid2{grid-template-columns:1fr}}
-label{display:block;font-size:.74rem;font-weight:600;margin-bottom:4px}
-input[type=text],input[type=number],input[type=date]{width:100%;padding:9px 12px;border:1.5px solid var(--bd);border-radius:7px;font-size:.85rem;font-family:inherit;background:var(--bg)}
-input:focus{outline:none;border-color:var(--g)}
-.btn-save{background:var(--g);color:#fff;font-weight:700;font-size:.9rem;padding:10px 22px;border-radius:8px;border:none;cursor:pointer;font-family:inherit}
-.btn-save:hover{opacity:.9}
-.btn-out{background:transparent;color:var(--g);font-weight:700;font-size:.84rem;padding:8px 16px;border-radius:8px;border:1.5px solid var(--g);cursor:pointer;font-family:inherit}
-.btn-out:hover{background:var(--glt)}
-.btn-sm{font-size:.7rem;padding:4px 10px}
-.period-sel{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:20px}
-.pf{display:flex;flex-direction:column;gap:4px}
-.billing-sum{background:var(--glt);padding:14px 18px;display:flex;gap:24px;flex-wrap:wrap;border-top:1px solid var(--bd)}
-.bsum-item{font-size:.82rem}
-.bsum-item strong{color:var(--g);font-size:1rem}
-.codetag{font-family:monospace;font-size:.73rem;background:var(--glt);padding:2px 7px;border-radius:5px;color:var(--g)}
-.msg{font-size:.8rem;color:var(--mu);padding:20px;text-align:center}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--g);color:#fff;padding:10px 22px;border-radius:30px;font-size:.82rem;font-weight:600;z-index:999;transition:transform .3s;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.sec-hd{background:var(--g2);color:#fff;border-radius:var(--r) var(--r) 0 0;padding:13px 20px;display:flex;align-items:center;justify-content:space-between}
+.sec-hd h2{font-size:.95rem;font-weight:600}
+.sec-body{background:var(--card);border-radius:0 0 var(--r) var(--r);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+table{width:100%;border-collapse:collapse}
+th{padding:9px 14px;text-align:left;font-size:.7rem;color:var(--mu);font-weight:600;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+td{padding:11px 14px;font-size:.86rem;border-bottom:1px solid var(--border)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#f9fafb}
+.msg{text-align:center;color:var(--mu);padding:32px;font-size:.88rem}
+.badge{display:inline-block;padding:3px 9px;border-radius:12px;font-size:.7rem;font-weight:700}
+.b-active{background:#dcfce7;color:#15803d}
+.b-paused{background:#fef9c3;color:#a16207}
+.b-frozen{background:#dbeafe;color:#1d4ed8}
+.b-pending{background:#f3f4f6;color:#374151}
+.codetag{background:#f3f4f6;border-radius:4px;padding:2px 7px;font-family:monospace;font-size:.78rem;color:var(--g2)}
+.btn{border:none;padding:7px 14px;border-radius:7px;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-green{background:var(--g3);color:#fff}.btn-green:hover{background:var(--g)}
+.btn-gold{background:var(--gold);color:#000}.btn-gold:hover{background:#e09200}
+.btn-outline{background:#f3f4f6;color:var(--txt)}.btn-outline:hover{background:var(--border)}
+.btn-blue{background:#3b82f6;color:#fff}.btn-blue:hover{background:#2563eb}
+.btn-copy{background:var(--g2);color:#fff;padding:10px 18px;font-size:.9rem;border-radius:8px;border:none;cursor:pointer;font-weight:700;transition:background .2s}
+.btn-copy:hover{background:var(--g)}
+/* PAYMENT LINK GENERATOR */
+.generator{background:var(--card);border-radius:var(--r);box-shadow:0 2px 12px rgba(0,0,0,.1);overflow:hidden;margin-bottom:24px}
+.generator-hd{background:linear-gradient(135deg,var(--g2),var(--g));color:#fff;padding:20px 24px}
+.generator-hd h2{font-size:1.15rem;font-weight:700;margin-bottom:4px}
+.generator-hd p{font-size:.82rem;opacity:.8}
+.generator-body{padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.generator-body .full{grid-column:1/-1}
+.fgrp label{display:block;font-size:.75rem;font-weight:700;color:var(--mu);margin-bottom:5px;text-transform:uppercase;letter-spacing:.3px}
+.fgrp input,.fgrp select{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.92rem;outline:none;transition:border-color .2s;background:#fff}
+.fgrp input:focus,.fgrp select:focus{border-color:var(--g3)}
+.link-result{background:#f0fdf4;border:2px solid var(--g3);border-radius:10px;padding:16px 18px;margin-top:4px}
+.link-result label{font-size:.72rem;font-weight:700;color:var(--g);text-transform:uppercase;margin-bottom:6px;display:block}
+.link-text{font-family:monospace;font-size:.78rem;color:var(--g2);word-break:break-all;line-height:1.5;margin-bottom:10px}
+.link-actions{display:flex;gap:8px;flex-wrap:wrap}
+/* FORM */
+.form-panel{padding:22px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-panel .full{grid-column:1/-1}
+.form-actions{grid-column:1/-1;display:flex;justify-content:flex-end;gap:10px;padding-top:12px;border-top:1px solid var(--border)}
+.err-box{background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:12px 16px;color:var(--red);font-size:.83rem;margin:0 22px 16px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--g2);color:#fff;padding:10px 22px;border-radius:40px;font-size:.88rem;box-shadow:0 4px 16px rgba(0,0,0,.25);transition:transform .25s;z-index:999;pointer-events:none}
 .toast.show{transform:translateX(-50%) translateY(0)}
+.mb-16{margin-bottom:16px}
+@media(max-width:700px){.stats-grid{grid-template-columns:1fr 1fr}.generator-body{grid-template-columns:1fr}.generator-body .full{grid-column:1}.form-panel{grid-template-columns:1fr}.form-panel .full{grid-column:1}.form-actions{grid-column:1}}
 </style>
 </head>
 <body>
 
-<div class="login-wrap" id="loginWrap">
+<div id="loginWrap">
   <div class="login-card">
-    <div class="login-logo">Sosua Pesce</div>
-    <div class="login-sub">YNHALD Corp. Admin Panel</div>
-    <h2>Iniciar sesion</h2>
-    <input type="password" id="pwInput" placeholder="Contrasena de administrador">
-    <button class="btn-login" onclick="doLogin()">Entrar</button>
+    <div style="font-size:2rem;margin-bottom:8px">🏪</div>
+    <h2 id="loginTitle">Händler-Admin</h2>
+    <p id="loginSlug">Wird geladen...</p>
+    <input type="password" id="pwInput" placeholder="Admin-Passwort">
     <div class="lerr" id="lerr"></div>
+    <button onclick="doLogin()">Einloggen</button>
   </div>
 </div>
 
-<div class="app" id="app">
-  <div class="topbar">
-    <div class="topbar-brand">Sosua Pesce - Admin</div>
-    <div class="topbar-right">
-      <button class="tbtn active" onclick="showPage('dashboard',this)">Dashboard</button>
-      <button class="tbtn" onclick="showPage('sales',this)">Ventas</button>
-      <button class="tbtn" onclick="showPage('agents',this)">Agentes</button>
-      <button class="tbtn" onclick="showPage('billing',this)">Facturacion</button>
-      <button class="tbtn" onclick="doLogout()" style="border-color:rgba(191,26,42,.5);color:#ff9999">Salir</button>
-    </div>
-  </div>
+<div id="app">
+  <nav class="nav">
+    <div class="nav-brand">🏪 <span id="navName">Admin</span> <span class="nav-slug" id="navSlug"></span></div>
+    <button class="tbtn active" onclick="showPage('dashboard',this)">📊 Dashboard</button>
+    <button class="tbtn" onclick="showPage('paylink',this)">🔗 Zahlungslink</button>
+    <button class="tbtn" onclick="showPage('sales',this)">💰 Verkäufe</button>
+    <button class="tbtn" onclick="showPage('agents',this)">🤝 Agenten</button>
+    <button class="tbtn" onclick="showPage('billing',this)">💳 Abrechnung</button>
+    <button class="tbtn tbtn-out" onclick="doLogout()">Ausloggen</button>
+  </nav>
 
   <div class="main">
 
+    <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
-      <div class="page-title">Dashboard</div>
-      <div class="stats">
-        <div class="stat"><div class="stat-num" id="st-agents">-</div><div class="stat-lbl">Agentes activos</div></div>
-        <div class="stat"><div class="stat-num" id="st-sales">-</div><div class="stat-lbl">Ventas totales</div></div>
-        <div class="stat"><div class="stat-num" id="st-revenue">-</div><div class="stat-lbl">Ingresos servicio RD$</div></div>
-        <div class="stat"><div class="stat-num" id="st-pending">-</div><div class="stat-lbl">Comisiones pendientes RD$</div></div>
+      <h1 style="font-size:1.35rem;font-weight:800;margin-bottom:20px">📊 Dashboard</h1>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-val" id="d-sales-today">—</div><div class="stat-lbl">Verkäufe heute</div></div>
+        <div class="stat-card"><div class="stat-val" id="d-sales-month">—</div><div class="stat-lbl">Verkäufe diesen Monat</div></div>
+        <div class="stat-card gold"><div class="stat-val" id="d-revenue">—</div><div class="stat-lbl">Umsatz gesamt</div></div>
+        <div class="stat-card blue"><div class="stat-val" id="d-agents">—</div><div class="stat-lbl">Aktive Agenten</div></div>
       </div>
-      <div class="tbl-wrap">
-        <div class="tbl-head"><h3>Ventas recientes</h3><button class="tbtn btn-sm" onclick="loadDashboard()">Actualizar</button></div>
-        <div style="overflow-x:auto"><table>
-          <thead><tr><th>Fecha</th><th>Cliente</th><th>Agente</th><th>Pescado</th><th>Servicio</th><th>Comision</th></tr></thead>
-          <tbody id="recentSales"><tr><td colspan="6" class="msg">Cargando...</td></tr></tbody>
-        </table></div>
+      <!-- Letzte Verkäufe -->
+      <div class="mb-16">
+        <div class="sec-hd"><h2>🕐 Letzte Verkäufe</h2></div>
+        <div class="sec-body">
+          <table><thead><tr><th>DATUM</th><th>KUNDE (TEL)</th><th>AGENT</th><th>BETRAG</th><th>PROVISION</th><th>QUELLE</th></tr></thead>
+          <tbody id="d-recent"><tr><td colspan="6" class="msg">Lade...</td></tr></tbody></table>
+        </div>
+      </div>
+      <!-- Ausstehende Provision -->
+      <div>
+        <div class="sec-hd"><h2>⏳ Ausstehende Agentenprovisionen</h2></div>
+        <div class="sec-body">
+          <table><thead><tr><th>AGENT</th><th>CODE</th><th>VERKÄUFE</th><th>PROVISION GESAMT</th><th>DAVON AUSSTEHEND</th></tr></thead>
+          <tbody id="d-pending"><tr><td colspan="5" class="msg">Lade...</td></tr></tbody></table>
+        </div>
       </div>
     </div>
 
+    <!-- ZAHLUNGSLINK GENERATOR -->
+    <div class="page" id="page-paylink">
+      <h1 style="font-size:1.35rem;font-weight:800;margin-bottom:20px">🔗 Zahlungslink generieren</h1>
+
+      <div class="generator">
+        <div class="generator-hd">
+          <h2>⚡ Neuen Zahlungslink erstellen</h2>
+          <p>Wähle Produkt, Agent und gib die Telefonnummer des Kunden ein – fertig!</p>
+        </div>
+        <div class="generator-body">
+          <div class="fgrp">
+            <label>📱 Telefonnummer des Kunden *</label>
+            <input id="pl-phone" placeholder="+1809..." oninput="generateLink()">
+          </div>
+          <div class="fgrp">
+            <label>🤝 Agent *</label>
+            <select id="pl-agent" onchange="generateLink()">
+              <option value="">— Agent auswählen —</option>
+            </select>
+          </div>
+          <div class="fgrp full">
+            <label>📦 Produkt / Stripe-Link *</label>
+            <select id="pl-product" onchange="generateLink()">
+              <option value="">— Produkt auswählen —</option>
+            </select>
+          </div>
+          <div class="full" id="linkResultWrap" style="display:none">
+            <div class="link-result">
+              <label>✅ Dein Zahlungslink – direkt per WhatsApp senden:</label>
+              <div class="link-text" id="linkText">—</div>
+              <div class="link-actions">
+                <button class="btn-copy" onclick="copyLink()">📋 Kopieren</button>
+                <a id="waLink" href="#" target="_blank" class="btn btn-green" style="text-decoration:none;padding:10px 16px">📱 Per WhatsApp senden</a>
+                <button class="btn btn-outline" onclick="clearLink()">✕ Zurücksetzen</button>
+              </div>
+            </div>
+          </div>
+          <div class="full" style="font-size:.78rem;color:var(--mu);padding-top:4px">
+            💡 Der Zahlungslink enthält automatisch den Agent-Code und die Telefonnummer. Nach der Zahlung wird der Verkauf automatisch eingetragen.
+          </div>
+        </div>
+      </div>
+
+      <!-- Produkte verwalten -->
+      <div>
+        <div class="sec-hd"><h2>📦 Produkte & Stripe-Links</h2><button class="btn btn-outline" style="color:#fff;background:rgba(255,255,255,.15)" onclick="showAddProduct()">+ Produkt</button></div>
+        <div class="sec-body">
+          <table><thead><tr><th>PRODUKT</th><th>PREIS</th><th>STRIPE-LINK</th><th>STATUS</th><th></th></tr></thead>
+          <tbody id="productsList"><tr><td colspan="5" class="msg">Lade...</td></tr></tbody></table>
+          <div id="addProductForm" style="display:none;padding:20px;border-top:1px solid var(--border)">
+            <div class="form-panel" style="padding:0;margin-bottom:14px">
+              <div class="fgrp"><label>Produktname</label><input id="p-name" placeholder="z.B. Frischer Fisch 2kg"></div>
+              <div class="fgrp"><label>Preis (RD$)</label><input id="p-price" type="number" placeholder="500"></div>
+              <div class="fgrp full"><label>Stripe Payment Link</label><input id="p-stripe" placeholder="https://buy.stripe.com/..."></div>
+              <div class="fgrp"><label>Beschreibung</label><input id="p-desc" placeholder="optional"></div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-green" onclick="saveProduct()">✓ Speichern</button>
+              <button class="btn btn-outline" onclick="document.getElementById('addProductForm').style.display='none'">Abbrechen</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VERKÄUFE -->
     <div class="page" id="page-sales">
-      <div class="page-title">Registrar Venta</div>
-      <div class="panel">
-        <h3>Nueva entrega confirmada</h3>
-        <div class="grid2">
-          <div><label>Nombre del cliente</label><input type="text" id="s-cname" placeholder="Maria Garcia"></div>
-          <div><label>Telefono del cliente *</label><input type="text" id="s-cphone" placeholder="+1 809 000 0000"></div>
-        </div>
-        <div class="grid2">
-          <div><label>Codigo del agente (del ref: en WhatsApp)</label><input type="text" id="s-acode" placeholder="CARLOS4821" style="text-transform:uppercase"></div>
-          <div><label>Precio del pescado (RD$)</label><input type="number" id="s-fish" placeholder="400" min="0"></div>
-        </div>
-        <div class="grid2">
-          <div><label>Referencia Stripe (opcional)</label><input type="text" id="s-stripe" placeholder="pi_xxxxx"></div>
-          <div><label>Notas</label><input type="text" id="s-notes" placeholder="Dorado 2 lbs"></div>
-        </div>
-        <div style="display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap">
-          <button class="btn-save" onclick="addSale()">Guardar entrega</button>
-          <span style="font-size:.75rem;color:var(--mu)">Servicio: <strong>500 RD$</strong> - Comision agente: <strong>150 RD$</strong></span>
+      <h1 style="font-size:1.35rem;font-weight:800;margin-bottom:20px">💰 Alle Verkäufe</h1>
+      <!-- Manuell eintragen -->
+      <div class="mb-16">
+        <div class="sec-hd"><h2>➕ Verkauf manuell eintragen</h2></div>
+        <div class="sec-body">
+          <div class="form-panel">
+            <div class="fgrp"><label>Telefonnummer Kunde</label><input id="s-phone" placeholder="+1809..."></div>
+            <div class="fgrp"><label>Agent</label><select id="s-agent"><option value="">— kein Agent —</option></select></div>
+            <div class="fgrp"><label>Produkt</label><select id="s-product"><option value="">— Produkt wählen —</option></select></div>
+            <div class="fgrp"><label>Betrag (RD$)</label><input id="s-amount" type="number" placeholder="500"></div>
+            <div class="fgrp full"><label>Notiz (optional)</label><input id="s-note" placeholder="z.B. Bar bezahlt, WhatsApp #..."></div>
+            <div class="form-actions">
+              <button class="btn btn-green" onclick="saveSale()">✓ Verkauf eintragen</button>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="tbl-wrap">
-        <div class="tbl-head"><h3>Todas las ventas</h3><button class="tbtn btn-sm" onclick="loadSales()">Actualizar</button></div>
-        <div style="overflow-x:auto"><table>
-          <thead><tr><th>Fecha</th><th>Cliente</th><th>Telefono</th><th>Agente</th><th>Pescado</th><th>Servicio</th><th>Comision</th></tr></thead>
-          <tbody id="salesTable"><tr><td colspan="7" class="msg">Cargando...</td></tr></tbody>
-        </table></div>
+      <!-- Liste -->
+      <div>
+        <div class="sec-hd">
+          <h2>📋 Verkaufshistorie</h2>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select id="salesFilter" onchange="loadSales()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:5px 10px;border-radius:6px;font-size:.82rem">
+              <option value="all">Alle</option>
+              <option value="today">Heute</option>
+              <option value="month">Diesen Monat</option>
+            </select>
+            <button class="btn btn-outline" style="color:#fff;background:rgba(255,255,255,.15)" onclick="loadSales()">Aktualisieren</button>
+          </div>
+        </div>
+        <div class="sec-body">
+          <table><thead><tr><th>DATUM</th><th>KUNDE (TEL)</th><th>AGENT</th><th>PRODUKT</th><th>BETRAG</th><th>PROVISION</th><th>QUELLE</th></tr></thead>
+          <tbody id="salesList"><tr><td colspan="7" class="msg">Lade...</td></tr></tbody></table>
+        </div>
       </div>
     </div>
 
+    <!-- AGENTEN -->
     <div class="page" id="page-agents">
-      <div class="page-title">Agentes</div>
-      <div class="tbl-wrap">
-        <div class="tbl-head"><h3>Agentes registrados</h3><button class="tbtn btn-sm" onclick="loadAgents()">Actualizar</button></div>
-        <div style="overflow-x:auto"><table>
-          <thead><tr><th>Nombre</th><th>Email</th><th>Telefono</th><th>Codigo</th><th>Estado</th><th>Ventas</th><th>Saldo RD$</th><th>Accion</th></tr></thead>
-          <tbody id="agentsTable"><tr><td colspan="8" class="msg">Cargando...</td></tr></tbody>
-        </table></div>
+      <h1 style="font-size:1.35rem;font-weight:800;margin-bottom:20px">🤝 Meine Agenten</h1>
+      <div class="mb-16" style="background:var(--card);border-radius:var(--r);padding:18px 20px;border-left:4px solid var(--g3);box-shadow:0 1px 4px rgba(0,0,0,.07)">
+        <strong>🔗 Agenten-Registrierungslink:</strong><br>
+        <span class="codetag" id="agentRegLink" style="font-size:.85rem;margin-top:6px;display:inline-block">—</span>
+        <button class="btn btn-outline" style="margin-left:10px;padding:4px 10px" onclick="copyAgentLink()">📋</button>
+      </div>
+      <div>
+        <div class="sec-hd"><h2>Agenten-Liste</h2><button class="btn btn-outline" style="color:#fff;background:rgba(255,255,255,.15)" onclick="loadAgents()">Aktualisieren</button></div>
+        <div class="sec-body">
+          <table><thead><tr><th>NAME</th><th>CODE</th><th>TELEFON</th><th>VERKÄUFE</th><th>PROVISION</th><th>STATUS</th><th>SEIT</th></tr></thead>
+          <tbody id="agentsList"><tr><td colspan="7" class="msg">Lade...</td></tr></tbody></table>
+        </div>
       </div>
     </div>
 
+    <!-- ABRECHNUNG -->
     <div class="page" id="page-billing">
-      <div class="page-title">Facturacion</div>
-      <div class="panel">
-        <h3>Generar reporte de periodo</h3>
-        <div class="period-sel">
-          <div class="pf"><label>Desde</label><input type="date" id="b-from"></div>
-          <div class="pf"><label>Hasta</label><input type="date" id="b-to"></div>
-          <button class="btn-save" onclick="genBilling()">Generar reporte</button>
-          <button class="btn-out" onclick="setHalf(1)">1-15</button>
-          <button class="btn-out" onclick="setHalf(2)">16-fin</button>
-          <button class="btn-out" onclick="window.print()">Imprimir</button>
-        </div>
-        <p style="font-size:.76rem;color:var(--mu)">Solo agentes con comisiones mayores o iguales a 1.000 RD$ en el periodo.</p>
+      <h1 style="font-size:1.35rem;font-weight:800;margin-bottom:20px">💳 Abrechnung</h1>
+      <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+        <button class="btn btn-green" onclick="loadBilling('month')" id="btn-month">📅 Aktueller Monat</button>
+        <button class="btn btn-outline" onclick="loadBilling('prev')" id="btn-prev">📅 Vormonat</button>
+        <button class="btn btn-outline" onclick="loadBilling('1-15')" id="btn-115">1.–15.</button>
+        <button class="btn btn-outline" onclick="loadBilling('16-end')" id="btn-16">16.–Ende</button>
       </div>
-      <div class="tbl-wrap">
-        <div class="tbl-head"><h3 id="billingTitle">Reporte</h3></div>
-        <div style="overflow-x:auto"><table>
-          <thead><tr><th>Agente</th><th>Codigo</th><th>Telefono</th><th>Entregas</th><th>Comision RD$</th><th>Estado</th></tr></thead>
-          <tbody id="billingTable"><tr><td colspan="6" class="msg">Selecciona un periodo y genera el reporte.</td></tr></tbody>
-        </table></div>
-        <div class="billing-sum" id="billingSummary" style="display:none">
-          <div class="bsum-item">Total agentes: <strong id="bsum-agents">0</strong></div>
-          <div class="bsum-item">Total entregas: <strong id="bsum-sales">0</strong></div>
-          <div class="bsum-item">Total a pagar: <strong id="bsum-total">0 RD$</strong></div>
-        </div>
+      <div id="billingContent">
+        <div class="msg">Abrechnungszeitraum wählen</div>
       </div>
     </div>
 
@@ -187,242 +282,407 @@ input:focus{outline:none;border-color:var(--g)}
 
 <script>
 var sb = null;
+var merchant = null;
+var slug = '';
+var products = [];
+var agents = [];
 
 window.addEventListener('load', function() {
-  // Determine merchant slug from URL path
+  // Slug aus URL ermitteln
   var parts = window.location.pathname.split('/').filter(Boolean);
-  window.merchantSlug = null;
-  for (var i=0; i<parts.length; i++) {
-    if (parts[i] !== 'admin.html' && parts[i] !== 'index.html') {
-      window.merchantSlug = parts[i]; break;
-    }
-  }
-  
+  slug = parts[parts.length - 2] || 'sosuapesce';
+  document.getElementById('loginSlug').textContent = '/' + slug + '/';
+  document.getElementById('navSlug').textContent = slug;
+
   try {
     var cfg = window.SP_CONFIG;
-    if (cfg && cfg.SUPABASE_URL && cfg.SUPABASE_URL.indexOf('XXXX') === -1) {
-      sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_SERVICE_KEY);
-    }
-  } catch(e) { console.warn('Supabase:', e.message); }
-
-  document.getElementById('pwInput').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') { doLogin(); }
-  });
-});
-function doLogin() {
-  var pw  = document.getElementById('pwInput').value;
-  var cfg = window.SP_CONFIG;
-  if (!cfg) { document.getElementById('lerr').textContent = 'config.js nicht geladen'; return; }
-  
-  // Get merchant slug from URL
-  var slug = new URLSearchParams(window.location.search).get('m') || 'sosuapesce';
-  
-  // Check against Supabase merchant password
-  if (sb) {
-    sb.from('merchants').select('admin_password,id,name,currency').eq('slug', slug).single().then(function(r) {
-      if (r.error || !r.data) { document.getElementById('lerr').textContent = 'Haendler nicht gefunden'; return; }
-      if (pw === r.data.admin_password || pw === cfg.ADMIN_PASSWORD) {
-        window.merchantData = r.data;
-        window.merchantSlug = slug;
-        document.getElementById('loginWrap').style.display = 'none';
-        document.getElementById('app').classList.add('show');
-        loadDashboard();
-      } else {
-        document.getElementById('lerr').textContent = 'Contrasena incorrecta';
+    if (!cfg) return;
+    var key = cfg.SUPABASE_ANON_KEY || cfg.SUPABASE_KEY;
+    if (!key || key.indexOf('XXXX') !== -1) return;
+    sb = window.supabase.createClient(cfg.SUPABASE_URL, key);
+    // Händlername laden
+    sb.from('merchants').select('name').eq('slug', slug).single().then(function(r) {
+      if (r.data) {
+        document.getElementById('loginTitle').textContent = r.data.name;
+        document.getElementById('navName').textContent = r.data.name;
       }
     });
-  } else if (pw === cfg.ADMIN_PASSWORD) {
-    window.merchantSlug = slug;
-    document.getElementById('loginWrap').style.display = 'none';
-    document.getElementById('app').classList.add('show');
-    loadDashboard();
-  } else {
-    document.getElementById('lerr').textContent = 'Contrasena incorrecta';
-  }
-}
+  } catch(e) { console.error(e); }
+
+  document.getElementById('pwInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') doLogin();
+  });
+});
+
 function doLogin() {
-  var pw  = document.getElementById('pwInput').value;
-  var cfg = window.SP_CONFIG;
-  if (!cfg) { document.getElementById('lerr').textContent = 'Error: config.js no cargado'; return; }
-  if (pw === cfg.ADMIN_PASSWORD) {
+  var pw = document.getElementById('pwInput').value;
+  if (!pw) { document.getElementById('lerr').textContent = 'Bitte Passwort eingeben'; return; }
+  if (!sb) { document.getElementById('lerr').textContent = 'Verbindungsfehler'; return; }
+
+  sb.from('merchants').select('*').eq('slug', slug).single().then(function(r) {
+    if (r.error || !r.data) { document.getElementById('lerr').textContent = 'Händler nicht gefunden'; return; }
+    if (r.data.admin_password !== pw) { document.getElementById('lerr').textContent = 'Falsches Passwort'; return; }
+    merchant = r.data;
     document.getElementById('loginWrap').style.display = 'none';
     document.getElementById('app').classList.add('show');
-    loadDashboard();
-  } else {
-    document.getElementById('lerr').textContent = 'Contrasena incorrecta';
-  }
+    document.getElementById('navName').textContent = merchant.name;
+    // Agenten-Link setzen
+    var siteBase = (window.SP_CONFIG && window.SP_CONFIG.SITE_URL) || window.location.origin + '/sosuapesce';
+    document.getElementById('agentRegLink').textContent = siteBase + '/' + slug + '/agentes.html';
+    loadAll();
+  });
 }
 
 function doLogout() { location.reload(); }
 
 function showPage(id, btn) {
-  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
-  document.querySelectorAll('.tbtn').forEach(function(b) { b.classList.remove('active'); });
-  document.getElementById('page-' + id).classList.add('active');
-  btn.classList.add('active');
-  if (id === 'agents')    { loadAgents(); }
-  if (id === 'sales')     { loadSales(); }
-  if (id === 'dashboard') { loadDashboard(); }
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.tbtn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('page-'+id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (id === 'dashboard') loadDashboard();
+  if (id === 'paylink')   { loadProducts(); loadAgentsDropdown(); }
+  if (id === 'sales')     { loadSales(); loadAgentsDropdown(); loadProductsDropdown(); }
+  if (id === 'agents')    loadAgents();
+  if (id === 'billing')   loadBilling('month');
 }
 
 function showToast(msg) {
   var t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(function() { t.classList.remove('show'); }, 2800);
+  setTimeout(function(){t.classList.remove('show');}, 3000);
 }
 
-function fmtDate(d) { return d ? new Date(d).toLocaleDateString('es-DO') : '-'; }
+function fmtDate(d) { return d ? new Date(d).toLocaleDateString('de-AT') : '—'; }
+function fmtNum(n) { return (parseFloat(n)||0).toLocaleString('de-AT', {minimumFractionDigits:0}); }
+function statusBadge(s) {
+  var m={active:'b-active',paused:'b-paused',frozen:'b-frozen',pending:'b-pending'};
+  var l={active:'Aktiv',paused:'Pausiert',frozen:'Eingefroren',pending:'Ausstehend'};
+  return '<span class="badge '+(m[s]||'b-pending')+'">'+(l[s]||s)+'</span>';
+}
 
-function ct(code) { return '<span class="codetag">' + (code || '-') + '</span>'; }
+function loadAll() {
+  loadDashboard();
+  loadAgentsDropdown();
+  loadProductsDropdown();
+}
 
+// ── DASHBOARD ──────────────────────────────────────────────
 function loadDashboard() {
-  if (!sb) { return; }
-  Promise.all([
-    sb.from('agents').select('status'),
-    sb.from('sales').select('service_fee,commission,customer_name,agent_code,fish_amount,created_at').eq('status', 'delivered')
-  ]).then(function(res) {
-    var agents = res[0].data || [];
-    var sales  = res[1].data || [];
-    document.getElementById('st-agents').textContent  = agents.filter(function(a) { return a.status === 'active'; }).length;
-    document.getElementById('st-sales').textContent   = sales.length;
-    document.getElementById('st-revenue').textContent = sales.reduce(function(s, r) { return s + (r.service_fee || 0); }, 0).toLocaleString('es-DO');
-    document.getElementById('st-pending').textContent = sales.reduce(function(s, r) { return s + (r.commission || 0); }, 0).toLocaleString('es-DO');
-    var recent = sales.slice().sort(function(a, b) { return new Date(b.created_at) - new Date(a.created_at); }).slice(0, 8);
-    document.getElementById('recentSales').innerHTML = recent.length
-      ? recent.map(function(r) { return '<tr><td>' + fmtDate(r.created_at) + '</td><td>' + (r.customer_name || '-') + '</td><td>' + ct(r.agent_code) + '</td><td>' + (r.fish_amount || 0) + ' RD$</td><td>500 RD$</td><td style="color:var(--g);font-weight:700">150 RD$</td></tr>'; }).join('')
-      : '<tr><td colspan="6" class="msg">No hay ventas aun.</td></tr>';
+  if (!sb || !merchant) return;
+  var today = new Date(); today.setHours(0,0,0,0);
+  var monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+
+  sb.from('sales').select('*, agents(name,referral_code)').eq('merchant_id', merchant.id)
+    .order('created_at', {ascending:false}).then(function(r) {
+    var sales = r.data || [];
+    var todaySales = sales.filter(function(s){ return new Date(s.created_at) >= today; });
+    var monthSales = sales.filter(function(s){ return new Date(s.created_at) >= monthStart; });
+    var totalRev = sales.reduce(function(t,s){ return t+(parseFloat(s.total_amount)||0); }, 0);
+
+    document.getElementById('d-sales-today').textContent = todaySales.length;
+    document.getElementById('d-sales-month').textContent = monthSales.length;
+    document.getElementById('d-revenue').textContent = fmtNum(totalRev) + ' ' + (merchant.currency||'RD$');
+
+    document.getElementById('d-recent').innerHTML = sales.slice(0,8).length
+      ? sales.slice(0,8).map(function(s){
+          var agName = (s.agents && s.agents.name) || '—';
+          return '<tr><td>'+fmtDate(s.created_at)+'</td><td><span class="codetag">'+(s.customer_phone||'—')+'</span></td><td>'+agName+'</td><td>'+fmtNum(s.total_amount)+' '+(merchant.currency||'RD$')+'</td><td style="color:var(--g3);font-weight:600">'+fmtNum(s.agent_commission)+' '+(merchant.currency||'RD$')+'</td><td><span class="badge '+(s.source==='stripe'?'b-active':'b-pending')+'">'+(s.source==='stripe'?'Stripe':'Manuell')+'</span></td></tr>';
+        }).join('')
+      : '<tr><td colspan="6" class="msg">Noch keine Verkäufe.</td></tr>';
+  });
+
+  // Agenten-Provisionen
+  sb.from('agents').select('*').eq('merchant_id', merchant.id).then(function(r){
+    var ags = r.data || [];
+    document.getElementById('d-agents').textContent = ags.filter(function(a){return a.status==='active';}).length;
+    document.getElementById('d-pending').innerHTML = ags.length
+      ? ags.map(function(a){
+          return '<tr><td><strong>'+(a.name||'—')+'</strong></td><td><span class="codetag">'+(a.referral_code||'—')+'</span></td><td>'+(a.total_sales||0)+'</td><td>'+fmtNum(a.total_commission)+' '+(merchant.currency||'RD$')+'</td><td style="color:var(--gold);font-weight:700">'+fmtNum(a.pending_commission||a.total_commission)+' '+(merchant.currency||'RD$')+'</td></tr>';
+        }).join('')
+      : '<tr><td colspan="5" class="msg">Keine Agenten registriert.</td></tr>';
   });
 }
 
-function loadSales() {
-  if (!sb) { return; }
-  sb.from('sales').select('created_at,customer_name,customer_phone,agent_code,fish_amount').order('created_at', {ascending: false}).then(function(r) {
+// ── ZAHLUNGSLINK GENERATOR ─────────────────────────────────
+function generateLink() {
+  var phone   = document.getElementById('pl-phone').value.trim();
+  var agentEl = document.getElementById('pl-agent');
+  var prodEl  = document.getElementById('pl-product');
+  var agentCode = agentEl.value;
+  var stripeUrl = prodEl.value;
+
+  if (!phone || !agentCode || !stripeUrl) {
+    document.getElementById('linkResultWrap').style.display = 'none';
+    return;
+  }
+
+  // Telefonnummer bereinigen
+  var cleanPhone = phone.replace(/[^+0-9]/g, '');
+  // client_reference_id: AGENTCODE_PHONE
+  var refId = agentCode + '_' + cleanPhone;
+  var fullLink = stripeUrl + (stripeUrl.indexOf('?') === -1 ? '?' : '&') + 'client_reference_id=' + encodeURIComponent(refId);
+
+  document.getElementById('linkText').textContent = fullLink;
+  // WhatsApp-Link mit dem Zahlungslink als Text
+  var waMsg = encodeURIComponent('Hier ist dein Zahlungslink:\n' + fullLink);
+  var waNum = cleanPhone.replace('+', '');
+  document.getElementById('waLink').href = 'https://wa.me/' + waNum + '?text=' + waMsg;
+  document.getElementById('linkResultWrap').style.display = 'block';
+}
+
+function copyLink() {
+  var txt = document.getElementById('linkText').textContent;
+  navigator.clipboard.writeText(txt).then(function(){
+    showToast('✅ Link kopiert!');
+  }).catch(function(){
+    // Fallback
+    var ta = document.createElement('textarea');
+    ta.value = txt; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    showToast('✅ Link kopiert!');
+  });
+}
+
+function clearLink() {
+  document.getElementById('pl-phone').value = '';
+  document.getElementById('pl-agent').selectedIndex = 0;
+  document.getElementById('pl-product').selectedIndex = 0;
+  document.getElementById('linkResultWrap').style.display = 'none';
+}
+
+function copyAgentLink() {
+  var txt = document.getElementById('agentRegLink').textContent;
+  navigator.clipboard.writeText(txt).then(function(){ showToast('✅ Link kopiert!'); });
+}
+
+// ── PRODUKTE ───────────────────────────────────────────────
+function loadProducts() {
+  if (!sb || !merchant) return;
+  sb.from('merchant_products').select('*').eq('merchant_id', merchant.id).then(function(r){
+    products = r.data || [];
+    // Dropdown füllen
+    var opts = '<option value="">— Produkt auswählen —</option>' +
+      products.map(function(p){ return '<option value="'+p.stripe_link+'">'+p.name+' ('+fmtNum(p.price)+' '+(merchant.currency||'RD$')+')</option>'; }).join('');
+    document.getElementById('pl-product').innerHTML = opts;
+    // Tabelle
+    document.getElementById('productsList').innerHTML = products.length
+      ? products.map(function(p){
+          return '<tr><td><strong>'+p.name+'</strong><br><small style="color:var(--mu)">'+(p.description||'')+'</small></td><td>'+fmtNum(p.price)+' '+(merchant.currency||'RD$')+'</td><td><a href="'+p.stripe_link+'" target="_blank" style="color:var(--g3);font-size:.78rem">'+p.stripe_link.substring(0,40)+'...</a></td><td>'+statusBadge(p.status||'active')+'</td><td><button class="btn btn-outline" onclick="deleteProduct(\''+p.id+'\')">🗑</button></td></tr>';
+        }).join('')
+      : '<tr><td colspan="5" class="msg">Noch keine Produkte. Klicke "+ Produkt".</td></tr>';
+  });
+}
+
+function loadProductsDropdown() {
+  if (!sb || !merchant) return;
+  sb.from('merchant_products').select('*').eq('merchant_id', merchant.id).then(function(r){
     var data = r.data || [];
-    document.getElementById('salesTable').innerHTML = data.length
-      ? data.map(function(row) { return '<tr><td>' + fmtDate(row.created_at) + '</td><td>' + (row.customer_name || '-') + '</td><td>' + (row.customer_phone || '-') + '</td><td>' + ct(row.agent_code) + '</td><td>' + (row.fish_amount || 0) + ' RD$</td><td>500 RD$</td><td style="color:var(--g);font-weight:700">' + (row.agent_code ? '150' : '0') + ' RD$</td></tr>'; }).join('')
-      : '<tr><td colspan="7" class="msg">No hay ventas registradas.</td></tr>';
+    var opts = '<option value="">— Produkt wählen —</option>' +
+      data.map(function(p){ return '<option value="'+p.id+'">'+p.name+'</option>'; }).join('');
+    document.getElementById('s-product').innerHTML = opts;
   });
 }
 
-function addSale() {
-  var cname  = document.getElementById('s-cname').value.trim();
-  var cphone = document.getElementById('s-cphone').value.trim();
-  var acode  = document.getElementById('s-acode').value.trim().toUpperCase();
-  var fish   = parseInt(document.getElementById('s-fish').value) || 0;
-  var stripe = document.getElementById('s-stripe').value.trim();
-  var notes  = document.getElementById('s-notes').value.trim();
-  if (!cphone) { showToast('Telefono del cliente requerido'); return; }
-  if (!sb)     { showToast('Error: Supabase no conectado');   return; }
-  var resolveAgent = acode
-    ? sb.from('agents').select('id').eq('code', acode).maybeSingle()
-    : Promise.resolve({data: null});
-  resolveAgent.then(function(ar) {
-    var payload = {
-      customer_name: cname || null, customer_phone: cphone,
-      agent_code: acode || null, agent_id: ar.data ? ar.data.id : null,
-      fish_amount: fish, service_fee: 500, commission: acode ? 150 : 0,
-      stripe_ref: stripe || null, notes: notes || null
-    };
-    return sb.from('sales').insert(payload);
-  }).then(function(res) {
-    if (res.error) { showToast('Error: ' + res.error.message); return; }
-    showToast('Venta registrada correctamente!');
-    ['s-cname','s-cphone','s-acode','s-fish','s-stripe','s-notes'].forEach(function(id) { document.getElementById(id).value = ''; });
-    loadSales(); loadDashboard();
+function showAddProduct() {
+  var f = document.getElementById('addProductForm');
+  f.style.display = f.style.display === 'none' ? 'block' : 'none';
+}
+
+function saveProduct() {
+  if (!sb || !merchant) return;
+  var name  = document.getElementById('p-name').value.trim();
+  var price = parseFloat(document.getElementById('p-price').value) || 0;
+  var link  = document.getElementById('p-stripe').value.trim();
+  if (!name || !link) { showToast('Name und Stripe-Link sind Pflicht'); return; }
+  sb.from('merchant_products').insert({
+    merchant_id: merchant.id, name: name, price: price,
+    stripe_link: link, description: document.getElementById('p-desc').value.trim() || null,
+    status: 'active'
+  }).then(function(r){
+    if (r.error) { showToast('Fehler: '+r.error.message); return; }
+    showToast('✅ Produkt gespeichert!');
+    document.getElementById('addProductForm').style.display = 'none';
+    document.getElementById('p-name').value = '';
+    document.getElementById('p-price').value = '';
+    document.getElementById('p-stripe').value = '';
+    document.getElementById('p-desc').value = '';
+    loadProducts();
+  });
+}
+
+function deleteProduct(id) {
+  if (!sb) return;
+  if (!confirm('Produkt wirklich löschen?')) return;
+  sb.from('merchant_products').delete().eq('id', id).then(function(){
+    showToast('Produkt gelöscht'); loadProducts();
+  });
+}
+
+// ── AGENTEN ────────────────────────────────────────────────
+function loadAgentsDropdown() {
+  if (!sb || !merchant) return;
+  sb.from('agents').select('id,name,referral_code').eq('merchant_id', merchant.id).eq('status','active').then(function(r){
+    agents = r.data || [];
+    var opts = '<option value="">— Agent auswählen —</option>' +
+      agents.map(function(a){ return '<option value="'+a.referral_code+'">'+a.name+' ('+a.referral_code+')</option>'; }).join('');
+    document.getElementById('pl-agent').innerHTML = opts;
+    var opts2 = '<option value="">— kein Agent —</option>' +
+      agents.map(function(a){ return '<option value="'+a.id+'">'+a.name+' ('+a.referral_code+')</option>'; }).join('');
+    document.getElementById('s-agent').innerHTML = opts2;
   });
 }
 
 function loadAgents() {
-  if (!sb) { return; }
-  Promise.all([
-    sb.from('agents').select('*').order('created_at', {ascending: false}),
-    sb.from('sales').select('agent_code,commission').eq('status', 'delivered'),
-    sb.from('payouts').select('agent_id,amount')
-  ]).then(function(res) {
-    var agents  = res[0].data || [];
-    var sales   = res[1].data || [];
-    var payouts = res[2].data || [];
-    if (!agents.length) { document.getElementById('agentsTable').innerHTML = '<tr><td colspan="8" class="msg">No hay agentes registrados.</td></tr>'; return; }
-    document.getElementById('agentsTable').innerHTML = agents.map(function(a) {
-      var agSales = sales.filter(function(s) { return s.agent_code === a.code; });
-      var earned  = agSales.reduce(function(s, r) { return s + (r.commission || 0); }, 0);
-      var paid    = payouts.filter(function(p) { return p.agent_id === a.id; }).reduce(function(s, p) { return s + (p.amount || 0); }, 0);
-      var balance = earned - paid;
-      var payBtn  = balance >= 1000 ? '<button class="btn-save btn-sm" style="margin-left:4px" onclick="markPaid(\'' + a.id + '\',\'' + a.code + '\',' + balance + ')">Pagar ' + balance + ' RD$</button>' : '';
-      return '<tr><td><strong>' + a.name + '</strong></td><td style="font-size:.76rem">' + a.email + '</td><td>' + a.phone + '</td><td>' + ct(a.code) + '</td><td><span class="badge ' + (a.status === 'active' ? 'b-active' : 'b-paused') + '">' + (a.status === 'active' ? 'Activo' : 'Pausado') + '</span></td><td>' + agSales.length + '</td><td style="font-weight:700;color:' + (balance >= 1000 ? 'var(--g)' : 'var(--mu)') + '">' + balance.toLocaleString('es-DO') + ' RD$</td><td><button class="btn-out btn-sm" onclick="toggleAgent(\'' + a.id + '\',\'' + a.status + '\')">' + (a.status === 'active' ? 'Pausar' : 'Activar') + '</button>' + payBtn + '</td></tr>';
-    }).join('');
+  if (!sb || !merchant) return;
+  sb.from('agents').select('*').eq('merchant_id', merchant.id).order('created_at',{ascending:false}).then(function(r){
+    var data = r.data || [];
+    document.getElementById('agentsList').innerHTML = data.length
+      ? data.map(function(a){
+          return '<tr><td><strong>'+(a.name||'—')+'</strong><br><small style="color:var(--mu)">'+(a.email||'')+'</small></td><td><span class="codetag">'+(a.referral_code||'—')+'</span></td><td>'+(a.phone||'—')+'</td><td>'+(a.total_sales||0)+'</td><td style="color:var(--g3);font-weight:600">'+fmtNum(a.total_commission)+' '+(merchant.currency||'RD$')+'</td><td>'+statusBadge(a.status)+'</td><td>'+fmtDate(a.created_at)+'</td></tr>';
+        }).join('')
+      : '<tr><td colspan="7" class="msg">Noch keine Agenten registriert. Teile den Registrierungslink!</td></tr>';
   });
 }
 
-function toggleAgent(id, status) {
-  if (!sb) { return; }
-  sb.from('agents').update({status: status === 'active' ? 'paused' : 'active'}).eq('id', id).then(function(r) {
-    if (r.error) { showToast('Error: ' + r.error.message); return; }
-    showToast('Estado actualizado'); loadAgents();
-  });
-}
+// ── VERKÄUFE ───────────────────────────────────────────────
+function loadSales() {
+  if (!sb || !merchant) return;
+  var filter = document.getElementById('salesFilter').value;
+  var query = sb.from('sales').select('*, agents(name,referral_code), merchant_products(name)').eq('merchant_id', merchant.id).order('created_at',{ascending:false});
 
-function markPaid(agentId, code, amount) {
-  if (!confirm('Confirmar pago de ' + amount + ' RD$ al agente ' + code + '?')) { return; }
-  if (!sb) { return; }
-  var now   = new Date();
-  var start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-  sb.from('payouts').insert({agent_id: agentId, agent_code: code, amount: amount, period_start: start, period_end: now.toISOString().split('T')[0], sale_count: 0}).then(function(r) {
-    if (r.error) { showToast('Error: ' + r.error.message); return; }
-    showToast('Pago registrado!'); loadAgents(); loadDashboard();
-  });
-}
-
-function setHalf(half) {
-  var now = new Date();
-  var y   = now.getFullYear();
-  var m   = String(now.getMonth() + 1).padStart(2, '0');
-  if (half === 1) {
-    document.getElementById('b-from').value = y + '-' + m + '-01';
-    document.getElementById('b-to').value   = y + '-' + m + '-15';
-  } else {
-    var last = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-    document.getElementById('b-from').value = y + '-' + m + '-16';
-    document.getElementById('b-to').value   = y + '-' + m + '-' + String(last);
+  if (filter === 'today') {
+    var t = new Date(); t.setHours(0,0,0,0);
+    query = query.gte('created_at', t.toISOString());
+  } else if (filter === 'month') {
+    var m = new Date(); m = new Date(m.getFullYear(), m.getMonth(), 1);
+    query = query.gte('created_at', m.toISOString());
   }
+
+  query.then(function(r){
+    var data = r.data || [];
+    document.getElementById('salesList').innerHTML = data.length
+      ? data.map(function(s){
+          var ag = (s.agents && s.agents.name) || '—';
+          var pr = (s.merchant_products && s.merchant_products.name) || '—';
+          return '<tr><td>'+fmtDate(s.created_at)+'</td><td><span class="codetag">'+(s.customer_phone||'—')+'</span></td><td>'+ag+'</td><td>'+pr+'</td><td>'+fmtNum(s.total_amount)+' '+(merchant.currency||'RD$')+'</td><td style="color:var(--g3)">'+fmtNum(s.agent_commission)+' '+(merchant.currency||'RD$')+'</td><td><span class="badge '+(s.source==='stripe'?'b-active':'b-pending')+'">'+(s.source==='stripe'?'🤖 Stripe':'✍️ Manuell')+'</span></td></tr>';
+        }).join('')
+      : '<tr><td colspan="7" class="msg">Keine Verkäufe in diesem Zeitraum.</td></tr>';
+  });
 }
 
-function genBilling() {
-  var from = document.getElementById('b-from').value;
-  var to   = document.getElementById('b-to').value;
-  if (!from || !to) { showToast('Selecciona fechas'); return; }
-  if (!sb) { return; }
-  Promise.all([
-    sb.from('sales').select('agent_code,commission').eq('status','delivered').gte('created_at', from + 'T00:00:00').lte('created_at', to + 'T23:59:59'),
-    sb.from('agents').select('code,name,phone')
-  ]).then(function(res) {
-    var sales  = res[0].data || [];
-    var agents = res[1].data || [];
-    var map = {};
-    sales.forEach(function(s) {
-      if (!s.agent_code) { return; }
-      if (!map[s.agent_code]) { map[s.agent_code] = {count: 0, total: 0}; }
-      map[s.agent_code].count++;
-      map[s.agent_code].total += (s.commission || 0);
-    });
-    var agMap = {};
-    agents.forEach(function(a) { agMap[a.code] = a; });
-    var rows = Object.keys(map).filter(function(c) { return map[c].total >= 1000; }).sort(function(a, b) { return map[b].total - map[a].total; });
-    document.getElementById('billingTitle').textContent = 'Reporte ' + from + ' a ' + to;
-    if (!rows.length) {
-      document.getElementById('billingTable').innerHTML = '<tr><td colspan="6" class="msg">No hay agentes con comisiones mayores a 1.000 RD$ en este periodo.</td></tr>';
-      document.getElementById('billingSummary').style.display = 'none';
+function saveSale() {
+  if (!sb || !merchant) return;
+  var phone   = document.getElementById('s-phone').value.trim();
+  var agentId = document.getElementById('s-agent').value;
+  var prodId  = document.getElementById('s-product').value;
+  var amount  = parseFloat(document.getElementById('s-amount').value) || 0;
+  if (!amount) { showToast('Bitte Betrag eingeben'); return; }
+
+  // Provision berechnen
+  var commission = 0;
+  if (agentId && merchant) {
+    commission = merchant.platform_fee_type === 'percentage'
+      ? amount * (merchant.platform_fee_value / 100)
+      : merchant.platform_fee_value;
+  }
+
+  var payload = {
+    merchant_id: merchant.id,
+    customer_phone: phone || null,
+    agent_id: agentId || null,
+    product_id: prodId || null,
+    total_amount: amount,
+    agent_commission: commission,
+    platform_fee: merchant.platform_fee_value || 0,
+    source: 'manual',
+    notes: document.getElementById('s-note').value.trim() || null
+  };
+
+  sb.from('sales').insert(payload).then(function(r){
+    if (r.error) { showToast('Fehler: '+r.error.message); return; }
+    // Agent-Statistik aktualisieren
+    if (agentId) {
+      sb.from('agents').select('total_sales,total_commission').eq('id',agentId).single().then(function(ra){
+        if (ra.data) {
+          sb.from('agents').update({
+            total_sales: (ra.data.total_sales||0)+1,
+            total_commission: (ra.data.total_commission||0)+commission
+          }).eq('id',agentId).then(function(){});
+        }
+      });
+    }
+    showToast('✅ Verkauf eingetragen!');
+    document.getElementById('s-phone').value='';
+    document.getElementById('s-amount').value='';
+    document.getElementById('s-note').value='';
+    document.getElementById('s-agent').selectedIndex=0;
+    document.getElementById('s-product').selectedIndex=0;
+    loadSales();
+    loadDashboard();
+  });
+}
+
+// ── ABRECHNUNG ─────────────────────────────────────────────
+function loadBilling(period) {
+  if (!sb || !merchant) return;
+  var now = new Date();
+  var from, to;
+  if (period === 'month') {
+    from = new Date(now.getFullYear(), now.getMonth(), 1);
+    to   = new Date(now.getFullYear(), now.getMonth()+1, 0, 23,59,59);
+  } else if (period === 'prev') {
+    from = new Date(now.getFullYear(), now.getMonth()-1, 1);
+    to   = new Date(now.getFullYear(), now.getMonth(), 0, 23,59,59);
+  } else if (period === '1-15') {
+    from = new Date(now.getFullYear(), now.getMonth(), 1);
+    to   = new Date(now.getFullYear(), now.getMonth(), 15, 23,59,59);
+  } else {
+    from = new Date(now.getFullYear(), now.getMonth(), 16);
+    to   = new Date(now.getFullYear(), now.getMonth()+1, 0, 23,59,59);
+  }
+
+  sb.from('sales').select('*, agents(id,name,referral_code)')
+    .eq('merchant_id', merchant.id)
+    .gte('created_at', from.toISOString())
+    .lte('created_at', to.toISOString())
+    .then(function(r){
+    var sales = r.data || [];
+    if (!sales.length) {
+      document.getElementById('billingContent').innerHTML = '<div class="msg">Keine Verkäufe in diesem Zeitraum.</div>';
       return;
     }
-    document.getElementById('billingTable').innerHTML = rows.map(function(code) {
-      var v = map[code]; var ag = agMap[code] || {};
-      return '<tr><td><strong>' + (ag.name || '-') + '</strong></td><td>' + ct(code) + '</td><td>' + (ag.phone || '-') + '</td><td>' + v.count + '</td><td style="font-weight:700;color:var(--g)">' + v.total.toLocaleString('es-DO') + ' RD$</td><td><span class="badge b-active">Por pagar</span></td></tr>';
-    }).join('');
-    document.getElementById('bsum-agents').textContent = rows.length;
-    document.getElementById('bsum-sales').textContent  = rows.reduce(function(s, c) { return s + map[c].count; }, 0);
-    document.getElementById('bsum-total').textContent  = rows.reduce(function(s, c) { return s + map[c].total; }, 0).toLocaleString('es-DO') + ' RD$';
-    document.getElementById('billingSummary').style.display = 'flex';
+    // Gruppieren nach Agent
+    var byAgent = {};
+    sales.forEach(function(s){
+      var key = (s.agents && s.agents.id) || 'none';
+      var name = (s.agents && s.agents.name) || 'Kein Agent';
+      var code = (s.agents && s.agents.referral_code) || '—';
+      if (!byAgent[key]) byAgent[key] = {name:name,code:code,sales:0,revenue:0,commission:0};
+      byAgent[key].sales++;
+      byAgent[key].revenue += parseFloat(s.total_amount)||0;
+      byAgent[key].commission += parseFloat(s.agent_commission)||0;
+    });
+    var totalRev = sales.reduce(function(t,s){return t+(parseFloat(s.total_amount)||0);},0);
+    var totalComm = sales.reduce(function(t,s){return t+(parseFloat(s.agent_commission)||0);},0);
+    var platFee = sales.reduce(function(t,s){return t+(parseFloat(s.platform_fee)||0);},0);
+    var cur = merchant.currency||'RD$';
+    var html = '<div style="background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08)">' +
+      '<div style="background:var(--g2);color:#fff;padding:14px 20px"><strong>Abrechnungsdetails</strong></div>' +
+      '<table><thead><tr><th>AGENT</th><th>CODE</th><th>VERKÄUFE</th><th>UMSATZ</th><th>PROVISION (AUSZAHLEN)</th></tr></thead><tbody>' +
+      Object.values(byAgent).map(function(a){
+        return '<tr><td><strong>'+a.name+'</strong></td><td><span class="codetag">'+a.code+'</span></td><td>'+a.sales+'</td><td>'+fmtNum(a.revenue)+' '+cur+'</td><td style="color:var(--gold);font-weight:700">'+fmtNum(a.commission)+' '+cur+'</td></tr>';
+      }).join('') +
+      '<tr style="background:#f9fafb;font-weight:700"><td colspan="2">GESAMT</td><td>'+sales.length+'</td><td>'+fmtNum(totalRev)+' '+cur+'</td><td style="color:var(--gold)">'+fmtNum(totalComm)+' '+cur+'</td></tr>' +
+      '</tbody></table>' +
+      '<div style="padding:16px 20px;border-top:2px solid var(--g2);background:#f9fafb;display:flex;gap:32px;flex-wrap:wrap">' +
+      '<span>💰 Gesamtumsatz: <strong>'+fmtNum(totalRev)+' '+cur+'</strong></span>' +
+      '<span>🤝 Agentenprovisionen: <strong style="color:var(--gold)">'+fmtNum(totalComm)+' '+cur+'</strong></span>' +
+      '<span>⭐ Plattformgebühren: <strong style="color:var(--g3)">'+fmtNum(platFee)+' '+cur+'</strong></span>' +
+      '<span>🏦 Händler-Erlös: <strong style="color:var(--g2)">'+fmtNum(totalRev-totalComm-platFee)+' '+cur+'</strong></span>' +
+      '</div></div>';
+    document.getElementById('billingContent').innerHTML = html;
   });
 }
 </script>
