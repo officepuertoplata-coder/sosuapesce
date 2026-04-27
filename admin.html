@@ -195,21 +195,37 @@ tr:hover td{background:#f9fafb}
 
       <!-- Produkte verwalten -->
       <div>
-        <div class="sec-hd"><h2>📦 Produkte & Stripe-Links</h2><button class="btn btn-outline" style="color:#fff;background:rgba(255,255,255,.15)" onclick="showAddProduct()">+ Produkt</button></div>
+        <div class="sec-hd"><h2>📦 Meine Produkte</h2><button class="btn btn-outline" style="color:#fff;background:rgba(255,255,255,.15)" onclick="showAddProduct()">+ Neues Produkt</button></div>
         <div class="sec-body">
-          <table><thead><tr><th>PRODUKT</th><th>PREIS</th><th>STRIPE-LINK</th><th>STATUS</th><th></th></tr></thead>
-          <tbody id="productsList"><tr><td colspan="5" class="msg">Lade...</td></tr></tbody></table>
-          <div id="addProductForm" style="display:none;padding:20px;border-top:1px solid var(--border)">
-            <div class="form-panel" style="padding:0;margin-bottom:14px">
-              <div class="fgrp"><label>Produktname</label><input id="p-name" placeholder="z.B. Frischer Fisch 2kg"></div>
-              <div class="fgrp"><label>Preis (RD$)</label><input id="p-price" type="number" placeholder="500"></div>
+          <div id="productsList" style="padding:8px"><div class="msg">Lade...</div></div>
+          <div id="addProductForm" style="display:none;padding:24px;border-top:2px solid var(--g2)">
+            <h3 style="margin-bottom:16px;color:var(--g2)" id="productFormTitle">➕ Neues Produkt</h3>
+            <input type="hidden" id="p-id">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+              <div class="fgrp full"><label>Produkttitel *</label><input id="p-name" placeholder="z.B. Frischer Dorado 1kg"></div>
+              <div class="fgrp"><label>Preis *</label><input id="p-price" type="number" placeholder="500" min="0" step="0.01"></div>
+              <div class="fgrp"><label>Status</label><select id="p-available"><option value="true">✅ Verfügbar</option><option value="false">❌ Nicht verfügbar</option></select></div>
+              <div class="fgrp full"><label>Kurzbeschreibung</label><input id="p-short" placeholder="z.B. Frisch gefangen, direkt geliefert"></div>
+              <div class="fgrp full"><label>Langbeschreibung</label><textarea id="p-long" placeholder="Ausführliche Beschreibung, Herkunft, Besonderheiten..." style="min-height:80px;width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:.9rem;outline:none;font-family:inherit;resize:vertical"></textarea></div>
               <div class="fgrp full"><label>Stripe Payment Link</label><input id="p-stripe" placeholder="https://buy.stripe.com/..."></div>
-              <div class="fgrp"><label>Beschreibung</label><input id="p-desc" placeholder="optional"></div>
+              <div class="fgrp full">
+                <label>Produktbild</label>
+                <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+                  <input type="file" id="p-img-file" accept="image/*" onchange="previewImage(this)" style="font-size:.82rem">
+                  <div id="p-img-preview" style="display:none">
+                    <img id="p-img-thumb" src="" style="width:72px;height:72px;object-fit:cover;border-radius:8px;border:2px solid var(--g3)">
+                  </div>
+                </div>
+                <div style="font-size:.72rem;color:var(--mu);margin-top:4px">JPG, PNG, WebP – max 5MB</div>
+                <input type="hidden" id="p-img-url">
+              </div>
+              <div class="fgrp"><label>Reihenfolge (1 = zuerst)</label><input id="p-sort" type="number" value="1" min="1"></div>
             </div>
-            <div style="display:flex;gap:8px">
-              <button class="btn btn-green" onclick="saveProduct()">✓ Speichern</button>
-              <button class="btn btn-outline" onclick="document.getElementById('addProductForm').style.display='none'">Abbrechen</button>
+            <div style="display:flex;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+              <button class="btn btn-green" onclick="saveProduct()">💾 Speichern</button>
+              <button class="btn btn-outline" onclick="closeProductForm()">Abbrechen</button>
             </div>
+            <div id="p-save-status" style="margin-top:10px"></div>
           </div>
         </div>
       </div>
@@ -484,56 +500,164 @@ function copyAgentLink() {
 // ── PRODUKTE ───────────────────────────────────────────────
 function loadProducts() {
   if (!sb || !merchant) return;
-  sb.from('merchant_products').select('*').eq('merchant_id', merchant.id).then(function(r){
+  sb.from('merchant_products').select('*').eq('merchant_id', merchant.id).order('sort_order',{ascending:true}).then(function(r){
     products = r.data || [];
-    // Dropdown füllen
+    // Dropdown für Zahlungslink
     var opts = '<option value="">— Produkt auswählen —</option>' +
       products.map(function(p){ return '<option value="'+p.stripe_link+'" data-price="'+p.price+'">'+p.name+' ('+fmtNum(p.price)+' '+(merchant.currency||'RD$')+')</option>'; }).join('');
     document.getElementById('pl-product').innerHTML = opts;
-    // Tabelle
-    document.getElementById('productsList').innerHTML = products.length
-      ? products.map(function(p){
-          return '<tr><td><strong>'+p.name+'</strong><br><small style="color:var(--mu)">'+(p.description||'')+'</small></td><td>'+fmtNum(p.price)+' '+(merchant.currency||'RD$')+'</td><td><a href="'+p.stripe_link+'" target="_blank" style="color:var(--g3);font-size:.78rem">'+p.stripe_link.substring(0,40)+'...</a></td><td>'+statusBadge(p.status||'active')+'</td><td><button class="btn btn-outline" onclick="deleteProduct(\''+p.id+'\')">🗑</button></td></tr>';
-        }).join('')
-      : '<tr><td colspan="5" class="msg">Noch keine Produkte. Klicke "+ Produkt".</td></tr>';
+    // Produktkarten
+    if (!products.length) {
+      document.getElementById('productsList').innerHTML = '<div class="msg">Noch keine Produkte. Klicke "+ Neues Produkt".</div>';
+      return;
+    }
+    document.getElementById('productsList').innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;padding:8px">' +
+      products.map(function(p) {
+        var avail = p.available !== false;
+        return '<div style="border:1.5px solid var(--border);border-radius:10px;overflow:hidden;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.07)">' +
+          (p.image_url ? '<img src="'+p.image_url+'" style="width:100%;height:160px;object-fit:cover">' :
+            '<div style="width:100%;height:100px;background:#f0fdf4;display:flex;align-items:center;justify-content:center;font-size:2.5rem">🛒</div>') +
+          '<div style="padding:14px">' +
+            '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">' +
+              '<strong style="font-size:.95rem;color:var(--g2)">'+p.name+'</strong>' +
+              '<span class="badge '+(avail?'b-active':'b-paused')+'">'+(avail?'Verfügbar':'Pausiert')+'</span>' +
+            '</div>' +
+            (p.short_description ? '<p style="font-size:.8rem;color:var(--mu);margin-bottom:8px">'+p.short_description+'</p>' : '') +
+            '<div style="font-size:1.1rem;font-weight:800;color:var(--gold);margin-bottom:10px">'+fmtNum(p.price)+' '+(merchant.currency||'RD$')+'</div>' +
+            '<div style="display:flex;gap:6px">' +
+              '<button class="btn btn-gold" style="flex:1;padding:6px 0;font-size:.78rem" onclick="editProduct(\''+p.id+'\')">✏️ Bearbeiten</button>' +
+              '<button class="btn btn-danger" style="padding:6px 10px;font-size:.78rem" onclick="deleteProduct(\''+p.id+'\')">🗑️</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('') + '</div>';
   });
 }
 
 function loadProductsDropdown() {
   if (!sb || !merchant) return;
-  sb.from('merchant_products').select('*').eq('merchant_id', merchant.id).then(function(r){
+  sb.from('merchant_products').select('*').eq('merchant_id', merchant.id).order('sort_order',{ascending:true}).then(function(r){
     var data = r.data || [];
-    var opts = '<option value="">— Produkt wählen —</option>' +
+    var opts2 = '<option value="">— Produkt wählen —</option>' +
       data.map(function(p){ return '<option value="'+p.id+'">'+p.name+'</option>'; }).join('');
-    document.getElementById('s-product').innerHTML = opts;
+    document.getElementById('s-product').innerHTML = opts2;
   });
 }
 
 function showAddProduct() {
+  document.getElementById('p-id').value = '';
+  document.getElementById('p-name').value = '';
+  document.getElementById('p-price').value = '';
+  document.getElementById('p-short').value = '';
+  document.getElementById('p-long').value = '';
+  document.getElementById('p-stripe').value = '';
+  document.getElementById('p-sort').value = '1';
+  document.getElementById('p-img-url').value = '';
+  document.getElementById('p-img-preview').style.display = 'none';
+  document.getElementById('p-available').selectedIndex = 0;
+  document.getElementById('productFormTitle').textContent = '➕ Neues Produkt';
+  document.getElementById('p-save-status').innerHTML = '';
   var f = document.getElementById('addProductForm');
   f.style.display = f.style.display === 'none' ? 'block' : 'none';
+  if (f.style.display === 'block') f.scrollIntoView({behavior:'smooth'});
+}
+
+function editProduct(id) {
+  var p = products.find(function(x){ return x.id === id; });
+  if (!p) return;
+  document.getElementById('p-id').value = p.id;
+  document.getElementById('p-name').value = p.name || '';
+  document.getElementById('p-price').value = p.price || '';
+  document.getElementById('p-short').value = p.short_description || '';
+  document.getElementById('p-long').value = p.long_description || '';
+  document.getElementById('p-stripe').value = p.stripe_link || '';
+  document.getElementById('p-sort').value = p.sort_order || 1;
+  document.getElementById('p-img-url').value = p.image_url || '';
+  document.getElementById('p-available').value = p.available === false ? 'false' : 'true';
+  if (p.image_url) {
+    document.getElementById('p-img-thumb').src = p.image_url;
+    document.getElementById('p-img-preview').style.display = 'block';
+  } else {
+    document.getElementById('p-img-preview').style.display = 'none';
+  }
+  document.getElementById('productFormTitle').textContent = '✏️ Produkt bearbeiten';
+  document.getElementById('p-save-status').innerHTML = '';
+  var f = document.getElementById('addProductForm');
+  f.style.display = 'block';
+  f.scrollIntoView({behavior:'smooth'});
+}
+
+function closeProductForm() {
+  document.getElementById('addProductForm').style.display = 'none';
+}
+
+function previewImage(input) {
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('p-img-thumb').src = e.target.result;
+      document.getElementById('p-img-preview').style.display = 'block';
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
 }
 
 function saveProduct() {
   if (!sb || !merchant) return;
   var name  = document.getElementById('p-name').value.trim();
   var price = parseFloat(document.getElementById('p-price').value) || 0;
-  var link  = document.getElementById('p-stripe').value.trim();
-  if (!name || !link) { showToast('Name und Stripe-Link sind Pflicht'); return; }
-  sb.from('merchant_products').insert({
-    merchant_id: merchant.id, name: name, price: price,
-    stripe_link: link, description: document.getElementById('p-desc').value.trim() || null,
-    status: 'active'
-  }).then(function(r){
-    if (r.error) { showToast('Fehler: '+r.error.message); return; }
-    showToast('✅ Produkt gespeichert!');
-    document.getElementById('addProductForm').style.display = 'none';
-    document.getElementById('p-name').value = '';
-    document.getElementById('p-price').value = '';
-    document.getElementById('p-stripe').value = '';
-    document.getElementById('p-desc').value = '';
-    loadProducts();
-  });
+  if (!name) { showToast('Produkttitel ist Pflicht'); return; }
+
+  document.getElementById('p-save-status').innerHTML = '<span style="color:var(--mu);font-size:.82rem">⏳ Wird gespeichert...</span>';
+
+  var imgFile = document.getElementById('p-img-file').files[0];
+
+  function doSave(imgUrl) {
+    var pid = document.getElementById('p-id').value;
+    var payload = {
+      merchant_id:       merchant.id,
+      name:              name,
+      price:             price,
+      short_description: document.getElementById('p-short').value.trim() || null,
+      long_description:  document.getElementById('p-long').value.trim()  || null,
+      stripe_link:       document.getElementById('p-stripe').value.trim() || null,
+      sort_order:        parseInt(document.getElementById('p-sort').value) || 1,
+      available:         document.getElementById('p-available').value === 'true',
+      status:            'active'
+    };
+    if (imgUrl) payload.image_url = imgUrl;
+
+    var op = pid
+      ? sb.from('merchant_products').update(payload).eq('id', pid)
+      : sb.from('merchant_products').insert(payload);
+
+    op.then(function(r) {
+      if (r.error) {
+        document.getElementById('p-save-status').innerHTML = '<span style="color:var(--red)">Fehler: '+r.error.message+'</span>';
+        return;
+      }
+      showToast('✅ Produkt gespeichert!');
+      closeProductForm();
+      loadProducts();
+      loadProductsDropdown();
+    });
+  }
+
+  // Bild hochladen falls vorhanden
+  if (imgFile) {
+    var ext = imgFile.name.split('.').pop();
+    var path = merchant.slug + '/' + Date.now() + '.' + ext;
+    sb.storage.from('product-images').upload(path, imgFile, {upsert:true}).then(function(r) {
+      if (r.error) {
+        document.getElementById('p-save-status').innerHTML = '<span style="color:var(--red)">Bild-Upload fehlgeschlagen: '+r.error.message+'</span>';
+        return;
+      }
+      var imgUrl = sb.storage.from('product-images').getPublicUrl(path).data.publicUrl;
+      doSave(imgUrl);
+    });
+  } else {
+    doSave(document.getElementById('p-img-url').value || null);
+  }
 }
 
 function deleteProduct(id) {
