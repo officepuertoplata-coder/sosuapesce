@@ -631,27 +631,31 @@ function loadMerchants() {
 
     document.getElementById('merchantsList').innerHTML = data.map(function(m) {
       var fee = m.platform_fee_value + (m.platform_fee_type === 'percentage' ? '%' : ' ' + m.currency);
+      var mid = m.id;
+      var mname = m.name;
+      var mstatus = m.status;
+      var mslug = m.slug;
       return '<div class="merchant-card">' +
         '<div class="merchant-card-left">' +
-          '<h3>' + m.name + '</h3>' +
+          '<h3>' + mname + '</h3>' +
           '<p>' + (m.description || '') + '</p>' +
           '<p style="font-size:.75rem;color:var(--mu);margin-top:4px">' +
             (m.city ? '📍 ' + m.city + (m.country ? ', ' + m.country : '') + ' &nbsp;·&nbsp; ' : '') +
             (m.whatsapp_number ? '📱 ' + m.whatsapp_number + ' &nbsp;·&nbsp; ' : '') +
             '💰 ' + m.currency + ' &nbsp;·&nbsp; Plattform-Fee: ' + fee +
           '</p>' +
-          '<p style="font-size:.73rem;color:var(--mu);margin-top:2px">🔗 /' + m.slug + '/ &nbsp;·&nbsp; Angelegt: ' + fmtDate(m.created_at) + '</p>' +
+          '<p style="font-size:.73rem;color:var(--mu);margin-top:2px">🔗 /' + mslug + '/ &nbsp;·&nbsp; Angelegt: ' + fmtDate(m.created_at) + '</p>' +
         '</div>' +
         '<div class="merchant-card-right" style="flex-wrap:wrap">' +
-          statusBadge(m.status) +
-          '<a href="' + siteUrl + '/' + m.slug + '/" target="_blank" class="btn btn-outline" style="text-decoration:none">🌐 Landingpage</a>' +
-          '<a href="' + siteUrl + '/' + m.slug + '/agentes.html" target="_blank" class="btn btn-outline" style="text-decoration:none">👥 Agenten</a>' +
-          '<a href="' + siteUrl + '/' + m.slug + '/admin.html" target="_blank" class="btn btn-outline" style="text-decoration:none">⚙️ Admin</a>' +
-          '<button class="btn btn-outline" onclick="toggleMerchant(\'' + m.id + '\',\'' + m.status + '\')">'
-            + (m.status === 'active' ? '⏸ Pausieren' : '▶ Aktivieren') +
+          statusBadge(mstatus) +
+          '<a href="' + siteUrl + '/' + mslug + '/" target="_blank" class="btn btn-outline" style="text-decoration:none">🌐 Landingpage</a>' +
+          '<a href="' + siteUrl + '/' + mslug + '/agentes.html" target="_blank" class="btn btn-outline" style="text-decoration:none">👥 Agenten</a>' +
+          '<a href="' + siteUrl + '/' + mslug + '/admin.html" target="_blank" class="btn btn-outline" style="text-decoration:none">⚙️ Admin</a>' +
+          '<button class="btn btn-outline" onclick="toggleMerchant(\`' + mid + '\`,\`' + mstatus + '\`)">'+
+            (mstatus === 'active' ? '⏸ Pausieren' : '▶ Aktivieren') +
           '</button>' +
-          '<button class="btn btn-gold" onclick="openEdit(\'' + m.id + '\')">✏️ Bearbeiten</button>' +
-          '<button class="btn btn-danger" onclick="openConfirm(\'' + m.id + '\',\'' + m.name.replace(/'/g, "\\''") + '\')">🗑️</button>' +
+          '<button class="btn btn-gold" onclick="openEdit(\`' + mid + '\`)">✏️ Bearbeiten</button>' +
+          '<button class="btn btn-danger" onclick="openConfirm(\`' + mid + '\`,\`' + mname + '\`)">🗑️</button>' +
         '</div>' +
       '</div>';
     }).join('');
