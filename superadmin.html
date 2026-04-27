@@ -172,6 +172,7 @@ tr:hover td{background:#f9fafb}
     <button class="tbtn" id="btn-agents" onclick="showPage('agents',this)">🤝 Agenten</button>
     <button class="tbtn" id="btn-billing" onclick="showPage('billing',this)">💳 Abrechnung</button>
     <button class="tbtn tbtn-out" onclick="doLogout()">Ausloggen</button>
+    <a href="https://officepuertoplata-coder.github.io/sosuapesce/" target="_blank" class="tbtn" style="color:#a7f3d0;text-decoration:none;border:1px solid rgba(167,243,208,.4);margin-left:6px">🌐 Zur Plattform</a>
   </nav>
 
   <div class="main">
@@ -534,6 +535,7 @@ function loadOverview() {
   document.getElementById('ov-platform').textContent = '—';
 
   // Alle Händler laden
+  var siteUrl = (window.SP_CONFIG && window.SP_CONFIG.SITE_URL) || 'https://officepuertoplata-coder.github.io/sosuapesce';
   sb.from('merchants').select('*').order('created_at', {ascending:false}).then(function(r) {
     if (r.error) {
       showErrOverview('Fehler beim Laden der Händler: ' + r.error.message + ' (Code: ' + r.error.code + ')');
@@ -640,13 +642,16 @@ function loadMerchants() {
           '</p>' +
           '<p style="font-size:.73rem;color:var(--mu);margin-top:2px">🔗 /' + m.slug + '/ &nbsp;·&nbsp; Angelegt: ' + fmtDate(m.created_at) + '</p>' +
         '</div>' +
-        '<div class="merchant-card-right">' +
+        '<div class="merchant-card-right" style="flex-wrap:wrap">' +
           statusBadge(m.status) +
-          '<button class="btn btn-outline" onclick="toggleMerchant(\'' + m.id + '\',\'' + m.status + '\')">' +
-            (m.status === 'active' ? '⏸ Pausieren' : '▶ Aktivieren') +
+          '<a href="' + siteUrl + '/' + m.slug + '/" target="_blank" class="btn btn-outline" style="text-decoration:none">🌐 Landingpage</a>' +
+          '<a href="' + siteUrl + '/' + m.slug + '/agentes.html" target="_blank" class="btn btn-outline" style="text-decoration:none">👥 Agenten</a>' +
+          '<a href="' + siteUrl + '/' + m.slug + '/admin.html" target="_blank" class="btn btn-outline" style="text-decoration:none">⚙️ Admin</a>' +
+          '<button class="btn btn-outline" onclick="toggleMerchant(\'' + m.id + '\',\'' + m.status + '\')">'
+            + (m.status === 'active' ? '⏸ Pausieren' : '▶ Aktivieren') +
           '</button>' +
           '<button class="btn btn-gold" onclick="openEdit(\'' + m.id + '\')">✏️ Bearbeiten</button>' +
-          '<button class="btn btn-danger" onclick="openConfirm(\'' + m.id + '\',\'' + m.name.replace(/'/g,"\\'") + '\')">🗑️</button>' +
+          '<button class="btn btn-danger" onclick="openConfirm(\'' + m.id + '\',\'' + m.name.replace(/'/g, "\\''") + '\')">🗑️</button>' +
         '</div>' +
       '</div>';
     }).join('');
