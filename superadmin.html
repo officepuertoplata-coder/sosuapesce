@@ -2,379 +2,455 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Platform Superadmin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Superadmin – Referral Platform</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--g:#3a7d5c;--g2:#4a9470;--glt:#f0f7f3;--red:#bf1a2a;--bg:#f1f5f2;--wh:#fff;--dk:#0d2a1f;--mu:#5a7268;--bd:#e2ebe6;--gold:#d4a017;--blue:#1a4a8f;--stripe:#635bff}
+:root {
+  --g: #2d6a4f; --g2: #1b4332; --g3: #40916c;
+  --gold: #f4a100; --bg: #f0f2f0; --card: #fff;
+  --txt: #1a1a1a; --mu: #6b7280; --red: #dc2626;
+  --border: #e5e7eb; --r: 10px;
+}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--dk)}
-.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-.login-card{background:var(--wh);border:1.5px solid var(--bd);border-radius:18px;padding:40px 36px;max-width:360px;width:100%;box-shadow:0 8px 32px rgba(13,42,31,.1);text-align:center}
-.login-logo{font-family:'Fraunces',serif;font-size:1.8rem;color:var(--g);margin-bottom:4px}
-.login-sub{font-size:.78rem;color:var(--mu);margin-bottom:24px}
-.login-card input{width:100%;padding:11px 14px;border:1.5px solid var(--bd);border-radius:8px;font-size:.9rem;font-family:inherit;margin-bottom:12px}
-.login-card input:focus{outline:none;border-color:var(--g)}
-.btn-login{width:100%;background:var(--dk);color:#fff;font-weight:700;font-size:.95rem;padding:12px;border-radius:9px;border:none;cursor:pointer;font-family:inherit}
-.btn-login:hover{opacity:.9}
-.lerr{color:var(--red);font-size:.77rem;margin-top:8px;min-height:18px}
-.app{display:none}.app.show{display:block}
-.topbar{background:var(--dk);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--gold);flex-wrap:wrap;gap:8px}
-.topbar-brand{font-family:'Fraunces',serif;color:#fff;font-size:1.1rem;display:flex;align-items:center;gap:10px}
-.super-badge{background:var(--gold);color:var(--dk);font-size:.62rem;font-weight:700;padding:3px 8px;border-radius:4px;letter-spacing:.5px}
-.topbar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.tbtn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:.76rem;font-weight:600;padding:6px 14px;border-radius:20px;cursor:pointer;font-family:inherit;transition:background .2s}
-.tbtn:hover{background:rgba(255,255,255,.2)}.tbtn.active{background:var(--g);border-color:var(--g)}
+body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh}
+
+/* ── NAV ── */
+.nav{background:var(--g2);color:#fff;display:flex;align-items:center;gap:8px;padding:0 20px;height:52px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.nav-brand{font-weight:700;font-size:1.05rem;display:flex;align-items:center;gap:8px;margin-right:16px}
+.nav-brand .badge{background:var(--gold);color:#000;font-size:.65rem;font-weight:800;padding:2px 7px;border-radius:4px;letter-spacing:.5px}
+.tbtn{background:none;border:none;color:rgba(255,255,255,.75);cursor:pointer;padding:6px 13px;border-radius:6px;font-size:.88rem;font-weight:500;display:flex;align-items:center;gap:6px;transition:all .15s}
+.tbtn:hover,.tbtn.active{background:rgba(255,255,255,.15);color:#fff}
+.tbtn-new{background:var(--g3);color:#fff!important}
+.tbtn-new:hover{background:#52b788!important}
+.tbtn-out{color:var(--gold)!important;margin-left:auto}
+
+/* ── LOGIN ── */
+#loginWrap{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--g2)}
+.login-card{background:#fff;border-radius:14px;padding:40px 36px;width:340px;box-shadow:0 8px 32px rgba(0,0,0,.3);text-align:center}
+.login-card h2{color:var(--g2);margin-bottom:6px;font-size:1.4rem}
+.login-card p{color:var(--mu);font-size:.85rem;margin-bottom:24px}
+.login-card input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:1rem;outline:none;margin-bottom:12px;transition:border-color .2s}
+.login-card input:focus{border-color:var(--g3)}
+.login-card button{width:100%;background:var(--g2);color:#fff;border:none;padding:11px;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;transition:background .2s}
+.login-card button:hover{background:var(--g)}
+.lerr{color:var(--red);font-size:.83rem;min-height:18px;margin-top:4px}
+
+/* ── APP ── */
+#app{display:none}
+#app.show{display:block}
 .main{max-width:1200px;margin:0 auto;padding:28px 20px}
-.page{display:none}.page.active{display:block}
-.page-title{font-family:'Fraunces',serif;font-size:1.4rem;margin-bottom:20px}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:28px}
-.stat{background:var(--wh);border:1.5px solid var(--bd);border-radius:13px;padding:20px;border-top:3px solid var(--g)}
-.stat-num{font-size:2rem;font-weight:700;color:var(--g);line-height:1;margin-bottom:4px}
-.stat-lbl{font-size:.73rem;color:var(--mu)}
-.stat.gold{border-top-color:var(--gold)}.stat.gold .stat-num{color:var(--gold)}
-.tbl-wrap{background:var(--wh);border:1.5px solid var(--bd);border-radius:14px;overflow:hidden;margin-bottom:24px}
-.tbl-head{background:linear-gradient(135deg,var(--dk),#1a4a2e);padding:14px 18px;display:flex;align-items:center;justify-content:space-between}
-.tbl-head h3{color:#fff;font-size:.92rem;font-weight:700}
-table{width:100%;border-collapse:collapse;font-size:.8rem}
-th{background:var(--glt);padding:10px 14px;text-align:left;font-size:.72rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px}
-td{padding:10px 14px;border-bottom:1px solid var(--bd)}
-tr:last-child td{border:none}tr:hover td{background:rgba(58,125,92,.03)}
-.badge{display:inline-block;font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:20px}
-.b-active{background:var(--glt);color:var(--g);border:1px solid rgba(58,125,92,.25)}
-.b-paused{background:#fff8e1;color:#a07800;border:1px solid rgba(160,120,0,.2)}
-.b-frozen{background:#e8f0ff;color:var(--blue);border:1px solid rgba(26,74,143,.2)}
-.b-pending{background:#f5f5f5;color:var(--mu);border:1px solid var(--bd)}
-.panel{background:var(--wh);border:1.5px solid var(--bd);border-radius:14px;padding:24px;margin-bottom:20px}
-.panel h3{font-size:.95rem;font-weight:700;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--bd)}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px}
-@media(max-width:600px){.grid2,.grid3{grid-template-columns:1fr}}
-label{display:block;font-size:.74rem;font-weight:600;margin-bottom:4px}
-input[type=text],input[type=number],input[type=email],input[type=date],select,textarea{width:100%;padding:9px 12px;border:1.5px solid var(--bd);border-radius:7px;font-size:.85rem;font-family:inherit;background:var(--bg);color:var(--dk)}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--g)}
-textarea{min-height:80px;resize:vertical}
-.btn-save{background:var(--g);color:#fff;font-weight:700;font-size:.9rem;padding:10px 22px;border-radius:8px;border:none;cursor:pointer;font-family:inherit}
-.btn-save:hover{opacity:.9}
-.btn-out{background:transparent;color:var(--g);font-weight:700;font-size:.84rem;padding:8px 16px;border-radius:8px;border:1.5px solid var(--g);cursor:pointer;font-family:inherit}
-.btn-out:hover{background:var(--glt)}
-.btn-red{background:var(--red);color:#fff;font-weight:700;font-size:.84rem;padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-family:inherit}
-.btn-sm{font-size:.7rem;padding:4px 10px}
-.form-section{margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--bd)}
-.form-section:last-child{border:none;margin:0;padding:0}
-.form-section-title{font-size:.8rem;font-weight:700;color:var(--g);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
-.codetag{font-family:monospace;font-size:.73rem;background:var(--glt);padding:2px 7px;border-radius:5px;color:var(--g)}
-.msg{font-size:.8rem;color:var(--mu);padding:20px;text-align:center}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--g);color:#fff;padding:10px 22px;border-radius:30px;font-size:.82rem;font-weight:600;z-index:999;transition:transform .3s;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+
+/* ── STATS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.stat-card{background:var(--card);border-radius:var(--r);padding:22px 20px;border-top:4px solid var(--g3);box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.stat-card.gold{border-top-color:var(--gold)}
+.stat-val{font-size:1.8rem;font-weight:800;color:var(--g2);line-height:1}
+.stat-lbl{font-size:.8rem;color:var(--mu);margin-top:6px}
+
+/* ── SECTION HEADER ── */
+.sec-hd{background:var(--g2);color:#fff;border-radius:var(--r) var(--r) 0 0;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.sec-hd h2{font-size:1rem;font-weight:600}
+.sec-body{background:var(--card);border-radius:0 0 var(--r) var(--r);box-shadow:0 1px 4px rgba(0,0,0,.08);overflow:hidden}
+
+/* ── TABLE ── */
+table{width:100%;border-collapse:collapse}
+th{padding:10px 14px;text-align:left;font-size:.72rem;color:var(--mu);font-weight:600;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+td{padding:12px 14px;font-size:.88rem;border-bottom:1px solid var(--border)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#f9fafb}
+.msg{text-align:center;color:var(--mu);padding:36px 20px;font-size:.9rem}
+.codetag{background:#f3f4f6;border-radius:4px;padding:2px 7px;font-family:monospace;font-size:.8rem;color:var(--g2)}
+.badge{display:inline-block;padding:3px 9px;border-radius:12px;font-size:.72rem;font-weight:700}
+.b-active{background:#dcfce7;color:#15803d}
+.b-paused{background:#fef9c3;color:#a16207}
+.b-frozen{background:#dbeafe;color:#1d4ed8}
+.b-pending{background:#f3f4f6;color:#374151}
+
+/* ── MERCHANT CARDS ── */
+.merchant-card{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.merchant-card:last-child{border-bottom:none}
+.merchant-card h3{font-size:1rem;color:var(--g2);margin-bottom:4px}
+.merchant-card p{font-size:.82rem;color:var(--mu);margin-bottom:2px}
+.merchant-card-right{display:flex;gap:8px;flex-shrink:0;align-items:center}
+.btn{border:none;padding:7px 14px;border-radius:7px;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-outline{background:#f3f4f6;color:var(--txt)}
+.btn-outline:hover{background:var(--border)}
+.btn-green{background:var(--g3);color:#fff}
+.btn-green:hover{background:var(--g)}
+.btn-gold{background:var(--gold);color:#000}
+.btn-gold:hover{background:#e09200}
+.btn-danger{background:#fef2f2;color:var(--red)}
+.btn-danger:hover{background:#fee2e2}
+
+/* ── FORM ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:24px}
+.form-grid .full{grid-column:1/-1}
+.form-group label{display:block;font-size:.78rem;font-weight:600;color:var(--mu);margin-bottom:5px;text-transform:uppercase;letter-spacing:.3px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:.9rem;outline:none;transition:border-color .2s;background:#fff;font-family:inherit}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--g3)}
+.form-group textarea{min-height:70px;resize:vertical}
+.form-section{grid-column:1/-1;margin-top:8px;padding-top:14px;border-top:1px solid var(--border);font-size:.8rem;font-weight:700;color:var(--g2);text-transform:uppercase;letter-spacing:.5px}
+.form-actions{grid-column:1/-1;display:flex;justify-content:flex-end;gap:10px;margin-top:8px;padding-top:14px;border-top:1px solid var(--border)}
+
+/* ── PAGES ── */
+.page{display:none}
+.page.active{display:block}
+
+/* ── AGENTS TABLE ── */
+.agents-wrap{padding:0}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--g2);color:#fff;padding:10px 22px;border-radius:40px;font-size:.88rem;box-shadow:0 4px 16px rgba(0,0,0,.25);transition:transform .25s;z-index:999;pointer-events:none}
 .toast.show{transform:translateX(-50%) translateY(0)}
-.merchant-card{background:var(--wh);border:1.5px solid var(--bd);border-radius:14px;padding:18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;cursor:pointer;transition:border-color .2s}
-.merchant-card:hover{border-color:var(--g)}
-.merchant-card-left h3{font-size:.95rem;font-weight:700;margin-bottom:3px}
-.merchant-card-left p{font-size:.75rem;color:var(--mu)}
-.merchant-card-right{display:flex;align-items:center;gap:8px}
-.link-tag{font-family:monospace;font-size:.72rem;color:var(--mu);background:var(--bg);padding:3px 8px;border-radius:4px}
+
+/* ── ERROR BOX ── */
+.err-box{background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:14px 18px;color:var(--red);font-size:.85rem;margin:16px 20px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:800px){
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .form-grid{grid-template-columns:1fr}
+  .form-grid .full{grid-column:1}
+  .form-actions{grid-column:1}
+  .form-section{grid-column:1}
+}
+@media(max-width:500px){
+  .stats-grid{grid-template-columns:1fr}
+  .nav{overflow-x:auto}
+}
+
+/* ── BILLING ── */
+.billing-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:20px}
+.billing-card{border:1.5px solid var(--border);border-radius:var(--r);padding:18px}
+.billing-card h3{color:var(--g2);margin-bottom:12px;font-size:.95rem}
+.billing-row{display:flex;justify-content:space-between;font-size:.85rem;padding:5px 0;border-bottom:1px solid #f3f4f6}
+.billing-row:last-child{border:none;font-weight:700;padding-top:10px}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:14px;width:100%;max-width:780px;max-height:90vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,.3)}
+.modal-hd{background:var(--g2);color:#fff;padding:16px 22px;border-radius:14px 14px 0 0;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.modal-hd h3{font-size:1rem;font-weight:700}
+.modal-close{background:none;border:none;color:rgba(255,255,255,.8);font-size:1.4rem;cursor:pointer;line-height:1;padding:0 4px}
+.modal-close:hover{color:#fff}
+/* confirm delete dialog */
+.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:600;align-items:center;justify-content:center}
+.confirm-overlay.open{display:flex}
+.confirm-box{background:#fff;border-radius:12px;padding:30px 28px;width:360px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.confirm-box h3{color:var(--red);margin-bottom:10px;font-size:1.1rem}
+.confirm-box p{color:var(--mu);font-size:.88rem;margin-bottom:22px;line-height:1.5}
+.confirm-box .btn-row{display:flex;gap:10px;justify-content:center}
+.btn-red{background:var(--red);color:#fff}
+.btn-red:hover{background:#b91c1c}
 </style>
 </head>
 <body>
 
-<div class="login-wrap" id="loginWrap">
+<!-- LOGIN -->
+<div id="loginWrap">
   <div class="login-card">
-    <div class="login-logo">&#9733; Superadmin</div>
-    <div class="login-sub">Referral Platform &mdash; YNHALD Corp.</div>
-    <input type="password" id="pwInput" placeholder="Superadmin-Passwort">
-    <button class="btn-login" onclick="doLogin()">Einloggen &rarr;</button>
+    <div style="font-size:2rem;margin-bottom:8px">⭐</div>
+    <h2>Referral Platform</h2>
+    <p>Superadmin-Zugang</p>
+    <input type="password" id="pwInput" placeholder="Passwort" autocomplete="current-password">
     <div class="lerr" id="lerr"></div>
+    <button onclick="doLogin()">Einloggen</button>
   </div>
 </div>
 
-<div class="app" id="app">
-  <div class="topbar">
-    <div class="topbar-brand">
-      &#9733; Referral Platform
-      <span class="super-badge">SUPERADMIN</span>
-    </div>
-    <div class="topbar-right">
-      <button class="tbtn active" onclick="showPage('overview',this)">&#128202; Übersicht</button>
-      <button class="tbtn" onclick="showPage('merchants',this)">&#127978; Händler</button>
-      <button class="tbtn" onclick="showPage('new-merchant',this)">&#10133; Neuer Händler</button>
-      <button class="tbtn" onclick="showPage('agents',this)">&#129309; Agenten</button>
-      <button class="tbtn" onclick="showPage('billing',this)">&#128197; Abrechnung</button>
-      <button class="tbtn" onclick="doLogout()" style="border-color:rgba(191,26,42,.5);color:#ff9999">Ausloggen</button>
-    </div>
-  </div>
+<!-- APP -->
+<div id="app">
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-brand">⭐ Referral Platform <span class="badge">SUPERADMIN</span></div>
+    <button class="tbtn active" id="btn-overview" onclick="showPage('overview',this)">📊 Übersicht</button>
+    <button class="tbtn" id="btn-merchants" onclick="showPage('merchants',this)">🏪 Händler</button>
+    <button class="tbtn tbtn-new" id="btn-new" onclick="showPage('new',this)">➕ Neuer Händler</button>
+    <button class="tbtn" id="btn-agents" onclick="showPage('agents',this)">🤝 Agenten</button>
+    <button class="tbtn" id="btn-billing" onclick="showPage('billing',this)">💳 Abrechnung</button>
+    <button class="tbtn tbtn-out" onclick="doLogout()">Ausloggen</button>
+  </nav>
 
   <div class="main">
 
     <!-- ÜBERSICHT -->
     <div class="page active" id="page-overview">
-      <div class="page-title">&#128202; Plattform-Übersicht</div>
-      <div class="stats">
-        <div class="stat"><div class="stat-num" id="ov-merchants">-</div><div class="stat-lbl">Aktive Händler</div></div>
-        <div class="stat"><div class="stat-num" id="ov-agents">-</div><div class="stat-lbl">Aktive Agenten</div></div>
-        <div class="stat"><div class="stat-num" id="ov-sales">-</div><div class="stat-lbl">Verkäufe gesamt</div></div>
-        <div class="stat gold"><div class="stat-num" id="ov-platform">-</div><div class="stat-lbl">Plattform-Einnahmen</div></div>
+      <h1 style="font-size:1.4rem;font-weight:800;margin-bottom:20px;display:flex;align-items:center;gap:10px">📊 Plattform-Übersicht</h1>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-val" id="ov-merchants">—</div><div class="stat-lbl">Aktive Händler</div></div>
+        <div class="stat-card"><div class="stat-val" id="ov-agents">—</div><div class="stat-lbl">Aktive Agenten</div></div>
+        <div class="stat-card"><div class="stat-val" id="ov-sales">—</div><div class="stat-lbl">Verkäufe gesamt</div></div>
+        <div class="stat-card gold"><div class="stat-val" id="ov-platform">—</div><div class="stat-lbl">Plattform-Einnahmen</div></div>
       </div>
-      <div class="tbl-wrap">
-        <div class="tbl-head"><h3>Händler-Übersicht</h3><button class="tbtn btn-sm" onclick="loadOverview()">Aktualisieren</button></div>
-        <div style="overflow-x:auto"><table>
-          <thead><tr><th>Händler</th><th>Slug</th><th>Agenten</th><th>Verkäufe</th><th>Umsatz</th><th>Plattform-Fee</th><th>Status</th></tr></thead>
+      <div>
+        <div class="sec-hd"><h2>🏪 Händler-Übersicht</h2><button class="btn btn-outline" style="color:#fff;background:rgba(255,255,255,.15)" onclick="loadOverview()">Aktualisieren</button></div>
+        <div class="sec-body">
+          <table><thead><tr>
+            <th>HÄNDLER</th><th>SLUG</th><th>AGENTEN</th><th>VERKÄUFE</th><th>UMSATZ</th><th>PLATTFORM-FEE</th><th>STATUS</th>
+          </tr></thead>
           <tbody id="overviewTable"><tr><td colspan="7" class="msg">Lade...</td></tr></tbody>
-        </table></div>
+          </table>
+        </div>
       </div>
     </div>
 
     <!-- HÄNDLER LISTE -->
     <div class="page" id="page-merchants">
-      <div class="page-title">&#127978; Händler verwalten</div>
-      <div id="merchantsList"><div class="msg">Lade...</div></div>
+      <h1 style="font-size:1.4rem;font-weight:800;margin-bottom:20px">🏪 Alle Händler</h1>
+      <div>
+        <div class="sec-hd"><h2>Händler-Liste</h2><button class="btn btn-outline" style="color:#fff;background:rgba(255,255,255,.15)" onclick="loadMerchants()">Aktualisieren</button></div>
+        <div class="sec-body" id="merchantsList"><div class="msg">Lade...</div></div>
+      </div>
     </div>
 
     <!-- NEUER HÄNDLER -->
-    <div class="page" id="page-new-merchant">
-      <div class="page-title">&#10133; Neuer Händler einrichten</div>
-      <div class="panel">
-        <div class="form-section">
-          <div class="form-section-title">&#127978; Grunddaten</div>
-          <div class="grid2">
-            <div><label>Slug (URL-Name) *</label><input type="text" id="m-slug" placeholder="sosuapesce" style="text-transform:lowercase"><div style="font-size:.7rem;color:var(--mu);margin-top:3px">Wird zur URL: .../sosuapesce/</div></div>
-            <div><label>Name *</label><input type="text" id="m-name" placeholder="Sosua Pesce"></div>
-          </div>
-          <div class="grid2">
-            <div><label>Kategorie</label>
+    <div class="page" id="page-new">
+      <h1 style="font-size:1.4rem;font-weight:800;margin-bottom:20px">➕ Neuer Händler anlegen</h1>
+      <div>
+        <div class="sec-hd"><h2>Händler-Daten</h2></div>
+        <div class="sec-body">
+          <div class="form-grid">
+            <div class="form-section">🏪 Grunddaten</div>
+            <div class="form-group">
+              <label>Slug (URL-Name) *</label>
+              <input id="m-slug" placeholder="z.B. masseur-xyz" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,'')">
+            </div>
+            <div class="form-group">
+              <label>Name *</label>
+              <input id="m-name" placeholder="Geschäftsname">
+            </div>
+            <div class="form-group full">
+              <label>Beschreibung</label>
+              <textarea id="m-desc" placeholder="Kurze Beschreibung des Händlers"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Kategorie</label>
               <select id="m-category">
-                <option value="fish">Fisch / Lebensmittel</option>
-                <option value="massage">Massage / Wellness</option>
-                <option value="handwerk">Handwerk / Reparatur</option>
-                <option value="delivery">Lieferservice</option>
-                <option value="retail">Einzelhandel</option>
+                <option value="fish">Fischhandel</option>
+                <option value="food">Lebensmittel</option>
+                <option value="massage">Massage/Wellness</option>
+                <option value="handwerk">Handwerk</option>
                 <option value="other">Sonstiges</option>
               </select>
             </div>
-            <div><label>Sprache (Standard)</label>
+            <div class="form-group">
+              <label>Sprache</label>
               <select id="m-language">
-                <option value="es">Spanisch (ES)</option>
-                <option value="en">Englisch (EN)</option>
-                <option value="de">Deutsch (DE)</option>
+                <option value="es">Español</option>
+                <option value="de">Deutsch</option>
+                <option value="en">English</option>
               </select>
             </div>
-          </div>
-          <div><label>Beschreibung</label><textarea id="m-desc" placeholder="Kurze Beschreibung des Händlers..."></textarea></div>
-        </div>
 
-        <div class="form-section">
-          <div class="form-section-title">&#128222; Kontakt</div>
-          <div class="grid3">
-            <div><label>WhatsApp-Nummer</label><input type="text" id="m-wa" placeholder="18299758857"></div>
-            <div><label>E-Mail</label><input type="email" id="m-email" placeholder="name@example.com"></div>
-            <div><label>Telefon</label><input type="text" id="m-phone" placeholder="+1 829 000 0000"></div>
-          </div>
-          <div class="grid2">
-            <div><label>Adresse / Straße</label><input type="text" id="m-address" placeholder="Calle Principal 123"></div>
-            <div><label>Stadt / Ort</label><input type="text" id="m-city" placeholder="Sosúa"></div>
-          </div>
-          <div class="grid3">
-            <div><label>PLZ / ZIP Code</label><input type="text" id="m-zip" placeholder="57000"></div>
-            <div><label>Staat / State</label><input type="text" id="m-state" placeholder="Puerto Plata / FL"></div>
-            <div><label>Land / Country</label>
+            <div class="form-section">📞 Kontakt</div>
+            <div class="form-group">
+              <label>WhatsApp</label>
+              <input id="m-wa" placeholder="+1809...">
+            </div>
+            <div class="form-group">
+              <label>E-Mail</label>
+              <input id="m-email" type="email" placeholder="email@beispiel.com">
+            </div>
+            <div class="form-group">
+              <label>Telefon</label>
+              <input id="m-phone" placeholder="+1809...">
+            </div>
+            <div class="form-group">
+              <label>Stripe-Zahlungslink</label>
+              <input id="m-stripe" placeholder="https://buy.stripe.com/...">
+            </div>
+
+            <div class="form-section">📍 Adresse</div>
+            <div class="form-group full">
+              <label>Straße / Adresse</label>
+              <input id="m-address" placeholder="Calle Principal 123">
+            </div>
+            <div class="form-group">
+              <label>Stadt / Ort</label>
+              <input id="m-city" placeholder="Sosúa">
+            </div>
+            <div class="form-group">
+              <label>PLZ</label>
+              <input id="m-zip" placeholder="57000">
+            </div>
+            <div class="form-group">
+              <label>Staat / Provinz</label>
+              <input id="m-state" placeholder="Puerto Plata">
+            </div>
+            <div class="form-group">
+              <label>Land</label>
               <select id="m-country">
                 <option value="DO">🇩🇴 Dominikanische Republik</option>
-                <option value="US">🇺🇸 USA</option>
                 <option value="DE">🇩🇪 Deutschland</option>
                 <option value="AT">🇦🇹 Österreich</option>
                 <option value="CH">🇨🇭 Schweiz</option>
+                <option value="US">🇺🇸 USA</option>
+                <option value="MX">🇲🇽 Mexiko</option>
                 <option value="ES">🇪🇸 Spanien</option>
-                <option value="other">Andere</option>
               </select>
             </div>
-          </div>
-        </div>
 
-        <div class="form-section">
-          <div class="form-section-title">&#128176; Zahlungen</div>
-          <div class="grid2">
-            <div><label>Währung</label>
+            <div class="form-section">💰 Finanzen</div>
+            <div class="form-group">
+              <label>Währung</label>
               <select id="m-currency">
-                <option value="RD$">Peso Dominicano (RD$)</option>
-                <option value="USD">US Dollar (USD)</option>
-                <option value="EUR">Euro (EUR)</option>
+                <option value="RD$">RD$ (Dominikanischer Peso)</option>
+                <option value="EUR">EUR (Euro)</option>
+                <option value="USD">USD (US-Dollar)</option>
               </select>
             </div>
-            <div><label>Stripe Payment Link</label><input type="text" id="m-stripe" placeholder="https://buy.stripe.com/..."></div>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <div class="form-section-title">&#9733; Plattformgebühr</div>
-          <div class="grid3">
-            <div><label>Grundgebühr / Monat</label><input type="number" id="m-basefee" value="0" min="0"></div>
-            <div><label>Transaktionsgebühr-Typ</label>
+            <div class="form-group">
+              <label>Plattformgebühr-Typ</label>
               <select id="m-feetype">
-                <option value="fixed">Fix pro Transaktion</option>
-                <option value="percentage">Prozent vom Umsatz</option>
-                <option value="none">Keine</option>
+                <option value="fixed">Fix (Betrag)</option>
+                <option value="percentage">Prozent (%)</option>
               </select>
             </div>
-            <div><label>Transaktionsgebühr-Wert</label><input type="number" id="m-feevalue" value="0" min="0" step="0.01"></div>
-          </div>
-        </div>
+            <div class="form-group">
+              <label>Plattformgebühr-Betrag</label>
+              <input id="m-feevalue" type="number" value="50" min="0" step="0.01">
+            </div>
+            <div class="form-group">
+              <label>Monatsgebühr (fix)</label>
+              <input id="m-basefee" type="number" value="0" min="0" step="0.01">
+            </div>
 
-        <div class="form-section">
-          <div class="form-section-title">&#129309; Agenten-Provisionsregeln</div>
-          <div class="grid3">
-            <div><label>Neukunden/Monat (Minimum)</label><input type="number" id="m-minnew" value="1" min="0"></div>
-            <div><label>Freeze nach X Monaten Pause</label><input type="number" id="m-freeze" value="3" min="1"></div>
-            <div><label>Mindestbetrag Auszahlung</label><input type="number" id="m-minpayout" value="1000" min="0"></div>
-          </div>
-          <div class="grid2">
-            <div><label>Abrechnungsperiode</label>
+            <div class="form-section">⚙️ Provisions-Regeln</div>
+            <div class="form-group">
+              <label>Min. Neukunden/Monat</label>
+              <input id="m-minnew" type="number" value="1" min="0">
+            </div>
+            <div class="form-group">
+              <label>Einfrieren nach X Monaten Pause</label>
+              <input id="m-freeze" type="number" value="3" min="1">
+            </div>
+            <div class="form-group">
+              <label>Min. Auszahlung</label>
+              <input id="m-minpayout" type="number" value="1000" min="0">
+            </div>
+            <div class="form-group">
+              <label>Auszahlungsrhythmus</label>
               <select id="m-schedule">
-                <option value="bimonthly">2× im Monat (15. + letzter)</option>
-                <option value="monthly">Monatlich</option>
+                <option value="twice_monthly">2x monatlich (15. und Monatsende)</option>
+                <option value="monthly">1x monatlich</option>
                 <option value="weekly">Wöchentlich</option>
               </select>
             </div>
-            <div><label>Provisionen bei Pause</label>
+            <div class="form-group">
+              <label>Provision bei Pause</label>
               <select id="m-pauseaction">
-                <option value="accumulate">Akkumulieren (Modell A)</option>
-                <option value="forfeit">Verfallen sofort (Modell B)</option>
-                <option value="forfeit_after_30">Verfallen nach 30 Tagen (Modell C)</option>
+                <option value="accumulate">Akkumulieren (Nachzahlung)</option>
+                <option value="forfeit">Verfallen</option>
+                <option value="hold">Einfrieren</option>
               </select>
             </div>
-          </div>
-        </div>
 
-        <div class="form-section">
-          <div class="form-section-title">&#128274; Händler Admin-Passwort</div>
-          <div class="grid2">
-            <div><label>Passwort für Händler-Admin</label><input type="text" id="m-password" placeholder="SicheresPasswort123!"></div>
-            <div style="display:flex;align-items:flex-end"><button class="btn-out" onclick="genPassword()">Generieren</button></div>
-          </div>
-        </div>
+            <div class="form-section">🔐 Händler-Admin Zugang</div>
+            <div class="form-group">
+              <label>Admin-Passwort</label>
+              <div style="display:flex;gap:8px">
+                <input id="m-password" placeholder="Passwort generieren oder eingeben" style="flex:1">
+                <button class="btn btn-outline" onclick="genPassword()" type="button">🔑 Generieren</button>
+              </div>
+            </div>
 
-        <button class="btn-save" onclick="createMerchant()" style="width:100%;margin-top:8px">&#10003; Händler anlegen</button>
-      </div>
-
-      <div class="panel" id="merchantProductForm" style="display:none">
-        <h3>&#128230; Erstes Produkt anlegen</h3>
-        <div class="grid2">
-          <div><label>Produktname *</label><input type="text" id="p-name" placeholder="Entrega de Pescado Fresco"></div>
-          <div><label>Kategorie</label><input type="text" id="p-cat" placeholder="Fisch"></div>
+            <div class="form-actions">
+              <button class="btn btn-outline" onclick="clearMerchantForm()" type="button">Abbrechen</button>
+              <button class="btn btn-green" onclick="createMerchant()" type="button">✓ Händler anlegen</button>
+            </div>
+          </div>
+          <div id="createStatus" style="padding:0 24px 20px"></div>
         </div>
-        <div><label>Beschreibung</label><textarea id="p-desc" placeholder="Produktbeschreibung..."></textarea></div>
-        <div class="grid3">
-          <div><label>Preistyp</label>
-            <select id="p-pricetype" onchange="updateProductForm()">
-              <option value="fixed">Fix</option>
-              <option value="per_unit">Pro Einheit</option>
-              <option value="variable">Variabel (min-max)</option>
-              <option value="negotiated">Verhandelbar</option>
-              <option value="free">Kostenlos</option>
-            </select>
-          </div>
-          <div><label>Preis</label><input type="number" id="p-price" value="0" min="0" step="0.01"></div>
-          <div><label>Einheit</label><input type="text" id="p-unit" placeholder="kg / Stunde / Stück"></div>
-        </div>
-        <div class="grid3">
-          <div><label>Service-Fee Typ</label>
-            <select id="p-feetype">
-              <option value="none">Keine</option>
-              <option value="fixed">Fix</option>
-              <option value="percentage">Prozent</option>
-            </select>
-          </div>
-          <div><label>Service-Fee Wert</label><input type="number" id="p-fee" value="0" min="0"></div>
-          <div><label>Zahlungsmethode</label>
-            <select id="p-payment">
-              <option value="hybrid">Hybrid (online + bar)</option>
-              <option value="online">Nur online</option>
-              <option value="cash">Nur bar</option>
-              <option value="any">Beliebig</option>
-            </select>
-          </div>
-        </div>
-        <div class="grid3">
-          <div><label>Liefertyp</label>
-            <select id="p-fulfill">
-              <option value="delivery">Lieferung</option>
-              <option value="pickup">Abholung</option>
-              <option value="onsite">Vor Ort</option>
-              <option value="appointment">Termin</option>
-              <option value="digital">Digital</option>
-            </select>
-          </div>
-          <div><label>Provisions-Typ</label>
-            <select id="p-commtype">
-              <option value="fixed">Fix</option>
-              <option value="percentage">Prozent</option>
-              <option value="points">Punkte</option>
-              <option value="hybrid">Hybrid</option>
-              <option value="none">Keine</option>
-            </select>
-          </div>
-          <div><label>Provisions-Wert</label><input type="number" id="p-commval" value="0" min="0" step="0.01"></div>
-        </div>
-        <div class="grid2">
-          <div><label>Provisions-Basis</label>
-            <select id="p-commbase">
-              <option value="sale_amount">Auf Verkaufspreis</option>
-              <option value="service_fee">Auf Service-Fee</option>
-              <option value="total">Auf Gesamt</option>
-            </select>
-          </div>
-          <div><label>Hervorgehoben anzeigen?</label>
-            <select id="p-featured">
-              <option value="true">Ja</option>
-              <option value="false">Nein</option>
-            </select>
-          </div>
-        </div>
-        <button class="btn-save" onclick="createProduct()" style="width:100%;margin-top:8px">&#10003; Produkt anlegen</button>
       </div>
     </div>
 
     <!-- AGENTEN -->
     <div class="page" id="page-agents">
-      <div class="page-title">&#129309; Alle Agenten</div>
-      <div class="tbl-wrap">
-        <div class="tbl-head"><h3>Agenten (plattformübergreifend)</h3><button class="tbtn btn-sm" onclick="loadAllAgents()">Aktualisieren</button></div>
-        <div style="overflow-x:auto"><table>
-          <thead><tr><th>Name</th><th>Email</th><th>Telefon</th><th>Händler</th><th>Code</th><th>Status</th><th>Verkäufe</th><th>Verdient</th><th>Pause</th></tr></thead>
-          <tbody id="allAgentsTable"><tr><td colspan="9" class="msg">Lade...</td></tr></tbody>
-        </table></div>
+      <h1 style="font-size:1.4rem;font-weight:800;margin-bottom:20px">🤝 Alle Agenten</h1>
+      <div>
+        <div class="sec-hd"><h2>Agenten-Übersicht</h2><button class="btn btn-outline" style="color:#fff;background:rgba(255,255,255,.15)" onclick="loadAllAgents()">Aktualisieren</button></div>
+        <div class="sec-body">
+          <table><thead><tr>
+            <th>NAME</th><th>HÄNDLER</th><th>CODE</th><th>VERKÄUFE</th><th>PROVISION</th><th>STATUS</th><th>REGISTRIERT</th>
+          </tr></thead>
+          <tbody id="agentsList"><tr><td colspan="7" class="msg">Lade...</td></tr></tbody></table>
+        </div>
       </div>
     </div>
 
     <!-- ABRECHNUNG -->
     <div class="page" id="page-billing">
-      <div class="page-title">&#128197; Plattform-Abrechnung</div>
-      <div class="panel">
-        <h3>Plattformgebühren pro Händler</h3>
-        <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px">
-          <div><label>Von</label><input type="date" id="b-from" style="width:auto"></div>
-          <div><label>Bis</label><input type="date" id="b-to" style="width:auto"></div>
-          <button class="btn-save" onclick="genBilling()">Bericht erstellen</button>
-          <button class="btn-out" onclick="setHalf(1)">1–15</button>
-          <button class="btn-out" onclick="setHalf(2)">16–Ende</button>
-        </div>
-      </div>
-      <div class="tbl-wrap">
-        <div class="tbl-head"><h3 id="billingTitle">Bericht</h3><button class="tbtn btn-sm" onclick="window.print()">Drucken</button></div>
-        <div style="overflow-x:auto"><table>
-          <thead><tr><th>Händler</th><th>Slug</th><th>Transaktionen</th><th>Umsatz</th><th>Plattformgebühr</th><th>Grundgebühr</th><th>Gesamt</th></tr></thead>
-          <tbody id="billingTable"><tr><td colspan="7" class="msg">Zeitraum wählen und Bericht erstellen.</td></tr></tbody>
-        </table></div>
-        <div id="billingSummary" style="display:none;background:var(--glt);padding:14px 18px;display:none;gap:24px;flex-wrap:wrap;border-top:1px solid var(--bd)">
-          <span style="font-size:.82rem">Händler: <strong id="bs-m">0</strong></span>
-          <span style="font-size:.82rem">Transaktionen: <strong id="bs-t">0</strong></span>
-          <span style="font-size:.82rem">Gesamt-Plattformgebühren: <strong id="bs-total" style="color:var(--g)">0</strong></span>
+      <h1 style="font-size:1.4rem;font-weight:800;margin-bottom:20px">💳 Plattform-Abrechnung</h1>
+      <div>
+        <div class="sec-hd"><h2>Abrechnungsübersicht</h2></div>
+        <div class="sec-body">
+          <div class="billing-cards" id="billingContent">
+            <div class="msg" style="grid-column:1/-1">Lade...</div>
+          </div>
         </div>
       </div>
     </div>
 
   </div><!-- /main -->
 </div><!-- /app -->
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="editOverlay">
+  <div class="modal">
+    <div class="modal-hd">
+      <h3>&#9999;&#65039; H&#228;ndler bearbeiten</h3>
+      <button class="modal-close" onclick="closeEdit()">&#10005;</button>
+    </div>
+    <div class="form-grid" style="padding:22px">
+      <input type="hidden" id="e-id">
+      <div class="form-section" style="grid-column:1/-1;margin-top:0;padding-top:0;border:none">&#127978; Grunddaten</div>
+      <div class="form-group"><label>Slug (URL-Name)</label><input id="e-slug" readonly style="background:#f9fafb;color:var(--mu)"></div>
+      <div class="form-group"><label>Name *</label><input id="e-name"></div>
+      <div class="form-group full"><label>Beschreibung</label><textarea id="e-desc"></textarea></div>
+      <div class="form-group"><label>Kategorie</label><select id="e-category"><option value="fish">Fischhandel</option><option value="food">Lebensmittel</option><option value="massage">Massage/Wellness</option><option value="handwerk">Handwerk</option><option value="other">Sonstiges</option></select></div>
+      <div class="form-group"><label>Sprache</label><select id="e-language"><option value="es">Espa&#241;ol</option><option value="de">Deutsch</option><option value="en">English</option></select></div>
+      <div class="form-section">&#128222; Kontakt</div>
+      <div class="form-group"><label>WhatsApp</label><input id="e-wa"></div>
+      <div class="form-group"><label>E-Mail</label><input id="e-email" type="email"></div>
+      <div class="form-group"><label>Telefon</label><input id="e-phone"></div>
+      <div class="form-group"><label>Stripe-Zahlungslink</label><input id="e-stripe"></div>
+      <div class="form-section">&#128205; Adresse</div>
+      <div class="form-group full"><label>Stra&#223;e / Adresse</label><input id="e-address"></div>
+      <div class="form-group"><label>Stadt / Ort</label><input id="e-city"></div>
+      <div class="form-group"><label>PLZ</label><input id="e-zip"></div>
+      <div class="form-group"><label>Staat / Provinz</label><input id="e-state"></div>
+      <div class="form-group"><label>Land</label><select id="e-country"><option value="DO">&#127465;&#127476; Dominikanische Republik</option><option value="DE">&#127465;&#127466; Deutschland</option><option value="AT">&#127462;&#127481; &#214;sterreich</option><option value="CH">&#127464;&#127469; Schweiz</option><option value="US">&#127482;&#127480; USA</option><option value="MX">&#127474;&#127485; Mexiko</option><option value="ES">&#127466;&#127480; Spanien</option></select></div>
+      <div class="form-section">&#128176; Finanzen</div>
+      <div class="form-group"><label>W&#228;hrung</label><select id="e-currency"><option value="RD$">RD$ (Dominikanischer Peso)</option><option value="EUR">EUR (Euro)</option><option value="USD">USD (US-Dollar)</option></select></div>
+      <div class="form-group"><label>Plattformgeb&#252;hr-Typ</label><select id="e-feetype"><option value="fixed">Fix (Betrag)</option><option value="percentage">Prozent (%)</option></select></div>
+      <div class="form-group"><label>Plattformgeb&#252;hr-Betrag</label><input id="e-feevalue" type="number" min="0" step="0.01"></div>
+      <div class="form-group"><label>Monatsgeb&#252;hr (fix)</label><input id="e-basefee" type="number" min="0" step="0.01"></div>
+      <div class="form-section">&#128274; Admin-Passwort</div>
+      <div class="form-group full"><label>Admin-Passwort (leer lassen = nicht &#228;ndern)</label><div style="display:flex;gap:8px"><input id="e-password" placeholder="Neues Passwort (optional)" style="flex:1"><button class="btn btn-outline" onclick="genPasswordEdit()" type="button">&#128273; Generieren</button></div></div>
+      <div class="form-section">&#128203; Status</div>
+      <div class="form-group"><label>Status</label><select id="e-status"><option value="active">Aktiv</option><option value="paused">Pausiert</option><option value="inactive">Inaktiv</option></select></div>
+      <div class="form-actions">
+        <button class="btn btn-outline" onclick="closeEdit()" type="button">Abbrechen</button>
+        <button class="btn btn-green" onclick="saveEdit()" type="button">&#128190; Speichern</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <h3>&#128465;&#65039; H&#228;ndler l&#246;schen?</h3>
+    <p id="confirmMsg">M&#246;chtest du diesen H&#228;ndler wirklich l&#246;schen?<br><strong>Diese Aktion kann nicht r&#252;ckg&#228;ngig gemacht werden.</strong></p>
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="closeConfirm()">Abbrechen</button>
+      <button class="btn btn-red" onclick="confirmDeleteExec()">Ja, l&#246;schen</button>
+    </div>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -383,25 +459,21 @@ var sb = null;
 var newMerchantId = null;
 
 window.addEventListener('load', function() {
-  // Check if already logged in
-  var saved = localStorage.getItem('sp_superadmin_auth');
-  if (saved && window.SP_CONFIG) {
-    var expected = btoa(window.SP_CONFIG.SUPERADMIN_PASSWORD + '_' + new Date().toDateString());
-    if (saved === expected) {
-      // Re-init supabase
-      try {
-        sb = window.supabase.createClient(window.SP_CONFIG.SUPABASE_URL, window.SP_CONFIG.SUPABASE_ANON);
-      } catch(e) {}
-      showApp();
-      return;
-    }
-  }
+  // Prüfe config.js
   try {
     var cfg = window.SP_CONFIG;
-    if (cfg && cfg.SUPABASE_URL.indexOf('XXXX') === -1) {
-      sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON);
-    }
-  } catch(e) { console.warn('Supabase:', e.message); }
+    if (!cfg) { console.error('config.js nicht gefunden oder SP_CONFIG fehlt'); return; }
+
+    var url = cfg.SUPABASE_URL;
+    var key = cfg.SUPABASE_ANON_KEY || cfg.SUPABASE_KEY || cfg.SUPABASE_SERVICE_KEY;
+
+    if (!url || url.indexOf('XXXX') !== -1) { console.error('SUPABASE_URL nicht gesetzt'); return; }
+    if (!key || key.indexOf('XXXX') !== -1) { console.error('Supabase Key nicht gesetzt'); return; }
+
+    sb = window.supabase.createClient(url, key);
+    console.log('Supabase verbunden ✓');
+  } catch(e) { console.error('Supabase Fehler:', e.message); }
+
   document.getElementById('pwInput').addEventListener('keydown', function(e) {
     if (e.key === 'Enter') doLogin();
   });
@@ -411,88 +483,172 @@ function doLogin() {
   var pw = document.getElementById('pwInput').value;
   var cfg = window.SP_CONFIG;
   if (!cfg) { document.getElementById('lerr').textContent = 'config.js nicht geladen'; return; }
+  if (!pw) { document.getElementById('lerr').textContent = 'Bitte Passwort eingeben'; return; }
   if (pw === cfg.SUPERADMIN_PASSWORD) {
-    localStorage.setItem('sp_superadmin_auth', btoa(pw + '_' + new Date().toDateString()));
-    showApp();
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('app').classList.add('show');
+    loadOverview();
   } else {
     document.getElementById('lerr').textContent = 'Falsches Passwort';
+    document.getElementById('pwInput').value = '';
   }
 }
 
-function showApp() {
-  document.getElementById('loginWrap').style.display = 'none';
-  document.getElementById('app').classList.add('show');
-  loadOverview();
-}
-
-function doLogout() {
-  localStorage.removeItem('sp_superadmin_auth');
-  location.reload();
-}
 function doLogout() { location.reload(); }
 
 function showPage(id, btn) {
   document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
   document.querySelectorAll('.tbtn').forEach(function(b) { b.classList.remove('active'); });
   document.getElementById('page-' + id).classList.add('active');
-  btn.classList.add('active');
-  if (id === 'overview')  loadOverview();
+  if (btn) btn.classList.add('active');
+  if (id === 'overview') loadOverview();
   if (id === 'merchants') loadMerchants();
-  if (id === 'agents')    loadAllAgents();
+  if (id === 'agents') loadAllAgents();
+  if (id === 'billing') loadBilling();
 }
 
 function showToast(msg) {
   var t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(function() { t.classList.remove('show'); }, 2800);
+  setTimeout(function() { t.classList.remove('show'); }, 3000);
 }
 
-function fmtDate(d) { return d ? new Date(d).toLocaleDateString('de-AT') : '-'; }
-function fmtNum(n, cur) { return (n||0).toLocaleString('de-AT') + ' ' + (cur||''); }
+function fmtDate(d) { return d ? new Date(d).toLocaleDateString('de-AT') : '—'; }
+function fmtNum(n, cur) { return (parseFloat(n)||0).toLocaleString('de-AT', {minimumFractionDigits:0}) + (cur ? ' ' + cur : ''); }
 
 function statusBadge(s) {
   var map = { active:'b-active', paused:'b-paused', frozen:'b-frozen', pending:'b-pending', inactive:'b-paused' };
   var label = { active:'Aktiv', paused:'Pausiert', frozen:'Eingefroren', pending:'Ausstehend', inactive:'Inaktiv' };
-  return '<span class="badge ' + (map[s]||'b-pending') + '">' + (label[s]||s) + '</span>';
+  return '<span class="badge ' + (map[s]||'b-pending') + '">' + (label[s]||s||'Unbekannt') + '</span>';
 }
 
-// ── ÜBERSICHT ────────────────────────────────────────────
+// ── ÜBERSICHT ──────────────────────────────────────────
 function loadOverview() {
-  if (!sb) return;
-  Promise.all([
-    sb.from('merchants').select('*'),
-    sb.from('agents').select('id'),
-    sb.from('sales').select('id').catch(function(){ return {data:[]}; })
-  ]).then(function(res) {
-    var rows = res[0].data || [];
-    var totalAgents = (res[1].data || []).length;
-    var activeMerchants = rows.length;
-    var totalSales = 0;
-    var totalPlatform = 0;
+  if (!sb) { showErrOverview('Supabase nicht verbunden. Prüfe config.js'); return; }
 
+  document.getElementById('overviewTable').innerHTML = '<tr><td colspan="7" class="msg">Lade...</td></tr>';
+  document.getElementById('ov-merchants').textContent = '—';
+  document.getElementById('ov-agents').textContent = '—';
+  document.getElementById('ov-sales').textContent = '—';
+  document.getElementById('ov-platform').textContent = '—';
+
+  // Alle Händler laden
+  sb.from('merchants').select('*').order('created_at', {ascending:false}).then(function(r) {
+    if (r.error) {
+      showErrOverview('Fehler beim Laden der Händler: ' + r.error.message + ' (Code: ' + r.error.code + ')');
+      return;
+    }
+
+    var merchants = r.data || [];
+    var activeMerchants = merchants.filter(function(m) { return m.status === 'active'; }).length;
     document.getElementById('ov-merchants').textContent = activeMerchants;
-    document.getElementById('ov-agents').textContent = totalAgents;
-    document.getElementById('ov-sales').textContent = totalSales;
-    document.getElementById('ov-platform').textContent = totalPlatform.toLocaleString('de-AT');
 
-    document.getElementById('overviewTable').innerHTML = rows.length
-      ? rows.map(function(r) {
-          return '<tr><td><strong>' + r.name + '</strong></td><td><span class="codetag">' + r.slug + '</span></td><td>' + (r.active_agents||0) + '</td><td>' + (r.total_sales||0) + '</td><td>' + fmtNum(r.total_revenue) + '</td><td style="color:var(--gold);font-weight:700">' + fmtNum(r.platform_earnings) + '</td><td>' + statusBadge(r.status) + '</td></tr>';
-        }).join('')
-      : '<tr><td colspan="7" class="msg">Noch keine Händler.</td></tr>';
+    // Jetzt Agenten zählen
+    sb.from('agents').select('id', {count:'exact', head:true}).then(function(ra) {
+      document.getElementById('ov-agents').textContent = ra.count || 0;
+    });
+
+    // Sales laden
+    sb.from('sales').select('total_amount,platform_fee').then(function(rs) {
+      var sales = rs.data || [];
+      document.getElementById('ov-sales').textContent = sales.length;
+      var platform = sales.reduce(function(s,x) { return s + (parseFloat(x.platform_fee)||0); }, 0);
+      document.getElementById('ov-platform').textContent = fmtNum(platform);
+    });
+
+    // Tabelle befüllen
+    if (!merchants.length) {
+      document.getElementById('overviewTable').innerHTML = '<tr><td colspan="7" class="msg">Noch keine Händler angelegt.</td></tr>';
+      return;
+    }
+
+    // Für jeden Händler Agenten und Sales laden
+    var promises = merchants.map(function(m) {
+      return Promise.all([
+        sb.from('agents').select('id', {count:'exact', head:true}).eq('merchant_id', m.id),
+        sb.from('sales').select('total_amount,platform_fee').eq('merchant_id', m.id)
+      ]).then(function(res) {
+        var agentCount = res[0].count || 0;
+        var salesData = res[1].data || [];
+        var totalRevenue = salesData.reduce(function(s,x) { return s + (parseFloat(x.total_amount)||0); }, 0);
+        var platEarnings = salesData.reduce(function(s,x) { return s + (parseFloat(x.platform_fee)||0); }, 0);
+        return {
+          name: m.name,
+          slug: m.slug,
+          status: m.status,
+          currency: m.currency,
+          agents: agentCount,
+          sales: salesData.length,
+          revenue: totalRevenue,
+          platform: platEarnings
+        };
+      });
+    });
+
+    Promise.all(promises).then(function(rows) {
+      document.getElementById('overviewTable').innerHTML = rows.map(function(r) {
+        return '<tr>' +
+          '<td><strong>' + r.name + '</strong></td>' +
+          '<td><span class="codetag">' + r.slug + '</span></td>' +
+          '<td>' + r.agents + '</td>' +
+          '<td>' + r.sales + '</td>' +
+          '<td>' + fmtNum(r.revenue, r.currency) + '</td>' +
+          '<td style="color:var(--gold);font-weight:700">' + fmtNum(r.platform, r.currency) + '</td>' +
+          '<td>' + statusBadge(r.status) + '</td>' +
+          '</tr>';
+      }).join('');
+    });
   });
 }
 
-// ── HÄNDLER LISTE ────────────────────────────────────────
+function showErrOverview(msg) {
+  document.getElementById('overviewTable').innerHTML = '<tr><td colspan="7"><div class="err-box">⚠️ ' + msg + '</div></td></tr>';
+  console.error(msg);
+}
+
+// ── HÄNDLER LISTE ──────────────────────────────────────
 function loadMerchants() {
-  if (!sb) return;
+  if (!sb) { document.getElementById('merchantsList').innerHTML = '<div class="err-box">⚠️ Supabase nicht verbunden</div>'; return; }
+
+  document.getElementById('merchantsList').innerHTML = '<div class="msg">Lade...</div>';
+
   sb.from('merchants').select('*').order('created_at', {ascending:false}).then(function(r) {
+    if (r.error) {
+      document.getElementById('merchantsList').innerHTML =
+        '<div class="err-box">⚠️ Fehler: ' + r.error.message + '<br><small>Code: ' + r.error.code + '</small></div>';
+      console.error('loadMerchants error:', r.error);
+      return;
+    }
+
     var data = r.data || [];
-    var container = document.getElementById('merchantsList');
-    if (!data.length) { container.innerHTML = '<div class="msg">Noch keine Händler. Über "+ Neuer Händler" anlegen.</div>'; return; }
-    container.innerHTML = data.map(function(m) {
-      return '<div class="merchant-card"><div class="merchant-card-left"><h3>' + m.name + '</h3><p>' + (m.description||'') + '</p><p style="margin-top:4px;font-size:.72rem;color:var(--mu)">&#128222; ' + (m.whatsapp_number||'-') + ' &nbsp;&middot;&nbsp; &#128178; ' + m.currency + ' &nbsp;&middot;&nbsp; Platform-Fee: ' + m.platform_fee_value + (m.platform_fee_type==='percentage'?'%':' '+m.currency) + '/Transaktion</p></div><div class="merchant-card-right"><span class="link-tag">/' + m.slug + '/</span>' + statusBadge(m.status) + '<button class="btn-sm btn-out" onclick="toggleMerchant(\'' + m.id + '\',\'' + m.status + '\')">' + (m.status==='active'?'Pausieren':'Aktivieren') + '</button></div></div>';
+    if (!data.length) {
+      document.getElementById('merchantsList').innerHTML = '<div class="msg">Noch keine Händler. Über "+ Neuer Händler" anlegen.</div>';
+      return;
+    }
+
+    document.getElementById('merchantsList').innerHTML = data.map(function(m) {
+      var fee = m.platform_fee_value + (m.platform_fee_type === 'percentage' ? '%' : ' ' + m.currency);
+      return '<div class="merchant-card">' +
+        '<div class="merchant-card-left">' +
+          '<h3>' + m.name + '</h3>' +
+          '<p>' + (m.description || '') + '</p>' +
+          '<p style="font-size:.75rem;color:var(--mu);margin-top:4px">' +
+            (m.city ? '📍 ' + m.city + (m.country ? ', ' + m.country : '') + ' &nbsp;·&nbsp; ' : '') +
+            (m.whatsapp_number ? '📱 ' + m.whatsapp_number + ' &nbsp;·&nbsp; ' : '') +
+            '💰 ' + m.currency + ' &nbsp;·&nbsp; Plattform-Fee: ' + fee +
+          '</p>' +
+          '<p style="font-size:.73rem;color:var(--mu);margin-top:2px">🔗 /' + m.slug + '/ &nbsp;·&nbsp; Angelegt: ' + fmtDate(m.created_at) + '</p>' +
+        '</div>' +
+        '<div class="merchant-card-right">' +
+          statusBadge(m.status) +
+          '<button class="btn btn-outline" onclick="toggleMerchant(\'' + m.id + '\',\'' + m.status + '\')">' +
+            (m.status === 'active' ? '⏸ Pausieren' : '▶ Aktivieren') +
+          '</button>' +
+          '<button class="btn btn-gold" onclick="openEdit(\'' + m.id + '\')">✏️ Bearbeiten</button>' +
+          '<button class="btn btn-danger" onclick="openConfirm(\'' + m.id + '\',\'' + m.name.replace(/'/g,"\\'") + '\')">🗑️</button>' +
+        '</div>' +
+      '</div>';
     }).join('');
   });
 }
@@ -500,28 +656,45 @@ function loadMerchants() {
 function toggleMerchant(id, status) {
   if (!sb) return;
   var newStatus = status === 'active' ? 'paused' : 'active';
-  sb.from('merchants').update({status:newStatus}).eq('id',id).then(function() {
-    showToast('Status aktualisiert');
+  sb.from('merchants').update({status: newStatus}).eq('id', id).then(function(r) {
+    if (r.error) { showToast('Fehler: ' + r.error.message); return; }
+    showToast('Status auf "' + (newStatus === 'active' ? 'Aktiv' : 'Pausiert') + '" gesetzt');
     loadMerchants();
+    loadOverview();
   });
 }
 
-// ── NEUER HÄNDLER ────────────────────────────────────────
+// ── NEUER HÄNDLER ──────────────────────────────────────
 function genPassword() {
   var chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#';
   var pw = '';
-  for (var i=0; i<12; i++) pw += chars[Math.floor(Math.random()*chars.length)];
+  for (var i = 0; i < 12; i++) pw += chars[Math.floor(Math.random() * chars.length)];
   document.getElementById('m-password').value = pw;
+}
+
+function clearMerchantForm() {
+  ['m-slug','m-name','m-desc','m-wa','m-email','m-phone','m-stripe',
+   'm-address','m-city','m-zip','m-state','m-password'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('m-feevalue').value = '50';
+  document.getElementById('m-basefee').value = '0';
+  document.getElementById('createStatus').innerHTML = '';
 }
 
 function createMerchant() {
   if (!sb) { showToast('Supabase nicht verbunden'); return; }
-  var slug = document.getElementById('m-slug').value.trim().toLowerCase().replace(/[^a-z0-9-]/g,'');
+  var slug = document.getElementById('m-slug').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
   var name = document.getElementById('m-name').value.trim();
-  if (!slug || !name) { showToast('Slug und Name sind Pflichtfelder'); return; }
+  if (!slug) { showToast('Slug ist ein Pflichtfeld'); return; }
+  if (!name) { showToast('Name ist ein Pflichtfeld'); return; }
+
+  document.getElementById('createStatus').innerHTML = '<div style="color:var(--mu);font-size:.85rem">⏳ Händler wird angelegt...</div>';
 
   var payload = {
-    slug: slug, name: name,
+    slug: slug,
+    name: name,
     description: document.getElementById('m-desc').value.trim() || null,
     category: document.getElementById('m-category').value,
     language: document.getElementById('m-language').value,
@@ -532,150 +705,231 @@ function createMerchant() {
     city: document.getElementById('m-city').value.trim() || null,
     zip: document.getElementById('m-zip').value.trim() || null,
     state: document.getElementById('m-state').value.trim() || null,
-    country: document.getElementById('m-country').value || 'DO',
+    country: document.getElementById('m-country').value,
     currency: document.getElementById('m-currency').value,
     stripe_link: document.getElementById('m-stripe').value.trim() || null,
-    base_fee: parseFloat(document.getElementById('m-basefee').value)||0,
+    base_fee: parseFloat(document.getElementById('m-basefee').value) || 0,
     platform_fee_type: document.getElementById('m-feetype').value,
-    platform_fee_value: parseFloat(document.getElementById('m-feevalue').value)||0,
-    admin_password: document.getElementById('m-password').value.trim() || null
+    platform_fee_value: parseFloat(document.getElementById('m-feevalue').value) || 0,
+    admin_password: document.getElementById('m-password').value.trim() || null,
+    status: 'active'
   };
 
   sb.from('merchants').insert(payload).select().then(function(r) {
-    if (r.error) { showToast('Fehler: ' + r.error.message); return; }
+    if (r.error) {
+      document.getElementById('createStatus').innerHTML = '<div class="err-box">⚠️ Fehler: ' + r.error.message + '</div>';
+      showToast('Fehler beim Anlegen');
+      return;
+    }
+
     newMerchantId = r.data[0].id;
 
     // Provisionsregeln anlegen
     var rules = {
       merchant_id: newMerchantId,
-      min_new_customers_per_month: parseInt(document.getElementById('m-minnew').value)||1,
-      freeze_after_months: parseInt(document.getElementById('m-freeze').value)||3,
-      min_payout_amount: parseFloat(document.getElementById('m-minpayout').value)||1000,
+      min_new_customers_per_month: parseInt(document.getElementById('m-minnew').value) || 1,
+      freeze_after_months: parseInt(document.getElementById('m-freeze').value) || 3,
+      min_payout_amount: parseFloat(document.getElementById('m-minpayout').value) || 1000,
       payout_schedule: document.getElementById('m-schedule').value,
       pause_commission_action: document.getElementById('m-pauseaction').value
     };
 
     sb.from('merchant_commission_rules').insert(rules).then(function() {
-      showToast('Händler "' + name + '" angelegt! Jetzt erstes Produkt definieren.');
-      document.getElementById('merchantProductForm').style.display = 'block';
-      document.getElementById('merchantProductForm').scrollIntoView({behavior:'smooth'});
+      document.getElementById('createStatus').innerHTML =
+        '<div style="background:#dcfce7;border:1px solid #86efac;border-radius:8px;padding:14px 18px;color:#15803d;font-size:.88rem">' +
+        '✅ <strong>' + name + '</strong> wurde erfolgreich angelegt!<br>' +
+        '<small>URL: /' + slug + '/ &nbsp;·&nbsp; ID: ' + newMerchantId + '</small>' +
+        '</div>';
+      showToast('✅ Händler "' + name + '" angelegt!');
+      clearMerchantForm();
     });
   });
 }
 
-function createProduct() {
-  if (!sb || !newMerchantId) { showToast('Zuerst Händler anlegen'); return; }
-  var name = document.getElementById('p-name').value.trim();
-  if (!name) { showToast('Produktname ist Pflicht'); return; }
-
-  // Get merchant currency
-  sb.from('merchants').select('currency').eq('id',newMerchantId).single().then(function(mr) {
-    var cur = mr.data ? mr.data.currency : 'RD$';
-    var payload = {
-      merchant_id: newMerchantId,
-      name: name,
-      description: document.getElementById('p-desc').value.trim() || null,
-      category: document.getElementById('p-cat').value.trim() || null,
-      price_type: document.getElementById('p-pricetype').value,
-      price: parseFloat(document.getElementById('p-price').value)||0,
-      price_unit: document.getElementById('p-unit').value.trim() || null,
-      currency: cur,
-      service_fee_type: document.getElementById('p-feetype').value,
-      service_fee: parseFloat(document.getElementById('p-fee').value)||0,
-      payment_method: document.getElementById('p-payment').value,
-      fulfillment_type: document.getElementById('p-fulfill').value,
-      commission_type: document.getElementById('p-commtype').value,
-      commission_value: parseFloat(document.getElementById('p-commval').value)||0,
-      commission_base: document.getElementById('p-commbase').value,
-      is_featured: document.getElementById('p-featured').value === 'true',
-      status: 'active'
-    };
-
-    sb.from('merchant_products').insert(payload).then(function(r) {
-      if (r.error) { showToast('Fehler: ' + r.error.message); return; }
-      showToast('Produkt angelegt! Händler ist fertig eingerichtet.');
-      document.getElementById('merchantProductForm').style.display = 'none';
-      newMerchantId = null;
-    });
-  });
-}
-
-// ── ALLE AGENTEN ────────────────────────────────────────
+// ── AGENTEN ───────────────────────────────────────────
 function loadAllAgents() {
-  if (!sb) return;
-  sb.from('agent_balances').select('*').order('total_earned', {ascending:false}).then(function(r) {
+  if (!sb) { document.getElementById('agentsList').innerHTML = '<tr><td colspan="7" class="msg">Supabase nicht verbunden</td></tr>'; return; }
+  document.getElementById('agentsList').innerHTML = '<tr><td colspan="7" class="msg">Lade...</td></tr>';
+
+  sb.from('agents').select('*, merchants(name,currency)').order('created_at', {ascending:false}).then(function(r) {
+    if (r.error) {
+      document.getElementById('agentsList').innerHTML = '<tr><td colspan="7"><div class="err-box">⚠️ ' + r.error.message + '</div></td></tr>';
+      return;
+    }
     var data = r.data || [];
-    document.getElementById('allAgentsTable').innerHTML = data.length
-      ? data.map(function(a) {
-          return '<tr><td><strong>' + a.agent_name + '</strong></td><td style="font-size:.73rem">' + a.email + '</td><td>' + a.phone + '</td><td>' + a.merchant_name + '</td><td><span class="codetag">' + a.ref_code + '</span></td><td>' + statusBadge(a.status) + '</td><td>' + a.total_sales_count + '</td><td style="color:var(--g);font-weight:700">' + fmtNum(a.total_earned, a.currency) + '</td><td>' + (a.consecutive_pauses||0) + ' Mon.</td></tr>';
-        }).join('')
-      : '<tr><td colspan="9" class="msg">Noch keine Agenten registriert.</td></tr>';
+    if (!data.length) {
+      document.getElementById('agentsList').innerHTML = '<tr><td colspan="7" class="msg">Noch keine Agenten registriert.</td></tr>';
+      return;
+    }
+    document.getElementById('agentsList').innerHTML = data.map(function(a) {
+      var cur = (a.merchants && a.merchants.currency) || '';
+      return '<tr>' +
+        '<td><strong>' + (a.name || '—') + '</strong><br><small style="color:var(--mu)">' + (a.email || '') + '</small></td>' +
+        '<td>' + ((a.merchants && a.merchants.name) || '—') + '</td>' +
+        '<td><span class="codetag">' + (a.referral_code || '—') + '</span></td>' +
+        '<td>' + (a.total_sales || 0) + '</td>' +
+        '<td>' + fmtNum(a.total_commission, cur) + '</td>' +
+        '<td>' + statusBadge(a.status) + '</td>' +
+        '<td>' + fmtDate(a.created_at) + '</td>' +
+        '</tr>';
+    }).join('');
   });
 }
 
-// ── ABRECHNUNG ───────────────────────────────────────────
-function setHalf(half) {
-  var now = new Date();
-  var y = now.getFullYear();
-  var m = String(now.getMonth()+1).padStart(2,'0');
-  if (half===1) {
-    document.getElementById('b-from').value = y+'-'+m+'-01';
-    document.getElementById('b-to').value   = y+'-'+m+'-15';
-  } else {
-    var last = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
-    document.getElementById('b-from').value = y+'-'+m+'-16';
-    document.getElementById('b-to').value   = y+'-'+m+'-'+String(last);
-  }
-}
-
-function genBilling() {
-  var from = document.getElementById('b-from').value;
-  var to   = document.getElementById('b-to').value;
-  if (!from || !to || !sb) { showToast('Zeitraum wählen'); return; }
+// ── ABRECHNUNG ─────────────────────────────────────────
+function loadBilling() {
+  if (!sb) return;
+  document.getElementById('billingContent').innerHTML = '<div class="msg" style="grid-column:1/-1">Lade...</div>';
 
   Promise.all([
-    sb.from('sales').select('merchant_id,sale_amount,platform_fee,service_fee').eq('status','delivered').gte('created_at',from+'T00:00:00').lte('created_at',to+'T23:59:59'),
-    sb.from('merchants').select('id,name,slug,base_fee,currency')
+    sb.from('merchants').select('id,name,currency,platform_fee_type,platform_fee_value,base_fee').eq('status','active'),
+    sb.from('sales').select('merchant_id,total_amount,platform_fee,created_at')
   ]).then(function(res) {
-    var sales = res[0].data || [];
-    var merchants = res[1].data || [];
-    var mMap = {};
-    merchants.forEach(function(m) { mMap[m.id] = m; });
+    var merchants = res[0].data || [];
+    var sales = res[1].data || [];
 
-    var map = {};
-    sales.forEach(function(s) {
-      if (!map[s.merchant_id]) map[s.merchant_id] = {count:0, revenue:0, platformFee:0};
-      map[s.merchant_id].count++;
-      map[s.merchant_id].revenue += (s.sale_amount||0);
-      map[s.merchant_id].platformFee += (s.platform_fee||0);
-    });
-
-    var rows = Object.keys(map);
-    document.getElementById('billingTitle').textContent = 'Plattform-Abrechnung ' + from + ' bis ' + to;
-
-    if (!rows.length) {
-      document.getElementById('billingTable').innerHTML = '<tr><td colspan="7" class="msg">Keine Transaktionen in diesem Zeitraum.</td></tr>';
-      document.getElementById('billingSummary').style.display = 'none';
+    if (!merchants.length) {
+      document.getElementById('billingContent').innerHTML = '<div class="msg" style="grid-column:1/-1">Keine aktiven Händler</div>';
       return;
     }
 
-    document.getElementById('billingTable').innerHTML = rows.map(function(mid) {
-      var v = map[mid];
-      var m = mMap[mid] || {};
-      var baseFee = m.base_fee || 0;
-      var total = v.platformFee + baseFee;
-      return '<tr><td><strong>' + (m.name||'-') + '</strong></td><td><span class="codetag">' + (m.slug||'-') + '</span></td><td>' + v.count + '</td><td>' + fmtNum(v.revenue, m.currency) + '</td><td>' + fmtNum(v.platformFee, m.currency) + '</td><td>' + fmtNum(baseFee, m.currency) + '</td><td style="font-weight:700;color:var(--gold)">' + fmtNum(total, m.currency) + '</td></tr>';
+    var html = merchants.map(function(m) {
+      var mSales = sales.filter(function(s) { return s.merchant_id === m.id; });
+      var totalPlatform = mSales.reduce(function(t,s) { return t + (parseFloat(s.platform_fee)||0); }, 0);
+      var totalRevenue = mSales.reduce(function(t,s) { return t + (parseFloat(s.total_amount)||0); }, 0);
+      return '<div class="billing-card">' +
+        '<h3>🏪 ' + m.name + '</h3>' +
+        '<div class="billing-row"><span>Verkäufe total</span><span>' + mSales.length + '</span></div>' +
+        '<div class="billing-row"><span>Umsatz</span><span>' + fmtNum(totalRevenue, m.currency) + '</span></div>' +
+        '<div class="billing-row"><span>Plattformgebühr (pro Sale)</span><span>' + m.platform_fee_value + (m.platform_fee_type==='percentage'?'%':' '+m.currency) + '</span></div>' +
+        (m.base_fee ? '<div class="billing-row"><span>Monatsgebühr</span><span>' + fmtNum(m.base_fee, m.currency) + '</span></div>' : '') +
+        '<div class="billing-row" style="color:var(--gold)"><span>🏦 Gesamt Plattform-Einnahmen</span><span><strong>' + fmtNum(totalPlatform, m.currency) + '</strong></span></div>' +
+      '</div>';
     }).join('');
 
-    var totT = rows.reduce(function(s,mid) { return s + map[mid].count; }, 0);
-    var totF = rows.reduce(function(s,mid) { return s + map[mid].platformFee; }, 0);
-    document.getElementById('bs-m').textContent = rows.length;
-    document.getElementById('bs-t').textContent = totT;
-    document.getElementById('bs-total').textContent = totF.toLocaleString('de-AT');
-    var bsum = document.getElementById('billingSummary');
-    bsum.style.display = 'flex';
+    document.getElementById('billingContent').innerHTML = html;
   });
 }
+
+// ── EDIT MODAL ─────────────────────────────────────────
+var _merchantCache = {};
+
+function openEdit(id) {
+  if (!sb) return;
+  sb.from('merchants').select('*').eq('id', id).single().then(function(r) {
+    if (r.error) { showToast('Fehler beim Laden: ' + r.error.message); return; }
+    var m = r.data;
+    document.getElementById('e-id').value       = m.id;
+    document.getElementById('e-slug').value     = m.slug;
+    document.getElementById('e-name').value     = m.name || '';
+    document.getElementById('e-desc').value     = m.description || '';
+    document.getElementById('e-wa').value       = m.whatsapp_number || '';
+    document.getElementById('e-email').value    = m.email || '';
+    document.getElementById('e-phone').value    = m.phone || '';
+    document.getElementById('e-stripe').value   = m.stripe_link || '';
+    document.getElementById('e-address').value  = m.address || '';
+    document.getElementById('e-city').value     = m.city || '';
+    document.getElementById('e-zip').value      = m.zip || '';
+    document.getElementById('e-state').value    = m.state || '';
+    document.getElementById('e-feevalue').value = m.platform_fee_value || 0;
+    document.getElementById('e-basefee').value  = m.base_fee || 0;
+    document.getElementById('e-password').value = '';
+    setSelect('e-category', m.category);
+    setSelect('e-language', m.language);
+    setSelect('e-country',  m.country || 'DO');
+    setSelect('e-currency', m.currency || 'RD$');
+    setSelect('e-feetype',  m.platform_fee_type || 'fixed');
+    setSelect('e-status',   m.status || 'active');
+    document.getElementById('editOverlay').classList.add('open');
+  });
+}
+
+function setSelect(id, val) {
+  var el = document.getElementById(id);
+  if (!el || !val) return;
+  for (var i = 0; i < el.options.length; i++) {
+    if (el.options[i].value === val) { el.selectedIndex = i; break; }
+  }
+}
+
+function closeEdit() {
+  document.getElementById('editOverlay').classList.remove('open');
+}
+
+function genPasswordEdit() {
+  var chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#';
+  var pw = '';
+  for (var i = 0; i < 12; i++) pw += chars[Math.floor(Math.random() * chars.length)];
+  document.getElementById('e-password').value = pw;
+}
+
+function saveEdit() {
+  if (!sb) return;
+  var id   = document.getElementById('e-id').value;
+  var name = document.getElementById('e-name').value.trim();
+  if (!name) { showToast('Name ist ein Pflichtfeld'); return; }
+  var payload = {
+    name:               name,
+    description:        document.getElementById('e-desc').value.trim()    || null,
+    category:           document.getElementById('e-category').value,
+    language:           document.getElementById('e-language').value,
+    whatsapp_number:    document.getElementById('e-wa').value.trim()       || null,
+    email:              document.getElementById('e-email').value.trim()    || null,
+    phone:              document.getElementById('e-phone').value.trim()    || null,
+    stripe_link:        document.getElementById('e-stripe').value.trim()   || null,
+    address:            document.getElementById('e-address').value.trim()  || null,
+    city:               document.getElementById('e-city').value.trim()     || null,
+    zip:                document.getElementById('e-zip').value.trim()      || null,
+    state:              document.getElementById('e-state').value.trim()    || null,
+    country:            document.getElementById('e-country').value,
+    currency:           document.getElementById('e-currency').value,
+    platform_fee_type:  document.getElementById('e-feetype').value,
+    platform_fee_value: parseFloat(document.getElementById('e-feevalue').value) || 0,
+    base_fee:           parseFloat(document.getElementById('e-basefee').value)  || 0,
+    status:             document.getElementById('e-status').value
+  };
+  var pw = document.getElementById('e-password').value.trim();
+  if (pw) payload.admin_password = pw;
+  sb.from('merchants').update(payload).eq('id', id).then(function(r) {
+    if (r.error) { showToast('Fehler: ' + r.error.message); return; }
+    showToast('Haendler gespeichert!');
+    closeEdit();
+    loadMerchants();
+    loadOverview();
+  });
+}
+
+// ── DELETE ─────────────────────────────────────────────
+var _deleteId = null;
+
+function openConfirm(id, name) {
+  _deleteId = id;
+  document.getElementById('confirmMsg').innerHTML =
+    'Haendler <strong>' + name + '</strong> wirklich loeschen?<br>' +
+    '<small style="color:var(--red)">Alle Agenten und Verkaeufe bleiben erhalten.</small>';
+  document.getElementById('confirmOverlay').classList.add('open');
+}
+
+function closeConfirm() {
+  _deleteId = null;
+  document.getElementById('confirmOverlay').classList.remove('open');
+}
+
+function confirmDeleteExec() {
+  if (!sb || !_deleteId) return;
+  sb.from('merchants').delete().eq('id', _deleteId).then(function(r) {
+    if (r.error) { showToast('Fehler: ' + r.error.message); closeConfirm(); return; }
+    showToast('Haendler geloescht');
+    closeConfirm();
+    loadMerchants();
+    loadOverview();
+  });
+}
+
+document.addEventListener('click', function(e) {
+  if (e.target.id === 'editOverlay') closeEdit();
+  if (e.target.id === 'confirmOverlay') closeConfirm();
+});
 </script>
 </body>
 </html>
