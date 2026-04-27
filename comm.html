@@ -501,30 +501,39 @@ function sendViaTwilio(toNumber, textToSend, originalText, writeLang, sendLang) 
     return;
   }
 
-  var cfg = window.SP_CONFIG;
-  var edgeFnUrl = cfg.SUPABASE_URL.replace('.supabase.co', '.supabase.co') 
-    + '/functions/v1/send-message';
+  var toWhatsApp = toNumber.startsWith('whatsapp:') ? toNumber : 'whatsapp:' + toNumber;
+  var fromWhatsApp = (merchant.twilio_whatsapp_number || 'whatsapp:+14155238886');
+  if (!fromWhatsApp.startsWith('whatsapp:')) fromWhatsApp = 'whatsapp:' + fromWhatsApp;
 
-  fetch(edgeFnUrl, {
+  // CORS Proxy verwenden um Browser-Einschränkung zu umgehen
+  var proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(
+    'https://api.twilio.com/2010-04-01/Accounts/' + merchant.twilio_account_sid + '/Messages.json'
+  );
+
+  var formData = 'From=' + encodeURIComponent(fromWhatsApp) +
+                 '&To=' + encodeURIComponent(toWhatsApp) +
+                 '&Body=' + encodeURIComponent(textToSend);
+
+  var credentials = btoa(merchant.twilio_account_sid + ':' + merchant.twilio_auth_token);
+
+  fetch(proxyUrl, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      to: toNumber,
-      message: textToSend,
-      accountSid: merchant.twilio_account_sid,
-      authToken: merchant.twilio_auth_token,
-      fromNumber: merchant.twilio_whatsapp_number || 'whatsapp:+14155238886'
-    })
+    headers: {
+      'Authorization': 'Basic ' + credentials,
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'x-requested-with': 'XMLHttpRequest'
+    },
+    body: formData
   }).then(function(r) { return r.json(); }).then(function(data) {
-    if (data.error) {
-      showToast('⚠️ Fehler: ' + data.error);
+    if (data.error_code) {
+      showToast('⚠️ Twilio: ' + data.message);
       console.error('Twilio error:', data);
     } else {
       showToast('✅ Nachricht gesendet!');
     }
   }).catch(function(e) {
-    showToast('⚠️ Netzwerkfehler: ' + e.message);
-    console.error(e);
+    console.error('Send error:', e);
+    showToast('⚠️ Sendefehler - prüfe Konsole');
   });
 }
 
@@ -551,21 +560,14 @@ function updateTransPreview() {
 function translateText(text, fromLang, toLang) {
   var langNames = { de: 'Deutsch', es: 'Spanisch', en: 'Englisch' };
   // Claude API für Übersetzung
-  fetch('https://api.anthropic.com/v1/messages', {
+  var cfg = window.SP_CONFIG;
+  fetch(cfg.SUPABASE_URL + '/functions/v1/translate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 500,
-      messages: [{
-        role: 'user',
-        content: 'Übersetze diesen Text von ' + langNames[fromLang] + ' nach ' + langNames[toLang] +
-          '. Antworte NUR mit der Übersetzung, kein Kommentar:\n\n' + text
-      }]
-    })
+    body: JSON.stringify({ text: text, fromLang: fromLang, toLang: toLang })
   }).then(function(r) { return r.json(); }).then(function(data) {
-    var translated = data.content && data.content[0] ? data.content[0].text : text;
-    document.getElementById('transText').textContent = translated;
+    if (data.error) { document.getElementById('transStatus').textContent = '⚠️ ' + data.error; return; }
+    document.getElementById('transText').textContent = data.translated || text;
     document.getElementById('transPreview').style.display = 'block';
     document.getElementById('transStatus').textContent = '✓ Übersetzt';
   }).catch(function() {
