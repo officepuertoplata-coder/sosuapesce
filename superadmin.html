@@ -461,14 +461,15 @@ function statusBadge(s) {
 function loadOverview() {
   if (!sb) return;
   Promise.all([
-    sb.from('platform_overview').select('*'),
-    sb.from('agents').select('id', {count:'exact'})
+    sb.from('merchants').select('*'),
+    sb.from('agents').select('id'),
+    sb.from('sales').select('id').catch(function(){ return {data:[]}; })
   ]).then(function(res) {
     var rows = res[0].data || [];
-    var totalAgents = res[1].count || 0;
-    var activeMerchants = rows.filter(function(r) { return r.status === 'active'; }).length;
-    var totalSales = rows.reduce(function(s,r) { return s + (r.total_sales||0); }, 0);
-    var totalPlatform = rows.reduce(function(s,r) { return s + (r.platform_earnings||0); }, 0);
+    var totalAgents = (res[1].data || []).length;
+    var activeMerchants = rows.length;
+    var totalSales = 0;
+    var totalPlatform = 0;
 
     document.getElementById('ov-merchants').textContent = activeMerchants;
     document.getElementById('ov-agents').textContent = totalAgents;
