@@ -650,7 +650,7 @@ function loadMerchants() {
           statusBadge(mstatus) +
           '<a href="' + siteUrl + '/index.html?m=' + mslug + '" target="_blank" class="btn btn-outline" style="text-decoration:none">🌐 Landingpage</a>' +
           '<a href="' + siteUrl + '/agentes.html?m=' + mslug + '" target="_blank" class="btn btn-outline" style="text-decoration:none">👥 Agenten</a>' +
-          '<a href="' + siteUrl + '/' + mslug + '/admin.html" target="_blank" class="btn btn-outline" style="text-decoration:none">⚙️ Admin</a>' +
+          '<a href="' + siteUrl + '/admin.html?m=' + mslug + '" target="_blank" class="btn btn-outline" style="text-decoration:none">⚙️ Admin</a>' +
           '<button class="btn btn-outline" onclick="toggleMerchant(\`' + mid + '\`,\`' + mstatus + '\`)">'+
             (mstatus === 'active' ? '⏸ Pausieren' : '▶ Aktivieren') +
           '</button>' +
