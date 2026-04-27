@@ -458,6 +458,7 @@ tr:hover td{background:#f9fafb}
 <script>
 var sb = null;
 var newMerchantId = null;
+var siteUrl = 'https://officepuertoplata-coder.github.io/sosuapesce';
 
 window.addEventListener('load', function() {
   // Prüfe config.js
@@ -472,6 +473,7 @@ window.addEventListener('load', function() {
     if (!key || key.indexOf('XXXX') !== -1) { console.error('Supabase Key nicht gesetzt'); return; }
 
     sb = window.supabase.createClient(url, key);
+    if (cfg.SITE_URL) siteUrl = cfg.SITE_URL;
     console.log('Supabase verbunden ✓');
   } catch(e) { console.error('Supabase Fehler:', e.message); }
 
@@ -534,9 +536,7 @@ function loadOverview() {
   document.getElementById('ov-sales').textContent = '—';
   document.getElementById('ov-platform').textContent = '—';
 
-  // Alle Händler laden
-  var siteUrl = (window.SP_CONFIG && window.SP_CONFIG.SITE_URL) || 'https://officepuertoplata-coder.github.io/sosuapesce';
-  sb.from('merchants').select('*').order('created_at', {ascending:false}).then(function(r) {
+  sb.from('merchants').select('id,slug,name,status,currency,platform_fee_value,platform_fee_type').order('created_at', {ascending:false}).then(function(r) {
     if (r.error) {
       showErrOverview('Fehler beim Laden der Händler: ' + r.error.message + ' (Code: ' + r.error.code + ')');
       return;
