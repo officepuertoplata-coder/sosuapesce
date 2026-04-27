@@ -574,8 +574,8 @@ function loadAgents() {
             '<td>'+statusBadge(astatus)+'</td>' +
             '<td>'+fmtDate(a.created_at)+'</td>' +
             '<td style="white-space:nowrap">' +
-              '<button class="btn btn-outline" style="padding:4px 10px;font-size:.75rem;margin-right:4px" onclick="toggleAgent(''+aid+'',''+astatus+'')">'+(astatus==='active'?'⏸ Pause':'▶ Aktiv')+'</button>' +
-              '<button class="btn btn-danger" style="padding:4px 10px;font-size:.75rem" onclick="deleteAgent(''+aid+'',''+aname+'')">🗑️</button>' +
+              '<button class="btn btn-outline" style="padding:4px 10px;font-size:.75rem;margin-right:4px" onclick="toggleAgent(\''+aid+'\',\''+astatus+'\')">'+(astatus==='active'?'⏸ Pause':'▶ Aktiv')+'</button>' +
+              '<button class="btn btn-danger" style="padding:4px 10px;font-size:.75rem" onclick="deleteAgent(\''+aid+'\',\''+aname+'\')">🗑️</button>' +
             '</td>' +
           '</tr>';
         }).join('')
