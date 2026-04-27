@@ -171,8 +171,23 @@ textarea{min-height:80px;resize:vertical}
             <div><label>Telefon</label><input type="text" id="m-phone" placeholder="+1 829 000 0000"></div>
           </div>
           <div class="grid2">
-            <div><label>Adresse</label><input type="text" id="m-address" placeholder="Calle Principal 123"></div>
-            <div><label>Stadt</label><input type="text" id="m-city" placeholder="Sosua"></div>
+            <div><label>Adresse / Straße</label><input type="text" id="m-address" placeholder="Calle Principal 123"></div>
+            <div><label>Stadt / Ort</label><input type="text" id="m-city" placeholder="Sosúa"></div>
+          </div>
+          <div class="grid3">
+            <div><label>PLZ / ZIP Code</label><input type="text" id="m-zip" placeholder="57000"></div>
+            <div><label>Staat / State</label><input type="text" id="m-state" placeholder="Puerto Plata / FL"></div>
+            <div><label>Land / Country</label>
+              <select id="m-country">
+                <option value="DO">🇩🇴 Dominikanische Republik</option>
+                <option value="US">🇺🇸 USA</option>
+                <option value="DE">🇩🇪 Deutschland</option>
+                <option value="AT">🇦🇹 Österreich</option>
+                <option value="CH">🇨🇭 Schweiz</option>
+                <option value="ES">🇪🇸 Spanien</option>
+                <option value="other">Andere</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -368,10 +383,23 @@ var sb = null;
 var newMerchantId = null;
 
 window.addEventListener('load', function() {
+  // Check if already logged in
+  var saved = localStorage.getItem('sp_superadmin_auth');
+  if (saved && window.SP_CONFIG) {
+    var expected = btoa(window.SP_CONFIG.SUPERADMIN_PASSWORD + '_' + new Date().toDateString());
+    if (saved === expected) {
+      // Re-init supabase
+      try {
+        sb = window.supabase.createClient(window.SP_CONFIG.SUPABASE_URL, window.SP_CONFIG.SUPABASE_ANON);
+      } catch(e) {}
+      showApp();
+      return;
+    }
+  }
   try {
     var cfg = window.SP_CONFIG;
     if (cfg && cfg.SUPABASE_URL.indexOf('XXXX') === -1) {
-      sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_SERVICE_KEY);
+      sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON);
     }
   } catch(e) { console.warn('Supabase:', e.message); }
   document.getElementById('pwInput').addEventListener('keydown', function(e) {
@@ -384,12 +412,22 @@ function doLogin() {
   var cfg = window.SP_CONFIG;
   if (!cfg) { document.getElementById('lerr').textContent = 'config.js nicht geladen'; return; }
   if (pw === cfg.SUPERADMIN_PASSWORD) {
-    document.getElementById('loginWrap').style.display = 'none';
-    document.getElementById('app').classList.add('show');
-    loadOverview();
+    localStorage.setItem('sp_superadmin_auth', btoa(pw + '_' + new Date().toDateString()));
+    showApp();
   } else {
     document.getElementById('lerr').textContent = 'Falsches Passwort';
   }
+}
+
+function showApp() {
+  document.getElementById('loginWrap').style.display = 'none';
+  document.getElementById('app').classList.add('show');
+  loadOverview();
+}
+
+function doLogout() {
+  localStorage.removeItem('sp_superadmin_auth');
+  location.reload();
 }
 function doLogout() { location.reload(); }
 
@@ -491,6 +529,9 @@ function createMerchant() {
     phone: document.getElementById('m-phone').value.trim() || null,
     address: document.getElementById('m-address').value.trim() || null,
     city: document.getElementById('m-city').value.trim() || null,
+    zip: document.getElementById('m-zip').value.trim() || null,
+    state: document.getElementById('m-state').value.trim() || null,
+    country: document.getElementById('m-country').value || 'DO',
     currency: document.getElementById('m-currency').value,
     stripe_link: document.getElementById('m-stripe').value.trim() || null,
     base_fee: parseFloat(document.getElementById('m-basefee').value)||0,
