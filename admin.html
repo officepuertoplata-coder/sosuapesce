@@ -161,14 +161,24 @@ tr:hover td{background:#f9fafb}
             </select>
           </div>
           <div class="fgrp full">
-            <label>📦 Produkt / Stripe-Link *</label>
-            <select id="pl-product" onchange="generateLink()">
+            <label>📦 Produkt *</label>
+            <select id="pl-product" onchange="onProductChange()">
               <option value="">— Produkt auswählen —</option>
             </select>
+          </div>
+          <div class="fgrp">
+            <label>💰 Preis (wird automatisch gesetzt)</label>
+            <input id="pl-price" type="number" placeholder="Preis" oninput="generateLink()" step="0.01" min="0">
+          </div>
+          <div class="fgrp" style="display:flex;align-items:flex-end">
+            <div style="background:#f0fdf4;border:1px solid var(--g3);border-radius:8px;padding:10px 14px;font-size:.82rem;color:var(--g2);width:100%">
+              💡 Preis kann manuell übersteuert werden
+            </div>
           </div>
           <div class="full" id="linkResultWrap" style="display:none">
             <div class="link-result">
               <label>✅ Dein Zahlungslink – direkt per WhatsApp senden:</label>
+              <div style="font-size:.82rem;color:var(--g);font-weight:700;margin-bottom:4px" id="pl-priceinfo"></div>
               <div class="link-text" id="linkText">—</div>
               <div class="link-actions">
                 <button class="btn-copy" onclick="copyLink()">📋 Kopieren</button>
@@ -255,7 +265,7 @@ tr:hover td{background:#f9fafb}
       <div>
         <div class="sec-hd"><h2>Agenten-Liste</h2><button class="btn btn-outline" style="color:#fff;background:rgba(255,255,255,.15)" onclick="loadAgents()">Aktualisieren</button></div>
         <div class="sec-body">
-          <table><thead><tr><th>NAME</th><th>CODE</th><th>TELEFON</th><th>VERKÄUFE</th><th>PROVISION</th><th>STATUS</th><th>SEIT</th></tr></thead>
+          <table><thead><tr><th>NAME</th><th>CODE</th><th>TELEFON</th><th>VERKÄUFE</th><th>PROVISION</th><th>STATUS</th><th>SEIT</th><th>AKTIONEN</th></tr></thead>
           <tbody id="agentsList"><tr><td colspan="7" class="msg">Lade...</td></tr></tbody></table>
         </div>
       </div>
@@ -406,12 +416,24 @@ function loadDashboard() {
 }
 
 // ── ZAHLUNGSLINK GENERATOR ─────────────────────────────────
+function onProductChange() {
+  var prodEl = document.getElementById('pl-product');
+  var selectedOpt = prodEl.options[prodEl.selectedIndex];
+  if (selectedOpt && selectedOpt.dataset.price) {
+    document.getElementById('pl-price').value = selectedOpt.dataset.price;
+  } else {
+    document.getElementById('pl-price').value = '';
+  }
+  generateLink();
+}
+
 function generateLink() {
   var phone   = document.getElementById('pl-phone').value.trim();
   var agentEl = document.getElementById('pl-agent');
   var prodEl  = document.getElementById('pl-product');
   var agentCode = agentEl.value;
   var stripeUrl = prodEl.value;
+  var priceVal  = document.getElementById('pl-price').value;
 
   if (!phone || !agentCode || !stripeUrl) {
     document.getElementById('linkResultWrap').style.display = 'none';
@@ -424,9 +446,11 @@ function generateLink() {
   var refId = agentCode + '_' + cleanPhone;
   var fullLink = stripeUrl + (stripeUrl.indexOf('?') === -1 ? '?' : '&') + 'client_reference_id=' + encodeURIComponent(refId);
 
+  var priceInfo = priceVal ? ' | Preis: ' + parseFloat(priceVal).toLocaleString('de-AT') + ' ' + ((merchant && merchant.currency) || 'RD$') : '';
   document.getElementById('linkText').textContent = fullLink;
+  document.getElementById('pl-priceinfo').textContent = priceInfo ? '💰 Betrag: ' + parseFloat(priceVal).toLocaleString('de-AT') + ' ' + ((merchant && merchant.currency) || 'RD$') : '';
   // WhatsApp-Link mit dem Zahlungslink als Text
-  var waMsg = encodeURIComponent('Hier ist dein Zahlungslink:\n' + fullLink);
+  var waMsg = encodeURIComponent('Hier ist dein Zahlungslink:' + (priceVal ? ' (' + parseFloat(priceVal).toLocaleString('de-AT') + ' ' + ((merchant && merchant.currency)||'RD$') + ')' : '') + '\n' + fullLink);
   var waNum = cleanPhone.replace('+', '');
   document.getElementById('waLink').href = 'https://wa.me/' + waNum + '?text=' + waMsg;
   document.getElementById('linkResultWrap').style.display = 'block';
@@ -464,7 +488,7 @@ function loadProducts() {
     products = r.data || [];
     // Dropdown füllen
     var opts = '<option value="">— Produkt auswählen —</option>' +
-      products.map(function(p){ return '<option value="'+p.stripe_link+'">'+p.name+' ('+fmtNum(p.price)+' '+(merchant.currency||'RD$')+')</option>'; }).join('');
+      products.map(function(p){ return '<option value="'+p.stripe_link+'" data-price="'+p.price+'">'+p.name+' ('+fmtNum(p.price)+' '+(merchant.currency||'RD$')+')</option>'; }).join('');
     document.getElementById('pl-product').innerHTML = opts;
     // Tabelle
     document.getElementById('productsList').innerHTML = products.length
@@ -683,6 +707,29 @@ function loadBilling(period) {
       '<span>🏦 Händler-Erlös: <strong style="color:var(--g2)">'+fmtNum(totalRev-totalComm-platFee)+' '+cur+'</strong></span>' +
       '</div></div>';
     document.getElementById('billingContent').innerHTML = html;
+  });
+}
+
+// ── AGENT AKTIONEN ────────────────────────────────────────
+function toggleAgent(id, curStatus) {
+  if (!sb) return;
+  var newStatus = curStatus === 'active' ? 'paused' : 'active';
+  sb.from('agents').update({status: newStatus}).eq('id', id).then(function(r) {
+    if (r.error) { showToast('Fehler: ' + r.error.message); return; }
+    showToast('Status: ' + (newStatus === 'active' ? 'Aktiv' : 'Pausiert'));
+    loadAgents();
+    loadDashboard();
+  });
+}
+
+function deleteAgent(id, name) {
+  if (!confirm('Agent "' + name + '" wirklich loeschen? Diese Aktion kann nicht rueckgaengig gemacht werden.')) return;
+  if (!sb) return;
+  sb.from('agents').delete().eq('id', id).then(function(r) {
+    if (r.error) { showToast('Fehler: ' + r.error.message); return; }
+    showToast('Agent geloescht');
+    loadAgents();
+    loadDashboard();
   });
 }
 </script>
