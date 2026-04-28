@@ -14,7 +14,7 @@
   --wa:#25d366;--wa2:#128c7e;--in-bg:#dcf8c6;--out-bg:#fff;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',sans-serif;background:var(--bg);height:100vh;overflow:hidden}
+body{font-family:'Segoe UI',sans-serif;background:var(--bg);min-height:100vh;overflow:auto}
 
 /* NAV */
 .nav{background:var(--g2);color:#fff;display:flex;align-items:center;gap:8px;padding:0 20px;height:52px;position:sticky;top:0;z-index:100}
@@ -34,11 +34,11 @@ body{font-family:'Segoe UI',sans-serif;background:var(--bg);height:100vh;overflo
 .lerr{color:var(--red);font-size:.82rem;min-height:18px}
 
 /* APP LAYOUT */
-#app{display:none;height:calc(100vh - 52px)}
+#app{display:none;min-height:calc(100vh - 52px)}
 #app.show{display:flex}
 
 /* SIDEBAR */
-.sidebar{width:320px;min-width:320px;background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column}
+.sidebar{width:320px;min-width:320px;background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;height:calc(100vh - 52px);position:sticky;top:52px;overflow:hidden}
 .sidebar-hd{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
 .sidebar-hd h2{font-size:.95rem;font-weight:700;color:var(--g2)}
 .search-box{position:relative;padding:10px 12px;border-bottom:1px solid var(--border)}
@@ -63,7 +63,7 @@ body{font-family:'Segoe UI',sans-serif;background:var(--bg);height:100vh;overflo
 .no-conv{text-align:center;padding:40px 20px;color:var(--mu);font-size:.88rem}
 
 /* CHAT AREA */
-.chat-area{flex:1;display:flex;flex-direction:column;min-width:0}
+.chat-area{flex:1;display:flex;flex-direction:column;min-width:0;height:calc(100vh - 52px);position:sticky;top:52px;overflow:hidden}
 .chat-hd{padding:14px 20px;border-bottom:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:space-between}
 .chat-hd-info h3{font-size:1rem;font-weight:700;color:var(--txt)}
 .chat-hd-info p{font-size:.78rem;color:var(--mu)}
@@ -78,7 +78,7 @@ body{font-family:'Segoe UI',sans-serif;background:var(--bg);height:100vh;overflo
 .relay-badge.on{background:#fef9c3;border-color:var(--gold);color:#a16207}
 
 /* MESSAGES */
-.messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:#efeae4}
+.messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:#efeae4;min-height:200px;max-height:calc(100vh - 220px)}
 .msg-wrap{display:flex;flex-direction:column;max-width:70%}
 .msg-wrap.out{align-self:flex-end;align-items:flex-end}
 .msg-wrap.in{align-self:flex-start;align-items:flex-start}
@@ -150,7 +150,7 @@ body{font-family:'Segoe UI',sans-serif;background:var(--bg);height:100vh;overflo
   </nav>
 
   <!-- LAYOUT (below nav) -->
-  <div id="appLayout" style="display:flex;height:calc(100vh - 52px);margin-top:52px">
+  <div id="appLayout" style="display:flex;min-height:calc(100vh - 52px);margin-top:52px;flex:1">
 
     <!-- SIDEBAR -->
     <div class="sidebar">
