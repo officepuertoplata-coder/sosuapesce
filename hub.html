@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Converto – Hub</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="config.js"></script>
 <style>
 :root {
   --g1:#0d2818;--g2:#1b4332;--g3:#2d7a4f;--g4:#40916c;--g5:#74c69d;
@@ -243,21 +244,39 @@ function doLogin() {
   btn.disabled=true; btn.textContent='Einloggen...';
   document.getElementById('lerr').textContent='';
 
-  fetch(API+'/api/auth/login',{
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({slug:currentRole==='merchant'?slug:null, password:pw, role:currentRole})
-  }).then(function(r){return r.json();}).then(function(d){
-    btn.disabled=false; btn.textContent='Einloggen';
-    if (d.success) {
-      var name = d.merchant ? d.merchant.name : 'Superadmin';
-      saveAuth({role:currentRole, slug:slug, password:pw, name:name});
-      showApp({role:currentRole, slug:slug, name:name});
+  var cfg = window.SP_CONFIG;
+  if (!cfg) { document.getElementById('lerr').textContent='config.js fehlt'; btn.disabled=false; btn.textContent='Einloggen'; return; }
+
+  // Superadmin Login
+  if (currentRole === 'superadmin') {
+    if (pw === cfg.SUPERADMIN_PASSWORD) {
+      saveAuth({role:'superadmin', slug:null, password:pw, name:'Superadmin'});
+      showApp({role:'superadmin', slug:'sosuapesce', name:'Superadmin'});
     } else {
-      document.getElementById('lerr').textContent = d.error||'Falsches Passwort';
+      document.getElementById('lerr').textContent = 'Falsches Passwort';
     }
+    btn.disabled=false; btn.textContent='Einloggen';
+    return;
+  }
+
+  // Händler Login direkt gegen Supabase
+  var key = cfg.SUPABASE_ANON_KEY || cfg.SUPABASE_KEY;
+  fetch(cfg.SUPABASE_URL + '/rest/v1/merchants?slug=eq.' + slug + '&select=id,name,slug,admin_password', {
+    headers: {
+      'apikey': key,
+      'Authorization': 'Bearer ' + key,
+      'Content-Type': 'application/json'
+    }
+  }).then(function(r){ return r.json(); }).then(function(data) {
+    btn.disabled=false; btn.textContent='Einloggen';
+    if (!data || !data.length) { document.getElementById('lerr').textContent='Händler nicht gefunden'; return; }
+    var m = data[0];
+    if (m.admin_password !== pw) { document.getElementById('lerr').textContent='Falsches Passwort'; return; }
+    saveAuth({role:'merchant', slug:slug, password:pw, name:m.name});
+    showApp({role:'merchant', slug:slug, name:m.name});
   }).catch(function(){
     btn.disabled=false; btn.textContent='Einloggen';
-    document.getElementById('lerr').textContent='Verbindungsfehler – prüfe deine Internetverbindung';
+    document.getElementById('lerr').textContent='Verbindungsfehler';
   });
 }
 
