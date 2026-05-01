@@ -522,11 +522,7 @@ function sendViaTwilio(toNumber, textToSend, originalText, writeLang, sendLang) 
     console.error(e);
   });
 }
-  }).catch(function(e) {
-    showToast('⚠️ Verbindungsfehler');
-    console.error(e);
-  });
-}
+ 
 
 // ── TRANSLATION ───────────────────────────────────────────
 function onTyping() {
