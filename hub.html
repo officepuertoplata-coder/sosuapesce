@@ -6,6 +6,7 @@
 <title>Converto – Hub</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="config.js"></script>
+<script src="auth-init.js"></script>
 <style>
 :root {
   --g1:#0d2818;--g2:#1b4332;--g3:#2d7a4f;--g4:#40916c;--g5:#74c69d;
@@ -221,8 +222,8 @@ var merchant = 'sosuapesce';
 function getStored() {
   try { return JSON.parse(localStorage.getItem(KEY)||'null'); } catch(e) { return null; }
 }
-function saveAuth(d) {
-  if (!document.getElementById('rememberMe').checked) return;
+function saveAuth(d, force) {
+  if (!force && !document.getElementById('rememberMe').checked) return;
   localStorage.setItem(KEY, JSON.stringify({ role:d.role, slug:d.slug, password:d.password, name:d.name, savedAt:Date.now() }));
 }
 function clearAuth() { localStorage.removeItem(KEY); }
@@ -250,7 +251,7 @@ function doLogin() {
   // Superadmin Login
   if (currentRole === 'superadmin') {
     if (pw === cfg.SUPERADMIN_PASSWORD) {
-      saveAuth({role:'superadmin', slug:null, password:pw, name:'Superadmin'});
+      saveAuth({role:'superadmin', slug:null, password:pw, name:'Superadmin'}, true);
       showApp({role:'superadmin', slug:'sosuapesce', name:'Superadmin'});
     } else {
       document.getElementById('lerr').textContent = 'Falsches Passwort';
@@ -272,7 +273,7 @@ function doLogin() {
     if (!data || !data.length) { document.getElementById('lerr').textContent='Händler nicht gefunden'; return; }
     var m = data[0];
     if (m.admin_password !== pw) { document.getElementById('lerr').textContent='Falsches Passwort'; return; }
-    saveAuth({role:'merchant', slug:slug, password:pw, name:m.name});
+    saveAuth({role:'merchant', slug:slug, password:pw, name:m.name}, true);
     showApp({role:'merchant', slug:slug, name:m.name});
   }).catch(function(){
     btn.disabled=false; btn.textContent='Einloggen';
