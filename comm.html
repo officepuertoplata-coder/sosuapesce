@@ -497,36 +497,31 @@ function sendMsg() {
 }
 
 function sendViaTwilio(toNumber, textToSend, originalText, writeLang, sendLang) {
-  // Meta WhatsApp Cloud API
-  var META_TOKEN = 'EAAX7YTbHNasBRfE9P2L6o5xnCpErgPAzNlbmjlRH9oNbyH6ReHfjcghwzcOcXH7ez0M7FtOmSsaoduS7BiNwZBwUcbtQdZCvA7zUdLYXXE8gdEzscwmfGAXMHjTjBJtuxQmbnCKQhuXt3JjBhCvyWhFeWfr8FgxWGnYL2TCMCWMcLz57maJDdO4sG6THqYS08m3qvB4qKNubDiGlFVLEC1IkAIOlY75uZC4jwVUryJXgyvqQSCOu1X43MAKainyRxDPfZAS9cZBaaEjN6dDOqA1oPZBlU0qhKBWQZDZD';
-  var PHONE_ID = '1079416145255121';
+  var cfg = window.SP_CONFIG;
+  var apiUrl = cfg.API_URL || 'https://converto-server-production.up.railway.app';
 
-  // Nummer bereinigen (ohne + und whatsapp: prefix)
   var cleanTo = toNumber.replace('whatsapp:', '').replace(/[^0-9+]/g, '');
   if (!cleanTo.startsWith('+')) cleanTo = '+' + cleanTo;
 
-  var makeUrl = 'https://hook.us2.make.com/j7bh9etls2pcqg57e2wg7omvw0ewyefo';
-
-  // Via Make.com senden (umgeht CORS)
-  fetch(makeUrl, {
+  fetch(apiUrl + '/api/whatsapp/send', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      type: 'meta',
       to: cleanTo,
       message: textToSend,
-      phone_id: PHONE_ID,
-      token: META_TOKEN
+      merchant_id: merchant.id
     })
-  }).then(function(r) {
-    if (r.ok) {
+  }).then(function(r) { return r.json(); }).then(function(data) {
+    if (data.success) {
       showToast('✅ Nachricht gesendet!');
     } else {
-      r.text().then(function(t) {
-        showToast('⚠️ Fehler: ' + r.status);
-        console.error('Error:', t);
-      });
+      showToast('⚠️ Fehler: ' + (data.error || 'Unbekannt'));
     }
+  }).catch(function(e) {
+    showToast('⚠️ Verbindungsfehler');
+    console.error(e);
+  });
+}
   }).catch(function(e) {
     showToast('⚠️ Verbindungsfehler');
     console.error(e);
