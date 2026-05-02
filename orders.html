@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bestellungen</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="config.js"></script>
+<script src="auth-init.js"></script>
+<script src="nav.js"></script>
+<style>
+:root {
+  --bg: #f7f6f2;
+  --card: #ffffff;
+  --g1: #0d2818;
+  --g2: #1b4332;
+  --g3: #2d7a4f;
+  --g4: #40916c;
+  --g5: #74c69d;
+  --gold: #f4a100;
+  --red: #ef4444;
+  --blue: #3b82f6;
+  --border: #e8e8e4;
+  --txt: #1a1a1a;
+  --mu: #888880;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--txt);
+  min-height: 100vh;
+  padding-top: 48px;
+}
+
+/* HEADER */
+.page-header {
+  background: var(--g1);
+  color: #fff;
+  padding: 20px 20px 16px;
+  position: sticky;
+  top: 48px;
+  z-index: 40;
+}
+.page-header-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.page-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+.header-stats {
+  display: flex;
+  gap: 16px;
+}
+.hstat {
+  text-align: center;
+}
+.hstat-val {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--g5);
+  line-height: 1;
+}
+.hstat-label {
+  font-size: 0.6rem;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+/* FILTER TABS */
+.filter-bar {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 116px;
+  z-index: 35;
+}
+.filter-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.filter-inner::-webkit-scrollbar { display: none; }
+.filter-tab {
+  padding: 12px 16px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--mu);
+  border: none;
+  background: none;
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.filter-tab.active {
+  color: var(--g2);
+  border-bottom-color: var(--g3);
+}
+.filter-tab .badge {
+  background: var(--g5);
+  color: var(--g1);
+  border-radius: 10px;
+  padding: 1px 6px;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+.filter-tab.active .badge { background: var(--g2); color: #fff; }
+
+/* CONTENT */
+.content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 16px 16px 40px;
+}
+
+/* LOADING */
+.loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--mu);
+}
+.spinner {
+  width: 32px; height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--g3);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* EMPTY */
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--mu);
+  font-size: 0.88rem;
+}
+.empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+
+/* ORDER CARD */
+.order-card {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  margin-bottom: 10px;
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+.order-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+
+.order-header {
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+.order-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+.order-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--g2);
+  white-space: nowrap;
+}
+.order-info {
+  flex: 1;
+  min-width: 0;
+}
+.order-customer {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--txt);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.order-meta {
+  font-size: 0.7rem;
+  color: var(--mu);
+  margin-top: 2px;
+}
+.order-total {
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--g2);
+  white-space: nowrap;
+}
+.order-status {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.s-new { background: #fef9c3; color: #a16207; }
+.s-confirmed { background: #dcfce7; color: #15803d; }
+.s-preparing { background: #dbeafe; color: #1d4ed8; }
+.s-ready { background: #f0fdf4; color: #15803d; border: 1px solid #86efac; }
+.s-delivered { background: #f3f4f6; color: #6b7280; }
+.s-cancelled { background: #fee2e2; color: #dc2626; }
+
+/* ORDER BODY */
+.order-body {
+  padding: 0 16px 14px;
+  border-top: 1px solid var(--border);
+  display: none;
+}
+.order-body.open { display: block; }
+
+.order-items {
+  margin: 12px 0;
+}
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  padding: 5px 0;
+  border-bottom: 1px solid #f5f5f2;
+}
+.order-item:last-child { border-bottom: none; }
+.order-item-name { color: var(--txt); }
+.order-item-price { color: var(--g3); font-weight: 600; }
+
+.order-details {
+  display: flex;
+  gap: 16px;
+  font-size: 0.75rem;
+  color: var(--mu);
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.order-detail {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.order-note {
+  background: #fafaf7;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  color: var(--mu);
+  margin-bottom: 12px;
+  font-style: italic;
+}
+
+/* STATUS BUTTONS */
+.status-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.status-btn {
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.15s;
+  color: var(--txt);
+}
+.status-btn:hover { background: var(--bg); }
+.status-btn.confirm { border-color: var(--g4); color: var(--g3); }
+.status-btn.confirm:hover { background: #f0fdf4; }
+.status-btn.prepare { border-color: var(--blue); color: var(--blue); }
+.status-btn.prepare:hover { background: #eff6ff; }
+.status-btn.ready { border-color: var(--g3); background: var(--g3); color: #fff; }
+.status-btn.ready:hover { background: var(--g2); }
+.status-btn.deliver { border-color: var(--g2); background: var(--g2); color: #fff; }
+.status-btn.deliver:hover { background: var(--g1); }
+.status-btn.cancel { border-color: var(--red); color: var(--red); }
+.status-btn.cancel:hover { background: #fef2f2; }
+.status-btn.wa { border-color: #25d366; color: #25d366; }
+.status-btn.wa:hover { background: #f0fdf4; }
+
+/* REFRESH */
+.refresh-btn {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.8);
+  padding: 6px 12px;
+  border-radius: 7px;
+  font-size: 0.72rem;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.refresh-btn:hover { background: rgba(255,255,255,0.18); color: #fff; }
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--g1);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 40px;
+  font-size: 0.82rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  transition: transform 0.25s;
+  z-index: 999;
+  white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 600px) {
+  .page-header-inner { flex-wrap: wrap; }
+  .header-stats { gap: 12px; }
+  .hstat-val { font-size: 1.1rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="page-title">📦 Bestellungen</div>
+      <div style="font-size:.7rem;color:rgba(255,255,255,0.4);margin-top:2px" id="pageDate">—</div>
+    </div>
+    <div class="header-stats">
+      <div class="hstat"><div class="hstat-val" id="statNew">0</div><div class="hstat-label">Neu</div></div>
+      <div class="hstat"><div class="hstat-val" id="statToday">0</div><div class="hstat-label">Heute</div></div>
+      <div class="hstat"><div class="hstat-val" id="statRevenue">0</div><div class="hstat-label">Umsatz</div></div>
+    </div>
+    <button class="refresh-btn" onclick="loadOrders()">↻ Aktualisieren</button>
+  </div>
+</div>
+
+<!-- FILTER TABS -->
+<div class="filter-bar">
+  <div class="filter-inner">
+    <button class="filter-tab active" onclick="setFilter('all')" id="tab-all">Alle <span class="badge" id="badge-all">0</span></button>
+    <button class="filter-tab" onclick="setFilter('new')" id="tab-new">🔔 Neu <span class="badge" id="badge-new">0</span></button>
+    <button class="filter-tab" onclick="setFilter('confirmed')" id="tab-confirmed">✅ Bestätigt <span class="badge" id="badge-confirmed">0</span></button>
+    <button class="filter-tab" onclick="setFilter('preparing')" id="tab-preparing">👨‍🍳 Vorbereitung <span class="badge" id="badge-preparing">0</span></button>
+    <button class="filter-tab" onclick="setFilter('ready')" id="tab-ready">✔️ Bereit <span class="badge" id="badge-ready">0</span></button>
+    <button class="filter-tab" onclick="setFilter('delivered')" id="tab-delivered">🎉 Geliefert <span class="badge" id="badge-delivered">0</span></button>
+  </div>
+</div>
+
+<div class="content">
+  <div id="orderList">
+    <div class="loading">
+      <div class="spinner"></div>
+      Lade Bestellungen...
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var API = 'https://converto-server-production.up.railway.app';
+var merchant = null;
+var allOrders = [];
+var currentFilter = 'all';
+var openCards = {};
+
+// ── INIT ──────────────────────────────────────────────────
+window.addEventListener('load', function() {
+  var stored = null;
+  try { stored = JSON.parse(localStorage.getItem('converto_auth_v2') || 'null'); } catch(e) {}
+  if (!stored || !stored.slug) { window.location.href = 'hub.html'; return; }
+
+  var now = new Date();
+  var days = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+  var months = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+  document.getElementById('pageDate').textContent =
+    days[now.getDay()] + ', ' + now.getDate() + '. ' + months[now.getMonth()] + ' ' + now.getFullYear();
+
+  loadMerchantAndOrders(stored.slug);
+
+  // Auto-refresh alle 30 Sekunden
+  setInterval(loadOrders, 30000);
+});
+
+async function loadMerchantAndOrders(slug) {
+  try {
+    const res = await fetch(API + '/api/merchants/' + slug);
+    merchant = await res.json();
+    await loadOrders();
+  } catch(e) {
+    document.getElementById('orderList').innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div>Verbindungsfehler</div>';
+  }
+}
+
+async function loadOrders() {
+  if (!merchant) return;
+  try {
+    const res = await fetch(API + '/api/orders/' + merchant.id);
+    allOrders = await res.json();
+    updateStats();
+    renderOrders();
+  } catch(e) {
+    console.error('Load orders error:', e);
+  }
+}
+
+// ── STATS ─────────────────────────────────────────────────
+function updateStats() {
+  var today = new Date().toISOString().split('T')[0];
+  var todayOrders = allOrders.filter(function(o) {
+    return o.created_at && o.created_at.startsWith(today);
+  });
+  var newOrders = allOrders.filter(function(o){ return o.status === 'new'; });
+  var revenue = todayOrders.reduce(function(s, o){ return s + (o.total || 0); }, 0);
+
+  document.getElementById('statNew').textContent = newOrders.length;
+  document.getElementById('statToday').textContent = todayOrders.length;
+  document.getElementById('statRevenue').textContent = revenue.toFixed(0) + (merchant.currency || '€');
+
+  // Badges
+  var statuses = ['new', 'confirmed', 'preparing', 'ready', 'delivered'];
+  statuses.forEach(function(s) {
+    var count = allOrders.filter(function(o){ return o.status === s; }).length;
+    var el = document.getElementById('badge-' + s);
+    if (el) el.textContent = count;
+  });
+  document.getElementById('badge-all').textContent = allOrders.length;
+}
+
+// ── FILTER ────────────────────────────────────────────────
+function setFilter(filter) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-tab').forEach(function(t) { t.classList.remove('active'); });
+  document.getElementById('tab-' + filter).classList.add('active');
+  renderOrders();
+}
+
+// ── RENDER ────────────────────────────────────────────────
+function renderOrders() {
+  var filtered = currentFilter === 'all' ? allOrders :
+    allOrders.filter(function(o){ return o.status === currentFilter; });
+
+  var list = document.getElementById('orderList');
+
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">📭</div>' +
+      (currentFilter === 'all' ? 'Noch keine Bestellungen heute.' : 'Keine Bestellungen in dieser Kategorie.') +
+      '</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(function(order) {
+    return renderOrderCard(order);
+  }).join('');
+}
+
+function renderOrderCard(order) {
+  var items = order.items || [];
+  var currency = merchant.currency || '€';
+  var isOpen = openCards[order.id];
+  var statusLabel = {
+    new: 'Neu', confirmed: 'Bestätigt', preparing: 'Vorbereitung',
+    ready: 'Bereit', delivered: 'Geliefert', cancelled: 'Storniert'
+  }[order.status] || order.status;
+  var statusClass = 's-' + (order.status || 'new');
+
+  var time = order.created_at ?
+    new Date(order.created_at).toLocaleTimeString('de-AT', {hour:'2-digit', minute:'2-digit'}) : '—';
+
+  var html = '<div class="order-card" id="ocard-' + order.id + '">';
+
+  // Header
+  html += '<div class="order-header" onclick="toggleCard(\'' + order.id + '\')">';
+  html += '<div class="order-header-left">';
+  html += '<div class="order-num">' + (order.order_number || '#—') + '</div>';
+  html += '<div class="order-info">';
+  html += '<div class="order-customer">' + escHtml(order.customer_name || order.customer_wa || 'Unbekannt') + '</div>';
+  html += '<div class="order-meta">' + time + ' · ' + (order.delivery_type === 'delivery' ? '🚚 Lieferung' : '🏪 Abholung') + '</div>';
+  html += '</div></div>';
+  html += '<div style="display:flex;align-items:center;gap:10px">';
+  html += '<div class="order-total">' + (order.total || 0).toFixed(2) + currency + '</div>';
+  html += '<div class="order-status ' + statusClass + '">' + statusLabel + '</div>';
+  html += '</div></div>';
+
+  // Body
+  html += '<div class="order-body' + (isOpen ? ' open' : '') + '" id="obody-' + order.id + '">';
+
+  // Details
+  html += '<div class="order-details">';
+  if (order.customer_wa) html += '<div class="order-detail">📱 ' + escHtml(order.customer_wa) + '</div>';
+  if (order.delivery_type === 'delivery' && order.delivery_address) {
+    html += '<div class="order-detail">📍 ' + escHtml(order.delivery_address) + '</div>';
+  }
+  html += '</div>';
+
+  // Artikel
+  html += '<div class="order-items">';
+  items.forEach(function(item) {
+    html += '<div class="order-item">';
+    html += '<span class="order-item-name">' + escHtml(item.name) + ' × ' + item.quantity + ' ' + (item.unit_label || '') + '</span>';
+    html += '<span class="order-item-price">' + (item.total || 0).toFixed(2) + currency + '</span>';
+    html += '</div>';
+  });
+  if (order.delivery_fee > 0) {
+    html += '<div class="order-item"><span class="order-item-name">Liefergebühr</span><span class="order-item-price">' + order.delivery_fee.toFixed(2) + currency + '</span></div>';
+  }
+  html += '<div class="order-item" style="font-weight:700;border-top:1.5px solid var(--border);padding-top:8px;margin-top:4px">';
+  html += '<span>Gesamt</span><span class="order-item-price">' + (order.total || 0).toFixed(2) + currency + '</span>';
+  html += '</div>';
+  html += '</div>';
+
+  // Notiz
+  if (order.note) {
+    html += '<div class="order-note">📝 ' + escHtml(order.note) + '</div>';
+  }
+
+  // Status-Aktionen
+  html += '<div class="status-actions">';
+  if (order.status === 'new') {
+    html += '<button class="status-btn confirm" onclick="updateStatus(\'' + order.id + '\',\'confirmed\')">✅ Bestätigen</button>';
+    html += '<button class="status-btn cancel" onclick="updateStatus(\'' + order.id + '\',\'cancelled\')">✕ Stornieren</button>';
+  }
+  if (order.status === 'confirmed') {
+    html += '<button class="status-btn prepare" onclick="updateStatus(\'' + order.id + '\',\'preparing\')">👨‍🍳 In Vorbereitung</button>';
+  }
+  if (order.status === 'preparing') {
+    html += '<button class="status-btn ready" onclick="updateStatus(\'' + order.id + '\',\'ready\')">✔️ Bereit zur Abholung</button>';
+  }
+  if (order.status === 'ready') {
+    html += '<button class="status-btn deliver" onclick="updateStatus(\'' + order.id + '\',\'delivered\')">🎉 Übergeben/Geliefert</button>';
+  }
+  if (order.customer_wa && order.status !== 'cancelled') {
+    html += '<button class="status-btn wa" onclick="sendWA(\'' + order.id + '\',\'' + escHtml(order.customer_wa) + '\')">💬 WhatsApp</button>';
+  }
+  html += '</div>';
+
+  html += '</div></div>';
+  return html;
+}
+
+// ── TOGGLE CARD ───────────────────────────────────────────
+function toggleCard(id) {
+  openCards[id] = !openCards[id];
+  var body = document.getElementById('obody-' + id);
+  if (body) body.classList.toggle('open', openCards[id]);
+}
+
+// ── STATUS UPDATE ─────────────────────────────────────────
+async function updateStatus(orderId, newStatus) {
+  try {
+    const res = await fetch(API + '/api/orders/' + orderId + '/status', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      var statusLabels = {
+        confirmed: '✅ Bestätigt', preparing: '👨‍🍳 In Vorbereitung',
+        ready: '✔️ Bereit', delivered: '🎉 Übergeben', cancelled: '✕ Storniert'
+      };
+      showToast(statusLabels[newStatus] || 'Status aktualisiert');
+
+      // Local update
+      var order = allOrders.find(function(o){ return o.id === orderId; });
+      if (order) order.status = newStatus;
+      updateStats();
+      renderOrders();
+
+      // Card wieder öffnen
+      openCards[orderId] = true;
+      var body = document.getElementById('obody-' + orderId);
+      if (body) body.classList.add('open');
+    } else {
+      showToast('⚠️ Fehler: ' + (data.error || 'Unbekannt'));
+    }
+  } catch(e) {
+    showToast('⚠️ Verbindungsfehler');
+  }
+}
+
+// ── WHATSAPP ──────────────────────────────────────────────
+function sendWA(orderId, customerWa) {
+  var order = allOrders.find(function(o){ return o.id === orderId; });
+  if (!order) return;
+
+  var msg = 'Hallo! Bezüglich deiner Bestellung ' + (order.order_number || '') + ': ';
+  var waNum = customerWa.replace('+', '');
+  var url = 'https://wa.me/' + waNum + '?text=' + encodeURIComponent(msg);
+  window.open(url, '_blank');
+}
+
+// ── HELPERS ───────────────────────────────────────────────
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2800);
+}
+
+function escHtml(str) {
+  return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>
