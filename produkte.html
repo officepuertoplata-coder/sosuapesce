@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Produktverwaltung</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="config.js"></script>
+<script src="auth-init.js"></script>
+<script src="nav.js"></script>
+<style>
+:root {
+  --bg: #f7f6f2;
+  --card: #ffffff;
+  --g1: #0d2818;
+  --g2: #1b4332;
+  --g3: #2d7a4f;
+  --g4: #40916c;
+  --g5: #74c69d;
+  --gold: #f4a100;
+  --red: #ef4444;
+  --border: #e8e8e4;
+  --txt: #1a1a1a;
+  --mu: #888880;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--txt);
+  min-height: 100vh;
+  padding-top: 48px;
+}
+
+/* PAGE HEADER */
+.page-header {
+  background: var(--g1);
+  color: #fff;
+  padding: 20px 20px 16px;
+  position: sticky;
+  top: 48px;
+  z-index: 40;
+}
+.page-header-inner {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.page-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+.page-sub {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.4);
+  margin-top: 2px;
+}
+.btn-new {
+  background: var(--g3);
+  color: #fff;
+  border: none;
+  padding: 9px 16px;
+  border-radius: 9px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Syne', sans-serif;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-new:hover { background: var(--g4); }
+
+/* CONTENT */
+.content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 16px 16px 60px;
+}
+
+/* CATEGORY FILTER */
+.cat-filter {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.cat-filter::-webkit-scrollbar { display: none; }
+.cat-pill {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  color: var(--mu);
+  white-space: nowrap;
+  transition: all 0.15s;
+  font-family: 'Inter', sans-serif;
+}
+.cat-pill.active {
+  background: var(--g2);
+  color: #fff;
+  border-color: var(--g2);
+}
+
+/* PRODUCT GRID */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 10px;
+}
+
+/* PRODUCT CARD */
+.product-card {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: all 0.2s;
+  position: relative;
+}
+.product-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+.product-card.unavailable { opacity: 0.6; }
+
+.product-emoji {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.product-info { flex: 1; min-width: 0; }
+.product-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--txt);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 3px;
+}
+.product-details {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.product-price {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--g3);
+}
+.product-unit {
+  font-size: 0.72rem;
+  color: var(--mu);
+}
+.product-cat {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: rgba(45,122,79,0.1);
+  color: var(--g3);
+}
+
+.product-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+/* TOGGLE */
+.toggle {
+  width: 38px;
+  height: 22px;
+  background: #e0e0e0;
+  border-radius: 11px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+  border: none;
+}
+.toggle.on { background: var(--g3); }
+.toggle::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: left 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle.on::after { left: 18px; }
+
+.icon-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  transition: all 0.15s;
+  color: var(--mu);
+}
+.icon-btn:hover { background: var(--card); border-color: var(--g4); color: var(--g3); }
+.icon-btn.del:hover { border-color: var(--red); color: var(--red); background: #fef2f2; }
+
+/* ORDER ARROWS */
+.order-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.order-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  color: var(--mu);
+  transition: all 0.15s;
+}
+.order-btn:hover { background: var(--card); color: var(--g3); }
+
+/* EMPTY */
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--mu);
+}
+.empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+.empty-title { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: var(--txt); margin-bottom: 6px; }
+.empty-sub { font-size: 0.82rem; }
+
+/* LOADING */
+.loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--mu);
+}
+.spinner {
+  width: 32px; height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--g3);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* MODAL OVERLAY */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 200;
+  align-items: flex-end;
+  justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+
+/* MODAL */
+.modal {
+  background: var(--card);
+  border-radius: 20px 20px 0 0;
+  padding: 24px 20px 40px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.25s ease;
+}
+@keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+.modal-handle {
+  width: 40px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 0 auto 20px;
+}
+.modal-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+  color: var(--g1);
+}
+
+/* FORM */
+.fgrp { margin-bottom: 14px; }
+.fgrp label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--mu);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+}
+.fgrp input, .fgrp select, .fgrp textarea {
+  width: 100%;
+  padding: 10px 13px;
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  font-size: 0.88rem;
+  font-family: 'Inter', sans-serif;
+  color: var(--txt);
+  background: var(--bg);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.fgrp input:focus, .fgrp select:focus, .fgrp textarea:focus {
+  border-color: var(--g4);
+  background: #fff;
+}
+.fgrp textarea { resize: vertical; min-height: 72px; }
+.fgrp select option { background: #fff; }
+
+.fgrp-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* UNIT SELECTOR */
+.unit-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.unit-btn {
+  padding: 8px 4px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+  font-family: 'Inter', sans-serif;
+  color: var(--mu);
+}
+.unit-btn.selected {
+  border-color: var(--g3);
+  background: #f0fdf4;
+  color: var(--g2);
+}
+
+/* MODAL ACTIONS */
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+.btn-cancel {
+  flex: 1;
+  padding: 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  color: var(--mu);
+}
+.btn-save {
+  flex: 2;
+  padding: 12px;
+  background: var(--g2);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Syne', sans-serif;
+  transition: all 0.15s;
+}
+.btn-save:hover { background: var(--g3); }
+.btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* DELETE CONFIRM */
+.delete-modal {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 28px 24px;
+  width: calc(100% - 32px);
+  max-width: 360px;
+  margin: auto;
+  text-align: center;
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: none; } }
+.delete-icon { font-size: 2.5rem; margin-bottom: 12px; }
+.delete-title { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 800; margin-bottom: 6px; }
+.delete-sub { font-size: 0.82rem; color: var(--mu); margin-bottom: 20px; }
+.btn-delete {
+  width: 100%;
+  padding: 12px;
+  background: var(--red);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Syne', sans-serif;
+  margin-bottom: 8px;
+}
+.btn-keep {
+  width: 100%;
+  padding: 10px;
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  color: var(--mu);
+}
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--g1);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 40px;
+  font-size: 0.82rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  transition: transform 0.25s;
+  z-index: 999;
+  white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 600px) {
+  .product-grid { grid-template-columns: 1fr; }
+  .fgrp-row { grid-template-columns: 1fr; }
+  .unit-grid { grid-template-columns: repeat(4, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="page-title">🛒 Produktverwaltung</div>
+      <div class="page-sub" id="productCount">Lade...</div>
+    </div>
+    <button class="btn-new" onclick="openModal()">+ Neu</button>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+  <!-- Category Filter -->
+  <div class="cat-filter" id="catFilter">
+    <button class="cat-pill active" onclick="setCategory('all')" id="cat-all">Alle</button>
+  </div>
+
+  <!-- Product List -->
+  <div id="productArea">
+    <div class="loading">
+      <div class="spinner"></div>
+      Lade Produkte...
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="productModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalTitle">Neues Produkt</div>
+
+    <input type="hidden" id="editId">
+
+    <div class="fgrp">
+      <label>Produktname *</label>
+      <input type="text" id="fName" placeholder="z.B. Dorado, Beratung, Brot...">
+    </div>
+
+    <div class="fgrp-row">
+      <div class="fgrp">
+        <label>Preis *</label>
+        <input type="number" id="fPrice" placeholder="0.00" step="0.50" min="0">
+      </div>
+      <div class="fgrp">
+        <label>Kategorie</label>
+        <input type="text" id="fCategory" placeholder="z.B. Fisch, Service..." list="catList">
+        <datalist id="catList"></datalist>
+      </div>
+    </div>
+
+    <div class="fgrp">
+      <label>Einheit</label>
+      <div class="unit-grid" id="unitGrid">
+        <button class="unit-btn selected" onclick="selectUnit('kg','pro kg')">kg</button>
+        <button class="unit-btn" onclick="selectUnit('piece','pro Stück')">Stück</button>
+        <button class="unit-btn" onclick="selectUnit('liter','pro Liter')">Liter</button>
+        <button class="unit-btn" onclick="selectUnit('hour','pro Stunde')">Stunde</button>
+        <button class="unit-btn" onclick="selectUnit('gram','pro 100g')">100g</button>
+        <button class="unit-btn" onclick="selectUnit('portion','pro Portion')">Portion</button>
+        <button class="unit-btn" onclick="selectUnit('day','pro Tag')">Tag</button>
+        <button class="unit-btn" onclick="selectUnit('flat','pauschal')">Pauschal</button>
+      </div>
+    </div>
+
+    <div class="fgrp">
+      <label>Beschreibung (optional)</label>
+      <textarea id="fDesc" placeholder="Kurze Beschreibung für Kunden..."></textarea>
+    </div>
+
+    <div class="fgrp">
+      <label>Mengenschritte</label>
+      <select id="fStep">
+        <option value="0.1">0.1</option>
+        <option value="0.25">0.25</option>
+        <option value="0.5" selected>0.5</option>
+        <option value="1">1</option>
+        <option value="5">5</option>
+        <option value="10">10</option>
+      </select>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Abbrechen</button>
+      <button class="btn-save" id="saveBtn" onclick="saveProduct()">💾 Speichern</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div class="modal-overlay" id="deleteModal" style="align-items:center">
+  <div class="delete-modal">
+    <div class="delete-icon">🗑️</div>
+    <div class="delete-title">Produkt löschen?</div>
+    <div class="delete-sub" id="deleteName">Dieser Schritt kann nicht rückgängig gemacht werden.</div>
+    <button class="btn-delete" onclick="confirmDelete()">Ja, löschen</button>
+    <button class="btn-keep" onclick="closeDeleteModal()">Behalten</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var API = 'https://converto-server-production.up.railway.app';
+var merchant = null;
+var products = [];
+var selectedUnit = 'kg';
+var selectedUnitLabel = 'pro kg';
+var currentCategory = 'all';
+var deleteId = null;
+
+// ── INIT ──────────────────────────────────────────────────
+window.addEventListener('load', function() {
+  var stored = null;
+  try { stored = JSON.parse(localStorage.getItem('converto_auth_v2') || 'null'); } catch(e) {}
+  if (!stored || !stored.slug) { window.location.href = 'hub.html'; return; }
+  loadMerchantAndProducts(stored.slug);
+});
+
+async function loadMerchantAndProducts(slug) {
+  try {
+    const res = await fetch(API + '/api/merchants/' + slug);
+    merchant = await res.json();
+    await loadProducts();
+  } catch(e) {
+    document.getElementById('productArea').innerHTML =
+      '<div class="empty"><div class="empty-icon">⚠️</div>Verbindungsfehler</div>';
+  }
+}
+
+async function loadProducts() {
+  if (!merchant) return;
+  try {
+    const res = await fetch(API + '/api/products/' + merchant.id);
+    products = await res.json();
+    updateCategoryFilter();
+    renderProducts();
+    document.getElementById('productCount').textContent =
+      products.length + ' Produkt' + (products.length !== 1 ? 'e' : '');
+  } catch(e) {
+    console.error('Load error:', e);
+  }
+}
+
+// ── CATEGORIES ────────────────────────────────────────────
+function updateCategoryFilter() {
+  var cats = ['Alle'];
+  var seen = {};
+  products.forEach(function(p) {
+    if (p.category && !seen[p.category]) {
+      cats.push(p.category);
+      seen[p.category] = true;
+    }
+  });
+
+  var filter = document.getElementById('catFilter');
+  filter.innerHTML = cats.map(function(c) {
+    var val = c === 'Alle' ? 'all' : c;
+    return '<button class="cat-pill' + (currentCategory === val ? ' active' : '') +
+      '" onclick="setCategory(\'' + val + '\')">' + c + '</button>';
+  }).join('');
+
+  // Datalist für Kategorie-Input befüllen
+  var catList = document.getElementById('catList');
+  if (catList) {
+    catList.innerHTML = cats.filter(function(c){ return c !== 'Alle'; })
+      .map(function(c){ return '<option value="' + c + '">'; }).join('');
+  }
+}
+
+function setCategory(cat) {
+  currentCategory = cat;
+  updateCategoryFilter();
+  renderProducts();
+}
+
+// ── RENDER ────────────────────────────────────────────────
+function renderProducts() {
+  var filtered = currentCategory === 'all' ? products :
+    products.filter(function(p){ return p.category === currentCategory; });
+
+  var area = document.getElementById('productArea');
+
+  if (!filtered.length) {
+    area.innerHTML = '<div class="empty">' +
+      '<div class="empty-icon">📦</div>' +
+      '<div class="empty-title">Noch keine Produkte</div>' +
+      '<div class="empty-sub">Klicke "+ Neu" um dein erstes Produkt anzulegen.</div>' +
+      '</div>';
+    return;
+  }
+
+  area.innerHTML = '<div class="product-grid">' +
+    filtered.map(function(p, i) { return renderCard(p, i); }).join('') +
+    '</div>';
+}
+
+function getEmoji(p) {
+  var name = ((p.name || '') + ' ' + (p.category || '')).toLowerCase();
+  if (name.includes('fisch') || name.includes('fish') || name.includes('pescado')) return '🐟';
+  if (name.includes('fleisch') || name.includes('meat')) return '🥩';
+  if (name.includes('gemüse') || name.includes('vegetal')) return '🥦';
+  if (name.includes('obst') || name.includes('fruit')) return '🍎';
+  if (name.includes('brot') || name.includes('bread')) return '🍞';
+  if (name.includes('service') || name.includes('servicio')) return '🛠️';
+  if (name.includes('beratung') || name.includes('consult')) return '💼';
+  if (name.includes('lieferung') || name.includes('delivery')) return '🚚';
+  if (name.includes('getränk') || name.includes('drink')) return '🥤';
+  return '📦';
+}
+
+function renderCard(p) {
+  var currency = merchant.currency || '€';
+  return '<div class="product-card' + (p.available ? '' : ' unavailable') + '">' +
+    '<div class="product-emoji">' + getEmoji(p) + '</div>' +
+    '<div class="product-info">' +
+      '<div class="product-name">' + escHtml(p.name) + '</div>' +
+      '<div class="product-details">' +
+        '<span class="product-price">' + (p.price || 0).toFixed(2) + currency + '</span>' +
+        '<span class="product-unit">' + (p.unit_label || p.unit || '') + '</span>' +
+        (p.category ? '<span class="product-cat">' + escHtml(p.category) + '</span>' : '') +
+      '</div>' +
+    '</div>' +
+    '<div class="product-actions">' +
+      '<button class="toggle' + (p.available ? ' on' : '') + '" onclick="toggleAvailable(\'' + p.id + '\',' + !p.available + ')"></button>' +
+      '<div style="display:flex;gap:4px">' +
+        '<button class="icon-btn" onclick="openEditModal(\'' + p.id + '\')">✏️</button>' +
+        '<button class="icon-btn del" onclick="openDeleteModal(\'' + p.id + '\',\'' + escHtml(p.name) + '\')">🗑️</button>' +
+      '</div>' +
+      '<div class="order-btns">' +
+        '<button class="order-btn" onclick="moveProduct(\'' + p.id + '\',-1)">▲</button>' +
+        '<button class="order-btn" onclick="moveProduct(\'' + p.id + '\',1)">▼</button>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+// ── TOGGLE AVAILABLE ──────────────────────────────────────
+async function toggleAvailable(id, newVal) {
+  try {
+    await fetch(API + '/api/products/' + id, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ available: newVal })
+    });
+    var p = products.find(function(x){ return x.id === id; });
+    if (p) p.available = newVal;
+    renderProducts();
+    showToast(newVal ? '✅ Verfügbar' : '⏸ Nicht verfügbar');
+  } catch(e) { showToast('⚠️ Fehler'); }
+}
+
+// ── MOVE PRODUCT ──────────────────────────────────────────
+async function moveProduct(id, dir) {
+  var idx = products.findIndex(function(p){ return p.id === id; });
+  var newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= products.length) return;
+
+  // Swap
+  var tmp = products[idx];
+  products[idx] = products[newIdx];
+  products[newIdx] = tmp;
+
+  // Update sort_order
+  var updates = products.map(function(p, i) {
+    return fetch(API + '/api/products/' + p.id, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sort_order: i })
+    });
+  });
+  await Promise.all(updates);
+  renderProducts();
+}
+
+// ── MODAL ─────────────────────────────────────────────────
+function openModal() {
+  document.getElementById('modalTitle').textContent = 'Neues Produkt';
+  document.getElementById('editId').value = '';
+  document.getElementById('fName').value = '';
+  document.getElementById('fPrice').value = '';
+  document.getElementById('fCategory').value = '';
+  document.getElementById('fDesc').value = '';
+  document.getElementById('fStep').value = '0.5';
+  selectUnit('kg', 'pro kg');
+  document.getElementById('productModal').classList.add('open');
+  setTimeout(function(){ document.getElementById('fName').focus(); }, 200);
+}
+
+function openEditModal(id) {
+  var p = products.find(function(x){ return x.id === id; });
+  if (!p) return;
+
+  document.getElementById('modalTitle').textContent = 'Produkt bearbeiten';
+  document.getElementById('editId').value = p.id;
+  document.getElementById('fName').value = p.name || '';
+  document.getElementById('fPrice').value = p.price || '';
+  document.getElementById('fCategory').value = p.category || '';
+  document.getElementById('fDesc').value = p.description || '';
+  document.getElementById('fStep').value = p.step_quantity || '0.5';
+  selectUnit(p.unit || 'kg', p.unit_label || 'pro kg');
+
+  document.getElementById('productModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('productModal').classList.remove('open');
+}
+
+function selectUnit(unit, label) {
+  selectedUnit = unit;
+  selectedUnitLabel = label;
+  document.querySelectorAll('.unit-btn').forEach(function(btn) {
+    btn.classList.remove('selected');
+    if (btn.textContent.trim() === label.replace('pro ', '').trim() ||
+        btn.getAttribute('onclick') === "selectUnit('" + unit + "','" + label + "')") {
+      btn.classList.add('selected');
+    }
+  });
+}
+
+// ── SAVE ──────────────────────────────────────────────────
+async function saveProduct() {
+  var name = document.getElementById('fName').value.trim();
+  var price = parseFloat(document.getElementById('fPrice').value);
+  var category = document.getElementById('fCategory').value.trim();
+  var desc = document.getElementById('fDesc').value.trim();
+  var step = parseFloat(document.getElementById('fStep').value);
+  var editId = document.getElementById('editId').value;
+
+  if (!name) { showToast('⚠️ Bitte Produktname eingeben'); return; }
+  if (isNaN(price) || price < 0) { showToast('⚠️ Bitte gültigen Preis eingeben'); return; }
+
+  var btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Speichern...';
+
+  var payload = {
+    merchant_id: merchant.id,
+    name: name,
+    price: price,
+    unit: selectedUnit,
+    unit_label: selectedUnitLabel,
+    category: category || 'Allgemein',
+    description: desc,
+    step_quantity: step,
+    available: true
+  };
+
+  try {
+    var url = editId ? API + '/api/products/' + editId : API + '/api/products';
+    var method = editId ? 'PUT' : 'POST';
+
+    const res = await fetch(url, {
+      method: method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      closeModal();
+      await loadProducts();
+      showToast(editId ? '✅ Produkt aktualisiert' : '✅ Produkt angelegt');
+    } else {
+      showToast('⚠️ ' + (data.error || 'Fehler'));
+    }
+  } catch(e) {
+    showToast('⚠️ Verbindungsfehler');
+  }
+
+  btn.disabled = false;
+  btn.textContent = '💾 Speichern';
+}
+
+// ── DELETE ────────────────────────────────────────────────
+function openDeleteModal(id, name) {
+  deleteId = id;
+  document.getElementById('deleteName').textContent = '"' + name + '" wird dauerhaft gelöscht.';
+  document.getElementById('deleteModal').classList.add('open');
+}
+
+function closeDeleteModal() {
+  deleteId = null;
+  document.getElementById('deleteModal').classList.remove('open');
+}
+
+async function confirmDelete() {
+  if (!deleteId) return;
+  try {
+    const res = await fetch(API + '/api/products/' + deleteId, { method: 'DELETE' });
+    const data = await res.json();
+    if (data.success) {
+      closeDeleteModal();
+      await loadProducts();
+      showToast('🗑️ Produkt gelöscht');
+    } else {
+      showToast('⚠️ ' + (data.error || 'Fehler'));
+    }
+  } catch(e) {
+    showToast('⚠️ Verbindungsfehler');
+  }
+}
+
+// Close modal on overlay click
+document.addEventListener('click', function(e) {
+  if (e.target.id === 'productModal') closeModal();
+  if (e.target.id === 'deleteModal') closeDeleteModal();
+});
+
+// ── HELPERS ───────────────────────────────────────────────
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2800);
+}
+
+function escHtml(str) {
+  return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>
