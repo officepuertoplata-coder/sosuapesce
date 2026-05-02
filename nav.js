@@ -1,7 +1,5 @@
 /**
- * Converto Navigation Bar
- * Fügt einheitliche Navigation zu allen Admin-Seiten hinzu
- * Einfach <script src="nav.js"></script> in jede Seite einfügen
+ * Converto Navigation Bar v2
  */
 (function() {
 
@@ -13,12 +11,14 @@
 
   function getCurrentPage() {
     var path = window.location.pathname;
-    if (path.includes('comm.html'))       return 'comm';
-    if (path.includes('admin.html'))      return 'admin';
-    if (path.includes('agentes.html'))    return 'agentes';
-    if (path.includes('superadmin.html')) return 'superadmin';
-    if (path.includes('dashboard.html'))  return 'dashboard';
-    if (path.includes('hub.html'))        return 'hub';
+    if (path.includes('comm.html'))             return 'comm';
+    if (path.includes('haendler-session.html')) return 'haendler-session';
+    if (path.includes('orders.html'))           return 'orders';
+    if (path.includes('admin.html'))            return 'admin';
+    if (path.includes('agentes.html'))          return 'agentes';
+    if (path.includes('superadmin.html'))       return 'superadmin';
+    if (path.includes('dashboard.html'))        return 'dashboard';
+    if (path.includes('hub.html'))              return 'hub';
     return '';
   }
 
@@ -26,17 +26,18 @@
     var slug = getSlug();
     var current = getCurrentPage();
 
-    var pages = [
-      { id: 'hub',        label: '🏠 Hub',             url: BASE + '/hub.html',                   always: true },
-      { id: 'comm',       label: '💬 Kommunikation',   url: BASE + '/comm.html?m=' + slug,        always: true },
-      { id: 'agentes',    label: '👥 Agenten',         url: BASE + '/agentes.html?m=' + slug,     always: true },
-      { id: 'admin',      label: '⚙️ Admin',            url: BASE + '/admin.html?m=' + slug,       always: true },
-      { id: 'superadmin', label: '👑 Superadmin',      url: BASE + '/superadmin.html',            admin: true  },
-    ];
-
     var auth = null;
     try { auth = JSON.parse(localStorage.getItem('converto_auth_v2') || 'null'); } catch(e) {}
     var isSuperadmin = auth && auth.role === 'superadmin';
+
+    var pages = [
+      { id: 'comm',             label: '💬 Kommunikation',   url: BASE + '/comm.html?m=' + slug       },
+      { id: 'haendler-session', label: '📋 Verfügbarkeit',   url: BASE + '/haendler-session.html'     },
+      { id: 'orders',           label: '📦 Bestellungen',    url: BASE + '/orders.html'               },
+      { id: 'agentes',          label: '👥 Agenten',         url: BASE + '/agentes.html?m=' + slug    },
+      { id: 'admin',            label: '⚙️ Admin',            url: BASE + '/admin.html?m=' + slug      },
+      { id: 'superadmin',       label: '👑 Super',           url: BASE + '/superadmin.html', admin: true },
+    ];
 
     var css = `
       #converto-nav-bar {
@@ -47,47 +48,47 @@
         border-bottom: 1px solid rgba(64,145,108,0.25);
         display: flex;
         align-items: center;
-        padding: 0 16px;
-        gap: 4px;
+        padding: 0 12px;
+        gap: 2px;
         z-index: 9999;
         font-family: 'DM Sans', 'Segoe UI', sans-serif;
         box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+        overflow: hidden;
       }
       #converto-nav-bar .cnav-logo {
         display: flex;
         align-items: center;
-        gap: 7px;
-        margin-right: 12px;
+        gap: 6px;
+        margin-right: 8px;
         text-decoration: none;
         color: #74c69d;
         font-weight: 700;
-        font-size: .88rem;
+        font-size: .82rem;
         letter-spacing: -.3px;
         flex-shrink: 0;
       }
       #converto-nav-bar .cnav-logo span {
-        width: 26px; height: 26px;
+        width: 24px; height: 24px;
         background: linear-gradient(135deg, #2d7a4f, #40916c);
-        border-radius: 7px;
+        border-radius: 6px;
         display: flex; align-items: center; justify-content: center;
-        font-size: 13px;
+        font-size: 12px;
       }
       #converto-nav-bar .cnav-divider {
-        width: 1px; height: 20px;
+        width: 1px; height: 18px;
         background: rgba(64,145,108,0.25);
-        margin: 0 8px;
+        margin: 0 6px;
         flex-shrink: 0;
       }
       #converto-nav-bar .cnav-link {
         display: flex;
         align-items: center;
-        gap: 5px;
-        padding: 5px 11px;
-        border-radius: 7px;
+        padding: 4px 8px;
+        border-radius: 6px;
         text-decoration: none;
-        font-size: .78rem;
+        font-size: .72rem;
         font-weight: 500;
-        color: rgba(116,198,157,0.7);
+        color: rgba(116,198,157,0.6);
         transition: all .15s;
         white-space: nowrap;
         border: 1px solid transparent;
@@ -95,44 +96,43 @@
       #converto-nav-bar .cnav-link:hover {
         background: rgba(45,122,79,0.2);
         color: #74c69d;
-        border-color: rgba(64,145,108,0.3);
       }
       #converto-nav-bar .cnav-link.active {
         background: rgba(45,122,79,0.25);
         color: #e8f5ee;
-        border-color: rgba(64,145,108,0.4);
+        border-color: rgba(64,145,108,0.3);
         font-weight: 600;
       }
       #converto-nav-bar .cnav-right {
         margin-left: auto;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
         flex-shrink: 0;
       }
       #converto-nav-bar .cnav-merchant {
-        font-size: .7rem;
-        color: rgba(116,198,157,0.5);
-        font-family: 'DM Mono', monospace;
-        padding: 3px 8px;
+        font-size: .65rem;
+        color: rgba(116,198,157,0.4);
+        font-family: monospace;
+        padding: 2px 6px;
         background: rgba(45,122,79,0.1);
-        border-radius: 5px;
-        border: 1px solid rgba(64,145,108,0.15);
+        border-radius: 4px;
+        border: 1px solid rgba(64,145,108,0.12);
       }
-      #converto-nav-bar .cnav-logout {
-        padding: 5px 11px;
-        border-radius: 7px;
+      #converto-nav-bar .cnav-hub {
+        padding: 4px 10px;
+        border-radius: 6px;
         border: 1px solid rgba(64,145,108,0.2);
         background: none;
         color: rgba(116,198,157,0.6);
-        font-size: .75rem;
+        font-size: .7rem;
         cursor: pointer;
         font-family: inherit;
         transition: all .15s;
       }
-      #converto-nav-bar .cnav-logout:hover {
-        border-color: #ef4444;
-        color: #f87171;
+      #converto-nav-bar .cnav-hub:hover {
+        border-color: rgba(116,198,157,0.4);
+        color: #74c69d;
       }
     `;
 
@@ -150,16 +150,13 @@
     logo.innerHTML = '<span>🔄</span> Converto';
     nav.appendChild(logo);
 
-    // Divider
     var div1 = document.createElement('div');
     div1.className = 'cnav-divider';
     nav.appendChild(div1);
 
     // Links
     pages.forEach(function(page) {
-      if (page.id === 'hub') return; // Hub schon als Logo
-      if (page.admin && !isSuperadmin) return; // Superadmin nur für Superadmin
-
+      if (page.admin && !isSuperadmin) return;
       var a = document.createElement('a');
       a.className = 'cnav-link' + (current === page.id ? ' active' : '');
       a.href = page.url;
@@ -167,58 +164,45 @@
       nav.appendChild(a);
     });
 
-    // Right side
+    // Right
     var right = document.createElement('div');
     right.className = 'cnav-right';
 
-    if (slug && current !== 'hub' && current !== 'superadmin') {
-      var merchantBadge = document.createElement('span');
-      merchantBadge.className = 'cnav-merchant';
-      merchantBadge.textContent = '📍 ' + slug;
-      right.appendChild(merchantBadge);
+    if (slug && current !== 'hub') {
+      var badge = document.createElement('span');
+      badge.className = 'cnav-merchant';
+      badge.textContent = slug;
+      right.appendChild(badge);
     }
 
-    var logoutBtn = document.createElement('button');
-    logoutBtn.className = 'cnav-logout';
-    logoutBtn.textContent = '← Hub';
-    logoutBtn.onclick = function() { window.location.href = BASE + '/hub.html'; };
-    right.appendChild(logoutBtn);
+    var hubBtn = document.createElement('button');
+    hubBtn.className = 'cnav-hub';
+    hubBtn.textContent = '← Hub';
+    hubBtn.onclick = function() { window.location.href = BASE + '/hub.html'; };
+    right.appendChild(hubBtn);
 
     nav.appendChild(right);
     document.body.insertBefore(nav, document.body.firstChild);
 
-    // Bestehenden Nav nach unten verschieben
-    adjustPageLayout();
-  }
-
-  function adjustPageLayout() {
-    // Existierende fixe Navbars nach unten schieben
+    // Layout anpassen
     setTimeout(function() {
-      var existingNav = document.querySelector('nav.nav, nav[style*="fixed"], nav[style*="sticky"]');
-      if (existingNav) {
-        var currentTop = parseInt(existingNav.style.top) || 0;
-        existingNav.style.top = (currentTop + 48) + 'px';
+      var existingNav = document.querySelector('.nav');
+      if (existingNav && existingNav.style) {
+        var top = parseInt(existingNav.style.top) || 0;
+        existingNav.style.top = (top + 48) + 'px';
       }
-
-      // App-Layout anpassen
       var appLayout = document.getElementById('appLayout');
       if (appLayout) {
-        var currentMargin = parseInt(appLayout.style.marginTop) || 52;
-        appLayout.style.marginTop = (currentMargin + 48) + 'px';
-        var currentHeight = appLayout.style.height;
-        if (currentHeight && currentHeight.includes('calc')) {
-          appLayout.style.height = 'calc(100vh - ' + (currentMargin + 48) + 'px)';
-        }
+        var mt = parseInt(appLayout.style.marginTop) || 52;
+        appLayout.style.marginTop = (mt + 48) + 'px';
+        appLayout.style.height = 'calc(100vh - ' + (mt + 48) + 'px)';
       }
-
-      // Body padding falls nötig
-      if (!existingNav && !appLayout) {
-        document.body.style.paddingTop = '48px';
+      if (!document.getElementById('appLayout') && !document.querySelector('.nav')) {
+        document.body.style.paddingTop = (parseInt(document.body.style.paddingTop)||0) + 'px';
       }
     }, 50);
   }
 
-  // Warte auf DOM
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', buildNav);
   } else {
