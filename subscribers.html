@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aboverwaltung</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="auth-init.js"></script>
+<script src="nav.js"></script>
+<style>
+:root {
+  --bg: #f7f6f2;
+  --card: #ffffff;
+  --g1: #0d2818;
+  --g2: #1b4332;
+  --g3: #2d7a4f;
+  --g4: #40916c;
+  --g5: #74c69d;
+  --gold: #f4a100;
+  --red: #ef4444;
+  --blue: #3b82f6;
+  --wa: #25d366;
+  --border: #e8e8e4;
+  --txt: #1a1a1a;
+  --mu: #888880;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--txt);
+  min-height: 100vh;
+  padding-top: 48px;
+}
+
+/* PAGE HEADER */
+.page-header {
+  background: var(--g1);
+  color: #fff;
+  padding: 20px 20px 16px;
+  position: sticky;
+  top: 48px;
+  z-index: 40;
+}
+.page-header-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.page-title { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 800; }
+.page-sub { font-size: 0.7rem; color: rgba(255,255,255,0.4); margin-top: 2px; }
+
+.header-stats { display: flex; gap: 20px; }
+.hstat { text-align: center; }
+.hstat-val {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--g5);
+  line-height: 1;
+}
+.hstat-label { font-size: 0.6rem; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+.btn-broadcast {
+  background: var(--wa);
+  color: #fff;
+  border: none;
+  padding: 9px 16px;
+  border-radius: 9px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Syne', sans-serif;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.btn-broadcast:hover { background: #20b858; }
+
+/* FILTER BAR */
+.filter-bar {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 104px;
+  z-index: 35;
+}
+.filter-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  gap: 0;
+  align-items: center;
+  padding: 0 16px;
+}
+.filter-tab {
+  padding: 11px 14px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--mu);
+  border: none;
+  background: none;
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.filter-tab.active { color: var(--g2); border-bottom-color: var(--g3); }
+.filter-tab .badge {
+  background: var(--g5);
+  color: var(--g1);
+  border-radius: 10px;
+  padding: 1px 6px;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+.filter-tab.active .badge { background: var(--g2); color: #fff; }
+
+.search-box {
+  margin-left: auto;
+  padding: 8px 0;
+}
+.search-input {
+  padding: 7px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  background: var(--bg);
+  color: var(--txt);
+  width: 200px;
+  transition: border-color 0.2s;
+}
+.search-input:focus { border-color: var(--g4); background: #fff; }
+
+/* CONTENT */
+.content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 16px 16px 60px;
+}
+
+/* SUBSCRIBER TABLE */
+.sub-table {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.sub-table-header {
+  display: grid;
+  grid-template-columns: 1fr 120px 120px 100px 80px;
+  padding: 10px 16px;
+  background: #fafaf8;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--mu);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.sub-row {
+  display: grid;
+  grid-template-columns: 1fr 120px 120px 100px 80px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f5f5f2;
+  align-items: center;
+  transition: background 0.15s;
+}
+.sub-row:last-child { border-bottom: none; }
+.sub-row:hover { background: #fafaf8; }
+
+.sub-number {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sub-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--g3), var(--g4));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.sub-phone {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.82rem;
+  color: var(--txt);
+}
+.sub-name {
+  font-size: 0.72rem;
+  color: var(--mu);
+  margin-top: 2px;
+}
+.sub-date {
+  font-size: 0.75rem;
+  color: var(--mu);
+  font-family: 'DM Mono', monospace;
+}
+.sub-source {
+  font-size: 0.68rem;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+  background: rgba(45,122,79,0.1);
+  color: var(--g3);
+}
+.sub-source.email { background: rgba(59,130,246,0.1); color: var(--blue); }
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 10px;
+}
+.status-active { background: #dcfce7; color: #15803d; }
+.status-pending { background: #fef9c3; color: #a16207; }
+.status-inactive { background: #f3f4f6; color: #6b7280; }
+
+.sub-actions {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+.icon-btn {
+  width: 28px; height: 28px;
+  border-radius: 7px;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  transition: all 0.15s;
+  color: var(--mu);
+}
+.icon-btn:hover { background: var(--card); border-color: var(--g4); color: var(--g3); }
+.icon-btn.del:hover { border-color: var(--red); color: var(--red); }
+
+/* EMPTY */
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--mu);
+}
+.empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+.empty-title { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: var(--txt); margin-bottom: 6px; }
+.empty-sub { font-size: 0.82rem; line-height: 1.5; }
+
+/* LOADING */
+.loading { text-align: center; padding: 60px 20px; color: var(--mu); }
+.spinner {
+  width: 32px; height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--g3);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* BROADCAST MODAL */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--card);
+  border-radius: 18px;
+  padding: 28px;
+  width: 100%;
+  max-width: 500px;
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }
+.modal-title { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800; margin-bottom: 6px; color: var(--g1); }
+.modal-sub { font-size: 0.78rem; color: var(--mu); margin-bottom: 20px; }
+
+.fgrp { margin-bottom: 14px; }
+.fgrp label { display: block; font-size: 0.7rem; font-weight: 700; color: var(--mu); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+.fgrp textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-family: 'Inter', sans-serif;
+  color: var(--txt);
+  background: var(--bg);
+  outline: none;
+  resize: vertical;
+  min-height: 120px;
+  transition: border-color 0.2s;
+}
+.fgrp textarea:focus { border-color: var(--g4); background: #fff; }
+
+.char-count {
+  font-size: 0.68rem;
+  color: var(--mu);
+  text-align: right;
+  margin-top: 4px;
+  font-family: 'DM Mono', monospace;
+}
+.char-count.warn { color: var(--gold); }
+.char-count.danger { color: var(--red); }
+
+.broadcast-preview {
+  background: #f0fdf4;
+  border: 1px solid rgba(45,122,79,0.2);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 0.78rem;
+  color: var(--g2);
+  margin-bottom: 14px;
+}
+.broadcast-preview strong { display: block; font-size: 0.65rem; color: var(--mu); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+
+.recipient-select {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.rec-btn {
+  flex: 1;
+  padding: 8px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.15s;
+  color: var(--mu);
+  text-align: center;
+}
+.rec-btn.selected { border-color: var(--g3); background: #f0fdf4; color: var(--g2); }
+
+.modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+.btn-cancel {
+  flex: 1;
+  padding: 11px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  color: var(--mu);
+}
+.btn-send {
+  flex: 2;
+  padding: 11px;
+  background: var(--wa);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Syne', sans-serif;
+  transition: all 0.15s;
+}
+.btn-send:hover { background: #20b858; }
+.btn-send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--g1);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 40px;
+  font-size: 0.82rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  transition: transform 0.25s;
+  z-index: 999;
+  white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 700px) {
+  .sub-table-header, .sub-row { grid-template-columns: 1fr 90px 70px; }
+  .sub-table-header > *:nth-child(2),
+  .sub-row > *:nth-child(2),
+  .sub-table-header > *:nth-child(3),
+  .sub-row > *:nth-child(3) { display: none; }
+  .search-input { width: 140px; }
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="page-title">📬 Aboverwaltung</div>
+      <div class="page-sub" id="merchantName">—</div>
+    </div>
+    <div class="header-stats">
+      <div class="hstat"><div class="hstat-val" id="statActive">0</div><div class="hstat-label">Aktiv</div></div>
+      <div class="hstat"><div class="hstat-val" id="statPending">0</div><div class="hstat-label">Ausstehend</div></div>
+      <div class="hstat"><div class="hstat-val" id="statTotal">0</div><div class="hstat-label">Gesamt</div></div>
+    </div>
+    <button class="btn-broadcast" onclick="openBroadcast()">📢 Broadcast</button>
+  </div>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <div class="filter-inner">
+    <button class="filter-tab active" onclick="setFilter('all')" id="tab-all">Alle <span class="badge" id="badge-all">0</span></button>
+    <button class="filter-tab" onclick="setFilter('active')" id="tab-active">✅ Aktiv <span class="badge" id="badge-active">0</span></button>
+    <button class="filter-tab" onclick="setFilter('pending')" id="tab-pending">⏳ Ausstehend <span class="badge" id="badge-pending">0</span></button>
+    <button class="filter-tab" onclick="setFilter('inactive')" id="tab-inactive">⏸ Inaktiv <span class="badge" id="badge-inactive">0</span></button>
+    <div class="search-box">
+      <input class="search-input" id="searchInput" placeholder="🔍 Nummer suchen..." oninput="renderTable()">
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div id="tableArea">
+    <div class="loading"><div class="spinner"></div>Lade Abonnenten...</div>
+  </div>
+</div>
+
+<!-- BROADCAST MODAL -->
+<div class="modal-overlay" id="broadcastModal">
+  <div class="modal">
+    <div class="modal-title">📢 Broadcast senden</div>
+    <div class="modal-sub" id="broadcastSub">Nachricht an alle aktiven Abonnenten</div>
+
+    <div class="recipient-select">
+      <button class="rec-btn selected" onclick="setRecipients('active')" id="rec-active">✅ Aktive</button>
+      <button class="rec-btn" onclick="setRecipients('all')" id="rec-all">Alle</button>
+    </div>
+
+    <div class="fgrp">
+      <label>Nachricht *</label>
+      <textarea id="broadcastMsg" placeholder="Deine Nachricht an Abonnenten..." oninput="updateCharCount()"></textarea>
+      <div class="char-count" id="charCount">0 / 1024</div>
+    </div>
+
+    <div class="broadcast-preview">
+      <strong>📱 Vorschau</strong>
+      <div id="previewText">Gib eine Nachricht ein...</div>
+    </div>
+
+    <div class="fgrp">
+      <label>STOP-Hinweis (wird automatisch angehängt)</label>
+      <div style="font-size:.75rem;color:var(--mu);padding:8px 12px;background:var(--bg);border-radius:8px;border:1px solid var(--border)">
+        Antworte STOP zum Abmelden.
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeBroadcast()">Abbrechen</button>
+      <button class="btn-send" id="sendBtn" onclick="sendBroadcast()">📢 Jetzt senden</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var API = 'https://converto-server-production.up.railway.app';
+var sb = null;
+var merchant = null;
+var allSubs = [];
+var currentFilter = 'all';
+var broadcastRecipients = 'active';
+
+// ── INIT ──────────────────────────────────────────────────
+window.addEventListener('load', function() {
+  var stored = null;
+  try { stored = JSON.parse(localStorage.getItem('converto_auth_v2') || 'null'); } catch(e) {}
+  if (!stored || !stored.slug) { window.location.href = 'hub.html'; return; }
+
+  var cfg = window.SP_CONFIG;
+  if (cfg) {
+    var key = cfg.SUPABASE_ANON_KEY || cfg.SUPABASE_KEY;
+    sb = window.supabase.createClient(cfg.SUPABASE_URL, key);
+  }
+
+  loadData(stored.slug);
+});
+
+async function loadData(slug) {
+  try {
+    const res = await fetch(API + '/api/merchants/' + slug);
+    merchant = await res.json();
+    document.getElementById('merchantName').textContent = merchant.name;
+    await loadSubscribers();
+  } catch(e) {
+    document.getElementById('tableArea').innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div>Verbindungsfehler</div>';
+  }
+}
+
+async function loadSubscribers() {
+  if (!sb || !merchant) return;
+  try {
+    const { data, error } = await sb
+      .from('subscribers')
+      .select('*')
+      .eq('merchant_slug', merchant.slug)
+      .order('created_at', { ascending: false });
+
+    allSubs = data || [];
+    updateStats();
+    renderTable();
+  } catch(e) {
+    console.error('Load subscribers error:', e);
+  }
+}
+
+// ── STATS ─────────────────────────────────────────────────
+function updateStats() {
+  var active = allSubs.filter(function(s){ return s.active && s.status !== 'pending'; }).length;
+  var pending = allSubs.filter(function(s){ return s.status === 'pending'; }).length;
+  var inactive = allSubs.filter(function(s){ return !s.active; }).length;
+
+  document.getElementById('statActive').textContent = active;
+  document.getElementById('statPending').textContent = pending;
+  document.getElementById('statTotal').textContent = allSubs.length;
+
+  document.getElementById('badge-all').textContent = allSubs.length;
+  document.getElementById('badge-active').textContent = active;
+  document.getElementById('badge-pending').textContent = pending;
+  document.getElementById('badge-inactive').textContent = inactive;
+}
+
+// ── FILTER ────────────────────────────────────────────────
+function setFilter(filter) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-tab').forEach(function(t){ t.classList.remove('active'); });
+  document.getElementById('tab-' + filter).classList.add('active');
+  renderTable();
+}
+
+// ── RENDER TABLE ──────────────────────────────────────────
+function renderTable() {
+  var search = (document.getElementById('searchInput').value || '').toLowerCase();
+  var filtered = allSubs.filter(function(s) {
+    var matchFilter = currentFilter === 'all' ||
+      (currentFilter === 'active' && s.active && s.status !== 'pending') ||
+      (currentFilter === 'pending' && s.status === 'pending') ||
+      (currentFilter === 'inactive' && !s.active);
+    var matchSearch = !search || (s.whatsapp_number || '').toLowerCase().includes(search) ||
+      (s.email || '').toLowerCase().includes(search);
+    return matchFilter && matchSearch;
+  });
+
+  var area = document.getElementById('tableArea');
+
+  if (!filtered.length) {
+    area.innerHTML = '<div class="empty">' +
+      '<div class="empty-icon">📭</div>' +
+      '<div class="empty-title">Keine Abonnenten</div>' +
+      '<div class="empty-sub">Wenn Kunden "INFO" per WhatsApp schreiben<br>erscheinen sie hier nach dem Opt-in.</div>' +
+      '</div>';
+    return;
+  }
+
+  var html = '<div class="sub-table">';
+  html += '<div class="sub-table-header"><div>Kontakt</div><div>Angemeldet</div><div>Quelle</div><div>Status</div><div style="text-align:right">Aktionen</div></div>';
+
+  filtered.forEach(function(s) {
+    var phone = s.whatsapp_number || s.email || '—';
+    var initials = phone.replace(/[^a-zA-Z0-9]/g, '').substring(0, 2).toUpperCase() || '??';
+    var date = s.created_at ? new Date(s.created_at).toLocaleDateString('de-AT', { day:'2-digit', month:'2-digit', year:'2-digit' }) : '—';
+    var optInDate = s.opted_in_at ? new Date(s.opted_in_at).toLocaleDateString('de-AT', { day:'2-digit', month:'2-digit', year:'2-digit' }) : date;
+
+    var statusClass = s.status === 'pending' ? 'status-pending' : (s.active ? 'status-active' : 'status-inactive');
+    var statusLabel = s.status === 'pending' ? '⏳ Ausstehend' : (s.active ? '✅ Aktiv' : '⏸ Inaktiv');
+
+    var sourceClass = s.source === 'email' ? 'email' : '';
+    var sourceLabel = s.source === 'email' ? '📧 E-Mail' : '💬 WhatsApp';
+
+    html += '<div class="sub-row">';
+    html += '<div class="sub-number"><div class="sub-avatar">' + initials + '</div><div><div class="sub-phone">' + escHtml(phone) + '</div>' + (s.email && s.whatsapp_number ? '<div class="sub-name">' + escHtml(s.email) + '</div>' : '') + '</div></div>';
+    html += '<div class="sub-date">' + optInDate + '</div>';
+    html += '<div><span class="sub-source ' + sourceClass + '">' + sourceLabel + '</span></div>';
+    html += '<div><span class="status-badge ' + statusClass + '">' + statusLabel + '</span></div>';
+    html += '<div class="sub-actions">';
+    if (s.whatsapp_number) {
+      html += '<button class="icon-btn" onclick="openWhatsApp(\'' + escHtml(s.whatsapp_number) + '\')" title="WhatsApp">💬</button>';
+    }
+    if (s.active) {
+      html += '<button class="icon-btn" onclick="toggleSub(\'' + s.id + '\', false)" title="Deaktivieren">⏸</button>';
+    } else {
+      html += '<button class="icon-btn" onclick="toggleSub(\'' + s.id + '\', true)" title="Aktivieren">▶️</button>';
+    }
+    html += '</div>';
+    html += '</div>';
+  });
+
+  html += '</div>';
+  area.innerHTML = html;
+}
+
+// ── ACTIONS ───────────────────────────────────────────────
+async function toggleSub(id, active) {
+  if (!sb) return;
+  try {
+    await sb.from('subscribers').update({ active: active }).eq('id', id);
+    var sub = allSubs.find(function(s){ return s.id === id; });
+    if (sub) sub.active = active;
+    updateStats();
+    renderTable();
+    showToast(active ? '▶️ Aktiviert' : '⏸ Deaktiviert');
+  } catch(e) { showToast('⚠️ Fehler'); }
+}
+
+function openWhatsApp(number) {
+  var clean = number.replace('+', '');
+  window.open('https://wa.me/' + clean, '_blank');
+}
+
+// ── BROADCAST ─────────────────────────────────────────────
+function openBroadcast() {
+  document.getElementById('broadcastModal').classList.add('open');
+  updateBroadcastSub();
+}
+
+function closeBroadcast() {
+  document.getElementById('broadcastModal').classList.remove('open');
+}
+
+function setRecipients(type) {
+  broadcastRecipients = type;
+  document.querySelectorAll('.rec-btn').forEach(function(b){ b.classList.remove('selected'); });
+  document.getElementById('rec-' + type).classList.add('selected');
+  updateBroadcastSub();
+}
+
+function updateBroadcastSub() {
+  var count = broadcastRecipients === 'active'
+    ? allSubs.filter(function(s){ return s.active && s.status !== 'pending'; }).length
+    : allSubs.length;
+  document.getElementById('broadcastSub').textContent =
+    'Nachricht an ' + count + ' Abonnenten';
+  document.getElementById('sendBtn').textContent = '📢 An ' + count + ' senden';
+}
+
+function updateCharCount() {
+  var msg = document.getElementById('broadcastMsg').value;
+  var full = msg + '\n\nAntworte STOP zum Abmelden.';
+  var len = full.length;
+  var el = document.getElementById('charCount');
+  el.textContent = len + ' / 1024';
+  el.className = 'char-count' + (len > 900 ? ' danger' : len > 700 ? ' warn' : '');
+  document.getElementById('previewText').textContent = msg || 'Gib eine Nachricht ein...';
+}
+
+async function sendBroadcast() {
+  var msg = document.getElementById('broadcastMsg').value.trim();
+  if (!msg) { showToast('⚠️ Bitte Nachricht eingeben'); return; }
+  if (!merchant) return;
+
+  var btn = document.getElementById('sendBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Sende...';
+
+  var fullMsg = msg + '\n\nAntworte STOP zum Abmelden.';
+
+  try {
+    const res = await fetch(API + '/api/broadcast', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        merchant_id: merchant.id,
+        merchant_slug: merchant.slug,
+        message: fullMsg,
+        recipients: broadcastRecipients
+      })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      closeBroadcast();
+      document.getElementById('broadcastMsg').value = '';
+      showToast('✅ Gesendet an ' + data.sent + ' Abonnenten');
+    } else {
+      showToast('⚠️ ' + (data.error || 'Fehler'));
+    }
+  } catch(e) {
+    showToast('⚠️ Verbindungsfehler');
+  }
+
+  btn.disabled = false;
+  updateBroadcastSub();
+}
+
+// Close on overlay click
+document.getElementById('broadcastModal').addEventListener('click', function(e) {
+  if (e.target === this) closeBroadcast();
+});
+
+// ── HELPERS ───────────────────────────────────────────────
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2800);
+}
+
+function escHtml(str) {
+  return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>
