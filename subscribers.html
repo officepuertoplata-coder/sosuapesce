@@ -329,19 +329,20 @@ let allSubs      = [];
 // ── INIT ─────────────────────────────────────────────────
 window.onload = async function() {
   const p = new URLSearchParams(location.search);
-  merchantSlug = p.get('slug') || sessionStorage.getItem('merchantSlug');
+  merchantSlug = p.get('slug') || sessionStorage.getItem('merchantSlug') || 'sosuapesce';
   merchantId   = p.get('mid')  || sessionStorage.getItem('merchantId');
 
-  if (!merchantSlug && !merchantId) {
-    // Fallback: sosuapesce
-    merchantSlug = 'sosuapesce';
-  }
-
-  if (!merchantId && merchantSlug) {
-    const r = await fetch(API + '/api/merchants/' + merchantSlug);
-    const m = await r.json();
-    merchantId = m.id;
-    document.getElementById('navSlug').textContent = m.name || merchantSlug;
+  if (!merchantId) {
+    try {
+      const r = await fetch(API + '/api/merchants/' + merchantSlug);
+      const m = await r.json();
+      merchantId = m.id;
+      document.getElementById('navSlug').textContent = m.name || merchantSlug;
+    } catch(e) {
+      // Hardcode fallback
+      merchantId = '1cdf331b-2e37-4296-b648-6527a4247b46';
+      document.getElementById('navSlug').textContent = 'Sosua Pescado';
+    }
   }
 
   await loadSubscribers();
@@ -350,10 +351,9 @@ window.onload = async function() {
 // ── LOAD ─────────────────────────────────────────────────
 async function loadSubscribers() {
   try {
-    const res  = await fetch(SB_URL + '/rest/v1/subscribers?merchant_id=eq.' + merchantId + '&order=created_at.desc', {
-      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
-    });
-    allSubs = await res.json();
+    const res = await fetch(API + '/api/subscribers/' + merchantId);
+    allSubs   = await res.json();
+    if (!Array.isArray(allSubs)) throw new Error('Keine Daten');
     updateStats();
     renderTable(allSubs);
   } catch(e) {
@@ -441,12 +441,9 @@ function applyFilter() {
 
 // ── TOGGLE STATUS ─────────────────────────────────────────
 async function toggleStatus(id, newStatus) {
-  await fetch(SB_URL + '/rest/v1/subscribers?id=eq.' + id, {
+  await fetch(API + '/api/subscribers/' + id, {
     method: 'PATCH',
-    headers: {
-      'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY,
-      'Content-Type': 'application/json', 'Prefer': 'return=minimal'
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ status: newStatus,
       opted_out_at: newStatus === 'inactive' ? new Date().toISOString() : null })
   });
@@ -478,12 +475,9 @@ async function addSubscriber() {
     opted_in_at: new Date().toISOString()
   };
 
-  const res = await fetch(SB_URL + '/rest/v1/subscribers', {
+  const res = await fetch(API + '/api/subscribers', {
     method: 'POST',
-    headers: {
-      'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY,
-      'Content-Type': 'application/json', 'Prefer': 'return=minimal'
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
   });
 
