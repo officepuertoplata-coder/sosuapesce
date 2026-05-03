@@ -923,6 +923,27 @@ async function publishAvailability() {
       document.getElementById('publishedBanner').style.display = 'flex';
       btn.textContent = '✅ Publiziert';
       showToast('🎉 Live! Kunden sehen dein Angebot.');
+
+      // MailerLite E-Mail automatisch senden
+      var activeProducts = products.filter(function(p){ return p.active; });
+      fetch(API + '/api/mailerlite/daily-offer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          merchant_id: merchant.id,
+          availability_id: availabilityId,
+          products: activeProducts,
+          note: document.getElementById('noteText').value,
+          merchant_name: merchant.name,
+          wa_number: merchant.whatsapp_number
+        })
+      }).then(function(r){ return r.json(); }).then(function(d){
+        if (d.success) {
+          showToast('📧 E-Mail-Kampagne erstellt!');
+          document.getElementById('broadcastInfo').textContent = ' · E-Mail-Kampagne erstellt.';
+        }
+      }).catch(function(){ });
+
     } else {
       showToast('⚠️ Fehler: ' + (data.error || 'Unbekannt'));
       btn.disabled = false;
