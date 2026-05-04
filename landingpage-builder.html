@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Landingpage Builder – Converdino</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --wa:     #25D366;
+  --wa-d:   #128C7E;
+  --bg:     #0a1f12;
+  --card:   #111f15;
+  --card2:  #162a1a;
+  --border: rgba(37,211,102,0.15);
+  --txt:    #e8f5ec;
+  --muted:  #5d8a6a;
+  --red:    #ef4444;
+  --gold:   #f4a100;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;}
+
+/* NAV */
+nav{
+  background:rgba(10,31,18,0.95);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  padding:0 24px;height:56px;
+  display:flex;align-items:center;gap:0;
+  position:sticky;top:0;z-index:100;
+}
+.nav-brand{font-weight:900;font-size:1.1rem;color:var(--wa);text-decoration:none;margin-right:24px;}
+.nav-brand span{color:var(--txt);}
+.nav-link{color:var(--muted);text-decoration:none;font-size:.82rem;padding:0 12px;height:56px;display:flex;align-items:center;border-bottom:2px solid transparent;transition:all .2s;font-weight:600;}
+.nav-link:hover{color:var(--txt);}
+.nav-link.active{color:var(--wa);border-bottom-color:var(--wa);}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:420px 1fr;height:calc(100vh - 56px);}
+
+/* LEFT PANEL */
+.panel{
+  background:var(--card);
+  border-right:1px solid var(--border);
+  overflow-y:auto;
+  display:flex;flex-direction:column;
+}
+.panel-header{
+  padding:20px 20px 0;
+  border-bottom:1px solid var(--border);
+  display:flex;flex-direction:column;gap:0;
+}
+.panel-tabs{display:flex;gap:0;margin-top:16px;}
+.tab{
+  flex:1;padding:10px;border:none;background:none;
+  color:var(--muted);font-size:.82rem;font-weight:700;
+  font-family:'Nunito',sans-serif;cursor:pointer;
+  border-bottom:2px solid transparent;transition:all .2s;
+}
+.tab.active{color:var(--wa);border-bottom-color:var(--wa);}
+
+.panel-body{padding:20px;flex:1;}
+
+/* FORM ELEMENTS */
+.fgrp{margin-bottom:14px;}
+.fgrp label{
+  display:block;font-size:.68rem;font-weight:800;
+  color:var(--muted);margin-bottom:5px;
+  text-transform:uppercase;letter-spacing:.8px;
+}
+.fgrp input,.fgrp select,.fgrp textarea{
+  width:100%;padding:9px 12px;
+  background:var(--card2);border:1.5px solid rgba(37,211,102,0.1);
+  border-radius:8px;color:var(--txt);
+  font-size:.85rem;font-family:'Nunito',sans-serif;
+  outline:none;transition:border-color .2s;
+}
+.fgrp input:focus,.fgrp select:focus,.fgrp textarea:focus{border-color:var(--wa);}
+.fgrp textarea{resize:vertical;min-height:80px;line-height:1.5;}
+.fgrp select option{background:var(--card2);}
+
+.color-row{display:flex;align-items:center;gap:10px;}
+.color-row input[type="color"]{width:44px;height:36px;padding:2px;border-radius:8px;cursor:pointer;background:var(--card2);border:1.5px solid rgba(37,211,102,0.1);}
+.color-row input[type="text"]{flex:1;}
+
+/* SECTION CHECKBOXES */
+.sections-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.section-check{
+  display:flex;align-items:center;gap:8px;
+  background:var(--card2);border:1px solid rgba(37,211,102,0.1);
+  border-radius:8px;padding:8px 10px;cursor:pointer;
+  transition:border-color .2s;font-size:.8rem;
+}
+.section-check:hover{border-color:var(--wa);}
+.section-check input{accent-color:var(--wa);width:14px;height:14px;}
+.section-check.active{border-color:var(--wa);background:rgba(37,211,102,0.05);}
+
+/* UPLOAD */
+.upload-area{
+  border:2px dashed rgba(37,211,102,0.2);
+  border-radius:10px;padding:20px;text-align:center;
+  cursor:pointer;transition:all .2s;background:var(--card2);
+}
+.upload-area:hover{border-color:var(--wa);background:rgba(37,211,102,0.05);}
+.upload-area input{display:none;}
+.upload-icon{font-size:28px;margin-bottom:6px;}
+.upload-text{font-size:.8rem;color:var(--muted);}
+.doc-list{margin-top:10px;display:flex;flex-direction:column;gap:6px;}
+.doc-item{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(37,211,102,0.05);border:1px solid var(--border);
+  border-radius:8px;padding:8px 10px;font-size:.78rem;
+}
+.doc-item .doc-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.doc-remove{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0;}
+.doc-remove:hover{color:var(--red);}
+.doc-status{font-size:.68rem;padding:2px 6px;border-radius:4px;}
+.doc-status.extracting{background:rgba(244,161,0,0.15);color:var(--gold);}
+.doc-status.done{background:rgba(37,211,102,0.15);color:var(--wa);}
+
+/* CHAT */
+.chat-area{
+  display:flex;flex-direction:column;
+  height:100%;min-height:300px;
+}
+.chat-messages{
+  flex:1;overflow-y:auto;padding:12px;
+  display:flex;flex-direction:column;gap:10px;
+  max-height:300px;
+  background:var(--card2);border-radius:10px;
+  margin-bottom:10px;
+  border:1px solid rgba(37,211,102,0.08);
+}
+.chat-msg{
+  max-width:85%;padding:9px 12px;border-radius:12px;
+  font-size:.82rem;line-height:1.5;
+}
+.chat-msg.user{
+  align-self:flex-end;
+  background:var(--wa);color:#fff;
+  border-bottom-right-radius:3px;
+}
+.chat-msg.ai{
+  align-self:flex-start;
+  background:var(--card);border:1px solid var(--border);
+  border-bottom-left-radius:3px;
+}
+.chat-msg.system{
+  align-self:center;
+  background:rgba(37,211,102,0.08);color:var(--muted);
+  font-size:.73rem;border-radius:20px;padding:5px 12px;
+}
+.chat-input-row{display:flex;gap:8px;}
+.chat-input{
+  flex:1;padding:9px 12px;
+  background:var(--card2);border:1.5px solid rgba(37,211,102,0.1);
+  border-radius:8px;color:var(--txt);font-size:.85rem;
+  font-family:'Nunito',sans-serif;outline:none;
+  transition:border-color .2s;
+}
+.chat-input:focus{border-color:var(--wa);}
+.chat-send{
+  padding:9px 14px;background:var(--wa);color:#fff;
+  border:none;border-radius:8px;cursor:pointer;font-size:16px;
+  transition:background .2s;
+}
+.chat-send:hover{background:var(--wa-d);}
+.chat-send:disabled{opacity:.5;cursor:not-allowed;}
+
+/* BUTTONS */
+.btn{
+  padding:10px 20px;border-radius:10px;border:none;
+  font-size:.88rem;font-weight:800;cursor:pointer;
+  font-family:'Nunito',sans-serif;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-primary{background:var(--wa);color:#fff;box-shadow:0 4px 12px rgba(37,211,102,0.3);}
+.btn-primary:hover{background:var(--wa-d);}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+.btn-ghost{background:var(--card2);color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover{color:var(--txt);border-color:var(--wa);}
+.btn-danger{background:transparent;color:var(--red);border:1px solid var(--red);}
+.btn-danger:hover{background:var(--red);color:#fff;}
+.btn-full{width:100%;}
+.btn-sm{padding:6px 12px;font-size:.78rem;}
+
+.action-bar{
+  padding:16px 20px;border-top:1px solid var(--border);
+  display:flex;gap:8px;background:var(--card);
+}
+
+/* RIGHT PANEL – PREVIEW */
+.preview-panel{
+  display:flex;flex-direction:column;
+  background:#1a1a2e;
+  position:relative;
+}
+.preview-header{
+  padding:12px 20px;
+  background:var(--card);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;
+}
+.preview-url{
+  flex:1;padding:6px 12px;
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:8px;font-size:.78rem;
+  font-family:'DM Mono',monospace;color:var(--muted);
+}
+.preview-actions{display:flex;gap:8px;}
+
+.preview-frame{
+  flex:1;border:none;
+  background:#fff;
+}
+
+.preview-empty{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:16px;color:var(--muted);
+}
+.preview-empty-icon{font-size:64px;opacity:.3;}
+.preview-empty h3{font-size:1.1rem;font-weight:700;}
+.preview-empty p{font-size:.82rem;text-align:center;max-width:280px;line-height:1.6;}
+
+/* STATUS */
+.status-bar{
+  padding:8px 20px;background:var(--card);
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+  font-size:.75rem;color:var(--muted);
+  font-family:'DM Mono',monospace;
+}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);}
+.status-dot.green{background:var(--wa);box-shadow:0 0 6px var(--wa);}
+.status-dot.loading{background:var(--gold);animation:blink .8s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* SPINNER */
+.spinner{
+  width:18px;height:18px;border:2px solid rgba(255,255,255,.3);
+  border-top-color:#fff;border-radius:50%;
+  animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* PUBLISH BADGE */
+.publish-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:700;
+}
+.publish-badge.draft{background:rgba(244,161,0,.15);color:var(--gold);}
+.publish-badge.live{background:rgba(37,211,102,.15);color:var(--wa);}
+
+/* TOAST */
+#toast{
+  position:fixed;bottom:24px;right:24px;
+  background:var(--wa);color:#fff;
+  padding:12px 20px;border-radius:10px;
+  font-size:.85rem;font-weight:700;
+  transform:translateY(80px);opacity:0;
+  transition:all .3s;z-index:999;
+}
+#toast.show{transform:translateY(0);opacity:1;}
+#toast.error{background:var(--red);}
+
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr;grid-template-rows:auto 1fr;}
+  .panel{height:auto;max-height:60vh;}
+  .preview-panel{height:40vh;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="hub.html">Con<span>verdino</span></a>
+  <a class="nav-link" href="haendler-session.html">📋 Verfügbarkeit</a>
+  <a class="nav-link active" href="#">🌐 Landingpage</a>
+  <div class="nav-right">
+    <span id="navSlug" style="font-size:.78rem;color:var(--muted);"></span>
+    <a class="nav-link" href="hub.html">← Hub</a>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <!-- LEFT PANEL -->
+  <div class="panel">
+    <div class="panel-header">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:1rem;font-weight:900;">🌐 Landingpage Builder</div>
+          <div style="font-size:.75rem;color:var(--muted);margin-top:2px;">AI-gestützte Seitenerstellung</div>
+        </div>
+        <div id="publishBadge" class="publish-badge draft">● Draft</div>
+      </div>
+      <div class="panel-tabs">
+        <button class="tab active" onclick="switchTab('settings')">⚙️ Einstellungen</button>
+        <button class="tab" onclick="switchTab('docs')">📄 Dokumente</button>
+        <button class="tab" onclick="switchTab('chat')">💬 AI Chat</button>
+      </div>
+    </div>
+
+    <!-- SETTINGS TAB -->
+    <div class="panel-body" id="tab-settings">
+      <div class="fgrp">
+        <label>Firmenname</label>
+        <input type="text" id="companyName" placeholder="z.B. Ynhald Risikomanagement">
+      </div>
+      <div class="fgrp">
+        <label>Branche / Typ</label>
+        <select id="industry">
+          <option value="b2b_consultant">B2B Beratung / Consulting</option>
+          <option value="risk_management">Risikomanagement</option>
+          <option value="fish_market">Fischmarkt / Lebensmittel</option>
+          <option value="restaurant">Restaurant / Gastronomie</option>
+          <option value="retail">Einzelhandel</option>
+          <option value="service_local">Lokaler Dienstleister</option>
+          <option value="tech">Tech / Software</option>
+          <option value="other">Sonstiges</option>
+        </select>
+      </div>
+      <div class="fgrp">
+        <label>Kurzbeschreibung</label>
+        <textarea id="description" placeholder="Was macht dein Unternehmen? Wer sind deine Kunden?"></textarea>
+      </div>
+      <div class="fgrp">
+        <label>Zielgruppe</label>
+        <input type="text" id="targetAudience" placeholder="z.B. KMU, Einkaufsleiter, CFOs">
+      </div>
+      <div class="fgrp">
+        <label>USP / Alleinstellungsmerkmal</label>
+        <input type="text" id="usp" placeholder="Was macht dich einzigartig?">
+      </div>
+      <div class="fgrp">
+        <label>Leistungen (kommagetrennt)</label>
+        <textarea id="services" placeholder="z.B. Lieferantenbewertung, Sanktionsprüfung, PEP Check" style="min-height:60px;"></textarea>
+      </div>
+      <div class="fgrp">
+        <label>Call-to-Action</label>
+        <select id="cta">
+          <option value="Beratungsgespräch buchen">Beratungsgespräch buchen</option>
+          <option value="Jetzt anfragen">Jetzt anfragen</option>
+          <option value="Kostenlos testen">Kostenlos testen</option>
+          <option value="Demo anfordern">Demo anfordern</option>
+          <option value="Jetzt bestellen">Jetzt bestellen</option>
+          <option value="Kontakt aufnehmen">Kontakt aufnehmen</option>
+        </select>
+      </div>
+      <div class="fgrp">
+        <label>WhatsApp</label>
+        <input type="text" id="whatsapp" placeholder="+43...">
+      </div>
+      <div class="fgrp">
+        <label>E-Mail</label>
+        <input type="email" id="email" placeholder="office@firma.com">
+      </div>
+      <div class="fgrp">
+        <label>Buchungslink (optional)</label>
+        <input type="text" id="bookingLink" placeholder="Calendly, Cal.com Link...">
+      </div>
+      <div class="fgrp">
+        <label>Primärfarbe</label>
+        <div class="color-row">
+          <input type="color" id="colorPicker" value="#25D366" oninput="document.getElementById('colorHex').value=this.value">
+          <input type="text" id="colorHex" value="#25D366" oninput="document.getElementById('colorPicker').value=this.value">
+        </div>
+      </div>
+      <div class="fgrp">
+        <label>Stil</label>
+        <select id="style">
+          <option value="modern, professionell, vertrauenswürdig">Modern & Professionell</option>
+          <option value="minimalistisch, clean, elegant">Minimalistisch</option>
+          <option value="bold, dynamisch, modern">Bold & Dynamisch</option>
+          <option value="freundlich, warm, einladend">Freundlich & Warm</option>
+          <option value="corporate, seriös, formal">Corporate & Seriös</option>
+        </select>
+      </div>
+      <div class="fgrp">
+        <label>Sprache</label>
+        <select id="language">
+          <option value="de">🇩🇪 Deutsch</option>
+          <option value="en">🇬🇧 English</option>
+          <option value="es">🇪🇸 Español</option>
+        </select>
+      </div>
+      <div class="fgrp">
+        <label>Sections</label>
+        <div class="sections-grid">
+          <label class="section-check active"><input type="checkbox" value="Hero" checked> 🏠 Hero</label>
+          <label class="section-check active"><input type="checkbox" value="Leistungen" checked> ⭐ Leistungen</label>
+          <label class="section-check active"><input type="checkbox" value="Über uns" checked> 👥 Über uns</label>
+          <label class="section-check active"><input type="checkbox" value="Kontakt" checked> 📞 Kontakt</label>
+          <label class="section-check"><input type="checkbox" value="FAQ"> ❓ FAQ</label>
+          <label class="section-check"><input type="checkbox" value="Referenzen"> 🏆 Referenzen</label>
+          <label class="section-check"><input type="checkbox" value="Pricing"> 💰 Pricing</label>
+          <label class="section-check"><input type="checkbox" value="Team"> 👤 Team</label>
+          <label class="section-check"><input type="checkbox" value="Prozess"> 🔄 Prozess</label>
+          <label class="section-check"><input type="checkbox" value="Statistiken"> 📊 Statistiken</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOCS TAB -->
+    <div class="panel-body" id="tab-docs" style="display:none;">
+      <p style="font-size:.82rem;color:var(--muted);margin-bottom:14px;line-height:1.6;">
+        Lade Dokumente hoch – die AI extrahiert automatisch alle relevanten Informationen für deine Landingpage.
+      </p>
+      <div class="upload-area" onclick="document.getElementById('docInput').click()">
+        <input type="file" id="docInput" accept=".pdf,.doc,.docx,.txt" multiple onchange="handleDocUpload(event)">
+        <div class="upload-icon">📄</div>
+        <div style="font-size:.88rem;font-weight:700;margin-bottom:4px;">Dokumente hochladen</div>
+        <div class="upload-text">PDF, Word, TXT – KI liest und extrahiert</div>
+      </div>
+      <div class="doc-list" id="docList"></div>
+      <div id="extractedPreview" style="display:none;margin-top:14px;">
+        <div style="font-size:.72rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;">Extrahierte Informationen</div>
+        <div id="extractedText" style="font-size:.78rem;color:var(--muted);background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;max-height:200px;overflow-y:auto;line-height:1.6;white-space:pre-wrap;"></div>
+      </div>
+    </div>
+
+    <!-- CHAT TAB -->
+    <div class="panel-body" id="tab-chat" style="display:none;padding-bottom:8px;">
+      <p style="font-size:.8rem;color:var(--muted);margin-bottom:12px;line-height:1.5;">
+        Beschreibe Änderungen oder gib Anweisungen – die AI passt deine Seite sofort an.
+      </p>
+      <div class="chat-area">
+        <div class="chat-messages" id="chatMessages">
+          <div class="chat-msg system">💬 AI Assistent bereit</div>
+          <div class="chat-msg ai">Hallo! Ich kann deine Landingpage anpassen. Sag mir einfach was du ändern möchtest – z.B. "Mach den Hero Text professioneller" oder "Füge eine FAQ Section hinzu".</div>
+        </div>
+        <div class="chat-input-row">
+          <input class="chat-input" id="chatInput" placeholder="z.B. Füge Testimonials hinzu..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}">
+          <button class="chat-send" id="chatSendBtn" onclick="sendChat()">➤</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTION BAR -->
+    <div class="action-bar">
+      <button class="btn btn-primary" style="flex:1" id="generateBtn" onclick="generatePage()">
+        ✨ Generieren
+      </button>
+      <button class="btn btn-ghost btn-sm" onclick="savePage(false)" id="saveBtn">💾 Speichern</button>
+      <button class="btn btn-ghost btn-sm" onclick="togglePublish()" id="publishBtn">🌐 Live</button>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL – PREVIEW -->
+  <div class="preview-panel">
+    <div class="preview-header">
+      <div style="font-size:.78rem;color:var(--muted);font-family:'DM Mono',monospace;">Vorschau</div>
+      <div class="preview-url" id="previewUrl">converdino.com/[slug]</div>
+      <div class="preview-actions">
+        <button class="btn btn-ghost btn-sm" onclick="openFullscreen()">⛶ Vollbild</button>
+        <button class="btn btn-ghost btn-sm" onclick="copyHtml()">📋 HTML</button>
+      </div>
+    </div>
+
+    <div id="previewEmpty" class="preview-empty">
+      <div class="preview-empty-icon">🌐</div>
+      <h3>Noch keine Seite generiert</h3>
+      <p>Fülle die Einstellungen aus und klicke auf "Generieren" – die AI erstellt deine Landingpage in Sekunden.</p>
+      <button class="btn btn-primary" onclick="generatePage()">✨ Jetzt generieren</button>
+    </div>
+
+    <iframe id="previewFrame" class="preview-frame" style="display:none;" sandbox="allow-scripts allow-same-origin"></iframe>
+
+    <div class="status-bar">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">Bereit</span>
+      <span style="margin-left:auto;font-size:.68rem;" id="lastSaved"></span>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API = 'https://converto-server-production.up.railway.app';
+const params = new URLSearchParams(location.search);
+let merchantId   = params.get('mid') || sessionStorage.getItem('merchantId');
+let merchantSlug = params.get('m')   || sessionStorage.getItem('merchantSlug') || 'ynhald';
+let currentHtml  = '';
+let currentPage  = null;
+let extractedDocs = [];
+let isPublished  = false;
+
+// ── INIT ─────────────────────────────────────────────────
+window.onload = async function() {
+  document.getElementById('navSlug').textContent = merchantSlug;
+  document.getElementById('previewUrl').textContent = 'converdino.com/' + merchantSlug;
+
+  // Load merchant data
+  if (merchantSlug) {
+    try {
+      const r = await fetch(API + '/api/merchants/' + merchantSlug);
+      const m = await r.json();
+      if (m.id) {
+        merchantId = m.id;
+        document.getElementById('companyName').value = m.name || '';
+        document.getElementById('whatsapp').value    = m.wa_number || '';
+      }
+    } catch(e) {}
+  }
+
+  // Load existing page
+  if (merchantId) {
+    try {
+      const r = await fetch(API + '/api/pages/' + merchantId);
+      const p = await r.json();
+      if (p && p.html_content) {
+        currentPage = p;
+        currentHtml = p.html_content;
+        isPublished = p.published;
+        loadSettings(p.settings_json);
+        showPreview(currentHtml);
+        updatePublishBadge();
+        setStatus('Gespeicherte Seite geladen', 'green');
+      }
+    } catch(e) {}
+  }
+
+  // Section checkboxes
+  document.querySelectorAll('.section-check input').forEach(cb => {
+    cb.addEventListener('change', function() {
+      this.closest('.section-check').classList.toggle('active', this.checked);
+    });
+  });
+};
+
+// ── TABS ─────────────────────────────────────────────────
+function switchTab(tab) {
+  ['settings','docs','chat'].forEach(t => {
+    document.getElementById('tab-' + t).style.display = t === tab ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab').forEach((el, i) => {
+    el.classList.toggle('active', ['settings','docs','chat'][i] === tab);
+  });
+}
+
+// ── SETTINGS ─────────────────────────────────────────────
+function getSettings() {
+  const sections = Array.from(document.querySelectorAll('.section-check input:checked')).map(c => c.value).join(', ');
+  return {
+    company_name:    document.getElementById('companyName').value,
+    industry:        document.getElementById('industry').value,
+    description:     document.getElementById('description').value,
+    target_audience: document.getElementById('targetAudience').value,
+    usp:             document.getElementById('usp').value,
+    services:        document.getElementById('services').value,
+    cta:             document.getElementById('cta').value,
+    whatsapp:        document.getElementById('whatsapp').value,
+    email:           document.getElementById('email').value,
+    booking_link:    document.getElementById('bookingLink').value,
+    primary_color:   document.getElementById('colorHex').value,
+    style:           document.getElementById('style').value,
+    language:        document.getElementById('language').value,
+    sections
+  };
+}
+
+function loadSettings(s) {
+  if (!s) return;
+  if (s.company_name)    document.getElementById('companyName').value    = s.company_name;
+  if (s.industry)        document.getElementById('industry').value        = s.industry;
+  if (s.description)     document.getElementById('description').value     = s.description;
+  if (s.target_audience) document.getElementById('targetAudience').value  = s.target_audience;
+  if (s.usp)             document.getElementById('usp').value             = s.usp;
+  if (s.services)        document.getElementById('services').value        = s.services;
+  if (s.cta)             document.getElementById('cta').value             = s.cta;
+  if (s.whatsapp)        document.getElementById('whatsapp').value        = s.whatsapp;
+  if (s.email)           document.getElementById('email').value           = s.email;
+  if (s.booking_link)    document.getElementById('bookingLink').value     = s.booking_link;
+  if (s.primary_color) {
+    document.getElementById('colorHex').value    = s.primary_color;
+    document.getElementById('colorPicker').value = s.primary_color;
+  }
+  if (s.style)    document.getElementById('style').value    = s.style;
+  if (s.language) document.getElementById('language').value = s.language;
+}
+
+// ── GENERATE ─────────────────────────────────────────────
+async function generatePage() {
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Generiere...';
+  setStatus('AI generiert Landingpage...', 'loading');
+
+  try {
+    const settings = getSettings();
+    const extractedText = extractedDocs.map(d => d.extracted).filter(Boolean).join('\n\n');
+
+    const res = await fetch(API + '/api/pages/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        merchant_id: merchantId,
+        settings,
+        extracted_text: extractedText || null
+      })
+    });
+
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || 'Generierung fehlgeschlagen');
+
+    currentHtml = data.html;
+    showPreview(currentHtml);
+    setStatus('Landingpage generiert ✅', 'green');
+    showToast('✨ Landingpage erfolgreich generiert!');
+    addChatMsg('system', '✨ Neue Landingpage generiert');
+
+  } catch(e) {
+    setStatus('Fehler: ' + e.message, 'error');
+    showToast('⚠️ ' + e.message, true);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '✨ Generieren';
+  }
+}
+
+// ── PREVIEW ──────────────────────────────────────────────
+function showPreview(html) {
+  document.getElementById('previewEmpty').style.display = 'none';
+  const frame = document.getElementById('previewFrame');
+  frame.style.display = 'block';
+  frame.srcdoc = html;
+}
+
+function openFullscreen() {
+  if (!currentHtml) { showToast('⚠️ Erst generieren', true); return; }
+  const w = window.open('', '_blank');
+  w.document.write(currentHtml);
+  w.document.close();
+}
+
+function copyHtml() {
+  if (!currentHtml) { showToast('⚠️ Erst generieren', true); return; }
+  navigator.clipboard.writeText(currentHtml);
+  showToast('📋 HTML kopiert!');
+}
+
+// ── SAVE ─────────────────────────────────────────────────
+async function savePage(publish) {
+  if (!currentHtml) { showToast('⚠️ Erst generieren', true); return; }
+  if (!merchantId)  { showToast('⚠️ Merchant ID fehlt', true); return; }
+
+  setStatus('Speichern...', 'loading');
+  try {
+    const res = await fetch(API + '/api/pages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        merchant_id:   merchantId,
+        slug:          merchantSlug,
+        html_content:  currentHtml,
+        settings_json: getSettings(),
+        published:     publish !== undefined ? publish : isPublished
+      })
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+
+    currentPage = data.page;
+    document.getElementById('lastSaved').textContent = 'Gespeichert ' + new Date().toLocaleTimeString('de-AT');
+    setStatus('Gespeichert ✅', 'green');
+    showToast('💾 Gespeichert!');
+  } catch(e) {
+    setStatus('Fehler beim Speichern', 'error');
+    showToast('⚠️ ' + e.message, true);
+  }
+}
+
+// ── PUBLISH ──────────────────────────────────────────────
+async function togglePublish() {
+  if (!currentHtml) { showToast('⚠️ Erst generieren & speichern', true); return; }
+  await savePage(!isPublished);
+  isPublished = !isPublished;
+  updatePublishBadge();
+  showToast(isPublished ? '🌐 Seite ist jetzt LIVE!' : '📝 Seite auf Draft gesetzt');
+}
+
+function updatePublishBadge() {
+  const badge = document.getElementById('publishBadge');
+  badge.className = 'publish-badge ' + (isPublished ? 'live' : 'draft');
+  badge.textContent = isPublished ? '● Live' : '● Draft';
+  document.getElementById('publishBtn').textContent = isPublished ? '📝 Draft' : '🌐 Live';
+}
+
+// ── DOC UPLOAD ───────────────────────────────────────────
+async function handleDocUpload(event) {
+  const files = Array.from(event.target.files);
+  for (const file of files) {
+    const docId = Date.now() + '-' + file.name;
+    extractedDocs.push({ id: docId, name: file.name, extracted: null });
+    renderDocList();
+
+    // Read as base64
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      const base64 = e.target.result.split(',')[1];
+      const media_type = file.type || 'application/pdf';
+
+      // Update status to extracting
+      const doc = extractedDocs.find(d => d.id === docId);
+      if (doc) doc.status = 'extracting';
+      renderDocList();
+
+      try {
+        const res = await fetch(API + '/api/pages/extract-doc', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ base64, media_type, filename: file.name })
+        });
+        const data = await res.json();
+        if (doc && data.success) {
+          doc.extracted = data.extracted;
+          doc.status = 'done';
+          renderDocList();
+          showExtractedPreview();
+          showToast('✅ Dokument analysiert: ' + file.name);
+          addChatMsg('system', '📄 Dokument analysiert: ' + file.name);
+        }
+      } catch(err) {
+        if (doc) doc.status = 'error';
+        renderDocList();
+        showToast('⚠️ Fehler bei ' + file.name, true);
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+function renderDocList() {
+  const list = document.getElementById('docList');
+  list.innerHTML = extractedDocs.map(d => `
+    <div class="doc-item">
+      <span>📄</span>
+      <span class="doc-name">${d.name}</span>
+      <span class="doc-status ${d.status || 'extracting'}">${d.status === 'done' ? '✅ Fertig' : d.status === 'error' ? '❌' : '⏳'}</span>
+      <button class="doc-remove" onclick="removeDoc('${d.id}')">✕</button>
+    </div>
+  `).join('');
+}
+
+function removeDoc(id) {
+  extractedDocs = extractedDocs.filter(d => d.id !== id);
+  renderDocList();
+  showExtractedPreview();
+}
+
+function showExtractedPreview() {
+  const allExtracted = extractedDocs.filter(d => d.extracted).map(d => d.extracted).join('\n\n---\n\n');
+  const preview = document.getElementById('extractedPreview');
+  if (allExtracted) {
+    preview.style.display = 'block';
+    document.getElementById('extractedText').textContent = allExtracted;
+  } else {
+    preview.style.display = 'none';
+  }
+}
+
+// ── CHAT ─────────────────────────────────────────────────
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg || !currentHtml) {
+    if (!currentHtml) showToast('⚠️ Erst eine Seite generieren', true);
+    return;
+  }
+
+  input.value = '';
+  addChatMsg('user', msg);
+  document.getElementById('chatSendBtn').disabled = true;
+  addChatMsg('ai', '⏳ Aktualisiere Seite...');
+  setStatus('AI aktualisiert...', 'loading');
+
+  try {
+    const res = await fetch(API + '/api/pages/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        merchant_id: merchantId,
+        settings: getSettings(),
+        prompt: msg + '\n\nBitte passe die existierende HTML Seite entsprechend an. Gib nur das komplette überarbeitete HTML zurück.',
+        extracted_text: currentHtml.substring(0, 3000) // Send current HTML as context
+      })
+    });
+
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+
+    currentHtml = data.html;
+    showPreview(currentHtml);
+
+    // Remove loading message
+    const msgs = document.getElementById('chatMessages');
+    const last = msgs.querySelector('.chat-msg.ai:last-child');
+    if (last && last.textContent.includes('⏳')) last.remove();
+
+    addChatMsg('ai', '✅ Seite wurde aktualisiert!');
+    setStatus('Aktualisiert ✅', 'green');
+
+  } catch(e) {
+    const msgs = document.getElementById('chatMessages');
+    const last = msgs.querySelector('.chat-msg.ai:last-child');
+    if (last && last.textContent.includes('⏳')) last.remove();
+    addChatMsg('ai', '❌ Fehler: ' + e.message);
+    setStatus('Fehler', 'error');
+  } finally {
+    document.getElementById('chatSendBtn').disabled = false;
+  }
+}
+
+function addChatMsg(type, text) {
+  const msgs = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg ' + type;
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ── STATUS ───────────────────────────────────────────────
+function setStatus(text, state) {
+  document.getElementById('statusText').textContent = text;
+  const dot = document.getElementById('statusDot');
+  dot.className = 'status-dot' + (state === 'green' ? ' green' : state === 'loading' ? ' loading' : '');
+}
+
+// ── TOAST ────────────────────────────────────────────────
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = isError ? 'error' : '';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
