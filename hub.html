@@ -5,612 +5,357 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Converdino – Hub</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="config.js"></script>
-<script src="auth-init.js"></script>
 <style>
-:root {
-  --wa-green:   #25D366;
-  --wa-dark:    #128C7E;
-  --wa-darker:  #075E54;
-  --wa-light:   #DCF8C6;
-  --bg:         #0a1f12;
-  --bg2:        #0d2318;
-  --card:       #111f15;
-  --card2:      #162a1a;
-  --border:     rgba(37,211,102,0.15);
-  --border2:    rgba(37,211,102,0.08);
-  --txt:        #e8f5ec;
-  --muted:      #5d8a6a;
-  --gold:       #f4a100;
-  --blue:       #3b82f6;
-  --purple:     #8b5cf6;
-  --red:        #ef4444;
-}
+:root{--wa:#25D366;--wa-d:#128C7E;--bg:#0a1f12;--card:#111f15;--card2:#162a1a;--border:rgba(37,211,102,0.15);--txt:#e8f5ec;--muted:#5d8a6a;--gold:#f4a100;--red:#ef4444;--blue:#3b82f6;--purple:#8b5cf6;}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{
-  font-family:'Nunito',sans-serif;
-  background:var(--bg);
-  color:var(--txt);
-  min-height:100vh;
-  overflow-x:hidden;
-}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(45,122,79,0.12) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(244,161,0,0.06) 0%,transparent 50%);pointer-events:none;z-index:0;}
 
-/* ── BACKGROUND ─────────────────────────────────────── */
-body::before{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:
-    radial-gradient(ellipse 60% 40% at 10% 10%, rgba(37,211,102,0.07) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 60% at 90% 80%, rgba(18,140,126,0.08) 0%, transparent 60%),
-    radial-gradient(ellipse 30% 30% at 50% 50%, rgba(37,211,102,0.03) 0%, transparent 70%);
-}
+/* NAV */
+nav{position:relative;z-index:10;background:rgba(10,31,18,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;gap:0;}
+.nav-logo{font-weight:900;font-size:1.1rem;color:var(--wa);margin-right:20px;}
+.nav-logo span{color:var(--txt);}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+.nav-user{font-size:.78rem;color:var(--muted);}
+.nav-role{font-size:.65rem;font-weight:800;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px;}
+.role-superadmin{background:rgba(139,92,246,0.2);color:#c4b5fd;}
+.role-staff{background:rgba(244,161,0,0.15);color:var(--gold);}
+.role-merchant{background:rgba(37,211,102,0.15);color:var(--wa);}
+.btn-logout{background:none;border:1px solid var(--border);color:var(--muted);padding:5px 12px;border-radius:8px;cursor:pointer;font-size:.78rem;font-family:'Nunito',sans-serif;transition:all .2s;}
+.btn-logout:hover{border-color:var(--red);color:var(--red);}
 
-/* Subtle chat bubble pattern in background */
-body::after{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  opacity:.025;
-  background-image:
-    radial-gradient(circle 2px at 20% 30%, #25D366 100%, transparent 100%),
-    radial-gradient(circle 2px at 70% 60%, #25D366 100%, transparent 100%),
-    radial-gradient(circle 2px at 40% 80%, #25D366 100%, transparent 100%),
-    radial-gradient(circle 2px at 85% 20%, #25D366 100%, transparent 100%);
-}
-
-/* ── LOGIN ──────────────────────────────────────────── */
-#loginScreen{
-  position:fixed;inset:0;z-index:200;
-  display:flex;align-items:center;justify-content:center;
-  background:var(--bg);
-}
-#loginScreen::before{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse at 50% 40%, rgba(37,211,102,0.12) 0%, transparent 60%);
-}
-
-.login-box{
-  position:relative;z-index:1;
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:24px;
-  padding:40px 36px;
-  width:380px;
-  text-align:center;
-  box-shadow:0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(37,211,102,0.05);
-  animation:fadeUp .4s ease;
-}
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
-
-.login-logo{
-  width:72px;height:72px;
-  margin:0 auto 12px;
-  background: var(--card2);
-  border-radius:20px;
-  border:1px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  font-size:40px;
-  box-shadow:0 8px 24px rgba(37,211,102,0.15);
-}
-.login-logo img{width:52px;height:52px;object-fit:contain;}
-.login-title{font-size:1.6rem;font-weight:900;letter-spacing:-.5px;margin-bottom:3px;color:var(--txt);}
-.login-title span{color:var(--wa-green);}
-.login-sub{font-size:.8rem;color:var(--muted);margin-bottom:24px;}
-
-.login-tabs{
-  display:flex;background:var(--card2);border-radius:12px;padding:4px;margin-bottom:20px;gap:4px;
-  border:1px solid var(--border2);
-}
-.login-tab{
-  flex:1;padding:8px;border:none;border-radius:9px;cursor:pointer;
-  font-size:.8rem;font-weight:700;font-family:'Nunito',sans-serif;
-  transition:all .2s;background:none;color:var(--muted);
-}
-.login-tab.active{background:var(--wa-green);color:#fff;box-shadow:0 2px 8px rgba(37,211,102,0.3);}
-
-.fgrp{margin-bottom:12px;text-align:left;}
-.fgrp label{display:block;font-size:.7rem;font-weight:800;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px;}
-.fgrp input,.fgrp select{
-  width:100%;padding:11px 14px;
-  background:var(--card2);border:1.5px solid var(--border2);
-  border-radius:10px;color:var(--txt);font-size:.88rem;
-  font-family:'Nunito',sans-serif;outline:none;transition:border-color .2s;
-}
-.fgrp input:focus,.fgrp select:focus{border-color:var(--wa-green);}
-.fgrp select option{background:var(--card2);}
-
-.remember-row{display:flex;align-items:center;gap:8px;margin-bottom:16px;text-align:left;}
-.remember-row input[type="checkbox"]{width:16px;height:16px;accent-color:var(--wa-green);cursor:pointer;}
-.remember-row label{font-size:.8rem;color:var(--muted);cursor:pointer;}
-
-.login-btn{
-  width:100%;padding:13px;
-  background:var(--wa-green);color:#fff;border:none;border-radius:12px;
-  font-size:1rem;font-weight:800;cursor:pointer;
-  font-family:'Nunito',sans-serif;
-  transition:all .2s;
-  box-shadow:0 4px 16px rgba(37,211,102,0.3);
-}
-.login-btn:hover{background:#22c55e;transform:translateY(-1px);box-shadow:0 6px 20px rgba(37,211,102,0.4);}
-.login-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
-.lerr{color:#f87171;font-size:.78rem;margin-top:10px;min-height:18px;}
-
-/* ── APP ────────────────────────────────────────────── */
-#appScreen{display:none;position:relative;z-index:10;}
+/* MERCHANT SWITCHER (Superadmin + Staff only) */
+.merchant-bar{position:relative;z-index:10;display:flex;align-items:center;justify-content:center;gap:12px;padding:16px 24px;background:rgba(255,255,255,0.02);border-bottom:1px solid var(--border);}
+.merchant-bar label{font-size:.75rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;}
+.merchant-select{background:var(--card2);border:1.5px solid var(--border);color:var(--txt);padding:8px 14px;border-radius:8px;font-size:.88rem;font-family:'Nunito',sans-serif;outline:none;cursor:pointer;min-width:200px;}
+.merchant-select:focus{border-color:var(--wa);}
+.merchant-select option{background:var(--card2);}
 
 /* HEADER */
-.header{
-  position:sticky;top:0;z-index:50;
-  background:rgba(10,31,18,0.92);
-  backdrop-filter:blur(16px);
-  border-bottom:1px solid var(--border2);
-  padding:0 32px;height:60px;
-  display:flex;align-items:center;justify-content:space-between;
-}
+.hub-header{position:relative;z-index:10;text-align:center;padding:32px 24px 24px;}
+.hub-title{font-size:1.8rem;font-weight:900;letter-spacing:-0.5px;margin-bottom:6px;}
+.hub-title em{font-style:normal;color:var(--wa);}
+.hub-sub{font-size:.85rem;color:var(--muted);}
 
-.logo{display:flex;align-items:center;gap:10px;}
-.logo-img{
-  width:40px;height:40px;
-  border-radius:12px;
-  background:var(--card2);
-  border:1px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  overflow:hidden;
-  box-shadow:0 2px 12px rgba(37,211,102,0.2);
-}
-.logo-img img{width:36px;height:36px;object-fit:contain;}
-.logo-text{font-size:1.25rem;font-weight:900;letter-spacing:-.5px;}
-.logo-text span{color:var(--wa-green);}
-
-.header-right{display:flex;align-items:center;gap:10px;}
-.status-pill{
-  display:flex;align-items:center;gap:6px;
-  background:var(--card2);border:1px solid var(--border2);
-  border-radius:100px;padding:5px 12px;
-  font-size:.72rem;color:var(--muted);
-  font-family:'DM Mono',monospace;
-}
-.status-dot{width:7px;height:7px;border-radius:50%;background:var(--wa-green);animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(37,211,102,.4)}50%{opacity:.8;box-shadow:0 0 0 4px rgba(37,211,102,0)}}
-
-.user-badge{
-  display:flex;align-items:center;gap:7px;
-  background:var(--card2);border:1px solid var(--border);
-  border-radius:100px;padding:5px 14px;font-size:.78rem;
-}
-.user-dot{width:7px;height:7px;border-radius:50%;background:var(--wa-green);}
-
-.logout-btn{
-  background:none;border:1px solid var(--border2);color:var(--muted);
-  padding:6px 14px;border-radius:8px;cursor:pointer;
-  font-size:.78rem;font-family:'Nunito',sans-serif;transition:all .2s;
-}
-.logout-btn:hover{border-color:var(--red);color:#f87171;}
-
-/* HERO */
-.hero{padding:36px 32px 20px;position:relative;}
-.hero-inner{
-  background:linear-gradient(135deg, rgba(37,211,102,0.08) 0%, rgba(18,140,126,0.05) 100%);
-  border:1px solid var(--border);
-  border-radius:20px;
-  padding:28px 32px;
-  display:flex;align-items:center;gap:20px;
-  position:relative;overflow:hidden;
-}
-.hero-inner::before{
-  content:'';position:absolute;right:-40px;top:-40px;
-  width:200px;height:200px;
-  background:radial-gradient(circle, rgba(37,211,102,0.1) 0%, transparent 70%);
-  pointer-events:none;
-}
-.hero-dino{font-size:56px;flex-shrink:0;filter:drop-shadow(0 6px 24px rgba(37,211,102,0.6));min-width:180px;}
-.hero-dino img{width:160px;height:160px;object-fit:contain;}
-.hero-text h1{font-size:1.7rem;font-weight:900;letter-spacing:-.5px;line-height:1.1;margin-bottom:4px;}
-.hero-text h1 em{font-style:normal;color:var(--wa-green);}
-.hero-text p{color:var(--muted);font-size:.85rem;}
-.hero-wa-badge{
-  margin-left:auto;flex-shrink:0;
-  display:flex;align-items:center;gap:8px;
-  background:rgba(37,211,102,0.1);border:1px solid rgba(37,211,102,0.2);
-  border-radius:12px;padding:10px 16px;
-  font-size:.78rem;font-weight:700;color:var(--wa-green);
-}
-.hero-wa-badge span{font-size:20px;}
-
-/* MERCHANT BAR */
-.merchant-bar{
-  display:flex;align-items:center;gap:10px;
-  padding:0 32px 20px;
-}
-.merchant-label{font-size:.72rem;color:var(--muted);font-family:'DM Mono',monospace;font-weight:500;}
-.merchant-select{
-  background:var(--card2);border:1px solid var(--border);
-  color:var(--txt);padding:7px 12px;border-radius:10px;
-  font-size:.82rem;font-family:'Nunito',sans-serif;outline:none;cursor:pointer;
-}
-.merchant-select:focus{border-color:var(--wa-green);}
-
-/* SECTION TITLE */
-.section-title{
-  padding:8px 32px 12px;
-  font-size:.65rem;font-weight:800;letter-spacing:2px;
-  text-transform:uppercase;color:var(--muted);
-  font-family:'DM Mono',monospace;
-  display:flex;align-items:center;gap:12px;
-}
-.section-title::after{content:'';flex:1;height:1px;background:var(--border2);}
+/* SECTION */
+.section-label{position:relative;z-index:10;padding:4px 24px 12px;max-width:1100px;margin:0 auto;font-size:.68rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace;display:flex;align-items:center;gap:10px;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
 
 /* GRID */
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;padding:0 32px 24px;max-width:1200px;}
+.grid{position:relative;z-index:10;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;padding:0 24px 20px;max-width:1100px;margin:0 auto;}
 
-/* CARDS */
-.card{
-  background:var(--card);
-  border:1px solid var(--border2);
-  border-radius:16px;padding:22px;
-  cursor:pointer;text-decoration:none;color:inherit;
-  display:block;transition:all .22s;
-  position:relative;overflow:hidden;
-}
-.card::before{
-  content:'';position:absolute;inset:0;opacity:0;
-  transition:opacity .22s;border-radius:16px;
-}
-.card:hover{
-  transform:translateY(-3px);
-  border-color:rgba(37,211,102,0.35);
-  box-shadow:0 12px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(37,211,102,0.1);
-}
-.card:hover::before{opacity:1;}
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;cursor:pointer;text-decoration:none;color:inherit;display:block;transition:all .25s;position:relative;overflow:hidden;}
+.card:hover{transform:translateY(-4px);border-color:rgba(37,211,102,0.4);box-shadow:0 16px 40px rgba(0,0,0,0.4);}
+.card.disabled{opacity:.4;pointer-events:none;}
+.card-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px;}
+.card-title{font-size:1rem;font-weight:800;margin-bottom:6px;letter-spacing:-0.3px;}
+.card-desc{font-size:.8rem;color:var(--muted);line-height:1.5;margin-bottom:16px;}
+.card-action{display:inline-flex;align-items:center;gap:6px;font-size:.76rem;font-weight:700;padding:6px 12px;border-radius:6px;}
+.card-tag{position:absolute;top:14px;right:14px;font-size:.6rem;font-weight:800;padding:3px 7px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase;font-family:'DM Mono',monospace;}
 
-.card-icon{
-  width:44px;height:44px;border-radius:12px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:20px;margin-bottom:14px;
-}
-.card-title{font-size:.95rem;font-weight:800;margin-bottom:5px;letter-spacing:-.2px;}
-.card-desc{font-size:.77rem;color:var(--muted);line-height:1.55;margin-bottom:14px;}
-.card-action{
-  display:inline-flex;align-items:center;gap:5px;
-  font-size:.72rem;font-weight:700;padding:5px 11px;border-radius:7px;
-  transition:all .2s;
-}
-.card-tag{
-  position:absolute;top:14px;right:14px;
-  font-size:.58rem;font-weight:800;padding:3px 8px;border-radius:100px;
-  letter-spacing:.5px;text-transform:uppercase;font-family:'DM Mono',monospace;
-}
+/* Color variants */
+.green .card-icon{background:rgba(37,211,102,0.12);}
+.green .card-action{background:rgba(37,211,102,0.12);color:var(--wa);}
+.green:hover .card-action{background:var(--wa);color:#fff;}
+.gold .card-icon{background:rgba(244,161,0,0.12);}
+.gold .card-action{background:rgba(244,161,0,0.12);color:var(--gold);}
+.gold:hover .card-action{background:var(--gold);color:#000;}
+.blue .card-icon{background:rgba(59,130,246,0.12);}
+.blue .card-action{background:rgba(59,130,246,0.12);color:#93c5fd;}
+.blue:hover .card-action{background:var(--blue);color:#fff;}
+.purple .card-icon{background:rgba(139,92,246,0.12);}
+.purple .card-action{background:rgba(139,92,246,0.12);color:#c4b5fd;}
+.purple:hover .card-action{background:var(--purple);color:#fff;}
+.red-card .card-icon{background:rgba(239,68,68,0.12);}
+.red-card .card-action{background:rgba(239,68,68,0.12);color:#fca5a5;}
 
-/* WIDE CARD */
-.card-wide{grid-column:1/-1;display:flex;align-items:center;gap:20px;}
-.card-wide .card-icon{margin-bottom:0;flex-shrink:0;}
-.card-wide .card-content{flex:1;}
-.card-wide .card-title{margin-bottom:3px;}
-.card-wide .card-desc{margin-bottom:0;}
-.api-stats{display:flex;gap:10px;margin-left:auto;flex-shrink:0;}
-.api-stat{
-  text-align:center;padding:8px 14px;
-  background:rgba(37,211,102,0.07);
-  border-radius:10px;border:1px solid var(--border2);
-}
-.api-stat-val{font-size:.95rem;font-weight:800;color:var(--wa-green);font-family:'DM Mono',monospace;}
-.api-stat-label{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
+/* Tags */
+.tag-live{background:rgba(34,197,94,0.15);color:#4ade80;}
+.tag-daily{background:rgba(37,211,102,0.15);color:var(--wa);}
+.tag-admin{background:rgba(244,161,0,0.15);color:var(--gold);}
+.tag-super{background:rgba(139,92,246,0.15);color:#c4b5fd;}
+.tag-public{background:rgba(59,130,246,0.15);color:#93c5fd;}
 
-/* CARD THEMES */
-.card-wa .card-icon{background:rgba(37,211,102,0.12);}
-.card-wa::before{background:linear-gradient(135deg,rgba(37,211,102,0.06),transparent);}
-.card-wa .card-action{background:rgba(37,211,102,0.12);color:var(--wa-green);}
-.card-wa:hover .card-action{background:var(--wa-green);color:#fff;}
+/* LP Status card */
+.lp-status{font-size:.72rem;color:var(--muted);margin-top:4px;}
 
-.card-gold .card-icon{background:rgba(244,161,0,0.12);}
-.card-gold::before{background:linear-gradient(135deg,rgba(244,161,0,0.06),transparent);}
-.card-gold .card-action{background:rgba(244,161,0,0.12);color:#fbbf24;}
-.card-gold:hover .card-action{background:var(--gold);color:#000;}
+/* Status indicator */
+.status-bar-top{position:relative;z-index:10;display:flex;justify-content:center;align-items:center;gap:8px;padding:8px;font-size:.72rem;color:var(--muted);font-family:'DM Mono',monospace;}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--wa);box-shadow:0 0 6px var(--wa);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
-.card-blue .card-icon{background:rgba(59,130,246,0.12);}
-.card-blue::before{background:linear-gradient(135deg,rgba(59,130,246,0.06),transparent);}
-.card-blue .card-action{background:rgba(59,130,246,0.12);color:#93c5fd;}
-.card-blue:hover .card-action{background:var(--blue);color:#fff;}
+/* Footer */
+footer{position:relative;z-index:10;text-align:center;padding:24px;color:var(--muted);font-size:.72rem;font-family:'DM Mono',monospace;}
 
-.card-purple .card-icon{background:rgba(139,92,246,0.12);}
-.card-purple::before{background:linear-gradient(135deg,rgba(139,92,246,0.06),transparent);}
-.card-purple .card-action{background:rgba(139,92,246,0.12);color:#c4b5fd;}
-.card-purple:hover .card-action{background:var(--purple);color:#fff;}
-
-/* TAGS */
-.tag-live{background:rgba(37,211,102,0.12);color:var(--wa-green);}
-.tag-admin{background:rgba(244,161,0,0.12);color:#fbbf24;}
-.tag-api{background:rgba(59,130,246,0.12);color:#93c5fd;}
-.tag-super{background:rgba(139,92,246,0.12);color:#c4b5fd;}
-
-/* FOOTER */
-.footer{
-  padding:20px 32px 32px;text-align:center;
-  color:var(--muted);font-size:.68rem;
-  font-family:'DM Mono',monospace;
-  display:flex;align-items:center;justify-content:center;gap:12px;
-}
-.footer img{width:20px;height:20px;object-fit:contain;opacity:.5;}
-
-/* MOBILE */
-@media(max-width:640px){
-  .header{padding:0 16px;}
-  .hero{padding:16px 16px 12px;}
-  .hero-inner{padding:20px;gap:12px;}
-  .hero-wa-badge{display:none;}
-  .merchant-bar,.section-title{padding-left:16px;padding-right:16px;}
-  .grid{padding:0 16px 20px;gap:10px;}
-  .card-wide{flex-direction:column;}
-  .api-stats{margin-left:0;width:100%;justify-content:flex-start;}
-  .status-pill{display:none;}
-  .login-box{width:calc(100vw - 32px);padding:28px 20px;}
-  .hero-dino img{width:48px;height:48px;}
-}
+@media(max-width:600px){.grid{padding:0 14px 20px;}.hub-header{padding:20px 14px 16px;}.merchant-bar{flex-wrap:wrap;}}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div id="loginScreen">
-  <div class="login-box">
-    <div class="login-logo">
-      <img src="Converdino_logo-removebg-preview.png" alt="Converdino" onerror="this.parentElement.innerHTML='🦕'">
-    </div>
-    <div class="login-title">Con<span>verdino</span></div>
-    <div class="login-sub">Willkommen zurück 👋</div>
-    <div class="login-tabs">
-      <button class="login-tab active" onclick="setRole('merchant')">🏪 Händler</button>
-      <button class="login-tab" onclick="setRole('superadmin')">👑 Superadmin</button>
-    </div>
-    <div id="slugGroup" class="fgrp">
-      <label>Händler</label>
-      <select id="slugInput">
-        <option value="sosuapesce">🐟 Sosua Pescado</option>
-      </select>
-    </div>
-    <div class="fgrp">
-      <label>Passwort</label>
-      <input type="password" id="pwInput" placeholder="••••••••••" onkeydown="if(event.key==='Enter')doLogin()">
-    </div>
-    <div class="remember-row">
-      <input type="checkbox" id="rememberMe" checked>
-      <label for="rememberMe">Angemeldet bleiben (30 Tage)</label>
-    </div>
-    <button class="login-btn" id="loginBtn" onclick="doLogin()">Einloggen →</button>
-    <div class="lerr" id="lerr"></div>
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Con<span>verdino</span></div>
+  <div class="nav-right">
+    <span class="nav-user" id="navUser"></span>
+    <span class="nav-role" id="navRole"></span>
+    <div class="status-dot"></div>
+    <span id="navStatus" style="font-size:.72rem;color:var(--muted);font-family:'DM Mono',monospace;">API...</span>
+    <button class="btn-logout" onclick="doLogout()">Ausloggen</button>
   </div>
+</nav>
+
+<!-- MERCHANT SWITCHER (nur Superadmin + Staff) -->
+<div class="merchant-bar" id="merchantBar" style="display:none;">
+  <label>Händler:</label>
+  <select class="merchant-select" id="merchantSelect" onchange="switchMerchant()">
+    <option value="">— Händler wählen —</option>
+  </select>
 </div>
 
-<!-- APP -->
-<div id="appScreen">
-  <header class="header">
-    <div class="logo">
-      <div class="logo-img">
-        <img src="Converdino_logo-removebg-preview.png" alt="Converdino" onerror="this.parentElement.innerHTML='🦕'">
-      </div>
-      <div class="logo-text">Con<span>verdino</span></div>
-    </div>
-    <div class="header-right">
-      <div class="status-pill">
-        <div class="status-dot"></div>
-        <span id="serverStatus">Online</span>
-      </div>
-      <div class="user-badge">
-        <div class="user-dot"></div>
-        <span id="userBadge">—</span>
-      </div>
-      <button class="logout-btn" onclick="doLogout()">Ausloggen</button>
-    </div>
-  </header>
+<!-- HEADER -->
+<div class="hub-header">
+  <div class="hub-title">Dein <em>Kontrollzentrum</em></div>
+  <div class="hub-sub" id="hubSub">Alle Bereiche auf einen Blick</div>
+</div>
 
-  <div class="hero">
-    <div class="hero-inner">
-      <div class="hero-dino">
-        <img src="Converdino_logo-removebg-preview.png" alt="Converdino" onerror="this.parentElement.innerHTML='🦕'">
-      </div>
-      <div class="hero-text">
-        <h1>Dein <em>Kontrollzentrum</em></h1>
-        <p>Alle Bereiche der Converdino Plattform auf einen Blick</p>
-      </div>
-      <div class="hero-wa-badge">
-        <span>📱</span> WhatsApp Powered
-      </div>
-    </div>
-  </div>
+<!-- CONTENT -->
+<div id="hubContent"></div>
 
-  <div class="merchant-bar">
-    <span class="merchant-label">Händler:</span>
-    <select class="merchant-select" id="merchantSelect" onchange="updateMerchant()">
-      <option value="sosuapesce">🐟 Sosua Pescado</option>
-    </select>
-  </div>
+<footer id="hubFooter"></footer>
 
-  <div class="section-title">Tagesgeschäft</div>
+<script>
+const API   = 'https://converto-server-production.up.railway.app';
+const KEY   = 'converto_auth_v2';
+const BASE  = 'https://officepuertoplata-coder.github.io/sosuapesce';
+
+// ── AUTH CHECK ─────────────────────────────────────────────
+let auth = null;
+
+window.onload = async function() {
+  try { auth = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e) {}
+
+  if (!auth || !auth.role) {
+    window.location.href = 'login.html';
+    return;
+  }
+
+  // Session check (12h)
+  if (auth.loggedInAt) {
+    const age = Date.now() - new Date(auth.loggedInAt).getTime();
+    if (age > 12 * 60 * 60 * 1000) {
+      localStorage.removeItem(KEY);
+      window.location.href = 'login.html';
+      return;
+    }
+  }
+
+  // Nav aufbauen
+  document.getElementById('navUser').textContent = auth.name || auth.username || '';
+  const roleEl = document.getElementById('navRole');
+  roleEl.textContent = { superadmin:'Superadmin', staff:'Mitarbeiter', merchant:'Händler' }[auth.role] || auth.role;
+  roleEl.className = 'nav-role role-' + auth.role;
+
+  // Merchant Bar (nur für SA und Staff)
+  if (auth.role === 'superadmin' || auth.role === 'staff') {
+    buildMerchantBar();
+  }
+
+  // Hub Sub
+  if (auth.merchantName) {
+    document.getElementById('hubSub').textContent = auth.merchantName;
+  }
+
+  // Content aufbauen
+  buildHub();
+
+  // API Status
+  checkAPI();
+};
+
+function doLogout() {
+  localStorage.removeItem(KEY);
+  window.location.href = 'login.html';
+}
+
+// ── MERCHANT SWITCHER ──────────────────────────────────────
+function buildMerchantBar() {
+  const bar = document.getElementById('merchantBar');
+  const sel = document.getElementById('merchantSelect');
+  bar.style.display = 'flex';
+
+  const merchants = auth.merchants || [];
+  sel.innerHTML = merchants.map(m =>
+    `<option value="${m.id}" data-slug="${m.slug}" data-name="${m.name}" ${m.id === auth.merchantId ? 'selected' : ''}>${m.name}</option>`
+  ).join('');
+
+  // Superadmin: Händler anlegen Button
+  if (auth.role === 'superadmin') {
+    const addBtn = document.createElement('button');
+    addBtn.textContent = '+ Händler anlegen';
+    addBtn.style.cssText = 'background:var(--wa);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:.8rem;font-weight:800;cursor:pointer;font-family:Nunito,sans-serif;';
+    addBtn.onclick = () => window.location.href = 'superadmin.html';
+    bar.appendChild(addBtn);
+  }
+}
+
+function switchMerchant() {
+  const sel = document.getElementById('merchantSelect');
+  const opt = sel.options[sel.selectedIndex];
+  if (!opt.value) return;
+
+  auth.merchantId   = opt.value;
+  auth.merchantName = opt.dataset.name;
+  auth.slug         = opt.dataset.slug;
+  localStorage.setItem(KEY, JSON.stringify(auth));
+
+  document.getElementById('hubSub').textContent = opt.dataset.name;
+  buildHub();
+}
+
+// ── BUILD HUB ──────────────────────────────────────────────
+function buildHub() {
+  const slug       = auth.slug || '';
+  const merchantId = auth.merchantId || '';
+  const content    = document.getElementById('hubContent');
+
+  if (!slug && auth.role !== 'superadmin') {
+    content.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);">Bitte Händler auswählen</div>';
+    return;
+  }
+
+  let html = '';
+
+  // ── TAGESGESCHÄFT ────────────────────────────────────────
+  html += `<div class="section-label">Tagesgeschäft</div>
   <div class="grid">
-    <a class="card card-wa" href="haendler-session.html">
-      <span class="card-tag tag-live">Täglich</span>
+
+    <a class="card green" href="haendler-session.html">
+      <span class="card-tag tag-daily">Täglich</span>
       <div class="card-icon">📋</div>
       <div class="card-title">Tagesverfügbarkeit</div>
       <div class="card-desc">Artikel & Mengen für heute erfassen und für Kunden publizieren.</div>
       <div class="card-action">Erfassen →</div>
     </a>
-    <a class="card card-wa" href="orders.html">
+
+    <a class="card green" href="bestellungen.html?m=${slug}">
       <span class="card-tag tag-live">Live</span>
       <div class="card-icon">📦</div>
       <div class="card-title">Bestellungen</div>
       <div class="card-desc">Eingehende Bestellungen verwalten, Status aktualisieren und Kunden benachrichtigen.</div>
       <div class="card-action">Verwalten →</div>
     </a>
-    <a class="card card-wa" id="link-comm" href="#">
+
+    <a class="card green" href="comm.html?m=${slug}">
       <span class="card-tag tag-live">Chat</span>
       <div class="card-icon">💬</div>
       <div class="card-title">Kommunikation</div>
       <div class="card-desc">WhatsApp Nachrichten senden & empfangen, Konversationen und Übersetzung.</div>
       <div class="card-action">Öffnen →</div>
     </a>
-  </div>
 
-  <div class="section-title">Verwaltung</div>
+  </div>`;
+
+  // ── VERWALTUNG ────────────────────────────────────────────
+  html += `<div class="section-label">Verwaltung</div>
   <div class="grid">
-    <a class="card card-gold" id="link-admin" href="#">
+
+    <a class="card gold" href="admin.html?m=${slug}">
       <span class="card-tag tag-admin">Admin</span>
       <div class="card-icon">⚙️</div>
       <div class="card-title">Händler Admin</div>
       <div class="card-desc">Produkte & Preise verwalten, Einstellungen, WhatsApp konfigurieren.</div>
       <div class="card-action">Einstellungen →</div>
     </a>
-    <a class="card card-gold" id="link-agents" href="#">
-      <span class="card-tag tag-admin">Agenten</span>
-      <div class="card-icon">👥</div>
-      <div class="card-title">Agenten</div>
-      <div class="card-desc">Agenten verwalten, Provisionen einsehen, Referral Codes generieren.</div>
+
+    <a class="card gold" href="agentes.html?m=${slug}">
+      <span class="card-tag tag-admin">Partner</span>
+      <div class="card-icon">🤝</div>
+      <div class="card-title">Partner</div>
+      <div class="card-desc">Partner verwalten, Provisionen einsehen, Referral Codes generieren.</div>
       <div class="card-action">Verwalten →</div>
     </a>
-    <a class="card card-wa" href="subscribers.html">
-      <span class="card-tag tag-live">Email & WA</span>
+
+    <a class="card blue" href="subscribers.html?m=${slug}">
+      <span class="card-tag" style="background:rgba(37,211,102,0.15);color:var(--wa);">Email & WA</span>
       <div class="card-icon">📧</div>
       <div class="card-title">Abonnenten</div>
       <div class="card-desc">E-Mail & WhatsApp Abonnenten verwalten, hinzufügen und CSV exportieren.</div>
       <div class="card-action">Verwalten →</div>
     </a>
-    <a class="card card-wa" id="link-landing" href="#" target="_blank">
-      <span class="card-tag tag-live">Public</span>
-      <div class="card-icon">🌊</div>
+
+    <a class="card green" id="lpCard" href="landingpage-builder.html?m=${slug}&mid=${merchantId}">
+      <span class="card-tag tag-public">Public</span>
+      <div class="card-icon">🌐</div>
       <div class="card-title">Landingpage</div>
-      <div class="card-desc">Öffentliche Seite für Kunden mit Tagesangebot und Referral Links.</div>
-      <div class="card-action">Ansehen →</div>
+      <div class="card-desc" id="lpDesc">Öffentliche Seite für Kunden mit Tagesangebot und Referral Links.</div>
+      <div class="card-action">Bearbeiten →</div>
     </a>
-    <a class="card card-purple" href="superadmin.html">
-      <span class="card-tag tag-super">Super</span>
-      <div class="card-icon">👑</div>
-      <div class="card-title">Superadmin</div>
-      <div class="card-desc">Alle Händler verwalten, neue Händler anlegen, Plattform-Übersicht.</div>
-      <div class="card-action">Plattform →</div>
-    </a>
-  </div>
 
-  <div class="section-title">Technik & API</div>
-  <div class="grid">
-    <a class="card card-blue card-wide" href="https://converto-server-production.up.railway.app/api/health" target="_blank">
-      <div class="card-icon">⚡</div>
-      <div class="card-content">
-        <div class="card-title">Railway API Server</div>
-        <div class="card-desc">Node.js Express Server – WhatsApp, Resend, Auth, alle API Endpoints</div>
-      </div>
-      <div class="api-stats">
-        <div class="api-stat"><div class="api-stat-val" id="apiStatus">—</div><div class="api-stat-label">Status</div></div>
-        <div class="api-stat"><div class="api-stat-val">v2.0</div><div class="api-stat-label">Version</div></div>
-      </div>
-    </a>
-    <a class="card card-blue" href="https://github.com/officepuertoplata-coder/sosuapesce" target="_blank">
-      <div class="card-icon">🐙</div>
-      <div class="card-title">GitHub Frontend</div>
-      <div class="card-desc">Repository für die Frontend-Dateien. Änderungen hier → live in Sekunden.</div>
-      <div class="card-action">Repository →</div>
-    </a>
-    <a class="card card-blue" href="https://supabase.com/dashboard/project/oxybanupdrfopjionekk" target="_blank">
-      <div class="card-icon">🗄️</div>
-      <div class="card-title">Supabase Datenbank</div>
-      <div class="card-desc">Alle Daten: Händler, Agenten, Bestellungen, Konversationen, Nachrichten.</div>
-      <div class="card-action">Datenbank →</div>
-    </a>
-    <a class="card card-blue" href="https://developers.facebook.com/apps/332667220955173/whatsapp-business/wa-dev-console/" target="_blank">
-      <div class="card-icon">📱</div>
-      <div class="card-title">Meta WhatsApp</div>
-      <div class="card-desc">WhatsApp Business API, Access Token erneuern, Webhook konfigurieren.</div>
-      <div class="card-action">Meta Console →</div>
-    </a>
-  </div>
+  </div>`;
 
-  <div class="footer">
-    <img src="Converdino_logo-removebg-preview.png" alt="" onerror="this.style.display='none'">
-    converdino.com &nbsp;·&nbsp; v2.0.0 &nbsp;·&nbsp; Powered by WhatsApp Business API
-  </div>
-</div>
+  // ── SUPERADMIN BEREICH ────────────────────────────────────
+  if (auth.role === 'superadmin') {
+    html += `<div class="section-label">Plattform (Superadmin)</div>
+    <div class="grid">
 
-<script>
-var BASE = 'https://officepuertoplata-coder.github.io/sosuapesce';
-var API  = 'https://converto-server-production.up.railway.app';
-var KEY  = 'converto_auth_v2';
-var currentRole = 'merchant';
-var merchant = 'sosuapesce';
+      <a class="card purple" href="superadmin.html">
+        <span class="card-tag tag-super">Super</span>
+        <div class="card-icon">👑</div>
+        <div class="card-title">Plattform-Verwaltung</div>
+        <div class="card-desc">Händler anlegen/verwalten, Mitarbeiter-Zugänge, Plattform-Übersicht.</div>
+        <div class="card-action">Plattform →</div>
+      </a>
 
-function getStored(){try{return JSON.parse(localStorage.getItem(KEY)||'null');}catch(e){return null;}}
-function saveAuth(d,force){if(!force&&!document.getElementById('rememberMe').checked)return;localStorage.setItem(KEY,JSON.stringify({role:d.role,slug:d.slug,password:d.password,name:d.name,savedAt:Date.now()}));}
-function clearAuth(){localStorage.removeItem(KEY);}
-function isValid(s){return s&&(Date.now()-(s.savedAt||0))<30*24*60*60*1000;}
+      <a class="card blue" href="https://supabase.com/dashboard/project/oxybanupdrfopjionekk" target="_blank">
+        <div class="card-icon">🗄️</div>
+        <div class="card-title">Supabase Datenbank</div>
+        <div class="card-desc">Alle Daten: Händler, Partner, Bestellungen, Konversationen, Nachrichten.</div>
+        <div class="card-action">Datenbank →</div>
+      </a>
 
-function setRole(role){
-  currentRole=role;
-  document.querySelectorAll('.login-tab').forEach(function(t,i){t.classList.toggle('active',(i===0&&role==='merchant')||(i===1&&role==='superadmin'));});
-  document.getElementById('slugGroup').style.display=role==='merchant'?'block':'none';
-}
+      <a class="card blue" href="https://railway.com/project/0a1f59f3-d677-494c-acfd-b45f287a730b" target="_blank">
+        <div class="card-icon">⚡</div>
+        <div class="card-title">Railway Server</div>
+        <div class="card-desc">Node.js API Server – Logs, Deployments, Environment Variables.</div>
+        <div class="card-action" id="apiStatus">Railway →</div>
+      </a>
 
-function doLogin(){
-  var pw=document.getElementById('pwInput').value.trim();
-  var slug=document.getElementById('slugInput').value;
-  if(!pw){document.getElementById('lerr').textContent='Bitte Passwort eingeben';return;}
-  var btn=document.getElementById('loginBtn');
-  btn.disabled=true;btn.textContent='Einloggen...';
-  document.getElementById('lerr').textContent='';
-  var cfg=window.SP_CONFIG;
-  if(!cfg){document.getElementById('lerr').textContent='config.js fehlt';btn.disabled=false;btn.textContent='Einloggen →';return;}
-  if(currentRole==='superadmin'){
-    if(pw===cfg.SUPERADMIN_PASSWORD){saveAuth({role:'superadmin',slug:null,password:pw,name:'Superadmin'},true);showApp({role:'superadmin',slug:'sosuapesce',name:'Superadmin'});}
-    else{document.getElementById('lerr').textContent='Falsches Passwort';}
-    btn.disabled=false;btn.textContent='Einloggen →';return;
+    </div>`;
   }
-  var key=cfg.SUPABASE_ANON_KEY||cfg.SUPABASE_KEY;
-  fetch(cfg.SUPABASE_URL+'/rest/v1/merchants?slug=eq.'+slug+'&select=id,name,slug,admin_password',{
-    headers:{'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json'}
-  }).then(function(r){return r.json();}).then(function(data){
-    btn.disabled=false;btn.textContent='Einloggen →';
-    if(!data||!data.length){document.getElementById('lerr').textContent='Händler nicht gefunden';return;}
-    var m=data[0];
-    if(m.admin_password!==pw){document.getElementById('lerr').textContent='Falsches Passwort';return;}
-    saveAuth({role:'merchant',slug:slug,password:pw,name:m.name},true);
-    showApp({role:'merchant',slug:slug,name:m.name});
-  }).catch(function(){
-    btn.disabled=false;btn.textContent='Einloggen →';
-    document.getElementById('lerr').textContent='Verbindungsfehler';
-  });
+
+  content.innerHTML = html;
+
+  // Landingpage Status laden
+  if (merchantId) loadLpStatus(merchantId);
 }
 
-function doLogout(){
-  clearAuth();
-  document.getElementById('appScreen').style.display='none';
-  document.getElementById('loginScreen').style.display='flex';
-  document.getElementById('pwInput').value='';
-  document.getElementById('lerr').textContent='';
+// ── LANDINGPAGE STATUS ─────────────────────────────────────
+async function loadLpStatus(merchantId) {
+  try {
+    const r = await fetch(API + '/api/pages/' + merchantId);
+    if (!r.ok) return;
+    const p = await r.json();
+    if (p && p.html_content) {
+      const size = Math.round(p.html_content.length / 1024);
+      const date = new Date(p.updated_at).toLocaleDateString('de-AT');
+      const status = p.published ? '🟢 Live' : '🟡 Draft';
+      const desc = document.getElementById('lpDesc');
+      if (desc) desc.innerHTML = `${status} · ${size} KB · ${date}<br><small style="opacity:.7">Klicken zum Bearbeiten</small>`;
+    }
+  } catch(e) {}
 }
 
-function showApp(auth){
-  document.getElementById('loginScreen').style.display='none';
-  document.getElementById('appScreen').style.display='block';
-  merchant=auth.slug||'sosuapesce';
-  document.getElementById('merchantSelect').value=merchant;
-  document.getElementById('userBadge').textContent=auth.name||auth.slug;
-  updateLinks();checkAPI();
-}
-
-function updateMerchant(){merchant=document.getElementById('merchantSelect').value;updateLinks();}
-
-function updateLinks(){
-  document.getElementById('link-comm').href    =BASE+'/comm.html?m='+merchant;
-  document.getElementById('link-landing').href =BASE+'/index.html?m='+merchant;
-  document.getElementById('link-agents').href  =BASE+'/agentes.html?m='+merchant;
-  document.getElementById('link-admin').href   =BASE+'/admin.html?m='+merchant;
-}
-
-async function checkAPI(){
-  try{
-    await fetch(API+'/api/health');
-    document.getElementById('apiStatus').textContent='✅ OK';
-    document.getElementById('serverStatus').textContent='Online';
-  }catch(e){
-    document.getElementById('apiStatus').textContent='❌';
-    document.getElementById('serverStatus').textContent='Offline';
+// ── API STATUS ─────────────────────────────────────────────
+async function checkAPI() {
+  try {
+    const r = await fetch(API + '/api/health');
+    const d = await r.json();
+    document.getElementById('navStatus').textContent = 'Online ' + (d.version || '');
+  } catch(e) {
+    document.getElementById('navStatus').textContent = 'Offline';
   }
 }
-
-window.addEventListener('load',function(){var s=getStored();if(s&&isValid(s))showApp(s);});
 </script>
 </body>
 </html>

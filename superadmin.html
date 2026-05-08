@@ -2,945 +2,423 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Superadmin – Referral Platform</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js"></script>
-<script src="auth-init.js"></script>
-<script src="nav.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Superadmin – Converdino</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root {
-  --g: #2d6a4f; --g2: #1b4332; --g3: #40916c;
-  --gold: #f4a100; --bg: #f0f2f0; --card: #fff;
-  --txt: #1a1a1a; --mu: #6b7280; --red: #dc2626;
-  --border: #e5e7eb; --r: 10px;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh}
-
-/* ── NAV ── */
-.nav{background:var(--g2);color:#fff;display:flex;align-items:center;gap:8px;padding:0 20px;height:52px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.25)}
-.nav-brand{font-weight:700;font-size:1.05rem;display:flex;align-items:center;gap:8px;margin-right:16px}
-.nav-brand .badge{background:var(--gold);color:#000;font-size:.65rem;font-weight:800;padding:2px 7px;border-radius:4px;letter-spacing:.5px}
-.tbtn{background:none;border:none;color:rgba(255,255,255,.75);cursor:pointer;padding:6px 13px;border-radius:6px;font-size:.88rem;font-weight:500;display:flex;align-items:center;gap:6px;transition:all .15s}
-.tbtn:hover,.tbtn.active{background:rgba(255,255,255,.15);color:#fff}
-.tbtn-new{background:var(--g3);color:#fff!important}
-.tbtn-new:hover{background:#52b788!important}
-.tbtn-out{color:var(--gold)!important;margin-left:auto}
-
-/* ── LOGIN ── */
-#loginWrap{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--g2)}
-.login-card{background:#fff;border-radius:14px;padding:40px 36px;width:340px;box-shadow:0 8px 32px rgba(0,0,0,.3);text-align:center}
-.login-card h2{color:var(--g2);margin-bottom:6px;font-size:1.4rem}
-.login-card p{color:var(--mu);font-size:.85rem;margin-bottom:24px}
-.login-card input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:1rem;outline:none;margin-bottom:12px;transition:border-color .2s}
-.login-card input:focus{border-color:var(--g3)}
-.login-card button{width:100%;background:var(--g2);color:#fff;border:none;padding:11px;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;transition:background .2s}
-.login-card button:hover{background:var(--g)}
-.lerr{color:var(--red);font-size:.83rem;min-height:18px;margin-top:4px}
-
-/* ── APP ── */
-#app{display:none}
-#app.show{display:block}
-.main{max-width:1200px;margin:0 auto;padding:28px 20px}
-
-/* ── STATS ── */
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
-.stat-card{background:var(--card);border-radius:var(--r);padding:22px 20px;border-top:4px solid var(--g3);box-shadow:0 1px 4px rgba(0,0,0,.07)}
-.stat-card.gold{border-top-color:var(--gold)}
-.stat-val{font-size:1.8rem;font-weight:800;color:var(--g2);line-height:1}
-.stat-lbl{font-size:.8rem;color:var(--mu);margin-top:6px}
-
-/* ── SECTION HEADER ── */
-.sec-hd{background:var(--g2);color:#fff;border-radius:var(--r) var(--r) 0 0;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
-.sec-hd h2{font-size:1rem;font-weight:600}
-.sec-body{background:var(--card);border-radius:0 0 var(--r) var(--r);box-shadow:0 1px 4px rgba(0,0,0,.08);overflow:hidden}
-
-/* ── TABLE ── */
-table{width:100%;border-collapse:collapse}
-th{padding:10px 14px;text-align:left;font-size:.72rem;color:var(--mu);font-weight:600;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
-td{padding:12px 14px;font-size:.88rem;border-bottom:1px solid var(--border)}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:#f9fafb}
-.msg{text-align:center;color:var(--mu);padding:36px 20px;font-size:.9rem}
-.codetag{background:#f3f4f6;border-radius:4px;padding:2px 7px;font-family:monospace;font-size:.8rem;color:var(--g2)}
-.badge{display:inline-block;padding:3px 9px;border-radius:12px;font-size:.72rem;font-weight:700}
-.b-active{background:#dcfce7;color:#15803d}
-.b-paused{background:#fef9c3;color:#a16207}
-.b-frozen{background:#dbeafe;color:#1d4ed8}
-.b-pending{background:#f3f4f6;color:#374151}
-
-/* ── MERCHANT CARDS ── */
-.merchant-card{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
-.merchant-card:last-child{border-bottom:none}
-.merchant-card h3{font-size:1rem;color:var(--g2);margin-bottom:4px}
-.merchant-card p{font-size:.82rem;color:var(--mu);margin-bottom:2px}
-.merchant-card-right{display:flex;gap:8px;flex-shrink:0;align-items:center}
-.btn{border:none;padding:7px 14px;border-radius:7px;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .15s}
-.btn-outline{background:#f3f4f6;color:var(--txt)}
-.btn-outline:hover{background:var(--border)}
-.btn-green{background:var(--g3);color:#fff}
-.btn-green:hover{background:var(--g)}
-.btn-gold{background:var(--gold);color:#000}
-.btn-gold:hover{background:#e09200}
-.btn-danger{background:#fef2f2;color:var(--red)}
-.btn-danger:hover{background:#fee2e2}
-
-/* ── FORM ── */
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:24px}
-.form-grid .full{grid-column:1/-1}
-.form-group label{display:block;font-size:.78rem;font-weight:600;color:var(--mu);margin-bottom:5px;text-transform:uppercase;letter-spacing:.3px}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:.9rem;outline:none;transition:border-color .2s;background:#fff;font-family:inherit}
-.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--g3)}
-.form-group textarea{min-height:70px;resize:vertical}
-.form-section{grid-column:1/-1;margin-top:8px;padding-top:14px;border-top:1px solid var(--border);font-size:.8rem;font-weight:700;color:var(--g2);text-transform:uppercase;letter-spacing:.5px}
-.form-actions{grid-column:1/-1;display:flex;justify-content:flex-end;gap:10px;margin-top:8px;padding-top:14px;border-top:1px solid var(--border)}
-
-/* ── PAGES ── */
-.page{display:none}
-.page.active{display:block}
-
-/* ── AGENTS TABLE ── */
-.agents-wrap{padding:0}
-
-/* ── TOAST ── */
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--g2);color:#fff;padding:10px 22px;border-radius:40px;font-size:.88rem;box-shadow:0 4px 16px rgba(0,0,0,.25);transition:transform .25s;z-index:999;pointer-events:none}
-.toast.show{transform:translateX(-50%) translateY(0)}
-
-/* ── ERROR BOX ── */
-.err-box{background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:14px 18px;color:var(--red);font-size:.85rem;margin:16px 20px}
-
-/* ── RESPONSIVE ── */
-@media(max-width:800px){
-  .stats-grid{grid-template-columns:1fr 1fr}
-  .form-grid{grid-template-columns:1fr}
-  .form-grid .full{grid-column:1}
-  .form-actions{grid-column:1}
-  .form-section{grid-column:1}
-}
-@media(max-width:500px){
-  .stats-grid{grid-template-columns:1fr}
-  .nav{overflow-x:auto}
-}
-
-/* ── BILLING ── */
-.billing-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:20px}
-.billing-card{border:1.5px solid var(--border);border-radius:var(--r);padding:18px}
-.billing-card h3{color:var(--g2);margin-bottom:12px;font-size:.95rem}
-.billing-row{display:flex;justify-content:space-between;font-size:.85rem;padding:5px 0;border-bottom:1px solid #f3f4f6}
-.billing-row:last-child{border:none;font-weight:700;padding-top:10px}
-
-/* ── MODAL ── */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;align-items:center;justify-content:center;padding:20px}
-.modal-overlay.open{display:flex}
-.modal{background:#fff;border-radius:14px;width:100%;max-width:780px;max-height:90vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,.3)}
-.modal-hd{background:var(--g2);color:#fff;padding:16px 22px;border-radius:14px 14px 0 0;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
-.modal-hd h3{font-size:1rem;font-weight:700}
-.modal-close{background:none;border:none;color:rgba(255,255,255,.8);font-size:1.4rem;cursor:pointer;line-height:1;padding:0 4px}
-.modal-close:hover{color:#fff}
-/* confirm delete dialog */
-.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:600;align-items:center;justify-content:center}
-.confirm-overlay.open{display:flex}
-.confirm-box{background:#fff;border-radius:12px;padding:30px 28px;width:360px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.3)}
-.confirm-box h3{color:var(--red);margin-bottom:10px;font-size:1.1rem}
-.confirm-box p{color:var(--mu);font-size:.88rem;margin-bottom:22px;line-height:1.5}
-.confirm-box .btn-row{display:flex;gap:10px;justify-content:center}
-.btn-red{background:var(--red);color:#fff}
-.btn-red:hover{background:#b91c1c}
+:root{--wa:#25D366;--bg:#0a1f12;--card:#111f15;--card2:#162a1a;--border:rgba(37,211,102,0.15);--txt:#e8f5ec;--muted:#5d8a6a;--gold:#f4a100;--red:#ef4444;--purple:#8b5cf6;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;}
+nav{background:rgba(10,31,18,0.95);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;gap:0;position:sticky;top:0;z-index:100;}
+.nav-logo{font-weight:900;font-size:1.1rem;color:var(--wa);margin-right:20px;}
+.nav-logo span{color:var(--txt);}
+.tab{padding:0 16px;height:56px;display:flex;align-items:center;border:none;background:none;color:var(--muted);font-size:.85rem;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;}
+.tab.active{color:var(--wa);border-bottom-color:var(--wa);}
+.nav-right{margin-left:auto;display:flex;gap:8px;}
+.btn-nav{background:none;border:1px solid var(--border);color:var(--muted);padding:5px 12px;border-radius:8px;cursor:pointer;font-size:.78rem;font-family:'Nunito',sans-serif;}
+.btn-nav:hover{border-color:var(--wa);color:var(--txt);}
+.main{max-width:1100px;margin:0 auto;padding:28px 24px;}
+.page{display:none;}.page.active{display:block;}
+/* TABLE */
+.table-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px;}
+.table-hd{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.table-hd h2{font-size:.95rem;font-weight:800;}
+table{width:100%;border-collapse:collapse;}
+th{padding:10px 16px;text-align:left;font-size:.68rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border);}
+td{padding:12px 16px;font-size:.85rem;border-bottom:1px solid rgba(37,211,102,0.06);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(37,211,102,0.03);}
+.badge{display:inline-flex;padding:3px 9px;border-radius:20px;font-size:.68rem;font-weight:700;}
+.b-active{background:rgba(37,211,102,0.15);color:var(--wa);}
+.b-inactive{background:rgba(239,68,68,0.12);color:var(--red);}
+.b-super{background:rgba(139,92,246,0.15);color:#c4b5fd;}
+.b-staff{background:rgba(244,161,0,0.12);color:var(--gold);}
+.b-merchant{background:rgba(37,211,102,0.12);color:var(--wa);}
+/* FORM */
+.form-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center;}
+.form-overlay.open{display:flex;}
+.form-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
+.form-box h3{font-size:1rem;font-weight:800;margin-bottom:20px;}
+.fgrp{margin-bottom:14px;}
+.fgrp label{display:block;font-size:.65rem;font-weight:800;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px;}
+.fgrp input,.fgrp select,.fgrp textarea{width:100%;padding:9px 12px;background:var(--card2);border:1.5px solid rgba(37,211,102,0.1);border-radius:8px;color:var(--txt);font-size:.88rem;font-family:'Nunito',sans-serif;outline:none;transition:border-color .2s;}
+.fgrp input:focus,.fgrp select:focus{border-color:var(--wa);}
+.fgrp select option{background:var(--card2);}
+.form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;}
+.btn{padding:9px 18px;border-radius:8px;border:none;font-size:.85rem;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;}
+.btn-primary{background:var(--wa);color:#fff;}
+.btn-primary:hover{background:var(--wa-d);}
+.btn-ghost{background:var(--card2);color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover{color:var(--txt);}
+.btn-danger{background:transparent;color:var(--red);border:1px solid var(--red);}
+.btn-danger:hover{background:var(--red);color:#fff;}
+.btn-sm{padding:5px 10px;font-size:.76rem;}
+.btn-icon{background:none;border:none;cursor:pointer;font-size:14px;padding:4px;color:var(--muted);}
+.btn-icon:hover{color:var(--txt);}
+.err{color:var(--red);font-size:.78rem;margin-top:8px;}
+/* TOAST */
+#toast{position:fixed;bottom:24px;right:24px;background:var(--wa);color:#fff;padding:10px 18px;border-radius:10px;font-size:.85rem;font-weight:700;transform:translateY(80px);opacity:0;transition:all .3s;z-index:999;}
+#toast.show{transform:translateY(0);opacity:1;}
+/* Checkboxes for merchant access */
+.merchant-checks{display:flex;flex-direction:column;gap:8px;max-height:200px;overflow-y:auto;background:var(--card2);border:1.5px solid rgba(37,211,102,0.1);border-radius:8px;padding:10px;}
+.merchant-check-item{display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer;}
+.merchant-check-item input{accent-color:var(--wa);}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div id="loginWrap">
-  <div class="login-card">
-    <div style="font-size:2rem;margin-bottom:8px">⭐</div>
-    <h2>Referral Platform</h2>
-    <p>Superadmin-Zugang</p>
-    <input type="password" id="pwInput" placeholder="Passwort" autocomplete="current-password">
-    <div class="lerr" id="lerr"></div>
-    <button onclick="doLogin()">Einloggen</button>
+<nav>
+  <div class="nav-logo">Con<span>verdino</span></div>
+  <button class="tab active" onclick="switchTab('merchants',this)">🏪 Händler</button>
+  <button class="tab" onclick="switchTab('users',this)">👥 Benutzer</button>
+  <div class="nav-right">
+    <button class="btn-nav" onclick="window.location.href='hub.html'">← Hub</button>
+    <button class="btn-nav" onclick="doLogout()">Ausloggen</button>
   </div>
+</nav>
+
+<div class="main">
+
+  <!-- HÄNDLER TAB -->
+  <div class="page active" id="tab-merchants">
+    <div class="table-card">
+      <div class="table-hd">
+        <h2>🏪 Alle Händler</h2>
+        <button class="btn btn-primary btn-sm" onclick="openMerchantForm()">+ Neuer Händler</button>
+      </div>
+      <table>
+        <thead><tr><th>Name</th><th>Slug</th><th>Status</th><th>Währung</th><th>WhatsApp</th><th>Aktionen</th></tr></thead>
+        <tbody id="merchantsTable"><tr><td colspan="6" style="text-align:center;padding:30px;color:var(--muted);">Lade...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- BENUTZER TAB -->
+  <div class="page" id="tab-users">
+    <div class="table-card">
+      <div class="table-hd">
+        <h2>👥 Benutzer & Zugänge</h2>
+        <button class="btn btn-primary btn-sm" onclick="openUserForm()">+ Neuer Benutzer</button>
+      </div>
+      <table>
+        <thead><tr><th>Name</th><th>Username</th><th>Rolle</th><th>Händler</th><th>Status</th><th>Letzter Login</th><th>Aktionen</th></tr></thead>
+        <tbody id="usersTable"><tr><td colspan="7" style="text-align:center;padding:30px;color:var(--muted);">Lade...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
 
-<!-- APP -->
-<div id="app">
-  <!-- NAV -->
-  <nav class="nav">
-    <div class="nav-brand">⭐ Referral Platform <span class="badge">SUPERADMIN</span></div>
-    <button class="tbtn active" id="btn-overview" onclick="showPage('overview',this)">📊 Übersicht</button>
-    <button class="tbtn" id="btn-merchants" onclick="showPage('merchants',this)">🏪 Händler</button>
-    <button class="tbtn tbtn-new" id="btn-new" onclick="showPage('new',this)">➕ Neuer Händler</button>
-    <button class="tbtn" id="btn-agents" onclick="showPage('agents',this)">🤝 Agenten</button>
-    <button class="tbtn" id="btn-billing" onclick="showPage('billing',this)">💳 Abrechnung</button>
-    <button class="tbtn tbtn-out" onclick="doLogout()">Ausloggen</button>
-    <a href="https://officepuertoplata-coder.github.io/sosuapesce/" target="_blank" class="tbtn" style="color:#a7f3d0;text-decoration:none;border:1px solid rgba(167,243,208,.4);margin-left:6px">🌐 Zur Plattform</a>
-  </nav>
-
-  <div class="main">
-
-    <!-- ÜBERSICHT -->
-    <div class="page active" id="page-overview">
-      <h1 style="font-size:1.4rem;font-weight:800;margin-bottom:20px;display:flex;align-items:center;gap:10px">📊 Plattform-Übersicht</h1>
-      <div class="stats-grid">
-        <div class="stat-card"><div class="stat-val" id="ov-merchants">—</div><div class="stat-lbl">Aktive Händler</div></div>
-        <div class="stat-card"><div class="stat-val" id="ov-agents">—</div><div class="stat-lbl">Aktive Agenten</div></div>
-        <div class="stat-card"><div class="stat-val" id="ov-sales">—</div><div class="stat-lbl">Verkäufe gesamt</div></div>
-        <div class="stat-card gold"><div class="stat-val" id="ov-platform">—</div><div class="stat-lbl">Plattform-Einnahmen</div></div>
-      </div>
-      <div>
-        <div class="sec-hd"><h2>🏪 Händler-Übersicht</h2><button class="btn btn-outline" style="color:#fff;background:rgba(255,255,255,.15)" onclick="loadOverview()">Aktualisieren</button></div>
-        <div class="sec-body">
-          <table><thead><tr>
-            <th>HÄNDLER</th><th>SLUG</th><th>AGENTEN</th><th>VERKÄUFE</th><th>UMSATZ</th><th>PLATTFORM-FEE</th><th>STATUS</th>
-          </tr></thead>
-          <tbody id="overviewTable"><tr><td colspan="7" class="msg">Lade...</td></tr></tbody>
-          </table>
-        </div>
-      </div>
+<!-- MERCHANT FORM -->
+<div class="form-overlay" id="merchantForm">
+  <div class="form-box">
+    <h3 id="merchantFormTitle">🏪 Neuer Händler</h3>
+    <input type="hidden" id="m-id">
+    <div class="fgrp"><label>Name *</label><input id="m-name" placeholder="z.B. Sosua Pescado"></div>
+    <div class="fgrp"><label>Slug * (URL-freundlich, nur Kleinbuchstaben)</label><input id="m-slug" placeholder="z.B. sosuapesce" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,'')"></div>
+    <div class="fgrp"><label>Admin-Passwort *</label><input type="password" id="m-password" placeholder="Sicheres Passwort"></div>
+    <div class="fgrp"><label>Währung</label>
+      <select id="m-currency"><option value="EUR">€ Euro</option><option value="USD">$ US Dollar</option><option value="RD$">RD$ Dominikanischer Peso</option></select>
     </div>
-
-    <!-- HÄNDLER LISTE -->
-    <div class="page" id="page-merchants">
-      <h1 style="font-size:1.4rem;font-weight:800;margin-bottom:20px">🏪 Alle Händler</h1>
-      <div>
-        <div class="sec-hd"><h2>Händler-Liste</h2><button class="btn btn-outline" style="color:#fff;background:rgba(255,255,255,.15)" onclick="loadMerchants()">Aktualisieren</button></div>
-        <div class="sec-body" id="merchantsList"><div class="msg">Lade...</div></div>
-      </div>
-    </div>
-
-    <!-- NEUER HÄNDLER -->
-    <div class="page" id="page-new">
-      <h1 style="font-size:1.4rem;font-weight:800;margin-bottom:20px">➕ Neuer Händler anlegen</h1>
-      <div>
-        <div class="sec-hd"><h2>Händler-Daten</h2></div>
-        <div class="sec-body">
-          <div class="form-grid">
-            <div class="form-section">🏪 Grunddaten</div>
-            <div class="form-group">
-              <label>Slug (URL-Name) *</label>
-              <input id="m-slug" placeholder="z.B. masseur-xyz" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,'')">
-            </div>
-            <div class="form-group">
-              <label>Name *</label>
-              <input id="m-name" placeholder="Geschäftsname">
-            </div>
-            <div class="form-group full">
-              <label>Beschreibung</label>
-              <textarea id="m-desc" placeholder="Kurze Beschreibung des Händlers"></textarea>
-            </div>
-            <div class="form-group">
-              <label>Kategorie</label>
-              <select id="m-category">
-                <option value="fish">Fischhandel</option>
-                <option value="food">Lebensmittel</option>
-                <option value="massage">Massage/Wellness</option>
-                <option value="handwerk">Handwerk</option>
-                <option value="other">Sonstiges</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Sprache</label>
-              <select id="m-language">
-                <option value="es">Español</option>
-                <option value="de">Deutsch</option>
-                <option value="en">English</option>
-              </select>
-            </div>
-
-            <div class="form-section">📞 Kontakt</div>
-            <div class="form-group">
-              <label>WhatsApp</label>
-              <input id="m-wa" placeholder="+1809...">
-            </div>
-            <div class="form-group">
-              <label>E-Mail</label>
-              <input id="m-email" type="email" placeholder="email@beispiel.com">
-            </div>
-            <div class="form-group">
-              <label>Telefon</label>
-              <input id="m-phone" placeholder="+1809...">
-            </div>
-            <div class="form-group">
-              <label>Stripe-Zahlungslink</label>
-              <input id="m-stripe" placeholder="https://buy.stripe.com/...">
-            </div>
-
-            <div class="form-section">📍 Adresse</div>
-            <div class="form-group full">
-              <label>Straße / Adresse</label>
-              <input id="m-address" placeholder="Calle Principal 123">
-            </div>
-            <div class="form-group">
-              <label>Stadt / Ort</label>
-              <input id="m-city" placeholder="Sosúa">
-            </div>
-            <div class="form-group">
-              <label>PLZ</label>
-              <input id="m-zip" placeholder="57000">
-            </div>
-            <div class="form-group">
-              <label>Staat / Provinz</label>
-              <input id="m-state" placeholder="Puerto Plata">
-            </div>
-            <div class="form-group">
-              <label>Land</label>
-              <select id="m-country">
-                <option value="DO">🇩🇴 Dominikanische Republik</option>
-                <option value="DE">🇩🇪 Deutschland</option>
-                <option value="AT">🇦🇹 Österreich</option>
-                <option value="CH">🇨🇭 Schweiz</option>
-                <option value="US">🇺🇸 USA</option>
-                <option value="MX">🇲🇽 Mexiko</option>
-                <option value="ES">🇪🇸 Spanien</option>
-              </select>
-            </div>
-
-            <div class="form-section">💰 Finanzen</div>
-            <div class="form-group">
-              <label>Währung</label>
-              <select id="m-currency">
-                <option value="RD$">RD$ (Dominikanischer Peso)</option>
-                <option value="EUR">EUR (Euro)</option>
-                <option value="USD">USD (US-Dollar)</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Plattformgebühr-Typ</label>
-              <select id="m-feetype">
-                <option value="fixed">Fix (Betrag)</option>
-                <option value="percentage">Prozent (%)</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Plattformgebühr-Betrag</label>
-              <input id="m-feevalue" type="number" value="50" min="0" step="0.01">
-            </div>
-            <div class="form-group">
-              <label>Monatsgebühr (fix)</label>
-              <input id="m-basefee" type="number" value="0" min="0" step="0.01">
-            </div>
-
-            <div class="form-section">⚙️ Provisions-Regeln</div>
-            <div class="form-group">
-              <label>Min. Neukunden/Monat</label>
-              <input id="m-minnew" type="number" value="1" min="0">
-            </div>
-            <div class="form-group">
-              <label>Einfrieren nach X Monaten Pause</label>
-              <input id="m-freeze" type="number" value="3" min="1">
-            </div>
-            <div class="form-group">
-              <label>Min. Auszahlung</label>
-              <input id="m-minpayout" type="number" value="1000" min="0">
-            </div>
-            <div class="form-group">
-              <label>Auszahlungsrhythmus</label>
-              <select id="m-schedule">
-                <option value="twice_monthly">2x monatlich (15. und Monatsende)</option>
-                <option value="monthly">1x monatlich</option>
-                <option value="weekly">Wöchentlich</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Provision bei Pause</label>
-              <select id="m-pauseaction">
-                <option value="accumulate">Akkumulieren (Nachzahlung)</option>
-                <option value="forfeit">Verfallen</option>
-                <option value="hold">Einfrieren</option>
-              </select>
-            </div>
-
-            <div class="form-section">🔐 Händler-Admin Zugang</div>
-            <div class="form-group">
-              <label>Admin-Passwort</label>
-              <div style="display:flex;gap:8px">
-                <input id="m-password" placeholder="Passwort generieren oder eingeben" style="flex:1">
-                <button class="btn btn-outline" onclick="genPassword()" type="button">🔑 Generieren</button>
-              </div>
-            </div>
-
-            <div class="form-actions">
-              <button class="btn btn-outline" onclick="clearMerchantForm()" type="button">Abbrechen</button>
-              <button class="btn btn-green" onclick="createMerchant()" type="button">✓ Händler anlegen</button>
-            </div>
-          </div>
-          <div id="createStatus" style="padding:0 24px 20px"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- AGENTEN -->
-    <div class="page" id="page-agents">
-      <h1 style="font-size:1.4rem;font-weight:800;margin-bottom:20px">🤝 Alle Agenten</h1>
-      <div>
-        <div class="sec-hd"><h2>Agenten-Übersicht</h2><button class="btn btn-outline" style="color:#fff;background:rgba(255,255,255,.15)" onclick="loadAllAgents()">Aktualisieren</button></div>
-        <div class="sec-body">
-          <table><thead><tr>
-            <th>NAME</th><th>HÄNDLER</th><th>CODE</th><th>VERKÄUFE</th><th>PROVISION</th><th>STATUS</th><th>REGISTRIERT</th>
-          </tr></thead>
-          <tbody id="agentsList"><tr><td colspan="7" class="msg">Lade...</td></tr></tbody></table>
-        </div>
-      </div>
-    </div>
-
-    <!-- ABRECHNUNG -->
-    <div class="page" id="page-billing">
-      <h1 style="font-size:1.4rem;font-weight:800;margin-bottom:20px">💳 Plattform-Abrechnung</h1>
-      <div>
-        <div class="sec-hd"><h2>Abrechnungsübersicht</h2></div>
-        <div class="sec-body">
-          <div class="billing-cards" id="billingContent">
-            <div class="msg" style="grid-column:1/-1">Lade...</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /main -->
-</div><!-- /app -->
-
-<!-- EDIT MODAL -->
-<div class="modal-overlay" id="editOverlay">
-  <div class="modal">
-    <div class="modal-hd">
-      <h3>&#9999;&#65039; H&#228;ndler bearbeiten</h3>
-      <button class="modal-close" onclick="closeEdit()">&#10005;</button>
-    </div>
-    <div class="form-grid" style="padding:22px">
-      <input type="hidden" id="e-id">
-      <div class="form-section" style="grid-column:1/-1;margin-top:0;padding-top:0;border:none">&#127978; Grunddaten</div>
-      <div class="form-group"><label>Slug (URL-Name)</label><input id="e-slug" readonly style="background:#f9fafb;color:var(--mu)"></div>
-      <div class="form-group"><label>Name *</label><input id="e-name"></div>
-      <div class="form-group full"><label>Beschreibung</label><textarea id="e-desc"></textarea></div>
-      <div class="form-group"><label>Kategorie</label><select id="e-category"><option value="fish">Fischhandel</option><option value="food">Lebensmittel</option><option value="massage">Massage/Wellness</option><option value="handwerk">Handwerk</option><option value="other">Sonstiges</option></select></div>
-      <div class="form-group"><label>Sprache</label><select id="e-language"><option value="es">Espa&#241;ol</option><option value="de">Deutsch</option><option value="en">English</option></select></div>
-      <div class="form-section">&#128222; Kontakt</div>
-      <div class="form-group"><label>WhatsApp</label><input id="e-wa"></div>
-      <div class="form-group"><label>E-Mail</label><input id="e-email" type="email"></div>
-      <div class="form-group"><label>Telefon</label><input id="e-phone"></div>
-      <div class="form-group"><label>Stripe-Zahlungslink</label><input id="e-stripe"></div>
-      <div class="form-section">&#128205; Adresse</div>
-      <div class="form-group full"><label>Stra&#223;e / Adresse</label><input id="e-address"></div>
-      <div class="form-group"><label>Stadt / Ort</label><input id="e-city"></div>
-      <div class="form-group"><label>PLZ</label><input id="e-zip"></div>
-      <div class="form-group"><label>Staat / Provinz</label><input id="e-state"></div>
-      <div class="form-group"><label>Land</label><select id="e-country"><option value="DO">&#127465;&#127476; Dominikanische Republik</option><option value="DE">&#127465;&#127466; Deutschland</option><option value="AT">&#127462;&#127481; &#214;sterreich</option><option value="CH">&#127464;&#127469; Schweiz</option><option value="US">&#127482;&#127480; USA</option><option value="MX">&#127474;&#127485; Mexiko</option><option value="ES">&#127466;&#127480; Spanien</option></select></div>
-      <div class="form-section">&#128176; Finanzen</div>
-      <div class="form-group"><label>W&#228;hrung</label><select id="e-currency"><option value="RD$">RD$ (Dominikanischer Peso)</option><option value="EUR">EUR (Euro)</option><option value="USD">USD (US-Dollar)</option></select></div>
-      <div class="form-group"><label>Plattformgeb&#252;hr-Typ</label><select id="e-feetype"><option value="fixed">Fix (Betrag)</option><option value="percentage">Prozent (%)</option></select></div>
-      <div class="form-group"><label>Plattformgeb&#252;hr-Betrag</label><input id="e-feevalue" type="number" min="0" step="0.01"></div>
-      <div class="form-group"><label>Monatsgeb&#252;hr (fix)</label><input id="e-basefee" type="number" min="0" step="0.01"></div>
-      <div class="form-section">&#128274; Admin-Passwort</div>
-      <div class="form-group full"><label>Admin-Passwort (leer lassen = nicht &#228;ndern)</label><div style="display:flex;gap:8px"><input id="e-password" placeholder="Neues Passwort (optional)" style="flex:1"><button class="btn btn-outline" onclick="genPasswordEdit()" type="button">&#128273; Generieren</button></div></div>
-      <div class="form-section">&#128203; Status</div>
-      <div class="form-group"><label>Status</label><select id="e-status"><option value="active">Aktiv</option><option value="paused">Pausiert</option><option value="inactive">Inaktiv</option></select></div>
-      <div class="form-actions">
-        <button class="btn btn-outline" onclick="closeEdit()" type="button">Abbrechen</button>
-        <button class="btn btn-green" onclick="saveEdit()" type="button">&#128190; Speichern</button>
-      </div>
+    <div class="fgrp"><label>WhatsApp Nummer</label><input id="m-wa" placeholder="+43..."></div>
+    <div class="fgrp"><label>Beschreibung (optional)</label><textarea id="m-desc" rows="2" placeholder="Kurze Beschreibung"></textarea></div>
+    <div class="err" id="mErr"></div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeMerchantForm()">Abbrechen</button>
+      <button class="btn btn-primary" onclick="saveMerchant()">💾 Speichern</button>
     </div>
   </div>
 </div>
 
-<!-- DELETE CONFIRM -->
-<div class="confirm-overlay" id="confirmOverlay">
-  <div class="confirm-box">
-    <h3>&#128465;&#65039; H&#228;ndler l&#246;schen?</h3>
-    <p id="confirmMsg">M&#246;chtest du diesen H&#228;ndler wirklich l&#246;schen?<br><strong>Diese Aktion kann nicht r&#252;ckg&#228;ngig gemacht werden.</strong></p>
-    <div class="btn-row">
-      <button class="btn btn-outline" onclick="closeConfirm()">Abbrechen</button>
-      <button class="btn btn-red" onclick="confirmDeleteExec()">Ja, l&#246;schen</button>
+<!-- USER FORM -->
+<div class="form-overlay" id="userForm">
+  <div class="form-box">
+    <h3 id="userFormTitle">👥 Neuer Benutzer</h3>
+    <input type="hidden" id="u-id">
+    <div class="fgrp"><label>Name</label><input id="u-name" placeholder="Vollständiger Name"></div>
+    <div class="fgrp"><label>Username * (Login-Name)</label><input id="u-username" placeholder="z.B. alexander" oninput="this.value=this.value.toLowerCase().replace(/\s/g,'')"></div>
+    <div class="fgrp"><label>Passwort *</label><input type="password" id="u-password" placeholder="Sicheres Passwort"></div>
+    <div class="fgrp"><label>Rolle *</label>
+      <select id="u-role" onchange="onRoleChange()">
+        <option value="staff">👔 Mitarbeiter (Staff)</option>
+        <option value="merchant">🏪 Händler</option>
+        <option value="superadmin">👑 Superadmin</option>
+      </select>
+    </div>
+    <div id="merchantSelectDiv" class="fgrp">
+      <label>Händler-Zugriff (Mehrfachauswahl für Mitarbeiter)</label>
+      <div class="merchant-checks" id="merchantCheckboxes"></div>
+    </div>
+    <div id="singleMerchantDiv" class="fgrp" style="display:none;">
+      <label>Händler</label>
+      <select id="u-merchant"><option value="">— Händler wählen —</option></select>
+    </div>
+    <div class="fgrp"><label>E-Mail (optional)</label><input type="email" id="u-email" placeholder="email@firma.com"></div>
+    <div class="err" id="uErr"></div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeUserForm()">Abbrechen</button>
+      <button class="btn btn-primary" onclick="saveUser()">💾 Speichern</button>
     </div>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div id="toast"></div>
 
 <script>
-var sb = null;
-var newMerchantId = null;
-var siteUrl = 'https://officepuertoplata-coder.github.io/sosuapesce';
+const API = 'https://converto-server-production.up.railway.app';
+const KEY = 'converto_auth_v2';
+let allMerchants = [];
+let allUsers = [];
+let auth = null;
 
-window.addEventListener('load', function() {
-  // Prüfe config.js
-  try {
-    var cfg = window.SP_CONFIG;
-    if (!cfg) { console.error('config.js nicht gefunden oder SP_CONFIG fehlt'); return; }
-
-    var url = cfg.SUPABASE_URL;
-    var key = cfg.SUPABASE_ANON_KEY || cfg.SUPABASE_KEY || cfg.SUPABASE_SERVICE_KEY;
-
-    if (!url || url.indexOf('XXXX') !== -1) { console.error('SUPABASE_URL nicht gesetzt'); return; }
-    if (!key || key.indexOf('XXXX') !== -1) { console.error('Supabase Key nicht gesetzt'); return; }
-
-    sb = window.supabase.createClient(url, key);
-    if (cfg.SITE_URL) siteUrl = cfg.SITE_URL;
-    console.log('Supabase verbunden ✓');
-  } catch(e) { console.error('Supabase Fehler:', e.message); }
-
-  document.getElementById('pwInput').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') doLogin();
-  });
-});
-
-function doLogin() {
-  var pw = document.getElementById('pwInput').value;
-  var cfg = window.SP_CONFIG;
-  if (!cfg) { document.getElementById('lerr').textContent = 'config.js nicht geladen'; return; }
-  if (!pw) { document.getElementById('lerr').textContent = 'Bitte Passwort eingeben'; return; }
-  if (pw === cfg.SUPERADMIN_PASSWORD) {
-    document.getElementById('loginWrap').style.display = 'none';
-    document.getElementById('app').classList.add('show');
-    loadOverview();
-  } else {
-    document.getElementById('lerr').textContent = 'Falsches Passwort';
-    document.getElementById('pwInput').value = '';
+window.onload = async function() {
+  try { auth = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e) {}
+  if (!auth || auth.role !== 'superadmin') {
+    window.location.href = 'login.html';
+    return;
   }
+  loadMerchants();
+  loadUsers();
+};
+
+function doLogout() { localStorage.removeItem(KEY); window.location.href = 'login.html'; }
+
+function switchTab(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
 }
 
-function doLogout() { location.reload(); }
-
-function showPage(id, btn) {
-  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
-  document.querySelectorAll('.tbtn').forEach(function(b) { b.classList.remove('active'); });
-  document.getElementById('page-' + id).classList.add('active');
-  if (btn) btn.classList.add('active');
-  if (id === 'overview') loadOverview();
-  if (id === 'merchants') loadMerchants();
-  if (id === 'agents') loadAllAgents();
-  if (id === 'billing') loadBilling();
-}
-
-function showToast(msg) {
-  var t = document.getElementById('toast');
+function showToast(msg, err) {
+  const t = document.getElementById('toast');
   t.textContent = msg;
+  t.style.background = err ? 'var(--red)' : 'var(--wa)';
   t.classList.add('show');
-  setTimeout(function() { t.classList.remove('show'); }, 3000);
+  setTimeout(() => t.classList.remove('show'), 3000);
 }
 
 function fmtDate(d) { return d ? new Date(d).toLocaleDateString('de-AT') : '—'; }
-function fmtNum(n, cur) { return (parseFloat(n)||0).toLocaleString('de-AT', {minimumFractionDigits:0}) + (cur ? ' ' + cur : ''); }
 
-function statusBadge(s) {
-  var map = { active:'b-active', paused:'b-paused', frozen:'b-frozen', pending:'b-pending', inactive:'b-paused' };
-  var label = { active:'Aktiv', paused:'Pausiert', frozen:'Eingefroren', pending:'Ausstehend', inactive:'Inaktiv' };
-  return '<span class="badge ' + (map[s]||'b-pending') + '">' + (label[s]||s||'Unbekannt') + '</span>';
+// ── HÄNDLER ────────────────────────────────────────────────
+async function loadMerchants() {
+  try {
+    const r = await fetch(API + '/api/merchants');
+    allMerchants = await r.json();
+    const tbody = document.getElementById('merchantsTable');
+    tbody.innerHTML = allMerchants.length
+      ? allMerchants.map(m => `
+        <tr>
+          <td><strong>${m.name}</strong></td>
+          <td><code style="background:var(--card2);padding:2px 8px;border-radius:4px;font-size:.78rem;">${m.slug}</code></td>
+          <td><span class="badge ${m.status === 'active' ? 'b-active' : 'b-inactive'}">${m.status || 'active'}</span></td>
+          <td>${m.currency || '—'}</td>
+          <td>${m.wa_number || m.whatsapp_number || '—'}</td>
+          <td style="white-space:nowrap;">
+            <button class="btn-icon" onclick="editMerchant('${m.id}')" title="Bearbeiten">✏️</button>
+            <button class="btn btn-ghost btn-sm" onclick="loginAsMerchant('${m.slug}')" title="Als Händler anzeigen">👁️</button>
+          </td>
+        </tr>`).join('')
+      : '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted);">Keine Händler gefunden</td></tr>';
+  } catch(e) { showToast('Fehler beim Laden', true); }
 }
 
-// ── ÜBERSICHT ──────────────────────────────────────────
-function loadOverview() {
-  if (!sb) { showErrOverview('Supabase nicht verbunden. Prüfe config.js'); return; }
-
-  document.getElementById('overviewTable').innerHTML = '<tr><td colspan="7" class="msg">Lade...</td></tr>';
-  document.getElementById('ov-merchants').textContent = '—';
-  document.getElementById('ov-agents').textContent = '—';
-  document.getElementById('ov-sales').textContent = '—';
-  document.getElementById('ov-platform').textContent = '—';
-
-  sb.from('merchants').select('id,slug,name,status,currency,platform_fee_value,platform_fee_type').order('created_at', {ascending:false}).then(function(r) {
-    if (r.error) {
-      showErrOverview('Fehler beim Laden der Händler: ' + r.error.message + ' (Code: ' + r.error.code + ')');
-      return;
-    }
-
-    var merchants = r.data || [];
-    var activeMerchants = merchants.filter(function(m) { return m.status === 'active'; }).length;
-    document.getElementById('ov-merchants').textContent = activeMerchants;
-
-    // Jetzt Agenten zählen
-    sb.from('agents').select('id', {count:'exact', head:true}).then(function(ra) {
-      document.getElementById('ov-agents').textContent = ra.count || 0;
-    });
-
-    // Sales laden
-    sb.from('sales').select('total_amount,platform_fee').then(function(rs) {
-      var sales = rs.data || [];
-      document.getElementById('ov-sales').textContent = sales.length;
-      var platform = sales.reduce(function(s,x) { return s + (parseFloat(x.platform_fee)||0); }, 0);
-      document.getElementById('ov-platform').textContent = fmtNum(platform);
-    });
-
-    // Tabelle befüllen
-    if (!merchants.length) {
-      document.getElementById('overviewTable').innerHTML = '<tr><td colspan="7" class="msg">Noch keine Händler angelegt.</td></tr>';
-      return;
-    }
-
-    // Für jeden Händler Agenten und Sales laden
-    var promises = merchants.map(function(m) {
-      return Promise.all([
-        sb.from('agents').select('id', {count:'exact', head:true}).eq('merchant_id', m.id),
-        sb.from('sales').select('total_amount,platform_fee').eq('merchant_id', m.id)
-      ]).then(function(res) {
-        var agentCount = res[0].count || 0;
-        var salesData = res[1].data || [];
-        var totalRevenue = salesData.reduce(function(s,x) { return s + (parseFloat(x.total_amount)||0); }, 0);
-        var platEarnings = salesData.reduce(function(s,x) { return s + (parseFloat(x.platform_fee)||0); }, 0);
-        return {
-          name: m.name,
-          slug: m.slug,
-          status: m.status,
-          currency: m.currency,
-          agents: agentCount,
-          sales: salesData.length,
-          revenue: totalRevenue,
-          platform: platEarnings
-        };
-      });
-    });
-
-    Promise.all(promises).then(function(rows) {
-      document.getElementById('overviewTable').innerHTML = rows.map(function(r) {
-        return '<tr>' +
-          '<td><strong>' + r.name + '</strong></td>' +
-          '<td><span class="codetag">' + r.slug + '</span></td>' +
-          '<td>' + r.agents + '</td>' +
-          '<td>' + r.sales + '</td>' +
-          '<td>' + fmtNum(r.revenue, r.currency) + '</td>' +
-          '<td style="color:var(--gold);font-weight:700">' + fmtNum(r.platform, r.currency) + '</td>' +
-          '<td>' + statusBadge(r.status) + '</td>' +
-          '</tr>';
-      }).join('');
-    });
-  });
+function loginAsMerchant(slug) {
+  const m = allMerchants.find(x => x.slug === slug);
+  if (!m) return;
+  const tempAuth = { ...auth, merchantId: m.id, merchantName: m.name, slug: m.slug };
+  localStorage.setItem(KEY, JSON.stringify(tempAuth));
+  window.location.href = 'hub.html';
 }
 
-function showErrOverview(msg) {
-  document.getElementById('overviewTable').innerHTML = '<tr><td colspan="7"><div class="err-box">⚠️ ' + msg + '</div></td></tr>';
-  console.error(msg);
+function openMerchantForm(id) {
+  document.getElementById('m-id').value = '';
+  document.getElementById('m-name').value = '';
+  document.getElementById('m-slug').value = '';
+  document.getElementById('m-password').value = '';
+  document.getElementById('m-currency').value = 'EUR';
+  document.getElementById('m-wa').value = '';
+  document.getElementById('m-desc').value = '';
+  document.getElementById('mErr').textContent = '';
+  document.getElementById('merchantFormTitle').textContent = '🏪 Neuer Händler';
+  document.getElementById('merchantForm').classList.add('open');
 }
 
-// ── HÄNDLER LISTE ──────────────────────────────────────
-function loadMerchants() {
-  if (!sb) { document.getElementById('merchantsList').innerHTML = '<div class="err-box">⚠️ Supabase nicht verbunden</div>'; return; }
-
-  document.getElementById('merchantsList').innerHTML = '<div class="msg">Lade...</div>';
-
-  sb.from('merchants').select('*').order('created_at', {ascending:false}).then(function(r) {
-    if (r.error) {
-      document.getElementById('merchantsList').innerHTML =
-        '<div class="err-box">⚠️ Fehler: ' + r.error.message + '<br><small>Code: ' + r.error.code + '</small></div>';
-      console.error('loadMerchants error:', r.error);
-      return;
-    }
-
-    var data = r.data || [];
-    if (!data.length) {
-      document.getElementById('merchantsList').innerHTML = '<div class="msg">Noch keine Händler. Über "+ Neuer Händler" anlegen.</div>';
-      return;
-    }
-
-    document.getElementById('merchantsList').innerHTML = data.map(function(m) {
-      var fee = m.platform_fee_value + (m.platform_fee_type === 'percentage' ? '%' : ' ' + m.currency);
-      var mid = m.id;
-      var mname = m.name;
-      var mstatus = m.status;
-      var mslug = m.slug;
-      return '<div class="merchant-card">' +
-        '<div class="merchant-card-left">' +
-          '<h3>' + mname + '</h3>' +
-          '<p>' + (m.description || '') + '</p>' +
-          '<p style="font-size:.75rem;color:var(--mu);margin-top:4px">' +
-            (m.city ? '📍 ' + m.city + (m.country ? ', ' + m.country : '') + ' &nbsp;·&nbsp; ' : '') +
-            (m.whatsapp_number ? '📱 ' + m.whatsapp_number + ' &nbsp;·&nbsp; ' : '') +
-            '💰 ' + m.currency + ' &nbsp;·&nbsp; Plattform-Fee: ' + fee +
-          '</p>' +
-          '<p style="font-size:.73rem;color:var(--mu);margin-top:2px">🔗 /' + mslug + '/ &nbsp;·&nbsp; Angelegt: ' + fmtDate(m.created_at) + '</p>' +
-        '</div>' +
-        '<div class="merchant-card-right" style="flex-wrap:wrap">' +
-          statusBadge(mstatus) +
-          '<a href="' + siteUrl + '/index.html?m=' + mslug + '" target="_blank" class="btn btn-outline" style="text-decoration:none">🌐 Landingpage</a>' +
-          '<a href="' + siteUrl + '/agentes.html?m=' + mslug + '" target="_blank" class="btn btn-outline" style="text-decoration:none">👥 Agenten</a>' +
-          '<a href="' + siteUrl + '/admin.html?m=' + mslug + '" target="_blank" class="btn btn-outline" style="text-decoration:none">⚙️ Admin</a>' +
-          '<button class="btn btn-outline" onclick="toggleMerchant(\`' + mid + '\`,\`' + mstatus + '\`)">'+
-            (mstatus === 'active' ? '⏸ Pausieren' : '▶ Aktivieren') +
-          '</button>' +
-          '<button class="btn btn-gold" onclick="openEdit(\`' + mid + '\`)">✏️ Bearbeiten</button>' +
-          '<button class="btn btn-danger" onclick="openConfirm(\`' + mid + '\`,\`' + mname + '\`)">🗑️</button>' +
-        '</div>' +
-      '</div>';
-    }).join('');
-  });
+function editMerchant(id) {
+  const m = allMerchants.find(x => x.id === id);
+  if (!m) return;
+  document.getElementById('m-id').value = m.id;
+  document.getElementById('m-name').value = m.name || '';
+  document.getElementById('m-slug').value = m.slug || '';
+  document.getElementById('m-password').value = '';
+  document.getElementById('m-currency').value = m.currency || 'EUR';
+  document.getElementById('m-wa').value = m.wa_number || m.whatsapp_number || '';
+  document.getElementById('m-desc').value = m.description || '';
+  document.getElementById('merchantFormTitle').textContent = '✏️ Händler bearbeiten';
+  document.getElementById('mErr').textContent = '';
+  document.getElementById('merchantForm').classList.add('open');
 }
 
-function toggleMerchant(id, status) {
-  if (!sb) return;
-  var newStatus = status === 'active' ? 'paused' : 'active';
-  sb.from('merchants').update({status: newStatus}).eq('id', id).then(function(r) {
-    if (r.error) { showToast('Fehler: ' + r.error.message); return; }
-    showToast('Status auf "' + (newStatus === 'active' ? 'Aktiv' : 'Pausiert') + '" gesetzt');
+function closeMerchantForm() { document.getElementById('merchantForm').classList.remove('open'); }
+
+async function saveMerchant() {
+  const id = document.getElementById('m-id').value;
+  const name = document.getElementById('m-name').value.trim();
+  const slug = document.getElementById('m-slug').value.trim();
+  const password = document.getElementById('m-password').value;
+
+  if (!name || !slug) { document.getElementById('mErr').textContent = 'Name und Slug erforderlich'; return; }
+  if (!id && !password) { document.getElementById('mErr').textContent = 'Passwort für neuen Händler erforderlich'; return; }
+
+  const payload = { name, slug, currency: document.getElementById('m-currency').value, wa_number: document.getElementById('m-wa').value, description: document.getElementById('m-desc').value };
+  if (password) payload.admin_password = password;
+
+  try {
+    const url = id ? `${API}/api/merchants/${id}` : `${API}/api/merchants`;
+    const r = await fetch(url, { method: id ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    const data = await r.json();
+    if (!data.success) { document.getElementById('mErr').textContent = data.error; return; }
+    closeMerchantForm();
+    showToast(id ? '✅ Händler aktualisiert' : '✅ Händler angelegt');
     loadMerchants();
-    loadOverview();
-  });
+    // Auth merchants updaten
+    const rAll = await fetch(API + '/api/merchants');
+    const merchants = await rAll.json();
+    auth.merchants = merchants;
+    localStorage.setItem(KEY, JSON.stringify(auth));
+  } catch(e) { document.getElementById('mErr').textContent = 'Verbindungsfehler'; }
 }
 
-// ── NEUER HÄNDLER ──────────────────────────────────────
-function genPassword() {
-  var chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#';
-  var pw = '';
-  for (var i = 0; i < 12; i++) pw += chars[Math.floor(Math.random() * chars.length)];
-  document.getElementById('m-password').value = pw;
+// ── BENUTZER ───────────────────────────────────────────────
+async function loadUsers() {
+  try {
+    const r = await fetch(API + '/api/users');
+    allUsers = await r.json();
+    const tbody = document.getElementById('usersTable');
+    tbody.innerHTML = allUsers.length
+      ? allUsers.map(u => {
+          const roleBadge = { superadmin: 'b-super', staff: 'b-staff', merchant: 'b-merchant' }[u.role] || 'b-inactive';
+          const roleLabel = { superadmin: '👑 Superadmin', staff: '👔 Mitarbeiter', merchant: '🏪 Händler' }[u.role] || u.role;
+          const merchant = u.merchant_id ? (allMerchants.find(m => m.id === u.merchant_id)?.name || u.merchant_id) : '—';
+          return `<tr>
+            <td><strong>${u.name || '—'}</strong></td>
+            <td><code style="background:var(--card2);padding:2px 8px;border-radius:4px;font-size:.78rem;">${u.username}</code></td>
+            <td><span class="badge ${roleBadge}">${roleLabel}</span></td>
+            <td>${merchant}</td>
+            <td><span class="badge ${u.active ? 'b-active' : 'b-inactive'}">${u.active ? 'Aktiv' : 'Deaktiviert'}</span></td>
+            <td>${fmtDate(u.last_login)}</td>
+            <td style="white-space:nowrap;">
+              <button class="btn-icon" onclick="editUser('${u.id}')" title="Bearbeiten">✏️</button>
+              <button class="btn-icon" onclick="toggleUser('${u.id}',${u.active})" title="${u.active ? 'Deaktivieren' : 'Aktivieren'}">${u.active ? '🔒' : '🔓'}</button>
+              <button class="btn-icon" onclick="deleteUser('${u.id}')" title="Löschen" style="color:var(--red)">🗑️</button>
+            </td>
+          </tr>`;
+        }).join('')
+      : '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);">Keine Benutzer gefunden</td></tr>';
+  } catch(e) { showToast('Fehler beim Laden', true); }
 }
 
-function clearMerchantForm() {
-  ['m-slug','m-name','m-desc','m-wa','m-email','m-phone','m-stripe',
-   'm-address','m-city','m-zip','m-state','m-password'].forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el) el.value = '';
-  });
-  document.getElementById('m-feevalue').value = '50';
-  document.getElementById('m-basefee').value = '0';
-  document.getElementById('createStatus').innerHTML = '';
+function onRoleChange() {
+  const role = document.getElementById('u-role').value;
+  document.getElementById('merchantSelectDiv').style.display = role === 'staff' ? 'block' : 'none';
+  document.getElementById('singleMerchantDiv').style.display = role === 'merchant' ? 'block' : 'none';
 }
 
-function createMerchant() {
-  if (!sb) { showToast('Supabase nicht verbunden'); return; }
-  var slug = document.getElementById('m-slug').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
-  var name = document.getElementById('m-name').value.trim();
-  if (!slug) { showToast('Slug ist ein Pflichtfeld'); return; }
-  if (!name) { showToast('Name ist ein Pflichtfeld'); return; }
-
-  document.getElementById('createStatus').innerHTML = '<div style="color:var(--mu);font-size:.85rem">⏳ Händler wird angelegt...</div>';
-
-  var payload = {
-    slug: slug,
-    name: name,
-    description: document.getElementById('m-desc').value.trim() || null,
-    category: document.getElementById('m-category').value,
-    language: document.getElementById('m-language').value,
-    whatsapp_number: document.getElementById('m-wa').value.trim() || null,
-    email: document.getElementById('m-email').value.trim() || null,
-    phone: document.getElementById('m-phone').value.trim() || null,
-    address: document.getElementById('m-address').value.trim() || null,
-    city: document.getElementById('m-city').value.trim() || null,
-    zip: document.getElementById('m-zip').value.trim() || null,
-    state: document.getElementById('m-state').value.trim() || null,
-    country: document.getElementById('m-country').value,
-    currency: document.getElementById('m-currency').value,
-    stripe_link: document.getElementById('m-stripe').value.trim() || null,
-    base_fee: parseFloat(document.getElementById('m-basefee').value) || 0,
-    platform_fee_type: document.getElementById('m-feetype').value,
-    platform_fee_value: parseFloat(document.getElementById('m-feevalue').value) || 0,
-    admin_password: document.getElementById('m-password').value.trim() || null,
-    status: 'active'
-  };
-
-  sb.from('merchants').insert(payload).select().then(function(r) {
-    if (r.error) {
-      document.getElementById('createStatus').innerHTML = '<div class="err-box">⚠️ Fehler: ' + r.error.message + '</div>';
-      showToast('Fehler beim Anlegen');
-      return;
-    }
-
-    newMerchantId = r.data[0].id;
-
-    // Provisionsregeln anlegen
-    var rules = {
-      merchant_id: newMerchantId,
-      min_new_customers_per_month: parseInt(document.getElementById('m-minnew').value) || 1,
-      freeze_after_months: parseInt(document.getElementById('m-freeze').value) || 3,
-      min_payout_amount: parseFloat(document.getElementById('m-minpayout').value) || 1000,
-      payout_schedule: document.getElementById('m-schedule').value,
-      pause_commission_action: document.getElementById('m-pauseaction').value
-    };
-
-    sb.from('merchant_commission_rules').insert(rules).then(function() {
-      document.getElementById('createStatus').innerHTML =
-        '<div style="background:#dcfce7;border:1px solid #86efac;border-radius:8px;padding:14px 18px;color:#15803d;font-size:.88rem">' +
-        '✅ <strong>' + name + '</strong> wurde erfolgreich angelegt!<br>' +
-        '<small>URL: /' + slug + '/ &nbsp;·&nbsp; ID: ' + newMerchantId + '</small>' +
-        '</div>';
-      showToast('✅ Händler "' + name + '" angelegt!');
-      clearMerchantForm();
-    });
-  });
+function openUserForm() {
+  document.getElementById('u-id').value = '';
+  document.getElementById('u-name').value = '';
+  document.getElementById('u-username').value = '';
+  document.getElementById('u-password').value = '';
+  document.getElementById('u-role').value = 'staff';
+  document.getElementById('u-email').value = '';
+  document.getElementById('uErr').textContent = '';
+  document.getElementById('userFormTitle').textContent = '👥 Neuer Benutzer';
+  buildMerchantCheckboxes([]);
+  buildSingleMerchantSelect(null);
+  onRoleChange();
+  document.getElementById('userForm').classList.add('open');
 }
 
-// ── AGENTEN ───────────────────────────────────────────
-function loadAllAgents() {
-  if (!sb) { document.getElementById('agentsList').innerHTML = '<tr><td colspan="7" class="msg">Supabase nicht verbunden</td></tr>'; return; }
-  document.getElementById('agentsList').innerHTML = '<tr><td colspan="7" class="msg">Lade...</td></tr>';
-
-  sb.from('agents').select('*, merchants(name,currency)').order('created_at', {ascending:false}).then(function(r) {
-    if (r.error) {
-      document.getElementById('agentsList').innerHTML = '<tr><td colspan="7"><div class="err-box">⚠️ ' + r.error.message + '</div></td></tr>';
-      return;
-    }
-    var data = r.data || [];
-    if (!data.length) {
-      document.getElementById('agentsList').innerHTML = '<tr><td colspan="7" class="msg">Noch keine Agenten registriert.</td></tr>';
-      return;
-    }
-    document.getElementById('agentsList').innerHTML = data.map(function(a) {
-      var cur = (a.merchants && a.merchants.currency) || '';
-      return '<tr>' +
-        '<td><strong>' + (a.name || '—') + '</strong><br><small style="color:var(--mu)">' + (a.email || '') + '</small></td>' +
-        '<td>' + ((a.merchants && a.merchants.name) || '—') + '</td>' +
-        '<td><span class="codetag">' + (a.referral_code || '—') + '</span></td>' +
-        '<td>' + (a.total_sales || 0) + '</td>' +
-        '<td>' + fmtNum(a.total_commission, cur) + '</td>' +
-        '<td>' + statusBadge(a.status) + '</td>' +
-        '<td>' + fmtDate(a.created_at) + '</td>' +
-        '</tr>';
-    }).join('');
-  });
+function editUser(id) {
+  const u = allUsers.find(x => x.id === id);
+  if (!u) return;
+  document.getElementById('u-id').value = u.id;
+  document.getElementById('u-name').value = u.name || '';
+  document.getElementById('u-username').value = u.username || '';
+  document.getElementById('u-password').value = '';
+  document.getElementById('u-role').value = u.role || 'staff';
+  document.getElementById('u-email').value = u.email || '';
+  document.getElementById('uErr').textContent = '';
+  document.getElementById('userFormTitle').textContent = '✏️ Benutzer bearbeiten';
+  buildMerchantCheckboxes([]);
+  buildSingleMerchantSelect(u.merchant_id);
+  onRoleChange();
+  document.getElementById('userForm').classList.add('open');
 }
 
-// ── ABRECHNUNG ─────────────────────────────────────────
-function loadBilling() {
-  if (!sb) return;
-  document.getElementById('billingContent').innerHTML = '<div class="msg" style="grid-column:1/-1">Lade...</div>';
-
-  Promise.all([
-    sb.from('merchants').select('id,name,currency,platform_fee_type,platform_fee_value,base_fee').eq('status','active'),
-    sb.from('sales').select('merchant_id,total_amount,platform_fee,created_at')
-  ]).then(function(res) {
-    var merchants = res[0].data || [];
-    var sales = res[1].data || [];
-
-    if (!merchants.length) {
-      document.getElementById('billingContent').innerHTML = '<div class="msg" style="grid-column:1/-1">Keine aktiven Händler</div>';
-      return;
-    }
-
-    var html = merchants.map(function(m) {
-      var mSales = sales.filter(function(s) { return s.merchant_id === m.id; });
-      var totalPlatform = mSales.reduce(function(t,s) { return t + (parseFloat(s.platform_fee)||0); }, 0);
-      var totalRevenue = mSales.reduce(function(t,s) { return t + (parseFloat(s.total_amount)||0); }, 0);
-      return '<div class="billing-card">' +
-        '<h3>🏪 ' + m.name + '</h3>' +
-        '<div class="billing-row"><span>Verkäufe total</span><span>' + mSales.length + '</span></div>' +
-        '<div class="billing-row"><span>Umsatz</span><span>' + fmtNum(totalRevenue, m.currency) + '</span></div>' +
-        '<div class="billing-row"><span>Plattformgebühr (pro Sale)</span><span>' + m.platform_fee_value + (m.platform_fee_type==='percentage'?'%':' '+m.currency) + '</span></div>' +
-        (m.base_fee ? '<div class="billing-row"><span>Monatsgebühr</span><span>' + fmtNum(m.base_fee, m.currency) + '</span></div>' : '') +
-        '<div class="billing-row" style="color:var(--gold)"><span>🏦 Gesamt Plattform-Einnahmen</span><span><strong>' + fmtNum(totalPlatform, m.currency) + '</strong></span></div>' +
-      '</div>';
-    }).join('');
-
-    document.getElementById('billingContent').innerHTML = html;
-  });
+function buildMerchantCheckboxes(selected) {
+  const div = document.getElementById('merchantCheckboxes');
+  div.innerHTML = allMerchants.map(m => `
+    <label class="merchant-check-item">
+      <input type="checkbox" value="${m.id}" ${selected.includes(m.id) ? 'checked' : ''}>
+      ${m.name} <span style="font-size:.72rem;color:var(--muted);">(${m.slug})</span>
+    </label>`).join('');
 }
 
-// ── EDIT MODAL ─────────────────────────────────────────
-var _merchantCache = {};
-
-function openEdit(id) {
-  if (!sb) return;
-  sb.from('merchants').select('*').eq('id', id).single().then(function(r) {
-    if (r.error) { showToast('Fehler beim Laden: ' + r.error.message); return; }
-    var m = r.data;
-    document.getElementById('e-id').value       = m.id;
-    document.getElementById('e-slug').value     = m.slug;
-    document.getElementById('e-name').value     = m.name || '';
-    document.getElementById('e-desc').value     = m.description || '';
-    document.getElementById('e-wa').value       = m.whatsapp_number || '';
-    document.getElementById('e-email').value    = m.email || '';
-    document.getElementById('e-phone').value    = m.phone || '';
-    document.getElementById('e-stripe').value   = m.stripe_link || '';
-    document.getElementById('e-address').value  = m.address || '';
-    document.getElementById('e-city').value     = m.city || '';
-    document.getElementById('e-zip').value      = m.zip || '';
-    document.getElementById('e-state').value    = m.state || '';
-    document.getElementById('e-feevalue').value = m.platform_fee_value || 0;
-    document.getElementById('e-basefee').value  = m.base_fee || 0;
-    document.getElementById('e-password').value = '';
-    setSelect('e-category', m.category);
-    setSelect('e-language', m.language);
-    setSelect('e-country',  m.country || 'DO');
-    setSelect('e-currency', m.currency || 'RD$');
-    setSelect('e-feetype',  m.platform_fee_type || 'fixed');
-    setSelect('e-status',   m.status || 'active');
-    document.getElementById('editOverlay').classList.add('open');
-  });
+function buildSingleMerchantSelect(selected) {
+  const sel = document.getElementById('u-merchant');
+  sel.innerHTML = '<option value="">— Händler wählen —</option>' +
+    allMerchants.map(m => `<option value="${m.id}" ${m.id === selected ? 'selected' : ''}>${m.name}</option>`).join('');
 }
 
-function setSelect(id, val) {
-  var el = document.getElementById(id);
-  if (!el || !val) return;
-  for (var i = 0; i < el.options.length; i++) {
-    if (el.options[i].value === val) { el.selectedIndex = i; break; }
-  }
+function closeUserForm() { document.getElementById('userForm').classList.remove('open'); }
+
+async function saveUser() {
+  const id = document.getElementById('u-id').value;
+  const username = document.getElementById('u-username').value.trim();
+  const password = document.getElementById('u-password').value;
+  const role = document.getElementById('u-role').value;
+  const name = document.getElementById('u-name').value.trim();
+
+  if (!username) { document.getElementById('uErr').textContent = 'Username erforderlich'; return; }
+  if (!id && !password) { document.getElementById('uErr').textContent = 'Passwort für neuen Benutzer erforderlich'; return; }
+
+  // Händler IDs sammeln
+  const merchantIds = Array.from(document.querySelectorAll('#merchantCheckboxes input:checked')).map(cb => cb.value);
+  const singleMerchantId = document.getElementById('u-merchant').value;
+
+  const payload = { username, role, name, email: document.getElementById('u-email').value };
+  if (password) payload.password = password;
+  if (role === 'staff') payload.merchant_ids = merchantIds;
+  if (role === 'merchant') payload.merchant_id = singleMerchantId || null;
+
+  try {
+    const url = id ? `${API}/api/users/${id}` : `${API}/api/users`;
+    const r = await fetch(url, { method: id ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    const data = await r.json();
+    if (!data.success) { document.getElementById('uErr').textContent = data.error; return; }
+    closeUserForm();
+    showToast(id ? '✅ Benutzer aktualisiert' : '✅ Benutzer angelegt');
+    loadUsers();
+  } catch(e) { document.getElementById('uErr').textContent = 'Verbindungsfehler'; }
 }
 
-function closeEdit() {
-  document.getElementById('editOverlay').classList.remove('open');
+async function toggleUser(id, active) {
+  try {
+    const r = await fetch(`${API}/api/users/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ active: !active }) });
+    const data = await r.json();
+    if (data.success) { showToast(active ? '🔒 Deaktiviert' : '🔓 Aktiviert'); loadUsers(); }
+  } catch(e) { showToast('Fehler', true); }
 }
 
-function genPasswordEdit() {
-  var chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#';
-  var pw = '';
-  for (var i = 0; i < 12; i++) pw += chars[Math.floor(Math.random() * chars.length)];
-  document.getElementById('e-password').value = pw;
+async function deleteUser(id) {
+  if (!confirm('Benutzer wirklich löschen?')) return;
+  try {
+    const r = await fetch(`${API}/api/users/${id}`, { method: 'DELETE' });
+    const data = await r.json();
+    if (data.success) { showToast('✅ Gelöscht'); loadUsers(); }
+  } catch(e) { showToast('Fehler', true); }
 }
-
-function saveEdit() {
-  if (!sb) return;
-  var id   = document.getElementById('e-id').value;
-  var name = document.getElementById('e-name').value.trim();
-  if (!name) { showToast('Name ist ein Pflichtfeld'); return; }
-  var payload = {
-    name:               name,
-    description:        document.getElementById('e-desc').value.trim()    || null,
-    category:           document.getElementById('e-category').value,
-    language:           document.getElementById('e-language').value,
-    whatsapp_number:    document.getElementById('e-wa').value.trim()       || null,
-    email:              document.getElementById('e-email').value.trim()    || null,
-    phone:              document.getElementById('e-phone').value.trim()    || null,
-    stripe_link:        document.getElementById('e-stripe').value.trim()   || null,
-    address:            document.getElementById('e-address').value.trim()  || null,
-    city:               document.getElementById('e-city').value.trim()     || null,
-    zip:                document.getElementById('e-zip').value.trim()      || null,
-    state:              document.getElementById('e-state').value.trim()    || null,
-    country:            document.getElementById('e-country').value,
-    currency:           document.getElementById('e-currency').value,
-    platform_fee_type:  document.getElementById('e-feetype').value,
-    platform_fee_value: parseFloat(document.getElementById('e-feevalue').value) || 0,
-    base_fee:           parseFloat(document.getElementById('e-basefee').value)  || 0,
-    status:             document.getElementById('e-status').value
-  };
-  var pw = document.getElementById('e-password').value.trim();
-  if (pw) payload.admin_password = pw;
-  sb.from('merchants').update(payload).eq('id', id).then(function(r) {
-    if (r.error) { showToast('Fehler: ' + r.error.message); return; }
-    showToast('Haendler gespeichert!');
-    closeEdit();
-    loadMerchants();
-    loadOverview();
-  });
-}
-
-// ── DELETE ─────────────────────────────────────────────
-var _deleteId = null;
-
-function openConfirm(id, name) {
-  _deleteId = id;
-  document.getElementById('confirmMsg').innerHTML =
-    'Haendler <strong>' + name + '</strong> wirklich loeschen?<br>' +
-    '<small style="color:var(--red)">Alle Agenten und Verkaeufe bleiben erhalten.</small>';
-  document.getElementById('confirmOverlay').classList.add('open');
-}
-
-function closeConfirm() {
-  _deleteId = null;
-  document.getElementById('confirmOverlay').classList.remove('open');
-}
-
-function confirmDeleteExec() {
-  if (!sb || !_deleteId) return;
-  sb.from('merchants').delete().eq('id', _deleteId).then(function(r) {
-    if (r.error) { showToast('Fehler: ' + r.error.message); closeConfirm(); return; }
-    showToast('Haendler geloescht');
-    closeConfirm();
-    loadMerchants();
-    loadOverview();
-  });
-}
-
-document.addEventListener('click', function(e) {
-  if (e.target.id === 'editOverlay') closeEdit();
-  if (e.target.id === 'confirmOverlay') closeConfirm();
-});
 </script>
 </body>
 </html>
