@@ -715,7 +715,10 @@ function showPreview(html) {
 }
 function openFullscreen() {
   if(!currentHtml){showToast('⚠️ Erst generieren',true);return;}
-  const w=window.open('','_blank'); w.document.write(currentHtml); w.document.close();
+  const blob = new Blob([currentHtml], {type:'text/html'});
+  const url  = URL.createObjectURL(blob);
+  window.open(url, '_blank');
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
 }
 function copyHtml() {
   if(!currentHtml){showToast('⚠️ Erst generieren',true);return;}
@@ -772,36 +775,17 @@ async function sendChat() {
   document.getElementById('chatMessages').scrollTop=99999;
   setStatus('AI aktualisiert...','loading');
   try {
-    const res=await fetch(API+'/api/pages/generate',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({merchant_id:merchantId,settings:getSettingsObj(),prompt:msg,extracted_text:currentHtml})});
+    // Send to dedicated chat-patch endpoint
+    const res=await fetch(API+'/api/pages/chat-patch',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({merchant_id:merchantId, prompt:msg, html:currentHtml})});
     const data=await res.json();
     if(!data.success) throw new Error(data.error);
 
-    // Chat returns JS patch - inject into iframe AND persist to currentHtml
-    const jsCode = data.html;
-    const frame = document.getElementById('previewFrame');
-    try {
-      // 1. Inject into live iframe
-      frame.contentWindow.eval(jsCode);
-
-      // 2. Persist into currentHtml so fullscreen + save include it
-      if (currentHtml.includes('</body>')) {
-        currentHtml = currentHtml.replace('</body>', `<script>(function(){${jsCode}})()</scr` + `ipt></body>`);
-      } else {
-        currentHtml += `<script>(function(){${jsCode}})()</scr` + `ipt>`;
-      }
-
-      loadingDiv.textContent = '✅ Änderung angewendet!';
-      setStatus('Aktualisiert ✅', 'green');
-      await autoSave();
-    } catch(evalErr) {
-      // Fallback: full HTML
-      if (jsCode.includes('<!DOCTYPE') || jsCode.includes('<html')) {
-        currentHtml = jsCode; showPreview(currentHtml); await autoSave();
-      }
-      loadingDiv.textContent = '✅ Angewendet!';
-      setStatus('Aktualisiert ✅', 'green');
-    }
+    currentHtml = data.html;
+    showPreview(currentHtml);
+    loadingDiv.textContent = '✅ Änderung angewendet!';
+    setStatus('Gespeichert ✅', 'green');
+    document.getElementById('lastSaved').textContent = 'Gespeichert ' + new Date().toLocaleTimeString('de-AT',{hour:'2-digit',minute:'2-digit'});
   } catch(e) {
     loadingDiv.textContent='❌ Fehler: '+e.message;
     setStatus('Fehler','error');
