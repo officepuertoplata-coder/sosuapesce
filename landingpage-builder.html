@@ -295,23 +295,24 @@ nav{background:rgba(10,31,18,0.95);backdrop-filter:blur(12px);border-bottom:1px 
     </div>
 
     <!-- CHAT TAB -->
-    <div class="panel-body" id="tab-chat" style="display:none;padding-bottom:80px;">
+    <div class="panel-body" id="tab-chat" style="display:none;">
       <p style="font-size:.78rem;color:var(--muted);margin-bottom:10px;line-height:1.5;">Beschreibe Änderungen – die AI passt gezielt an.</p>
-      <div class="chat-messages" id="chatMessages" style="max-height:220px;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px;background:var(--card2);border-radius:10px;margin-bottom:10px;border:1px solid rgba(37,211,102,0.08);">
+      <div class="chat-messages" id="chatMessages" style="height:320px;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px;background:var(--card2);border-radius:10px;border:1px solid rgba(37,211,102,0.08);">
         <div class="chat-msg system">💬 AI Assistent bereit</div>
         <div class="chat-msg ai">Sag mir was du ändern möchtest – z.B. "Mach den Hero Text kürzer", "Ändere Buttons auf Blau" oder "Füge eine FAQ hinzu".</div>
-      </div>
-      <div style="display:flex;gap:8px;position:sticky;bottom:0;background:var(--card);padding:10px 0 4px;">
-        <input class="chat-input" id="chatInput" placeholder="z.B. Ändere die Primärfarbe auf #1324aa..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}">
-        <button class="chat-send" id="chatSendBtn" onclick="sendChat()">➤</button>
       </div>
     </div>
 
     <!-- ACTION BAR -->
-    <div class="action-bar">
+    <div class="action-bar" id="actionBar">
       <button class="btn btn-primary" style="flex:1" id="generateBtn" onclick="generatePage()">✨ Generieren</button>
       <button class="btn btn-ghost btn-sm" onclick="savePage()" id="saveBtn">💾</button>
       <button class="btn btn-ghost btn-sm" onclick="togglePublish()" id="publishBtn">🌐 Live</button>
+    </div>
+    <!-- CHAT ACTION BAR (shown when chat tab active) -->
+    <div id="chatActionBar" style="display:none;padding:10px 14px;border-top:1px solid var(--border);background:var(--card);gap:8px;align-items:center;">
+      <input class="chat-input" id="chatInput" style="flex:1;padding:10px 14px;background:var(--card2);border:1.5px solid rgba(37,211,102,0.2);border-radius:10px;color:var(--txt);font-size:.88rem;font-family:Nunito,sans-serif;outline:none;" placeholder="z.B. Ändere die Buttons auf Blau...">
+      <button class="chat-send" id="chatSendBtn" onclick="sendChat()" style="padding:10px 16px;background:var(--wa);color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:16px;flex-shrink:0;">➤</button>
     </div>
   </div>
 
@@ -419,6 +420,14 @@ function switchTab(tab) {
   document.querySelectorAll('.tab').forEach((el,i) => {
     el.classList.toggle('active', ['settings','sections','images','docs','chat'][i]===tab);
   });
+  // Show/hide correct action bars
+  const isChat = tab === 'chat';
+  document.getElementById('actionBar').style.display      = isChat ? 'none' : 'flex';
+  const chatBar = document.getElementById('chatActionBar');
+  chatBar.style.display = isChat ? 'flex' : 'none';
+  if (isChat) {
+    setTimeout(() => document.getElementById('chatInput').focus(), 100);
+  }
 }
 
 // ── LOCALSTORAGE ──────────────────────────────────────────
@@ -778,6 +787,14 @@ async function sendChat() {
     document.getElementById('chatMessages').scrollTop=99999;
   }
 }
+// Enter key for chat
+document.addEventListener('DOMContentLoaded', function() {
+  const ci = document.getElementById('chatInput');
+  if (ci) ci.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+  });
+});
+
 function addChatMsg(type,text) {
   const msgs=document.getElementById('chatMessages');
   const div=document.createElement('div'); div.className='chat-msg '+type; div.textContent=text;
