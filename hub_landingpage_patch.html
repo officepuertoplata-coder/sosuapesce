@@ -1,0 +1,77 @@
+<!-- 
+  HUB.HTML UPDATE ANLEITUNG
+  =========================
+  Füge diesen Bereich in deine hub.html ein, wo die Händler-Tools aufgelistet sind.
+  Ersetze den bestehenden Landingpage-Link (falls vorhanden) durch diesen Block.
+-->
+
+<!-- LANDINGPAGE BEREICH -->
+<div class="tool-card" id="lpCard">
+  <div class="tool-icon">🌐</div>
+  <div class="tool-info">
+    <div class="tool-name">Landingpage</div>
+    <div class="tool-desc" id="lpStatus">Wird geladen...</div>
+  </div>
+  <div class="tool-actions" style="display:flex;flex-direction:column;gap:6px;">
+    <a id="lpEditBtn" href="landingpage-builder.html" class="btn btn-primary btn-sm">✏️ Bearbeiten</a>
+    <a id="lpViewBtn" href="#" target="_blank" class="btn btn-ghost btn-sm" style="display:none;">🌐 Ansehen</a>
+    <button id="lpDeleteBtn" class="btn btn-danger btn-sm" style="display:none;" onclick="deleteLandingpage()">🗑️ Löschen</button>
+  </div>
+</div>
+
+<script>
+// Landingpage Status im Hub laden
+(async function() {
+  const API = 'https://converto-server-production.up.railway.app';
+  const merchantId = sessionStorage.getItem('merchantId');
+  const merchantSlug = sessionStorage.getItem('merchantSlug');
+
+  if (!merchantId) return;
+
+  // Edit/View Links mit Merchant Params
+  document.getElementById('lpEditBtn').href = `landingpage-builder.html?m=${merchantSlug}&mid=${merchantId}`;
+
+  try {
+    const r = await fetch(API + '/api/pages/' + merchantId);
+    if (r.ok) {
+      const p = await r.json();
+      if (p && p.html_content) {
+        const size = Math.round(p.html_content.length / 1024);
+        const date = new Date(p.updated_at).toLocaleDateString('de-AT');
+        const status = p.published ? '🟢 Live' : '🟡 Draft';
+
+        document.getElementById('lpStatus').innerHTML = 
+          `${status} · ${size} KB · Zuletzt: ${date}`;
+
+        // Show view + delete buttons
+        document.getElementById('lpViewBtn').style.display = 'block';
+        document.getElementById('lpViewBtn').href = `https://converdino.com/${merchantSlug}`;
+        document.getElementById('lpDeleteBtn').style.display = 'block';
+      } else {
+        document.getElementById('lpStatus').textContent = 'Noch keine Seite erstellt';
+      }
+    }
+  } catch(e) {
+    document.getElementById('lpStatus').textContent = 'Noch keine Seite erstellt';
+  }
+})();
+
+async function deleteLandingpage() {
+  if (!confirm('Landingpage wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.')) return;
+  
+  const API = 'https://converto-server-production.up.railway.app';
+  const merchantId = sessionStorage.getItem('merchantId');
+  
+  try {
+    const r = await fetch(API + '/api/pages/' + merchantId, { method: 'DELETE' });
+    if (r.ok) {
+      document.getElementById('lpStatus').textContent = 'Noch keine Seite erstellt';
+      document.getElementById('lpViewBtn').style.display = 'none';
+      document.getElementById('lpDeleteBtn').style.display = 'none';
+      alert('✅ Landingpage gelöscht');
+    }
+  } catch(e) {
+    alert('⚠️ Fehler beim Löschen');
+  }
+}
+</script>
