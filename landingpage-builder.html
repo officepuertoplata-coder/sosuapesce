@@ -778,12 +778,19 @@ async function sendChat() {
     // Send to dedicated chat-patch endpoint
     const res=await fetch(API+'/api/pages/chat-patch',{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({merchant_id:merchantId, prompt:msg, html:currentHtml})});
+
+    // Check if response is JSON (not HTML error page)
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      throw new Error('Server noch nicht aktualisiert – bitte warte 1 Minute und versuche es erneut');
+    }
+
     const data=await res.json();
     if(!data.success) throw new Error(data.error);
 
     currentHtml = data.html;
     showPreview(currentHtml);
-    loadingDiv.textContent = '✅ Änderung angewendet!';
+    loadingDiv.textContent = '✅ Änderung gespeichert!';
     setStatus('Gespeichert ✅', 'green');
     document.getElementById('lastSaved').textContent = 'Gespeichert ' + new Date().toLocaleTimeString('de-AT',{hour:'2-digit',minute:'2-digit'});
   } catch(e) {
