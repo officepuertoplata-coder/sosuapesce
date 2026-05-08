@@ -23,15 +23,7 @@ body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--txt);min
 .tbtn{background:none;border:none;color:rgba(255,255,255,.75);cursor:pointer;padding:6px 13px;border-radius:6px;font-size:.85rem;font-weight:500;transition:all .15s}
 .tbtn:hover,.tbtn.active{background:rgba(255,255,255,.15);color:#fff}
 .tbtn-out{color:var(--gold)!important;margin-left:auto}
-#loginWrap{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--g2)}
-.login-card{background:#fff;border-radius:14px;padding:40px 36px;width:340px;box-shadow:0 8px 32px rgba(0,0,0,.3);text-align:center}
-.login-card h2{color:var(--g2);margin-bottom:4px;font-size:1.3rem}
-.login-card p{color:var(--mu);font-size:.83rem;margin-bottom:22px}
-.login-card input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:1rem;outline:none;margin-bottom:10px;transition:border-color .2s}
-.login-card input:focus{border-color:var(--g3)}
-.login-card button{width:100%;background:var(--g2);color:#fff;border:none;padding:11px;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer}
-.login-card button:hover{background:var(--g)}
-.lerr{color:var(--red);font-size:.82rem;min-height:18px;margin-top:2px}
+#loginWrap{display:none}
 #app{display:none}
 #app.show{display:block}
 .main{max-width:1100px;margin:0 auto;padding:24px 20px}
@@ -64,7 +56,6 @@ tr:hover td{background:#f9fafb}
 .btn-blue{background:#3b82f6;color:#fff}.btn-blue:hover{background:#2563eb}
 .btn-copy{background:var(--g2);color:#fff;padding:10px 18px;font-size:.9rem;border-radius:8px;border:none;cursor:pointer;font-weight:700;transition:background .2s}
 .btn-copy:hover{background:var(--g)}
-/* PAYMENT LINK GENERATOR */
 .generator{background:var(--card);border-radius:var(--r);box-shadow:0 2px 12px rgba(0,0,0,.1);overflow:hidden;margin-bottom:24px}
 .generator-hd{background:linear-gradient(135deg,var(--g2),var(--g));color:#fff;padding:20px 24px}
 .generator-hd h2{font-size:1.15rem;font-weight:700;margin-bottom:4px}
@@ -78,11 +69,9 @@ tr:hover td{background:#f9fafb}
 .link-result label{font-size:.72rem;font-weight:700;color:var(--g);text-transform:uppercase;margin-bottom:6px;display:block}
 .link-text{font-family:monospace;font-size:.78rem;color:var(--g2);word-break:break-all;line-height:1.5;margin-bottom:10px}
 .link-actions{display:flex;gap:8px;flex-wrap:wrap}
-/* FORM */
 .form-panel{padding:22px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .form-panel .full{grid-column:1/-1}
 .form-actions{grid-column:1/-1;display:flex;justify-content:flex-end;gap:10px;padding-top:12px;border-top:1px solid var(--border)}
-.err-box{background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:12px 16px;color:var(--red);font-size:.83rem;margin:0 22px 16px}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--g2);color:#fff;padding:10px 22px;border-radius:40px;font-size:.88rem;box-shadow:0 4px 16px rgba(0,0,0,.25);transition:transform .25s;z-index:999;pointer-events:none}
 .toast.show{transform:translateX(-50%) translateY(0)}
 .mb-16{margin-bottom:16px}
@@ -91,16 +80,7 @@ tr:hover td{background:#f9fafb}
 </head>
 <body>
 
-<div id="loginWrap">
-  <div class="login-card">
-    <div style="font-size:2rem;margin-bottom:8px">🏪</div>
-    <h2 id="loginTitle">Händler-Admin</h2>
-    <p id="loginSlug">Wird geladen...</p>
-    <input type="password" id="pwInput" placeholder="Admin-Passwort">
-    <div class="lerr" id="lerr"></div>
-    <button onclick="doLogin()">Einloggen</button>
-  </div>
-</div>
+<div id="loginWrap"></div>
 
 <div id="app">
   <nav class="nav">
@@ -110,12 +90,11 @@ tr:hover td{background:#f9fafb}
     <button class="tbtn" onclick="showPage('sales',this)">💰 Verkäufe</button>
     <button class="tbtn" onclick="showPage('agents',this)">🤝 Agenten</button>
     <button class="tbtn" onclick="showPage('billing',this)">💳 Abrechnung</button>
+    <a href="hub.html" class="tbtn">← Hub</a>
     <button class="tbtn tbtn-out" onclick="doLogout()">Ausloggen</button>
   </nav>
 
   <div class="main">
-
-    <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
       <h1 style="font-size:1.35rem;font-weight:800;margin-bottom:20px">📊 Dashboard</h1>
       <div class="stats-grid">
@@ -124,80 +103,44 @@ tr:hover td{background:#f9fafb}
         <div class="stat-card gold"><div class="stat-val" id="d-revenue">—</div><div class="stat-lbl">Umsatz gesamt</div></div>
         <div class="stat-card blue"><div class="stat-val" id="d-agents">—</div><div class="stat-lbl">Aktive Agenten</div></div>
       </div>
-      <!-- Letzte Verkäufe -->
       <div class="mb-16">
         <div class="sec-hd"><h2>🕐 Letzte Verkäufe</h2></div>
-        <div class="sec-body">
-          <table><thead><tr><th>DATUM</th><th>KUNDE (TEL)</th><th>AGENT</th><th>BETRAG</th><th>PROVISION</th><th>QUELLE</th></tr></thead>
-          <tbody id="d-recent"><tr><td colspan="6" class="msg">Lade...</td></tr></tbody></table>
-        </div>
+        <div class="sec-body"><table><thead><tr><th>DATUM</th><th>KUNDE</th><th>AGENT</th><th>BETRAG</th><th>PROVISION</th><th>QUELLE</th></tr></thead>
+        <tbody id="d-recent"><tr><td colspan="6" class="msg">Lade...</td></tr></tbody></table></div>
       </div>
-      <!-- Ausstehende Provision -->
       <div>
         <div class="sec-hd"><h2>⏳ Ausstehende Agentenprovisionen</h2></div>
-        <div class="sec-body">
-          <table><thead><tr><th>AGENT</th><th>CODE</th><th>VERKÄUFE</th><th>PROVISION GESAMT</th><th>DAVON AUSSTEHEND</th></tr></thead>
-          <tbody id="d-pending"><tr><td colspan="5" class="msg">Lade...</td></tr></tbody></table>
-        </div>
+        <div class="sec-body"><table><thead><tr><th>AGENT</th><th>CODE</th><th>VERKÄUFE</th><th>PROVISION GESAMT</th><th>AUSSTEHEND</th></tr></thead>
+        <tbody id="d-pending"><tr><td colspan="5" class="msg">Lade...</td></tr></tbody></table></div>
       </div>
     </div>
 
-    <!-- ZAHLUNGSLINK GENERATOR -->
     <div class="page" id="page-paylink">
       <h1 style="font-size:1.35rem;font-weight:800;margin-bottom:20px">🔗 Zahlungslink generieren</h1>
-
       <div class="generator">
-        <div class="generator-hd">
-          <h2>⚡ Neuen Zahlungslink erstellen</h2>
-          <p>Wähle Produkt, Agent und gib die Telefonnummer des Kunden ein – fertig!</p>
-        </div>
+        <div class="generator-hd"><h2>⚡ Neuen Zahlungslink erstellen</h2><p>Wähle Produkt, Agent und Telefonnummer – fertig!</p></div>
         <div class="generator-body">
-          <div class="fgrp">
-            <label>📱 Telefonnummer des Kunden *</label>
-            <input id="pl-phone" placeholder="+1809..." oninput="generateLink()">
-          </div>
-          <div class="fgrp">
-            <label>🤝 Agent *</label>
-            <select id="pl-agent" onchange="generateLink()">
-              <option value="">— Agent auswählen —</option>
-            </select>
-          </div>
-          <div class="fgrp full">
-            <label>📦 Produkt *</label>
-            <select id="pl-product" onchange="onProductChange()">
-              <option value="">— Produkt auswählen —</option>
-            </select>
-          </div>
-          <div class="fgrp">
-            <label>💰 Preis (wird automatisch gesetzt)</label>
-            <input id="pl-price" type="number" placeholder="Preis" oninput="generateLink()" step="0.01" min="0">
-          </div>
-          <div class="fgrp" style="display:flex;align-items:flex-end">
-            <div style="background:#f0fdf4;border:1px solid var(--g3);border-radius:8px;padding:10px 14px;font-size:.82rem;color:var(--g2);width:100%">
-              💡 Preis kann manuell übersteuert werden
-            </div>
-          </div>
+          <div class="fgrp"><label>📱 Telefonnummer *</label><input id="pl-phone" placeholder="+1809..." oninput="generateLink()"></div>
+          <div class="fgrp"><label>🤝 Agent *</label><select id="pl-agent" onchange="generateLink()"><option value="">— Agent —</option></select></div>
+          <div class="fgrp full"><label>📦 Produkt *</label><select id="pl-product" onchange="onProductChange()"><option value="">— Produkt —</option></select></div>
+          <div class="fgrp"><label>💰 Preis</label><input id="pl-price" type="number" placeholder="Preis" oninput="generateLink()" step="0.01" min="0"></div>
+          <div class="fgrp" style="display:flex;align-items:flex-end"><div style="background:#f0fdf4;border:1px solid var(--g3);border-radius:8px;padding:10px 14px;font-size:.82rem;color:var(--g2);width:100%">💡 Preis kann manuell übersteuert werden</div></div>
           <div class="full" id="linkResultWrap" style="display:none">
             <div class="link-result">
-              <label>✅ Dein Zahlungslink – direkt per WhatsApp senden:</label>
+              <label>✅ Zahlungslink:</label>
               <div style="font-size:.82rem;color:var(--g);font-weight:700;margin-bottom:4px" id="pl-priceinfo"></div>
               <div class="link-text" id="linkText">—</div>
               <div class="link-actions">
                 <button class="btn-copy" onclick="copyLink()">📋 Kopieren</button>
-                <a id="waLink" href="#" target="_blank" class="btn btn-green" style="text-decoration:none;padding:10px 16px">📱 Per WhatsApp senden</a>
-                <button class="btn btn-outline" onclick="clearLink()">✕ Zurücksetzen</button>
+                <a id="waLink" href="#" target="_blank" class="btn btn-green" style="text-decoration:none;padding:10px 16px">📱 WhatsApp</a>
+                <button class="btn btn-outline" onclick="clearLink()">✕ Reset</button>
               </div>
             </div>
           </div>
-          <div class="full" style="font-size:.78rem;color:var(--mu);padding-top:4px">
-            💡 Der Zahlungslink enthält automatisch den Agent-Code und die Telefonnummer. Nach der Zahlung wird der Verkauf automatisch eingetragen.
-          </div>
         </div>
       </div>
-
-      <!-- Produkte verwalten -->
       <div>
-        <div class="sec-hd"><h2>📦 Meine Produkte</h2><button class="btn btn-outline" style="color:#fff;background:rgba(255,255,255,.15)" onclick="showAddProduct()">+ Neues Produkt</button></div>
+        <div class="sec-hd"><h2>📦 Produkte</h2><button class="btn btn-outline" style="color:#fff;background:rgba(255,255,255,.15)" onclick="showAddProduct()">+ Neu</button></div>
         <div class="sec-body">
           <div id="productsList" style="padding:8px"><div class="msg">Lade...</div></div>
           <div id="addProductForm" style="display:none;padding:24px;border-top:2px solid var(--g2)">
@@ -207,21 +150,19 @@ tr:hover td{background:#f9fafb}
               <div class="fgrp full"><label>Produkttitel *</label><input id="p-name" placeholder="z.B. Frischer Dorado 1kg"></div>
               <div class="fgrp"><label>Preis *</label><input id="p-price" type="number" placeholder="500" min="0" step="0.01"></div>
               <div class="fgrp"><label>Status</label><select id="p-available"><option value="true">✅ Verfügbar</option><option value="false">❌ Nicht verfügbar</option></select></div>
-              <div class="fgrp full"><label>Kurzbeschreibung</label><input id="p-short" placeholder="z.B. Frisch gefangen, direkt geliefert"></div>
-              <div class="fgrp full"><label>Langbeschreibung</label><textarea id="p-long" placeholder="Ausführliche Beschreibung, Herkunft, Besonderheiten..." style="min-height:80px;width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:.9rem;outline:none;font-family:inherit;resize:vertical"></textarea></div>
+              <div class="fgrp full"><label>Kurzbeschreibung</label><input id="p-short" placeholder="z.B. Frisch gefangen"></div>
+              <div class="fgrp full"><label>Langbeschreibung</label><textarea id="p-long" style="min-height:80px;width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:.9rem;outline:none;font-family:inherit;resize:vertical"></textarea></div>
               <div class="fgrp full"><label>Stripe Payment Link</label><input id="p-stripe" placeholder="https://buy.stripe.com/..."></div>
               <div class="fgrp full">
                 <label>Produktbild</label>
                 <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
                   <input type="file" id="p-img-file" accept="image/*" onchange="previewImage(this)" style="font-size:.82rem">
-                  <div id="p-img-preview" style="display:none">
-                    <img id="p-img-thumb" src="" style="width:72px;height:72px;object-fit:cover;border-radius:8px;border:2px solid var(--g3)">
-                  </div>
+                  <div id="p-img-preview" style="display:none"><img id="p-img-thumb" src="" style="width:72px;height:72px;object-fit:cover;border-radius:8px;border:2px solid var(--g3)"></div>
                 </div>
                 <div style="font-size:.72rem;color:var(--mu);margin-top:4px">JPG, PNG, WebP – max 5MB</div>
                 <input type="hidden" id="p-img-url">
               </div>
-              <div class="fgrp"><label>Reihenfolge (1 = zuerst)</label><input id="p-sort" type="number" value="1" min="1"></div>
+              <div class="fgrp"><label>Reihenfolge</label><input id="p-sort" type="number" value="1" min="1"></div>
             </div>
             <div style="display:flex;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
               <button class="btn btn-green" onclick="saveProduct()">💾 Speichern</button>
@@ -233,46 +174,35 @@ tr:hover td{background:#f9fafb}
       </div>
     </div>
 
-    <!-- VERKÄUFE -->
     <div class="page" id="page-sales">
       <h1 style="font-size:1.35rem;font-weight:800;margin-bottom:20px">💰 Alle Verkäufe</h1>
-      <!-- Manuell eintragen -->
       <div class="mb-16">
         <div class="sec-hd"><h2>➕ Verkauf manuell eintragen</h2></div>
         <div class="sec-body">
           <div class="form-panel">
-            <div class="fgrp"><label>Telefonnummer Kunde</label><input id="s-phone" placeholder="+1809..."></div>
+            <div class="fgrp"><label>Telefonnummer</label><input id="s-phone" placeholder="+1809..."></div>
             <div class="fgrp"><label>Agent</label><select id="s-agent"><option value="">— kein Agent —</option></select></div>
             <div class="fgrp"><label>Produkt</label><select id="s-product"><option value="">— Produkt wählen —</option></select></div>
-            <div class="fgrp"><label>Betrag (RD$)</label><input id="s-amount" type="number" placeholder="500"></div>
-            <div class="fgrp full"><label>Notiz (optional)</label><input id="s-note" placeholder="z.B. Bar bezahlt, WhatsApp #..."></div>
-            <div class="form-actions">
-              <button class="btn btn-green" onclick="saveSale()">✓ Verkauf eintragen</button>
-            </div>
+            <div class="fgrp"><label>Betrag</label><input id="s-amount" type="number" placeholder="500"></div>
+            <div class="fgrp full"><label>Notiz</label><input id="s-note" placeholder="z.B. Bar bezahlt..."></div>
+            <div class="form-actions"><button class="btn btn-green" onclick="saveSale()">✓ Eintragen</button></div>
           </div>
         </div>
       </div>
-      <!-- Liste -->
       <div>
         <div class="sec-hd">
           <h2>📋 Verkaufshistorie</h2>
           <div style="display:flex;gap:8px;align-items:center">
             <select id="salesFilter" onchange="loadSales()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:5px 10px;border-radius:6px;font-size:.82rem">
-              <option value="all">Alle</option>
-              <option value="today">Heute</option>
-              <option value="month">Diesen Monat</option>
+              <option value="all">Alle</option><option value="today">Heute</option><option value="month">Diesen Monat</option>
             </select>
-            <button class="btn btn-outline" style="color:#fff;background:rgba(255,255,255,.15)" onclick="loadSales()">Aktualisieren</button>
           </div>
         </div>
-        <div class="sec-body">
-          <table><thead><tr><th>DATUM</th><th>KUNDE (TEL)</th><th>AGENT</th><th>PRODUKT</th><th>BETRAG</th><th>PROVISION</th><th>QUELLE</th></tr></thead>
-          <tbody id="salesList"><tr><td colspan="7" class="msg">Lade...</td></tr></tbody></table>
-        </div>
+        <div class="sec-body"><table><thead><tr><th>DATUM</th><th>KUNDE</th><th>AGENT</th><th>PRODUKT</th><th>BETRAG</th><th>PROVISION</th><th>QUELLE</th></tr></thead>
+        <tbody id="salesList"><tr><td colspan="7" class="msg">Lade...</td></tr></tbody></table></div>
       </div>
     </div>
 
-    <!-- AGENTEN -->
     <div class="page" id="page-agents">
       <h1 style="font-size:1.35rem;font-weight:800;margin-bottom:20px">🤝 Meine Agenten</h1>
       <div class="mb-16" style="background:var(--card);border-radius:var(--r);padding:18px 20px;border-left:4px solid var(--g3);box-shadow:0 1px 4px rgba(0,0,0,.07)">
@@ -282,27 +212,21 @@ tr:hover td{background:#f9fafb}
       </div>
       <div>
         <div class="sec-hd"><h2>Agenten-Liste</h2><button class="btn btn-outline" style="color:#fff;background:rgba(255,255,255,.15)" onclick="loadAgents()">Aktualisieren</button></div>
-        <div class="sec-body">
-          <table><thead><tr><th>NAME</th><th>CODE</th><th>TELEFON</th><th>VERKÄUFE</th><th>PROVISION</th><th>STATUS</th><th>SEIT</th><th>AKTIONEN</th></tr></thead>
-          <tbody id="agentsList"><tr><td colspan="7" class="msg">Lade...</td></tr></tbody></table>
-        </div>
+        <div class="sec-body"><table><thead><tr><th>NAME</th><th>CODE</th><th>TELEFON</th><th>VERKÄUFE</th><th>PROVISION</th><th>STATUS</th><th>SEIT</th><th>AKTIONEN</th></tr></thead>
+        <tbody id="agentsList"><tr><td colspan="8" class="msg">Lade...</td></tr></tbody></table></div>
       </div>
     </div>
 
-    <!-- ABRECHNUNG -->
     <div class="page" id="page-billing">
       <h1 style="font-size:1.35rem;font-weight:800;margin-bottom:20px">💳 Abrechnung</h1>
       <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
-        <button class="btn btn-green" onclick="loadBilling('month')" id="btn-month">📅 Aktueller Monat</button>
-        <button class="btn btn-outline" onclick="loadBilling('prev')" id="btn-prev">📅 Vormonat</button>
-        <button class="btn btn-outline" onclick="loadBilling('1-15')" id="btn-115">1.–15.</button>
-        <button class="btn btn-outline" onclick="loadBilling('16-end')" id="btn-16">16.–Ende</button>
+        <button class="btn btn-green" onclick="loadBilling('month')">📅 Aktueller Monat</button>
+        <button class="btn btn-outline" onclick="loadBilling('prev')">📅 Vormonat</button>
+        <button class="btn btn-outline" onclick="loadBilling('1-15')">1.–15.</button>
+        <button class="btn btn-outline" onclick="loadBilling('16-end')">16.–Ende</button>
       </div>
-      <div id="billingContent">
-        <div class="msg">Abrechnungszeitraum wählen</div>
-      </div>
+      <div id="billingContent"><div class="msg">Abrechnungszeitraum wählen</div></div>
     </div>
-
   </div>
 </div>
 
@@ -315,53 +239,46 @@ var slug = '';
 var products = [];
 var agents = [];
 
-window.addEventListener('load', function() {
-  // Slug aus URL-Parameter ?m=slug ermitteln
-  var params = new URLSearchParams(window.location.search);
-  slug = params.get('m') || 'sosuapesce';
-  document.getElementById('loginSlug').textContent = '/' + slug + '/';
+// ── AUTH + INIT ────────────────────────────────────────────
+window.addEventListener('load', async function() {
+  var stored = null;
+  try { stored = JSON.parse(localStorage.getItem('converto_auth_v2') || 'null'); } catch(e) {}
+
+  if (!stored || !stored.role) {
+    window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+    return;
+  }
+  if (stored.loggedInAt) {
+    var age = Date.now() - new Date(stored.loggedInAt).getTime();
+    if (age > 43200000) { localStorage.removeItem('converto_auth_v2'); window.location.href = 'login.html'; return; }
+  }
+
+  slug = stored.slug || new URLSearchParams(location.search).get('m') || 'ynhald';
   document.getElementById('navSlug').textContent = slug;
 
   try {
     var cfg = window.SP_CONFIG;
-    if (!cfg) return;
-    var key = cfg.SUPABASE_ANON_KEY || cfg.SUPABASE_KEY;
-    if (!key || key.indexOf('XXXX') !== -1) return;
-    sb = window.supabase.createClient(cfg.SUPABASE_URL, key);
-    // Händlername laden
-    sb.from('merchants').select('name').eq('slug', slug).single().then(function(r) {
-      if (r.data) {
-        document.getElementById('loginTitle').textContent = r.data.name;
-        document.getElementById('navName').textContent = r.data.name;
-      }
-    });
+    if (cfg) {
+      var key = cfg.SUPABASE_ANON_KEY || cfg.SUPABASE_KEY;
+      if (key && key.indexOf('XXXX') === -1) sb = window.supabase.createClient(cfg.SUPABASE_URL, key);
+    }
   } catch(e) { console.error(e); }
 
-  document.getElementById('pwInput').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') doLogin();
-  });
+  if (sb) {
+    var r = await sb.from('merchants').select('*').eq('slug', slug).single();
+    if (r.data) {
+      merchant = r.data;
+      document.getElementById('navName').textContent = merchant.name;
+      var siteBase = (window.SP_CONFIG && window.SP_CONFIG.SITE_URL) || window.location.origin;
+      document.getElementById('agentRegLink').textContent = siteBase + '/agentes.html?m=' + slug;
+    }
+  }
+
+  document.getElementById('app').classList.add('show');
+  loadAll();
 });
 
-function doLogin() {
-  var pw = document.getElementById('pwInput').value;
-  if (!pw) { document.getElementById('lerr').textContent = 'Bitte Passwort eingeben'; return; }
-  if (!sb) { document.getElementById('lerr').textContent = 'Verbindungsfehler'; return; }
-
-  sb.from('merchants').select('*').eq('slug', slug).single().then(function(r) {
-    if (r.error || !r.data) { document.getElementById('lerr').textContent = 'Händler nicht gefunden'; return; }
-    if (r.data.admin_password !== pw) { document.getElementById('lerr').textContent = 'Falsches Passwort'; return; }
-    merchant = r.data;
-    document.getElementById('loginWrap').style.display = 'none';
-    document.getElementById('app').classList.add('show');
-    document.getElementById('navName').textContent = merchant.name;
-    // Agenten-Link setzen
-    var siteBase = (window.SP_CONFIG && window.SP_CONFIG.SITE_URL) || window.location.origin + '/sosuapesce';
-    document.getElementById('agentRegLink').textContent = siteBase + '/agentes.html?m=' + slug;
-    loadAll();
-  });
-}
-
-function doLogout() { location.reload(); }
+function doLogout() { localStorage.removeItem('converto_auth_v2'); window.location.href = 'login.html'; }
 
 function showPage(id, btn) {
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
@@ -369,16 +286,15 @@ function showPage(id, btn) {
   document.getElementById('page-'+id).classList.add('active');
   if (btn) btn.classList.add('active');
   if (id === 'dashboard') loadDashboard();
-  if (id === 'paylink')   { loadProducts(); loadAgentsDropdown(); }
-  if (id === 'sales')     { loadSales(); loadAgentsDropdown(); loadProductsDropdown(); }
-  if (id === 'agents')    loadAgents();
-  if (id === 'billing')   loadBilling('month');
+  if (id === 'paylink') { loadProducts(); loadAgentsDropdown(); }
+  if (id === 'sales') { loadSales(); loadAgentsDropdown(); loadProductsDropdown(); }
+  if (id === 'agents') loadAgents();
+  if (id === 'billing') loadBilling('month');
 }
 
 function showToast(msg) {
   var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
+  t.textContent = msg; t.classList.add('show');
   setTimeout(function(){t.classList.remove('show');}, 3000);
 }
 
@@ -390,148 +306,74 @@ function statusBadge(s) {
   return '<span class="badge '+(m[s]||'b-pending')+'">'+(l[s]||s)+'</span>';
 }
 
-function loadAll() {
-  loadDashboard();
-  loadAgentsDropdown();
-  loadProductsDropdown();
-}
+function loadAll() { loadDashboard(); loadAgentsDropdown(); loadProductsDropdown(); }
 
-// ── DASHBOARD ──────────────────────────────────────────────
 function loadDashboard() {
   if (!sb || !merchant) return;
   var today = new Date(); today.setHours(0,0,0,0);
   var monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-
   sb.from('sales').select('*, agents(name,referral_code)').eq('merchant_id', merchant.id)
     .order('created_at', {ascending:false}).then(function(r) {
     var sales = r.data || [];
-    var todaySales = sales.filter(function(s){ return new Date(s.created_at) >= today; });
-    var monthSales = sales.filter(function(s){ return new Date(s.created_at) >= monthStart; });
-    var totalRev = sales.reduce(function(t,s){ return t+(parseFloat(s.total_amount)||0); }, 0);
-
-    document.getElementById('d-sales-today').textContent = todaySales.length;
-    document.getElementById('d-sales-month').textContent = monthSales.length;
-    document.getElementById('d-revenue').textContent = fmtNum(totalRev) + ' ' + (merchant.currency||'RD$');
-
+    document.getElementById('d-sales-today').textContent = sales.filter(function(s){ return new Date(s.created_at) >= today; }).length;
+    document.getElementById('d-sales-month').textContent = sales.filter(function(s){ return new Date(s.created_at) >= monthStart; }).length;
+    document.getElementById('d-revenue').textContent = fmtNum(sales.reduce(function(t,s){ return t+(parseFloat(s.total_amount)||0); }, 0)) + ' ' + (merchant.currency||'RD$');
     document.getElementById('d-recent').innerHTML = sales.slice(0,8).length
       ? sales.slice(0,8).map(function(s){
-          var agName = (s.agents && s.agents.name) || '—';
-          return '<tr><td>'+fmtDate(s.created_at)+'</td><td><span class="codetag">'+(s.customer_phone||'—')+'</span></td><td>'+agName+'</td><td>'+fmtNum(s.total_amount)+' '+(merchant.currency||'RD$')+'</td><td style="color:var(--g3);font-weight:600">'+fmtNum(s.agent_commission)+' '+(merchant.currency||'RD$')+'</td><td><span class="badge '+(s.source==='stripe'?'b-active':'b-pending')+'">'+(s.source==='stripe'?'Stripe':'Manuell')+'</span></td></tr>';
+          return '<tr><td>'+fmtDate(s.created_at)+'</td><td><span class="codetag">'+(s.customer_phone||'—')+'</span></td><td>'+((s.agents&&s.agents.name)||'—')+'</td><td>'+fmtNum(s.total_amount)+' '+(merchant.currency||'RD$')+'</td><td style="color:var(--g3);font-weight:600">'+fmtNum(s.agent_commission)+' '+(merchant.currency||'RD$')+'</td><td><span class="badge '+(s.source==='stripe'?'b-active':'b-pending')+'">'+(s.source==='stripe'?'Stripe':'Manuell')+'</span></td></tr>';
         }).join('')
       : '<tr><td colspan="6" class="msg">Noch keine Verkäufe.</td></tr>';
   });
-
-  // Agenten-Provisionen
   sb.from('agents').select('*').eq('merchant_id', merchant.id).then(function(r){
     var ags = r.data || [];
     document.getElementById('d-agents').textContent = ags.filter(function(a){return a.status==='active';}).length;
     document.getElementById('d-pending').innerHTML = ags.length
-      ? ags.map(function(a){
-          return '<tr><td><strong>'+(a.name||'—')+'</strong></td><td><span class="codetag">'+(a.referral_code||'—')+'</span></td><td>'+(a.total_sales||0)+'</td><td>'+fmtNum(a.total_commission)+' '+(merchant.currency||'RD$')+'</td><td style="color:var(--gold);font-weight:700">'+fmtNum(a.pending_commission||a.total_commission)+' '+(merchant.currency||'RD$')+'</td></tr>';
-        }).join('')
+      ? ags.map(function(a){ return '<tr><td><strong>'+(a.name||'—')+'</strong></td><td><span class="codetag">'+(a.referral_code||'—')+'</span></td><td>'+(a.total_sales||0)+'</td><td>'+fmtNum(a.total_commission)+' '+(merchant.currency||'RD$')+'</td><td style="color:var(--gold);font-weight:700">'+fmtNum(a.pending_commission||a.total_commission)+' '+(merchant.currency||'RD$')+'</td></tr>'; }).join('')
       : '<tr><td colspan="5" class="msg">Keine Agenten registriert.</td></tr>';
   });
 }
 
-// ── ZAHLUNGSLINK GENERATOR ─────────────────────────────────
 function onProductChange() {
-  var prodEl = document.getElementById('pl-product');
-  var selectedOpt = prodEl.options[prodEl.selectedIndex];
-  if (selectedOpt && selectedOpt.dataset.price) {
-    document.getElementById('pl-price').value = selectedOpt.dataset.price;
-  } else {
-    document.getElementById('pl-price').value = '';
-  }
+  var opt = document.getElementById('pl-product').options[document.getElementById('pl-product').selectedIndex];
+  if (opt && opt.dataset.price) document.getElementById('pl-price').value = opt.dataset.price;
+  else document.getElementById('pl-price').value = '';
   generateLink();
 }
 
 function generateLink() {
-  var phone   = document.getElementById('pl-phone').value.trim();
-  var agentEl = document.getElementById('pl-agent');
-  var prodEl  = document.getElementById('pl-product');
-  var agentCode = agentEl.value;
-  var stripeUrl = prodEl.value;
-  var priceVal  = document.getElementById('pl-price').value;
-
-  if (!phone || !agentCode || !stripeUrl) {
-    document.getElementById('linkResultWrap').style.display = 'none';
-    return;
-  }
-
-  // Telefonnummer bereinigen
+  var phone = document.getElementById('pl-phone').value.trim();
+  var agentCode = document.getElementById('pl-agent').value;
+  var stripeUrl = document.getElementById('pl-product').value;
+  var priceVal = document.getElementById('pl-price').value;
+  if (!phone || !agentCode || !stripeUrl) { document.getElementById('linkResultWrap').style.display = 'none'; return; }
   var cleanPhone = phone.replace(/[^+0-9]/g, '');
-  // client_reference_id: AGENTCODE_PHONE
-  var refId = agentCode + '_' + cleanPhone;
-  var fullLink = stripeUrl + (stripeUrl.indexOf('?') === -1 ? '?' : '&') + 'client_reference_id=' + encodeURIComponent(refId);
-
-  var priceInfo = priceVal ? ' | Preis: ' + parseFloat(priceVal).toLocaleString('de-AT') + ' ' + ((merchant && merchant.currency) || 'RD$') : '';
+  var fullLink = stripeUrl + (stripeUrl.indexOf('?') === -1 ? '?' : '&') + 'client_reference_id=' + encodeURIComponent(agentCode + '_' + cleanPhone);
   document.getElementById('linkText').textContent = fullLink;
-  document.getElementById('pl-priceinfo').textContent = priceInfo ? '💰 Betrag: ' + parseFloat(priceVal).toLocaleString('de-AT') + ' ' + ((merchant && merchant.currency) || 'RD$') : '';
-  // WhatsApp-Link mit dem Zahlungslink als Text
-  var waMsg = encodeURIComponent('Hier ist dein Zahlungslink:' + (priceVal ? ' (' + parseFloat(priceVal).toLocaleString('de-AT') + ' ' + ((merchant && merchant.currency)||'RD$') + ')' : '') + '\n' + fullLink);
-  var waNum = cleanPhone.replace('+', '');
-  document.getElementById('waLink').href = 'https://wa.me/' + waNum + '?text=' + waMsg;
+  document.getElementById('pl-priceinfo').textContent = priceVal ? '💰 Betrag: ' + parseFloat(priceVal).toLocaleString('de-AT') + ' ' + ((merchant&&merchant.currency)||'RD$') : '';
+  document.getElementById('waLink').href = 'https://wa.me/' + cleanPhone.replace('+','') + '?text=' + encodeURIComponent('Hier ist dein Zahlungslink:\n' + fullLink);
   document.getElementById('linkResultWrap').style.display = 'block';
 }
 
-function copyLink() {
-  var txt = document.getElementById('linkText').textContent;
-  navigator.clipboard.writeText(txt).then(function(){
-    showToast('✅ Link kopiert!');
-  }).catch(function(){
-    // Fallback
-    var ta = document.createElement('textarea');
-    ta.value = txt; document.body.appendChild(ta); ta.select();
-    document.execCommand('copy'); document.body.removeChild(ta);
-    showToast('✅ Link kopiert!');
-  });
-}
+function copyLink() { navigator.clipboard.writeText(document.getElementById('linkText').textContent).then(function(){ showToast('✅ Kopiert!'); }); }
+function clearLink() { document.getElementById('pl-phone').value=''; document.getElementById('pl-agent').selectedIndex=0; document.getElementById('pl-product').selectedIndex=0; document.getElementById('linkResultWrap').style.display='none'; }
+function copyAgentLink() { navigator.clipboard.writeText(document.getElementById('agentRegLink').textContent).then(function(){ showToast('✅ Kopiert!'); }); }
 
-function clearLink() {
-  document.getElementById('pl-phone').value = '';
-  document.getElementById('pl-agent').selectedIndex = 0;
-  document.getElementById('pl-product').selectedIndex = 0;
-  document.getElementById('linkResultWrap').style.display = 'none';
-}
-
-function copyAgentLink() {
-  var txt = document.getElementById('agentRegLink').textContent;
-  navigator.clipboard.writeText(txt).then(function(){ showToast('✅ Link kopiert!'); });
-}
-
-// ── PRODUKTE ───────────────────────────────────────────────
 function loadProducts() {
   if (!sb || !merchant) return;
   sb.from('merchant_products').select('*').eq('merchant_id', merchant.id).order('sort_order',{ascending:true}).then(function(r){
     products = r.data || [];
-    // Dropdown für Zahlungslink
-    var opts = '<option value="">— Produkt auswählen —</option>' +
+    document.getElementById('pl-product').innerHTML = '<option value="">— Produkt —</option>' +
       products.map(function(p){ return '<option value="'+p.stripe_link+'" data-price="'+p.price+'">'+p.name+' ('+fmtNum(p.price)+' '+(merchant.currency||'RD$')+')</option>'; }).join('');
-    document.getElementById('pl-product').innerHTML = opts;
-    // Produktkarten
-    if (!products.length) {
-      document.getElementById('productsList').innerHTML = '<div class="msg">Noch keine Produkte. Klicke "+ Neues Produkt".</div>';
-      return;
-    }
+    if (!products.length) { document.getElementById('productsList').innerHTML = '<div class="msg">Noch keine Produkte.</div>'; return; }
     document.getElementById('productsList').innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;padding:8px">' +
       products.map(function(p) {
-        var avail = p.available !== false;
         return '<div style="border:1.5px solid var(--border);border-radius:10px;overflow:hidden;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.07)">' +
-          (p.image_url ? '<img src="'+p.image_url+'" style="width:100%;height:160px;object-fit:cover">' :
-            '<div style="width:100%;height:100px;background:#f0fdf4;display:flex;align-items:center;justify-content:center;font-size:2.5rem">🛒</div>') +
-          '<div style="padding:14px">' +
-            '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">' +
-              '<strong style="font-size:.95rem;color:var(--g2)">'+p.name+'</strong>' +
-              '<span class="badge '+(avail?'b-active':'b-paused')+'">'+(avail?'Verfügbar':'Pausiert')+'</span>' +
-            '</div>' +
-            (p.short_description ? '<p style="font-size:.8rem;color:var(--mu);margin-bottom:8px">'+p.short_description+'</p>' : '') +
-            '<div style="font-size:1.1rem;font-weight:800;color:var(--gold);margin-bottom:10px">'+fmtNum(p.price)+' '+(merchant.currency||'RD$')+'</div>' +
-            '<div style="display:flex;gap:6px">' +
-              '<button class="btn btn-gold" style="flex:1;padding:6px 0;font-size:.78rem" onclick="editProduct(\''+p.id+'\')">✏️ Bearbeiten</button>' +
-              '<button class="btn btn-danger" style="padding:6px 10px;font-size:.78rem" onclick="deleteProduct(\''+p.id+'\')">🗑️</button>' +
-            '</div>' +
-          '</div>' +
-        '</div>';
+          (p.image_url ? '<img src="'+p.image_url+'" style="width:100%;height:160px;object-fit:cover">' : '<div style="width:100%;height:100px;background:#f0fdf4;display:flex;align-items:center;justify-content:center;font-size:2.5rem">🛒</div>') +
+          '<div style="padding:14px"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px"><strong style="font-size:.95rem;color:var(--g2)">'+p.name+'</strong><span class="badge '+(p.available!==false?'b-active':'b-paused')+'">'+(p.available!==false?'Verfügbar':'Pausiert')+'</span></div>' +
+          (p.short_description?'<p style="font-size:.8rem;color:var(--mu);margin-bottom:8px">'+p.short_description+'</p>':'') +
+          '<div style="font-size:1.1rem;font-weight:800;color:var(--gold);margin-bottom:10px">'+fmtNum(p.price)+' '+(merchant.currency||'RD$')+'</div>' +
+          '<div style="display:flex;gap:6px"><button class="btn btn-gold" style="flex:1;padding:6px 0;font-size:.78rem" onclick="editProduct(\''+p.id+'\')">✏️ Bearbeiten</button><button class="btn" style="background:var(--red);color:#fff;padding:6px 10px;font-size:.78rem" onclick="deleteProduct(\''+p.id+'\')">🗑️</button></div>' +
+          '</div></div>';
       }).join('') + '</div>';
   });
 }
@@ -539,26 +381,17 @@ function loadProducts() {
 function loadProductsDropdown() {
   if (!sb || !merchant) return;
   sb.from('merchant_products').select('*').eq('merchant_id', merchant.id).order('sort_order',{ascending:true}).then(function(r){
-    var data = r.data || [];
-    var opts2 = '<option value="">— Produkt wählen —</option>' +
-      data.map(function(p){ return '<option value="'+p.id+'">'+p.name+'</option>'; }).join('');
-    document.getElementById('s-product').innerHTML = opts2;
+    document.getElementById('s-product').innerHTML = '<option value="">— Produkt wählen —</option>' + (r.data||[]).map(function(p){ return '<option value="'+p.id+'">'+p.name+'</option>'; }).join('');
   });
 }
 
 function showAddProduct() {
-  document.getElementById('p-id').value = '';
-  document.getElementById('p-name').value = '';
-  document.getElementById('p-price').value = '';
-  document.getElementById('p-short').value = '';
-  document.getElementById('p-long').value = '';
-  document.getElementById('p-stripe').value = '';
-  document.getElementById('p-sort').value = '1';
-  document.getElementById('p-img-url').value = '';
-  document.getElementById('p-img-preview').style.display = 'none';
-  document.getElementById('p-available').selectedIndex = 0;
-  document.getElementById('productFormTitle').textContent = '➕ Neues Produkt';
-  document.getElementById('p-save-status').innerHTML = '';
+  ['p-id','p-name','p-price','p-short','p-long','p-stripe','p-img-url'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('p-sort').value='1';
+  document.getElementById('p-img-preview').style.display='none';
+  document.getElementById('p-available').selectedIndex=0;
+  document.getElementById('productFormTitle').textContent='➕ Neues Produkt';
+  document.getElementById('p-save-status').innerHTML='';
   var f = document.getElementById('addProductForm');
   f.style.display = f.style.display === 'none' ? 'block' : 'none';
   if (f.style.display === 'block') f.scrollIntoView({behavior:'smooth'});
@@ -567,310 +400,132 @@ function showAddProduct() {
 function editProduct(id) {
   var p = products.find(function(x){ return x.id === id; });
   if (!p) return;
-  document.getElementById('p-id').value = p.id;
-  document.getElementById('p-name').value = p.name || '';
-  document.getElementById('p-price').value = p.price || '';
-  document.getElementById('p-short').value = p.short_description || '';
-  document.getElementById('p-long').value = p.long_description || '';
-  document.getElementById('p-stripe').value = p.stripe_link || '';
-  document.getElementById('p-sort').value = p.sort_order || 1;
-  document.getElementById('p-img-url').value = p.image_url || '';
-  document.getElementById('p-available').value = p.available === false ? 'false' : 'true';
-  if (p.image_url) {
-    document.getElementById('p-img-thumb').src = p.image_url;
-    document.getElementById('p-img-preview').style.display = 'block';
-  } else {
-    document.getElementById('p-img-preview').style.display = 'none';
-  }
-  document.getElementById('productFormTitle').textContent = '✏️ Produkt bearbeiten';
-  document.getElementById('p-save-status').innerHTML = '';
-  var f = document.getElementById('addProductForm');
-  f.style.display = 'block';
-  f.scrollIntoView({behavior:'smooth'});
+  document.getElementById('p-id').value=p.id; document.getElementById('p-name').value=p.name||'';
+  document.getElementById('p-price').value=p.price||''; document.getElementById('p-short').value=p.short_description||'';
+  document.getElementById('p-long').value=p.long_description||''; document.getElementById('p-stripe').value=p.stripe_link||'';
+  document.getElementById('p-sort').value=p.sort_order||1; document.getElementById('p-img-url').value=p.image_url||'';
+  document.getElementById('p-available').value=p.available===false?'false':'true';
+  if (p.image_url) { document.getElementById('p-img-thumb').src=p.image_url; document.getElementById('p-img-preview').style.display='block'; }
+  else document.getElementById('p-img-preview').style.display='none';
+  document.getElementById('productFormTitle').textContent='✏️ Produkt bearbeiten';
+  document.getElementById('p-save-status').innerHTML='';
+  document.getElementById('addProductForm').style.display='block';
+  document.getElementById('addProductForm').scrollIntoView({behavior:'smooth'});
 }
 
-function closeProductForm() {
-  document.getElementById('addProductForm').style.display = 'none';
-}
+function closeProductForm() { document.getElementById('addProductForm').style.display='none'; }
 
 function previewImage(input) {
-  if (input.files && input.files[0]) {
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      document.getElementById('p-img-thumb').src = e.target.result;
-      document.getElementById('p-img-preview').style.display = 'block';
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
+  if (input.files&&input.files[0]) { var r=new FileReader(); r.onload=function(e){ document.getElementById('p-img-thumb').src=e.target.result; document.getElementById('p-img-preview').style.display='block'; }; r.readAsDataURL(input.files[0]); }
 }
 
 function saveProduct() {
-  if (!sb || !merchant) return;
-  var name  = document.getElementById('p-name').value.trim();
-  var price = parseFloat(document.getElementById('p-price').value) || 0;
+  if (!sb||!merchant) return;
+  var name=document.getElementById('p-name').value.trim();
   if (!name) { showToast('Produkttitel ist Pflicht'); return; }
-
-  document.getElementById('p-save-status').innerHTML = '<span style="color:var(--mu);font-size:.82rem">⏳ Wird gespeichert...</span>';
-
-  var imgFile = document.getElementById('p-img-file').files[0];
-
+  document.getElementById('p-save-status').innerHTML='<span style="color:var(--mu);font-size:.82rem">⏳ Wird gespeichert...</span>';
+  var imgFile=document.getElementById('p-img-file').files[0];
   function doSave(imgUrl) {
-    var pid = document.getElementById('p-id').value;
-    var payload = {
-      merchant_id:       merchant.id,
-      name:              name,
-      price:             price,
-      short_description: document.getElementById('p-short').value.trim() || null,
-      long_description:  document.getElementById('p-long').value.trim()  || null,
-      stripe_link:       document.getElementById('p-stripe').value.trim() || null,
-      sort_order:        parseInt(document.getElementById('p-sort').value) || 1,
-      available:         document.getElementById('p-available').value === 'true',
-      status:            'active'
-    };
-    if (imgUrl) payload.image_url = imgUrl;
-
-    var op = pid
-      ? sb.from('merchant_products').update(payload).eq('id', pid)
-      : sb.from('merchant_products').insert(payload);
-
-    op.then(function(r) {
-      if (r.error) {
-        document.getElementById('p-save-status').innerHTML = '<span style="color:var(--red)">Fehler: '+r.error.message+'</span>';
-        return;
-      }
-      showToast('✅ Produkt gespeichert!');
-      closeProductForm();
-      loadProducts();
-      loadProductsDropdown();
-    });
+    var pid=document.getElementById('p-id').value;
+    var payload={merchant_id:merchant.id,name:name,price:parseFloat(document.getElementById('p-price').value)||0,
+      short_description:document.getElementById('p-short').value.trim()||null,long_description:document.getElementById('p-long').value.trim()||null,
+      stripe_link:document.getElementById('p-stripe').value.trim()||null,sort_order:parseInt(document.getElementById('p-sort').value)||1,
+      available:document.getElementById('p-available').value==='true',status:'active'};
+    if (imgUrl) payload.image_url=imgUrl;
+    var op=pid?sb.from('merchant_products').update(payload).eq('id',pid):sb.from('merchant_products').insert(payload);
+    op.then(function(r){ if(r.error){document.getElementById('p-save-status').innerHTML='<span style="color:var(--red)">Fehler: '+r.error.message+'</span>';return;} showToast('✅ Gespeichert!'); closeProductForm(); loadProducts(); loadProductsDropdown(); });
   }
-
-  // Bild hochladen falls vorhanden
   if (imgFile) {
-    var ext = imgFile.name.split('.').pop();
-    var path = merchant.slug + '/' + Date.now() + '.' + ext;
-    sb.storage.from('product-images').upload(path, imgFile, {upsert:true}).then(function(r) {
-      if (r.error) {
-        document.getElementById('p-save-status').innerHTML = '<span style="color:var(--red)">Bild-Upload fehlgeschlagen: '+r.error.message+'</span>';
-        return;
-      }
-      var imgUrl = sb.storage.from('product-images').getPublicUrl(path).data.publicUrl;
-      doSave(imgUrl);
+    var ext=imgFile.name.split('.').pop();
+    sb.storage.from('product-images').upload(merchant.slug+'/'+Date.now()+'.'+ext,imgFile,{upsert:true}).then(function(r){
+      if(r.error){document.getElementById('p-save-status').innerHTML='<span style="color:var(--red)">Bild-Upload fehler</span>';return;}
+      doSave(sb.storage.from('product-images').getPublicUrl(merchant.slug+'/'+Date.now()+'.'+ext).data.publicUrl);
     });
-  } else {
-    doSave(document.getElementById('p-img-url').value || null);
-  }
+  } else doSave(document.getElementById('p-img-url').value||null);
 }
 
-function deleteProduct(id) {
-  if (!sb) return;
-  if (!confirm('Produkt wirklich löschen?')) return;
-  sb.from('merchant_products').delete().eq('id', id).then(function(){
-    showToast('Produkt gelöscht'); loadProducts();
-  });
-}
+function deleteProduct(id) { if(!sb) return; if(!confirm('Produkt löschen?')) return; sb.from('merchant_products').delete().eq('id',id).then(function(){ showToast('Gelöscht'); loadProducts(); }); }
 
-// ── AGENTEN ────────────────────────────────────────────────
 function loadAgentsDropdown() {
-  if (!sb || !merchant) return;
-  sb.from('agents').select('id,name,referral_code').eq('merchant_id', merchant.id).eq('status','active').then(function(r){
-    agents = r.data || [];
-    var opts = '<option value="">— Agent auswählen —</option>' +
-      agents.map(function(a){ return '<option value="'+a.referral_code+'">'+a.name+' ('+a.referral_code+')</option>'; }).join('');
-    document.getElementById('pl-agent').innerHTML = opts;
-    var opts2 = '<option value="">— kein Agent —</option>' +
-      agents.map(function(a){ return '<option value="'+a.id+'">'+a.name+' ('+a.referral_code+')</option>'; }).join('');
-    document.getElementById('s-agent').innerHTML = opts2;
+  if (!sb||!merchant) return;
+  sb.from('agents').select('id,name,referral_code').eq('merchant_id',merchant.id).eq('status','active').then(function(r){
+    agents=r.data||[];
+    document.getElementById('pl-agent').innerHTML='<option value="">— Agent —</option>'+agents.map(function(a){ return '<option value="'+a.referral_code+'">'+a.name+' ('+a.referral_code+')</option>'; }).join('');
+    document.getElementById('s-agent').innerHTML='<option value="">— kein Agent —</option>'+agents.map(function(a){ return '<option value="'+a.id+'">'+a.name+'</option>'; }).join('');
   });
 }
 
 function loadAgents() {
-  if (!sb || !merchant) return;
-  sb.from('agents').select('*').eq('merchant_id', merchant.id).order('created_at',{ascending:false}).then(function(r){
-    var data = r.data || [];
-    document.getElementById('agentsList').innerHTML = data.length
-      ? data.map(function(a){
-          var aid = a.id; var aname = (a.name||'').replace(/'/g,''); var astatus = a.status;
-          return '<tr>' +
-            '<td><strong>'+(a.name||'—')+'</strong><br><small style="color:var(--mu)">'+(a.email||'')+'</small></td>' +
-            '<td><span class="codetag">'+(a.referral_code||'—')+'</span></td>' +
-            '<td>'+(a.phone||'—')+'</td>' +
-            '<td>'+(a.total_sales||0)+'</td>' +
-            '<td style="color:var(--g3);font-weight:600">'+fmtNum(a.total_commission)+' '+(merchant.currency||'RD$')+'</td>' +
-            '<td>'+statusBadge(astatus)+'</td>' +
-            '<td>'+fmtDate(a.created_at)+'</td>' +
-            '<td style="white-space:nowrap">' +
-              '<button class="btn btn-outline" style="padding:4px 10px;font-size:.75rem;margin-right:4px" onclick="toggleAgent(\''+aid+'\',\''+astatus+'\')">'+(astatus==='active'?'⏸ Pause':'▶ Aktiv')+'</button>' +
-              '<button class="btn btn-danger" style="padding:4px 10px;font-size:.75rem" onclick="deleteAgent(\''+aid+'\',\''+aname+'\')">🗑️</button>' +
-            '</td>' +
-          '</tr>';
-        }).join('')
-      : '<tr><td colspan="7" class="msg">Noch keine Agenten registriert. Teile den Registrierungslink!</td></tr>';
+  if (!sb||!merchant) return;
+  sb.from('agents').select('*').eq('merchant_id',merchant.id).order('created_at',{ascending:false}).then(function(r){
+    document.getElementById('agentsList').innerHTML=(r.data||[]).length
+      ?(r.data||[]).map(function(a){
+        return '<tr><td><strong>'+(a.name||'—')+'</strong><br><small style="color:var(--mu)">'+(a.email||'')+'</small></td><td><span class="codetag">'+(a.referral_code||'—')+'</span></td><td>'+(a.phone||'—')+'</td><td>'+(a.total_sales||0)+'</td><td style="color:var(--g3);font-weight:600">'+fmtNum(a.total_commission)+' '+(merchant.currency||'RD$')+'</td><td>'+statusBadge(a.status)+'</td><td>'+fmtDate(a.created_at)+'</td><td style="white-space:nowrap"><button class="btn btn-outline" style="padding:4px 10px;font-size:.75rem;margin-right:4px" onclick="toggleAgent(\''+a.id+'\',\''+a.status+'\')">'+(a.status==='active'?'⏸ Pause':'▶ Aktiv')+'</button><button class="btn" style="background:var(--red);color:#fff;padding:4px 10px;font-size:.75rem" onclick="deleteAgent(\''+a.id+'\',\''+a.name.replace(/'/g,'')+'\')")">🗑️</button></td></tr>';
+      }).join('')
+      :'<tr><td colspan="8" class="msg">Noch keine Agenten.</td></tr>';
   });
 }
 
-// ── VERKÄUFE ───────────────────────────────────────────────
 function loadSales() {
-  if (!sb || !merchant) return;
-  var filter = document.getElementById('salesFilter').value;
-  var query = sb.from('sales').select('*, agents(name,referral_code), merchant_products(name)').eq('merchant_id', merchant.id).order('created_at',{ascending:false});
-
-  if (filter === 'today') {
-    var t = new Date(); t.setHours(0,0,0,0);
-    query = query.gte('created_at', t.toISOString());
-  } else if (filter === 'month') {
-    var m = new Date(); m = new Date(m.getFullYear(), m.getMonth(), 1);
-    query = query.gte('created_at', m.toISOString());
-  }
-
+  if (!sb||!merchant) return;
+  var filter=document.getElementById('salesFilter').value;
+  var query=sb.from('sales').select('*, agents(name,referral_code), merchant_products(name)').eq('merchant_id',merchant.id).order('created_at',{ascending:false});
+  if (filter==='today') { var t=new Date(); t.setHours(0,0,0,0); query=query.gte('created_at',t.toISOString()); }
+  else if (filter==='month') { var m=new Date(); m=new Date(m.getFullYear(),m.getMonth(),1); query=query.gte('created_at',m.toISOString()); }
   query.then(function(r){
-    var data = r.data || [];
-    document.getElementById('salesList').innerHTML = data.length
-      ? data.map(function(s){
-          var ag = (s.agents && s.agents.name) || '—';
-          var pr = (s.merchant_products && s.merchant_products.name) || '—';
-          return '<tr><td>'+fmtDate(s.created_at)+'</td><td><span class="codetag">'+(s.customer_phone||'—')+'</span></td><td>'+ag+'</td><td>'+pr+'</td><td>'+fmtNum(s.total_amount)+' '+(merchant.currency||'RD$')+'</td><td style="color:var(--g3)">'+fmtNum(s.agent_commission)+' '+(merchant.currency||'RD$')+'</td><td><span class="badge '+(s.source==='stripe'?'b-active':'b-pending')+'">'+(s.source==='stripe'?'🤖 Stripe':'✍️ Manuell')+'</span></td></tr>';
-        }).join('')
-      : '<tr><td colspan="7" class="msg">Keine Verkäufe in diesem Zeitraum.</td></tr>';
+    document.getElementById('salesList').innerHTML=(r.data||[]).length
+      ?(r.data||[]).map(function(s){
+        return '<tr><td>'+fmtDate(s.created_at)+'</td><td><span class="codetag">'+(s.customer_phone||'—')+'</span></td><td>'+((s.agents&&s.agents.name)||'—')+'</td><td>'+((s.merchant_products&&s.merchant_products.name)||'—')+'</td><td>'+fmtNum(s.total_amount)+' '+(merchant.currency||'RD$')+'</td><td style="color:var(--g3)">'+fmtNum(s.agent_commission)+' '+(merchant.currency||'RD$')+'</td><td><span class="badge '+(s.source==='stripe'?'b-active':'b-pending')+'">'+(s.source==='stripe'?'🤖 Stripe':'✍️ Manuell')+'</span></td></tr>';
+      }).join('')
+      :'<tr><td colspan="7" class="msg">Keine Verkäufe.</td></tr>';
   });
 }
 
 function saveSale() {
-  if (!sb || !merchant) return;
-  var phone   = document.getElementById('s-phone').value.trim();
-  var agentId = document.getElementById('s-agent').value;
-  var prodId  = document.getElementById('s-product').value;
-  var amount  = parseFloat(document.getElementById('s-amount').value) || 0;
+  if (!sb||!merchant) return;
+  var amount=parseFloat(document.getElementById('s-amount').value)||0;
   if (!amount) { showToast('Bitte Betrag eingeben'); return; }
-
-  // Provision berechnen
-  var commission = 0;
-  if (agentId && merchant) {
-    commission = merchant.platform_fee_type === 'percentage'
-      ? amount * (merchant.platform_fee_value / 100)
-      : merchant.platform_fee_value;
-  }
-
-  var payload = {
-    merchant_id: merchant.id,
-    customer_phone: phone || null,
-    agent_id: agentId || null,
-    product_id: prodId || null,
-    total_amount: amount,
-    agent_commission: commission,
-    platform_fee: merchant.platform_fee_value || 0,
-    source: 'manual',
-    notes: document.getElementById('s-note').value.trim() || null
-  };
-
-  sb.from('sales').insert(payload).then(function(r){
-    if (r.error) { showToast('Fehler: '+r.error.message); return; }
-    // Agent-Statistik aktualisieren
-    if (agentId) {
-      sb.from('agents').select('total_sales,total_commission').eq('id',agentId).single().then(function(ra){
-        if (ra.data) {
-          sb.from('agents').update({
-            total_sales: (ra.data.total_sales||0)+1,
-            total_commission: (ra.data.total_commission||0)+commission
-          }).eq('id',agentId).then(function(){});
-        }
-      });
-    }
-    showToast('✅ Verkauf eingetragen!');
-    document.getElementById('s-phone').value='';
-    document.getElementById('s-amount').value='';
-    document.getElementById('s-note').value='';
-    document.getElementById('s-agent').selectedIndex=0;
-    document.getElementById('s-product').selectedIndex=0;
-    loadSales();
-    loadDashboard();
+  var agentId=document.getElementById('s-agent').value;
+  var commission=agentId&&merchant?(merchant.platform_fee_type==='percentage'?amount*(merchant.platform_fee_value/100):(merchant.platform_fee_value||0)):0;
+  sb.from('sales').insert({merchant_id:merchant.id,customer_phone:document.getElementById('s-phone').value.trim()||null,agent_id:agentId||null,product_id:document.getElementById('s-product').value||null,total_amount:amount,agent_commission:commission,platform_fee:merchant.platform_fee_value||0,source:'manual',notes:document.getElementById('s-note').value.trim()||null}).then(function(r){
+    if(r.error){showToast('Fehler: '+r.error.message);return;}
+    showToast('✅ Eingetragen!');
+    ['s-phone','s-amount','s-note'].forEach(function(id){document.getElementById(id).value='';});
+    document.getElementById('s-agent').selectedIndex=0; document.getElementById('s-product').selectedIndex=0;
+    loadSales(); loadDashboard();
   });
 }
 
-// ── ABRECHNUNG ─────────────────────────────────────────────
 function loadBilling(period) {
-  if (!sb || !merchant) return;
-  var now = new Date();
-  var from, to;
-  if (period === 'month') {
-    from = new Date(now.getFullYear(), now.getMonth(), 1);
-    to   = new Date(now.getFullYear(), now.getMonth()+1, 0, 23,59,59);
-  } else if (period === 'prev') {
-    from = new Date(now.getFullYear(), now.getMonth()-1, 1);
-    to   = new Date(now.getFullYear(), now.getMonth(), 0, 23,59,59);
-  } else if (period === '1-15') {
-    from = new Date(now.getFullYear(), now.getMonth(), 1);
-    to   = new Date(now.getFullYear(), now.getMonth(), 15, 23,59,59);
-  } else {
-    from = new Date(now.getFullYear(), now.getMonth(), 16);
-    to   = new Date(now.getFullYear(), now.getMonth()+1, 0, 23,59,59);
-  }
-
-  sb.from('sales').select('*, agents(id,name,referral_code)')
-    .eq('merchant_id', merchant.id)
-    .gte('created_at', from.toISOString())
-    .lte('created_at', to.toISOString())
-    .then(function(r){
-    var sales = r.data || [];
-    if (!sales.length) {
-      document.getElementById('billingContent').innerHTML = '<div class="msg">Keine Verkäufe in diesem Zeitraum.</div>';
-      return;
-    }
-    // Gruppieren nach Agent
-    var byAgent = {};
-    sales.forEach(function(s){
-      var key = (s.agents && s.agents.id) || 'none';
-      var name = (s.agents && s.agents.name) || 'Kein Agent';
-      var code = (s.agents && s.agents.referral_code) || '—';
-      if (!byAgent[key]) byAgent[key] = {name:name,code:code,sales:0,revenue:0,commission:0};
-      byAgent[key].sales++;
-      byAgent[key].revenue += parseFloat(s.total_amount)||0;
-      byAgent[key].commission += parseFloat(s.agent_commission)||0;
-    });
-    var totalRev = sales.reduce(function(t,s){return t+(parseFloat(s.total_amount)||0);},0);
-    var totalComm = sales.reduce(function(t,s){return t+(parseFloat(s.agent_commission)||0);},0);
-    var platFee = sales.reduce(function(t,s){return t+(parseFloat(s.platform_fee)||0);},0);
-    var cur = merchant.currency||'RD$';
-    var html = '<div style="background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08)">' +
-      '<div style="background:var(--g2);color:#fff;padding:14px 20px"><strong>Abrechnungsdetails</strong></div>' +
-      '<table><thead><tr><th>AGENT</th><th>CODE</th><th>VERKÄUFE</th><th>UMSATZ</th><th>PROVISION (AUSZAHLEN)</th></tr></thead><tbody>' +
-      Object.values(byAgent).map(function(a){
-        return '<tr><td><strong>'+a.name+'</strong></td><td><span class="codetag">'+a.code+'</span></td><td>'+a.sales+'</td><td>'+fmtNum(a.revenue)+' '+cur+'</td><td style="color:var(--gold);font-weight:700">'+fmtNum(a.commission)+' '+cur+'</td></tr>';
-      }).join('') +
-      '<tr style="background:#f9fafb;font-weight:700"><td colspan="2">GESAMT</td><td>'+sales.length+'</td><td>'+fmtNum(totalRev)+' '+cur+'</td><td style="color:var(--gold)">'+fmtNum(totalComm)+' '+cur+'</td></tr>' +
-      '</tbody></table>' +
-      '<div style="padding:16px 20px;border-top:2px solid var(--g2);background:#f9fafb;display:flex;gap:32px;flex-wrap:wrap">' +
-      '<span>💰 Gesamtumsatz: <strong>'+fmtNum(totalRev)+' '+cur+'</strong></span>' +
-      '<span>🤝 Agentenprovisionen: <strong style="color:var(--gold)">'+fmtNum(totalComm)+' '+cur+'</strong></span>' +
-      '<span>⭐ Plattformgebühren: <strong style="color:var(--g3)">'+fmtNum(platFee)+' '+cur+'</strong></span>' +
-      '<span>🏦 Händler-Erlös: <strong style="color:var(--g2)">'+fmtNum(totalRev-totalComm-platFee)+' '+cur+'</strong></span>' +
-      '</div></div>';
-    document.getElementById('billingContent').innerHTML = html;
+  if (!sb||!merchant) return;
+  var now=new Date(); var from,to;
+  if (period==='month'){from=new Date(now.getFullYear(),now.getMonth(),1);to=new Date(now.getFullYear(),now.getMonth()+1,0,23,59,59);}
+  else if (period==='prev'){from=new Date(now.getFullYear(),now.getMonth()-1,1);to=new Date(now.getFullYear(),now.getMonth(),0,23,59,59);}
+  else if (period==='1-15'){from=new Date(now.getFullYear(),now.getMonth(),1);to=new Date(now.getFullYear(),now.getMonth(),15,23,59,59);}
+  else{from=new Date(now.getFullYear(),now.getMonth(),16);to=new Date(now.getFullYear(),now.getMonth()+1,0,23,59,59);}
+  sb.from('sales').select('*, agents(id,name,referral_code)').eq('merchant_id',merchant.id).gte('created_at',from.toISOString()).lte('created_at',to.toISOString()).then(function(r){
+    var sales=r.data||[];
+    if (!sales.length){document.getElementById('billingContent').innerHTML='<div class="msg">Keine Verkäufe.</div>';return;}
+    var byAgent={};
+    sales.forEach(function(s){var key=(s.agents&&s.agents.id)||'none';if(!byAgent[key])byAgent[key]={name:(s.agents&&s.agents.name)||'Kein Agent',code:(s.agents&&s.agents.referral_code)||'—',sales:0,revenue:0,commission:0};byAgent[key].sales++;byAgent[key].revenue+=parseFloat(s.total_amount)||0;byAgent[key].commission+=parseFloat(s.agent_commission)||0;});
+    var totalRev=sales.reduce(function(t,s){return t+(parseFloat(s.total_amount)||0);},0);
+    var totalComm=sales.reduce(function(t,s){return t+(parseFloat(s.agent_commission)||0);},0);
+    var cur=merchant.currency||'RD$';
+    document.getElementById('billingContent').innerHTML='<div style="background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08)"><div style="background:var(--g2);color:#fff;padding:14px 20px"><strong>Abrechnungsdetails</strong></div><table><thead><tr><th>AGENT</th><th>CODE</th><th>VERKÄUFE</th><th>UMSATZ</th><th>PROVISION</th></tr></thead><tbody>'+Object.values(byAgent).map(function(a){return '<tr><td><strong>'+a.name+'</strong></td><td><span class="codetag">'+a.code+'</span></td><td>'+a.sales+'</td><td>'+fmtNum(a.revenue)+' '+cur+'</td><td style="color:var(--gold);font-weight:700">'+fmtNum(a.commission)+' '+cur+'</td></tr>';}).join('')+'<tr style="background:#f9fafb;font-weight:700"><td colspan="2">GESAMT</td><td>'+sales.length+'</td><td>'+fmtNum(totalRev)+' '+cur+'</td><td style="color:var(--gold)">'+fmtNum(totalComm)+' '+cur+'</td></tr></tbody></table><div style="padding:16px 20px;border-top:2px solid var(--g2);background:#f9fafb;display:flex;gap:32px;flex-wrap:wrap"><span>💰 Umsatz: <strong>'+fmtNum(totalRev)+' '+cur+'</strong></span><span>🤝 Provisionen: <strong style="color:var(--gold)">'+fmtNum(totalComm)+' '+cur+'</strong></span><span>🏦 Händler-Erlös: <strong style="color:var(--g2)">'+fmtNum(totalRev-totalComm)+' '+cur+'</strong></span></div></div>';
   });
 }
 
-// ── AGENT AKTIONEN ────────────────────────────────────────
-function toggleAgent(id, curStatus) {
+function toggleAgent(id,curStatus) {
   if (!sb) return;
-  var newStatus = curStatus === 'active' ? 'paused' : 'active';
-  sb.from('agents').update({status: newStatus}).eq('id', id).then(function(r) {
-    if (r.error) { showToast('Fehler: ' + r.error.message); return; }
-    showToast('Status: ' + (newStatus === 'active' ? 'Aktiv' : 'Pausiert'));
-    loadAgents();
-    loadDashboard();
-  });
+  var s=curStatus==='active'?'paused':'active';
+  sb.from('agents').update({status:s}).eq('id',id).then(function(r){ if(!r.error){showToast('Status: '+(s==='active'?'Aktiv':'Pausiert'));loadAgents();loadDashboard();} });
 }
 
-function deleteAgent(id, name) {
-  if (!confirm('Agent "' + name + '" wirklich loeschen? Diese Aktion kann nicht rueckgaengig gemacht werden.')) return;
+function deleteAgent(id,name) {
+  if (!confirm('Agent "'+name+'" wirklich löschen?')) return;
   if (!sb) return;
-  sb.from('agents').delete().eq('id', id).then(function(r) {
-    if (r.error) { showToast('Fehler: ' + r.error.message); return; }
-    showToast('Agent geloescht');
-    loadAgents();
-    loadDashboard();
-  });
+  sb.from('agents').delete().eq('id',id).then(function(r){ if(!r.error){showToast('Agent gelöscht');loadAgents();loadDashboard();} });
 }
 </script>
 </body>
-</html>
+</html>  
