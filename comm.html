@@ -17,29 +17,15 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',sans-serif;background:var(--bg);min-height:100vh;overflow:auto}
-
-/* NAV */
 .nav{background:var(--g2);color:#fff;display:flex;align-items:center;gap:8px;padding:0 20px;height:52px;position:sticky;top:0;z-index:100}
 .nav-brand{font-weight:700;font-size:1rem;margin-right:12px}
 .nav-slug{background:var(--gold);color:#000;font-size:.65rem;font-weight:800;padding:2px 8px;border-radius:4px}
 .tbtn{background:none;border:none;color:rgba(255,255,255,.75);cursor:pointer;padding:6px 13px;border-radius:6px;font-size:.85rem;font-weight:500;transition:all .15s;text-decoration:none;display:flex;align-items:center;gap:6px}
 .tbtn:hover{background:rgba(255,255,255,.15);color:#fff}
 .tbtn-out{color:var(--gold)!important;margin-left:auto}
-
-/* LOGIN */
-#loginWrap{display:flex;align-items:center;justify-content:center;height:100vh;background:var(--g2)}
-.login-card{background:#fff;border-radius:14px;padding:40px 36px;width:340px;text-align:center}
-.login-card h2{color:var(--g2);margin-bottom:4px}
-.login-card p{color:var(--mu);font-size:.83rem;margin-bottom:22px}
-.login-card input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:1rem;outline:none;margin-bottom:10px}
-.login-card button{width:100%;background:var(--g2);color:#fff;border:none;padding:11px;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer}
-.lerr{color:var(--red);font-size:.82rem;min-height:18px}
-
-/* APP LAYOUT */
+#loginWrap{display:none}
 #app{display:none}
 #app.show{display:block}
-
-/* SIDEBAR */
 .sidebar{width:320px;min-width:320px;background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100%;overflow:hidden}
 .sidebar-hd{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
 .sidebar-hd h2{font-size:.95rem;font-weight:700;color:var(--g2)}
@@ -63,8 +49,6 @@ body{font-family:'Segoe UI',sans-serif;background:var(--bg);min-height:100vh;ove
 .s-won{background:#dbeafe;color:#1d4ed8}
 .s-lost{background:#fee2e2;color:#dc2626}
 .no-conv{text-align:center;padding:40px 20px;color:var(--mu);font-size:.88rem}
-
-/* CHAT AREA */
 .chat-area{flex:1;display:flex;flex-direction:column;min-width:0;height:100%;overflow:hidden}
 .chat-hd{padding:14px 20px;border-bottom:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:space-between}
 .chat-hd-info h3{font-size:1rem;font-weight:700;color:var(--txt)}
@@ -72,14 +56,10 @@ body{font-family:'Segoe UI',sans-serif;background:var(--bg);min-height:100vh;ove
 .chat-hd-actions{display:flex;gap:8px;align-items:center}
 .status-select{padding:5px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:.8rem;outline:none;background:var(--card);cursor:pointer}
 .btn{border:none;padding:7px 14px;border-radius:7px;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .15s}
-.btn-green{background:var(--g3);color:#fff}
-.btn-green:hover{background:var(--g)}
-.btn-wa{background:var(--wa);color:#fff}
+.btn-green{background:var(--g3);color:#fff}.btn-green:hover{background:var(--g)}
 .btn-sm{padding:5px 10px;font-size:.76rem}
 .relay-badge{background:#f3f4f6;border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:.72rem;color:var(--mu);cursor:pointer;display:flex;align-items:center;gap:4px}
 .relay-badge.on{background:#fef9c3;border-color:var(--gold);color:#a16207}
-
-/* MESSAGES */
 .messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:#efeae4}
 .msg-wrap{display:flex;flex-direction:column;max-width:70%}
 .msg-wrap.out{align-self:flex-end;align-items:flex-end}
@@ -92,8 +72,6 @@ body{font-family:'Segoe UI',sans-serif;background:var(--bg);min-height:100vh;ove
 .msg-time{font-size:.68rem;color:var(--mu);margin-top:3px}
 .msg-media img{max-width:200px;border-radius:8px;margin-bottom:6px}
 .empty-chat{flex:1;display:flex;align-items:center;justify-content:center;color:var(--mu);font-size:.9rem;background:#efeae4}
-
-/* COMPOSER */
 .composer{padding:12px 16px;border-top:1px solid var(--border);background:var(--card)}
 .trans-preview{background:#f0fdf4;border:1px solid var(--g3);border-radius:8px;padding:8px 12px;font-size:.8rem;color:var(--g2);margin-bottom:8px;display:none}
 .trans-preview strong{display:block;margin-bottom:2px;font-size:.72rem;color:var(--mu);text-transform:uppercase}
@@ -105,12 +83,8 @@ body{font-family:'Segoe UI',sans-serif;background:var(--bg);min-height:100vh;ove
 .send-btn:disabled{background:#9ca3af;cursor:not-allowed}
 .lang-row{display:flex;gap:8px;align-items:center;margin-top:6px;font-size:.75rem;color:var(--mu)}
 .lang-row select{padding:3px 8px;border:1px solid var(--border);border-radius:6px;font-size:.75rem;outline:none}
-
-/* NO SELECTION */
 .no-selection{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--mu);background:var(--bg)}
 .no-selection .icon{font-size:3rem}
-
-/* NEW CONV MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center}
 .modal-overlay.open{display:flex}
 .modal{background:#fff;border-radius:14px;padding:28px;width:380px}
@@ -120,41 +94,24 @@ body{font-family:'Segoe UI',sans-serif;background:var(--bg);min-height:100vh;ove
 .fgrp input,.fgrp select{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.9rem;outline:none}
 .fgrp input:focus{border-color:var(--g3)}
 .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
-
-/* TOAST */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--g2);color:#fff;padding:10px 22px;border-radius:40px;font-size:.88rem;box-shadow:0 4px 16px rgba(0,0,0,.25);transition:transform .25s;z-index:999;pointer-events:none}
 .toast.show{transform:translateX(-50%) translateY(0)}
-
 @media(max-width:700px){.sidebar{width:100%;min-width:unset}.chat-area{display:none}.sidebar.mobile-chat{display:none}.chat-area.mobile-show{display:flex}}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div id="loginWrap">
-  <div class="login-card">
-    <div style="font-size:2rem;margin-bottom:8px">💬</div>
-    <h2 id="loginTitle">Kommunikationscenter</h2>
-    <p id="loginSlugTxt">Händler-Zugang</p>
-    <input type="password" id="pwInput" placeholder="Admin-Passwort">
-    <div class="lerr" id="lerr"></div>
-    <button onclick="doLogin()">Einloggen</button>
-  </div>
-</div>
+<div id="loginWrap"></div>
 
-<!-- APP -->
 <div id="app">
-  <!-- NAV -->
   <nav class="nav" style="position:fixed;top:0;left:0;right:0;z-index:100">
     <div class="nav-brand">💬 Kommunikation <span class="nav-slug" id="navSlug"></span></div>
+    <a href="hub.html" class="tbtn">← Hub</a>
     <a href="admin.html" class="tbtn">⚙️ Admin</a>
     <button class="tbtn tbtn-out" onclick="doLogout()">Ausloggen</button>
   </nav>
 
-  <!-- LAYOUT (below nav) -->
   <div id="appLayout" style="display:flex;height:calc(100vh - 52px);margin-top:52px;overflow:hidden">
-
-    <!-- SIDEBAR -->
     <div class="sidebar">
       <div class="sidebar-hd">
         <h2>📥 Posteingang</h2>
@@ -168,7 +125,6 @@ body{font-family:'Segoe UI',sans-serif;background:var(--bg);min-height:100vh;ove
       </div>
     </div>
 
-    <!-- CHAT -->
     <div class="chat-area" id="chatArea">
       <div class="no-selection" id="noSelection">
         <div class="icon">💬</div>
@@ -176,7 +132,6 @@ body{font-family:'Segoe UI',sans-serif;background:var(--bg);min-height:100vh;ove
         <div style="font-size:.8rem">oder neue starten</div>
       </div>
 
-      <!-- Chat Header (hidden until conv selected) -->
       <div id="chatHeader" style="display:none">
         <div class="chat-hd">
           <div class="chat-hd-info">
@@ -195,14 +150,10 @@ body{font-family:'Segoe UI',sans-serif;background:var(--bg);min-height:100vh;ove
             </select>
           </div>
         </div>
-
-        <!-- Messages -->
         <div class="messages" id="messages"></div>
-
-        <!-- Composer -->
         <div class="composer">
           <div class="trans-preview" id="transPreview">
-            <strong>🌐 Wird gesendet als (ES):</strong>
+            <strong>🌐 Wird gesendet als:</strong>
             <span id="transText">—</span>
           </div>
           <div class="composer-row">
@@ -231,20 +182,12 @@ body{font-family:'Segoe UI',sans-serif;background:var(--bg);min-height:100vh;ove
   </div>
 </div>
 
-<!-- NEW CONVERSATION MODAL -->
 <div class="modal-overlay" id="newConvModal">
   <div class="modal">
     <h3>➕ Neue Konversation</h3>
-    <div class="fgrp">
-      <label>WhatsApp Nummer *</label>
-      <input id="nc-phone" placeholder="+18295551234">
-    </div>
-    <div class="fgrp">
-      <label>Name (optional)</label>
-      <input id="nc-name" placeholder="Kundenname">
-    </div>
-    <div class="fgrp">
-      <label>Sprache des Kunden</label>
+    <div class="fgrp"><label>WhatsApp Nummer *</label><input id="nc-phone" placeholder="+18295551234"></div>
+    <div class="fgrp"><label>Name (optional)</label><input id="nc-name" placeholder="Kundenname"></div>
+    <div class="fgrp"><label>Sprache des Kunden</label>
       <select id="nc-lang">
         <option value="es">🇩🇴 Español</option>
         <option value="de">🇩🇪 Deutsch</option>
@@ -269,43 +212,50 @@ var allConvs = [];
 var realtimeSub = null;
 var transTimer = null;
 
-// ── INIT ──────────────────────────────────────────────────
-window.addEventListener('load', function() {
-  var params = new URLSearchParams(window.location.search);
-  slug = params.get('m') || 'sosuapesce';
-  document.getElementById('loginSlugTxt').textContent = '/' + slug + '/';
+// ── AUTH + INIT ────────────────────────────────────────────
+window.addEventListener('load', async function() {
+  var stored = null;
+  try { stored = JSON.parse(localStorage.getItem('converto_auth_v2') || 'null'); } catch(e) {}
+
+  if (!stored || !stored.role) {
+    window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+    return;
+  }
+  if (stored.loggedInAt) {
+    var age = Date.now() - new Date(stored.loggedInAt).getTime();
+    if (age > 43200000) {
+      localStorage.removeItem('converto_auth_v2');
+      window.location.href = 'login.html';
+      return;
+    }
+  }
+
+  slug = stored.slug || new URLSearchParams(location.search).get('m') || 'ynhald';
   document.getElementById('navSlug').textContent = slug;
 
   try {
     var cfg = window.SP_CONFIG;
-    if (!cfg) return;
-    var key = cfg.SUPABASE_ANON_KEY || cfg.SUPABASE_KEY;
-    sb = window.supabase.createClient(cfg.SUPABASE_URL, key);
-    sb.from('merchants').select('name').eq('slug', slug).single().then(function(r) {
-      if (r.data) document.getElementById('loginTitle').textContent = r.data.name;
-    });
+    if (cfg) {
+      var key = cfg.SUPABASE_ANON_KEY || cfg.SUPABASE_KEY;
+      if (key) sb = window.supabase.createClient(cfg.SUPABASE_URL, key);
+    }
   } catch(e) { console.error(e); }
 
-  document.getElementById('pwInput').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') doLogin();
-  });
+  if (sb) {
+    var r = await sb.from('merchants').select('*').eq('slug', slug).single();
+    if (r.data) merchant = r.data;
+  }
+
+  document.getElementById('app').classList.add('show');
+  loadConversations();
+  subscribeRealtime();
 });
 
-function doLogin() {
-  var pw = document.getElementById('pwInput').value;
-  if (!pw || !sb) return;
-  sb.from('merchants').select('*').eq('slug', slug).single().then(function(r) {
-    if (r.error || !r.data) { document.getElementById('lerr').textContent = 'Händler nicht gefunden'; return; }
-    if (r.data.admin_password !== pw) { document.getElementById('lerr').textContent = 'Falsches Passwort'; return; }
-    merchant = r.data;
-    document.getElementById('loginWrap').style.display = 'none';
-    document.getElementById('app').classList.add('show');
-    loadConversations();
-    subscribeRealtime();
-  });
+function doLogout() {
+  localStorage.removeItem('converto_auth_v2');
+  window.location.href = 'login.html';
 }
 
-function doLogout() { location.reload(); }
 function showToast(msg) {
   var t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
@@ -341,16 +291,11 @@ function renderConvList(convs) {
     var time = c.last_message_at ? new Date(c.last_message_at).toLocaleTimeString('de-AT', {hour:'2-digit',minute:'2-digit'}) : '';
     return '<div class="conv-item' + (isActive ? ' active' : '') + '" onclick="selectConv(\'' + c.id + '\')">' +
       '<div class="conv-avatar">' + initials + '</div>' +
-      '<div class="conv-info">' +
-        '<div class="conv-name">' + name + '</div>' +
-        '<div class="conv-preview">' + (c.last_message_preview || 'Neue Konversation') + '</div>' +
-      '</div>' +
-      '<div class="conv-meta">' +
-        '<span class="conv-time">' + time + '</span>' +
-        (c.unread_count > 0 ? '<span class="conv-badge">' + c.unread_count + '</span>' : '') +
-        '<span class="conv-status ' + statusClass + '">' + statusLabel + '</span>' +
-      '</div>' +
-    '</div>';
+      '<div class="conv-info"><div class="conv-name">' + name + '</div>' +
+      '<div class="conv-preview">' + (c.last_message_preview || 'Neue Konversation') + '</div></div>' +
+      '<div class="conv-meta"><span class="conv-time">' + time + '</span>' +
+      (c.unread_count > 0 ? '<span class="conv-badge">' + c.unread_count + '</span>' : '') +
+      '<span class="conv-status ' + statusClass + '">' + statusLabel + '</span></div></div>';
   }).join('');
 }
 
@@ -358,88 +303,56 @@ function filterConvs() {
   var q = document.getElementById('searchInput').value.toLowerCase();
   var filtered = allConvs.filter(function(c) {
     var contact = c.comm_contacts || {};
-    var name = (contact.display_name || '').toLowerCase();
-    var phone = (contact.whatsapp_number || '').toLowerCase();
-    var preview = (c.last_message_preview || '').toLowerCase();
-    return name.includes(q) || phone.includes(q) || preview.includes(q);
+    return (contact.display_name||'').toLowerCase().includes(q) ||
+           (contact.whatsapp_number||'').toLowerCase().includes(q) ||
+           (c.last_message_preview||'').toLowerCase().includes(q);
   });
   renderConvList(filtered);
 }
 
-// ── SELECT CONVERSATION ───────────────────────────────────
 function selectConv(id) {
   currentConv = allConvs.find(function(c){ return c.id === id; });
   if (!currentConv) return;
-
   var contact = currentConv.comm_contacts || {};
   document.getElementById('chatName').textContent = contact.display_name || contact.whatsapp_number;
   document.getElementById('chatPhone').textContent = contact.whatsapp_number || '';
   document.getElementById('noSelection').style.display = 'none';
-  document.getElementById('chatHeader').style.display = 'flex';
-  document.getElementById('chatHeader').style.flexDirection = 'column';
-        document.getElementById('chatHeader').style.height = '100%';
-  document.getElementById('chatHeader').style.flex = '1';
-
-  // Set status select
+  document.getElementById('chatHeader').style.cssText = 'display:flex;flex-direction:column;height:100%;flex:1';
   document.getElementById('statusSelect').value = currentConv.status || 'open';
-
-  // Set send language based on contact preference
-  var prefLang = contact.preferred_language || 'es';
-  document.getElementById('sendLang').value = prefLang;
-
-  // Relay
+  document.getElementById('sendLang').value = contact.preferred_language || 'es';
   updateRelayBadge();
-
-  // Mark as read
   sb.from('comm_conversations').update({ unread_count: 0 }).eq('id', id).then(function(){});
-
   loadMessages(id);
   renderConvList(allConvs);
 }
 
-// ── MESSAGES ──────────────────────────────────────────────
 function loadMessages(convId) {
   document.getElementById('messages').innerHTML = '<div style="text-align:center;color:var(--mu);padding:20px;font-size:.85rem">Lade...</div>';
-  sb.from('comm_messages')
-    .select('*')
-    .eq('conversation_id', convId)
-    .order('created_at', { ascending: true })
-    .then(function(r) {
-      renderMessages(r.data || []);
-    });
+  sb.from('comm_messages').select('*').eq('conversation_id', convId)
+    .order('created_at', { ascending: true }).then(function(r) { renderMessages(r.data || []); });
 }
 
 function renderMessages(msgs) {
   var el = document.getElementById('messages');
   if (!msgs.length) {
-    el.innerHTML = '<div style="text-align:center;color:var(--mu);padding:40px;font-size:.85rem">Noch keine Nachrichten.<br>Schreibe etwas um die Konversation zu starten.</div>';
+    el.innerHTML = '<div style="text-align:center;color:var(--mu);padding:40px;font-size:.85rem">Noch keine Nachrichten.</div>';
     return;
   }
   el.innerHTML = msgs.map(function(m) {
-    var dir = m.direction; // 'in' | 'out'
+    var dir = m.direction;
     var time = new Date(m.created_at).toLocaleTimeString('de-AT', {hour:'2-digit',minute:'2-digit'});
     var mediaHtml = m.media_url ? '<div class="msg-media"><img src="' + m.media_url + '" onerror="this.style.display=\'none\'"></div>' : '';
-    var origHtml = '';
-    var transHtml = '';
+    var content = '';
     if (m.original_text && m.translated_text && m.original_text !== m.translated_text) {
-      if (dir === 'in') {
-        origHtml = '<div class="msg-original">🇩🇴 ' + escHtml(m.original_text) + '</div>';
-        transHtml = '<div class="msg-translation">🇩🇪 ' + escHtml(m.translated_text) + '</div>';
-      } else {
-        origHtml = '<div class="msg-original">🇩🇪 ' + escHtml(m.original_text) + '</div>';
-        transHtml = '<div class="msg-translation">🇩🇴 ' + escHtml(m.translated_text) + '</div>';
-      }
+      var flag1 = dir === 'in' ? '🇩🇴 ' : '🇩🇪 ';
+      var flag2 = dir === 'in' ? '🇩🇪 ' : '🇩🇴 ';
+      content = '<div class="msg-original">' + flag1 + escHtml(m.original_text) + '</div>' +
+                '<div class="msg-translation">' + flag2 + escHtml(m.translated_text) + '</div>';
+    } else {
+      content = '<div>' + escHtml(m.translated_text || m.original_text || '') + '</div>';
     }
-    var mainText = m.translated_text || m.original_text || '';
-    return '<div class="msg-wrap ' + dir + '">' +
-      '<div class="msg-bubble">' +
-        mediaHtml +
-        (m.original_text && m.translated_text && m.original_text !== m.translated_text
-          ? origHtml + transHtml
-          : '<div>' + escHtml(mainText) + '</div>') +
-      '</div>' +
-      '<div class="msg-time">' + time + (dir === 'out' ? ' ✓✓' : '') + '</div>' +
-    '</div>';
+    return '<div class="msg-wrap ' + dir + '"><div class="msg-bubble">' + mediaHtml + content + '</div>' +
+      '<div class="msg-time">' + time + (dir === 'out' ? ' ✓✓' : '') + '</div></div>';
   }).join('');
   el.scrollTop = el.scrollHeight;
 }
@@ -448,46 +361,38 @@ function escHtml(str) {
   return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
 }
 
-// ── SEND MESSAGE ──────────────────────────────────────────
 function sendMsg() {
   var text = document.getElementById('msgInput').value.trim();
   if (!text || !currentConv || !merchant) return;
-
   var btn = document.getElementById('sendBtn');
   btn.disabled = true;
-
   var writeLang = document.getElementById('writeLang').value;
   var sendLang = document.getElementById('sendLang').value;
-  var needsTranslation = writeLang !== sendLang;
+  var needsTrans = writeLang !== sendLang;
   var transText = document.getElementById('transText').textContent;
-
-  var textToSend = (needsTranslation && transText && transText !== '—') ? transText : text;
+  var textToSend = (needsTrans && transText && transText !== '—') ? transText : text;
   var contact = currentConv.comm_contacts || {};
-  var toNumber = contact.whatsapp_number;
 
-  // Save to DB
-  var msgPayload = {
-    conversation_id: currentConv.id,
-    merchant_id: merchant.id,
-    direction: 'out',
-    content_type: 'text',
-    original_text: text,
-    translated_text: needsTranslation ? textToSend : null,
-    language_detected: writeLang,
-    source: 'dashboard'
-  };
-
-  sb.from('comm_messages').insert(msgPayload).then(function(r) {
+  sb.from('comm_messages').insert({
+    conversation_id: currentConv.id, merchant_id: merchant.id,
+    direction: 'out', content_type: 'text',
+    original_text: text, translated_text: needsTrans ? textToSend : null,
+    language_detected: writeLang, source: 'dashboard'
+  }).then(function(r) {
     if (r.error) { showToast('Fehler: ' + r.error.message); btn.disabled = false; return; }
-
-    // Update conversation preview
     sb.from('comm_conversations').update({
       last_message_at: new Date().toISOString(),
       last_message_preview: textToSend.substring(0, 80)
     }).eq('id', currentConv.id).then(function(){});
 
-    // Send via Twilio
-    sendViaTwilio(toNumber, textToSend, text, writeLang, sendLang);
+    var cleanTo = (contact.whatsapp_number||'').replace('whatsapp:','').replace(/[^0-9+]/g,'');
+    if (!cleanTo.startsWith('+')) cleanTo = '+' + cleanTo;
+    fetch('https://converto-server-production.up.railway.app/api/whatsapp/send', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ to: cleanTo, message: textToSend, merchant_id: merchant.id })
+    }).then(function(r){return r.json();}).then(function(d){
+      showToast(d.success ? '✅ Gesendet!' : '⚠️ ' + (d.error||'Fehler'));
+    }).catch(function(){ showToast('⚠️ Verbindungsfehler'); });
 
     document.getElementById('msgInput').value = '';
     document.getElementById('transPreview').style.display = 'none';
@@ -498,82 +403,38 @@ function sendMsg() {
   });
 }
 
-function sendViaTwilio(toNumber, textToSend, originalText, writeLang, sendLang) {
-  var cfg = window.SP_CONFIG;
-  var apiUrl = cfg.API_URL || 'https://converto-server-production.up.railway.app';
-
-  var cleanTo = toNumber.replace('whatsapp:', '').replace(/[^0-9+]/g, '');
-  if (!cleanTo.startsWith('+')) cleanTo = '+' + cleanTo;
-
-  fetch(apiUrl + '/api/whatsapp/send', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      to: cleanTo,
-      message: textToSend,
-      merchant_id: merchant.id
-    })
-  }).then(function(r) { return r.json(); }).then(function(data) {
-    if (data.success) {
-      showToast('✅ Nachricht gesendet!');
-    } else {
-      showToast('⚠️ Fehler: ' + (data.error || 'Unbekannt'));
-    }
-  }).catch(function(e) {
-    showToast('⚠️ Verbindungsfehler');
-    console.error(e);
-  });
-}
- 
-
-// ── TRANSLATION ───────────────────────────────────────────
 function onTyping() {
   clearTimeout(transTimer);
-  var writeLang = document.getElementById('writeLang').value;
-  var sendLang = document.getElementById('sendLang').value;
-  if (writeLang === sendLang) {
-    document.getElementById('transPreview').style.display = 'none';
-    return;
-  }
+  var wl = document.getElementById('writeLang').value;
+  var sl = document.getElementById('sendLang').value;
+  if (wl === sl) { document.getElementById('transPreview').style.display = 'none'; return; }
   var text = document.getElementById('msgInput').value.trim();
   if (!text) { document.getElementById('transPreview').style.display = 'none'; return; }
   document.getElementById('transStatus').textContent = '⏳ Übersetze...';
-  transTimer = setTimeout(function() { translateText(text, writeLang, sendLang); }, 800);
+  transTimer = setTimeout(function() { translateText(text, wl, sl); }, 800);
 }
 
-function updateTransPreview() {
-  var text = document.getElementById('msgInput').value.trim();
-  if (text) onTyping();
-}
+function updateTransPreview() { if (document.getElementById('msgInput').value.trim()) onTyping(); }
 
 function translateText(text, fromLang, toLang) {
-  var langNames = { de: 'Deutsch', es: 'Spanisch', en: 'Englisch' };
-  // Claude API für Übersetzung
   var cfg = window.SP_CONFIG;
+  if (!cfg) return;
   fetch(cfg.SUPABASE_URL + '/functions/v1/translate', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text: text, fromLang: fromLang, toLang: toLang })
-  }).then(function(r) { return r.json(); }).then(function(data) {
-    if (data.error) { document.getElementById('transStatus').textContent = '⚠️ ' + data.error; return; }
-    document.getElementById('transText').textContent = data.translated || text;
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ text, fromLang, toLang })
+  }).then(function(r){return r.json();}).then(function(d){
+    if (d.error) { document.getElementById('transStatus').textContent = '⚠️ ' + d.error; return; }
+    document.getElementById('transText').textContent = d.translated || text;
     document.getElementById('transPreview').style.display = 'block';
     document.getElementById('transStatus').textContent = '✓ Übersetzt';
-  }).catch(function() {
-    document.getElementById('transStatus').textContent = '⚠️ Übersetzung fehlgeschlagen';
-  });
+  }).catch(function(){ document.getElementById('transStatus').textContent = '⚠️ Übersetzung fehlgeschlagen'; });
 }
 
-// ── STATUS & RELAY ────────────────────────────────────────
 function updateStatus() {
   if (!currentConv || !sb) return;
-  var newStatus = document.getElementById('statusSelect').value;
-  sb.from('comm_conversations').update({ status: newStatus }).eq('id', currentConv.id).then(function(r) {
-    if (!r.error) {
-      currentConv.status = newStatus;
-      showToast('Status aktualisiert');
-      loadConversations();
-    }
+  var s = document.getElementById('statusSelect').value;
+  sb.from('comm_conversations').update({ status: s }).eq('id', currentConv.id).then(function(r) {
+    if (!r.error) { currentConv.status = s; showToast('Status aktualisiert'); loadConversations(); }
   });
 }
 
@@ -581,27 +442,17 @@ function toggleRelay() {
   if (!currentConv || !sb) return;
   var newRelay = !currentConv.relay_mode;
   sb.from('comm_conversations').update({ relay_mode: newRelay }).eq('id', currentConv.id).then(function(r) {
-    if (!r.error) {
-      currentConv.relay_mode = newRelay;
-      updateRelayBadge();
-      showToast('Relay-Modus: ' + (newRelay ? 'AN' : 'AUS'));
-    }
+    if (!r.error) { currentConv.relay_mode = newRelay; updateRelayBadge(); showToast('Relay: ' + (newRelay?'AN':'AUS')); }
   });
 }
 
 function updateRelayBadge() {
   var badge = document.getElementById('relayToggle');
   var status = document.getElementById('relayStatus');
-  if (currentConv && currentConv.relay_mode) {
-    badge.classList.add('on');
-    status.textContent = 'AN';
-  } else {
-    badge.classList.remove('on');
-    status.textContent = 'AUS';
-  }
+  if (currentConv && currentConv.relay_mode) { badge.classList.add('on'); status.textContent = 'AN'; }
+  else { badge.classList.remove('on'); status.textContent = 'AUS'; }
 }
 
-// ── NEW CONVERSATION ──────────────────────────────────────
 function openNewConv() { document.getElementById('newConvModal').classList.add('open'); }
 function closeNewConv() { document.getElementById('newConvModal').classList.remove('open'); }
 
@@ -612,51 +463,34 @@ function createConv() {
   if (!phone) { showToast('Telefonnummer eingeben'); return; }
   if (!phone.startsWith('+')) phone = '+' + phone;
 
-  // Contact erstellen
   sb.from('comm_contacts').upsert({
-    merchant_id: merchant.id,
-    whatsapp_number: phone,
-    display_name: name || phone,
-    preferred_language: lang
+    merchant_id: merchant.id, whatsapp_number: phone,
+    display_name: name || phone, preferred_language: lang
   }, { onConflict: 'merchant_id,whatsapp_number' }).select('id').single().then(function(r) {
     if (r.error) { showToast('Fehler: ' + r.error.message); return; }
-    var contactId = r.data.id;
-    // Konversation erstellen
     sb.from('comm_conversations').insert({
-      merchant_id: merchant.id,
-      contact_id: contactId,
-      status: 'open',
-      last_message_at: new Date().toISOString(),
-      last_message_preview: 'Neue Konversation'
+      merchant_id: merchant.id, contact_id: r.data.id, status: 'open',
+      last_message_at: new Date().toISOString(), last_message_preview: 'Neue Konversation'
     }).select().single().then(function(r2) {
       if (r2.error) { showToast('Fehler: ' + r2.error.message); return; }
-      closeNewConv();
-      showToast('✅ Konversation gestartet!');
+      closeNewConv(); showToast('✅ Konversation gestartet!');
       loadConversations();
       setTimeout(function() { selectConv(r2.data.id); }, 500);
     });
   });
 }
 
-// ── REALTIME ──────────────────────────────────────────────
 function subscribeRealtime() {
   if (!sb || !merchant) return;
-  realtimeSub = sb.channel('comm-' + merchant.id)
-    .on('postgres_changes', {
-      event: '*', schema: 'public', table: 'comm_messages',
-      filter: 'merchant_id=eq.' + merchant.id
-    }, function(payload) {
-      // Neue Nachricht angekommen
-      if (currentConv && payload.new && payload.new.conversation_id === currentConv.id) {
-        loadMessages(currentConv.id);
-      }
+  sb.channel('comm-' + merchant.id)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'comm_messages',
+        filter: 'merchant_id=eq.' + merchant.id }, function(payload) {
+      if (currentConv && payload.new && payload.new.conversation_id === currentConv.id) loadMessages(currentConv.id);
       loadConversations();
       showToast('📨 Neue Nachricht!');
-    })
-    .subscribe();
+    }).subscribe();
 }
 
-// ── HELPERS ───────────────────────────────────────────────
 function autoResize(el) {
   el.style.height = 'auto';
   el.style.height = Math.min(el.scrollHeight, 100) + 'px';
