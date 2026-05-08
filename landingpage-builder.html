@@ -295,17 +295,15 @@ nav{background:rgba(10,31,18,0.95);backdrop-filter:blur(12px);border-bottom:1px 
     </div>
 
     <!-- CHAT TAB -->
-    <div class="panel-body" id="tab-chat" style="display:none;padding-bottom:8px;">
+    <div class="panel-body" id="tab-chat" style="display:none;padding-bottom:80px;">
       <p style="font-size:.78rem;color:var(--muted);margin-bottom:10px;line-height:1.5;">Beschreibe Änderungen – die AI passt gezielt an.</p>
-      <div class="chat-area">
-        <div class="chat-messages" id="chatMessages">
-          <div class="chat-msg system">💬 AI Assistent bereit</div>
-          <div class="chat-msg ai">Sag mir was du ändern möchtest – z.B. "Mach den Hero Text kürzer" oder "Füge eine FAQ hinzu".</div>
-        </div>
-        <div class="chat-input-row">
-          <input class="chat-input" id="chatInput" placeholder="z.B. Ändere die Buttons auf Blau..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}">
-          <button class="chat-send" id="chatSendBtn" onclick="sendChat()">➤</button>
-        </div>
+      <div class="chat-messages" id="chatMessages" style="max-height:220px;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px;background:var(--card2);border-radius:10px;margin-bottom:10px;border:1px solid rgba(37,211,102,0.08);">
+        <div class="chat-msg system">💬 AI Assistent bereit</div>
+        <div class="chat-msg ai">Sag mir was du ändern möchtest – z.B. "Mach den Hero Text kürzer", "Ändere Buttons auf Blau" oder "Füge eine FAQ hinzu".</div>
+      </div>
+      <div style="display:flex;gap:8px;position:sticky;bottom:0;background:var(--card);padding:10px 0 4px;">
+        <input class="chat-input" id="chatInput" placeholder="z.B. Ändere die Primärfarbe auf #1324aa..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}">
+        <button class="chat-send" id="chatSendBtn" onclick="sendChat()">➤</button>
       </div>
     </div>
 
