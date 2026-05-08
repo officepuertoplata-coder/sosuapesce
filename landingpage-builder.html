@@ -197,6 +197,21 @@ nav{background:rgba(10,31,18,0.95);backdrop-filter:blur(12px);border-bottom:1px 
       <div class="fgrp"><label>E-Mail</label><input type="email" id="email" placeholder="office@firma.com" oninput="saveSettings()"></div>
       <div class="fgrp"><label>Buchungslink</label><input type="text" id="bookingLink" placeholder="Calendly, Cal.com..." oninput="saveSettings()"></div>
 
+      <div class="divider">Rechtliches & Links</div>
+      <div class="fgrp"><label>Impressum URL</label><input type="text" id="impressumUrl" placeholder="https://firma.com/impressum" oninput="saveSettings()"></div>
+      <div class="fgrp"><label>Datenschutz / DSGVO URL</label><input type="text" id="dsgvoUrl" placeholder="https://firma.com/datenschutz" oninput="saveSettings()"></div>
+      <div class="fgrp"><label>AGB URL (optional)</label><input type="text" id="agbUrl" placeholder="https://firma.com/agb" oninput="saveSettings()"></div>
+      <div class="fgrp"><label>Cookie Policy URL (optional)</label><input type="text" id="cookieUrl" placeholder="https://firma.com/cookies" oninput="saveSettings()"></div>
+      <div style="background:rgba(37,211,102,0.06);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:12px;">
+        <div style="font-size:.65rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;">📋 Impressum Daten</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <input type="text" id="impFirma" placeholder="Firma / Name" style="width:100%;padding:7px 10px;background:var(--card2);border:1.5px solid rgba(37,211,102,0.1);border-radius:7px;color:var(--txt);font-size:.8rem;font-family:Nunito,sans-serif;outline:none;" oninput="saveSettings()">
+          <input type="text" id="impAdresse" placeholder="Adresse, PLZ Stadt" style="width:100%;padding:7px 10px;background:var(--card2);border:1.5px solid rgba(37,211,102,0.1);border-radius:7px;color:var(--txt);font-size:.8rem;font-family:Nunito,sans-serif;outline:none;" oninput="saveSettings()">
+          <input type="text" id="impGf" placeholder="Geschäftsführer / Inhaber" style="width:100%;padding:7px 10px;background:var(--card2);border:1.5px solid rgba(37,211,102,0.1);border-radius:7px;color:var(--txt);font-size:.8rem;font-family:Nunito,sans-serif;outline:none;" oninput="saveSettings()">
+          <input type="text" id="impUid" placeholder="UID / Steuernummer (optional)" style="width:100%;padding:7px 10px;background:var(--card2);border:1.5px solid rgba(37,211,102,0.1);border-radius:7px;color:var(--txt);font-size:.8rem;font-family:Nunito,sans-serif;outline:none;" oninput="saveSettings()">
+        </div>
+      </div>
+
       <div class="divider">Farben</div>
       <div class="colors-grid">
         <div class="color-item"><label>Primärfarbe</label><div class="color-row"><input type="color" id="color1" value="#1b4332" oninput="syncColor('color1','color1hex');saveSettings()"><input type="text" id="color1hex" value="#1b4332" oninput="syncColorPicker('color1hex','color1');saveSettings()"></div></div>
@@ -236,6 +251,10 @@ nav{background:rgba(10,31,18,0.95);backdrop-filter:blur(12px);border-bottom:1px 
       <p style="font-size:.78rem;color:var(--muted);margin-bottom:14px;line-height:1.5;">Lade Bilder hoch – die AI platziert sie automatisch an der richtigen Stelle.</p>
 
       <div class="divider">Logo & Hero</div>
+      <div style="font-size:.7rem;color:var(--muted);margin-bottom:8px;line-height:1.6;">
+        🏢 Logo: <strong>PNG</strong> transparent · max. <strong>400×200px · 200 KB</strong> &nbsp;|&nbsp;
+        🖼️ Hero: <strong>JPG</strong> quer · max. <strong>1920×1080px · 1 MB</strong>
+      </div>
       <div class="img-upload-grid">
         <!-- LOGO -->
         <div class="img-upload-box" id="logoBox" onclick="document.getElementById('logoInput').click()">
@@ -256,6 +275,16 @@ nav{background:rgba(10,31,18,0.95);backdrop-filter:blur(12px);border-bottom:1px 
       </div>
 
       <div class="divider">Weitere Bilder</div>
+      <!-- Image size info -->
+      <div style="background:rgba(244,161,0,0.08);border:1px solid rgba(244,161,0,0.2);border-radius:8px;padding:10px;margin-bottom:10px;font-size:.72rem;line-height:1.7;">
+        <div style="font-weight:800;color:var(--gold);margin-bottom:4px;">📐 Empfohlene Bildgrößen</div>
+        <div style="color:var(--muted);">
+          🏢 <strong>Logo:</strong> PNG transparent · max. 400×200px · max. <strong>200 KB</strong><br>
+          🖼️ <strong>Hero:</strong> JPG quer · max. 1920×1080px · max. <strong>1 MB</strong><br>
+          📸 <strong>Weitere:</strong> JPG · max. 800×600px · max. <strong>300 KB</strong><br>
+          ⚠️ Alle Bilder zusammen max. <strong>3 MB</strong> – sonst Timeout
+        </div>
+      </div>
       <div class="upload-area" onclick="document.getElementById('extraImgInput').click()" style="margin-bottom:10px;">
         <input type="file" id="extraImgInput" accept="image/*" multiple onchange="handleExtraImages(event)">
         <div style="font-size:20px;margin-bottom:4px;">📸</div>
@@ -370,6 +399,7 @@ const SECTIONS_DEFAULT = [
   {id:'tagesangebot',icon:'🛒',name:'Tagesangebot', active:false},
   {id:'team',        icon:'👤',name:'Team',         active:false},
   {id:'kontakt',     icon:'📞',name:'Kontakt',      active:true},
+  {id:'impressum',   icon:'📋',name:'Impressum',    active:false},
 ];
 let sections = [...SECTIONS_DEFAULT];
 
@@ -457,7 +487,15 @@ function getSettingsObj() {
     style:           document.getElementById('style').value,
     languages:       langs,
     sections_order:  sections.map(s=>({id:s.id,active:s.active})),
-    sections:        sections.filter(s=>s.active).map(s=>s.name).join(', ')
+    sections:        sections.filter(s=>s.active).map(s=>s.name).join(', '),
+    impressum_url:   document.getElementById('impressumUrl').value,
+    dsgvo_url:       document.getElementById('dsgvoUrl').value,
+    agb_url:         document.getElementById('agbUrl').value,
+    cookie_url:      document.getElementById('cookieUrl').value,
+    imp_firma:       document.getElementById('impFirma').value,
+    imp_adresse:     document.getElementById('impAdresse').value,
+    imp_gf:          document.getElementById('impGf').value,
+    imp_uid:         document.getElementById('impUid').value,
   };
 }
 function loadSettingsObj(s) {
@@ -472,6 +510,14 @@ function loadSettingsObj(s) {
   if(s.color3){set('color3hex',s.color3);document.getElementById('color3').value=s.color3;}
   if(s.color4){set('color4hex',s.color4);document.getElementById('color4').value=s.color4;}
   if(s.style) set('style',s.style);
+  if(s.impressum_url) set('impressumUrl',s.impressum_url);
+  if(s.dsgvo_url)     set('dsgvoUrl',s.dsgvo_url);
+  if(s.agb_url)       set('agbUrl',s.agb_url);
+  if(s.cookie_url)    set('cookieUrl',s.cookie_url);
+  if(s.imp_firma)     set('impFirma',s.imp_firma);
+  if(s.imp_adresse)   set('impAdresse',s.imp_adresse);
+  if(s.imp_gf)        set('impGf',s.imp_gf);
+  if(s.imp_uid)       set('impUid',s.imp_uid);
   if(s.languages) {
     document.querySelectorAll('.lang-check input').forEach(cb=>{
       cb.checked=s.languages.includes(cb.value);
