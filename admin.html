@@ -264,6 +264,7 @@ var merchant = null;
 var slug = '';
 var products = [];
 var agents = [];
+var API = 'https://converto-server-production.up.railway.app';
 
 // ── AUTH + INIT ────────────────────────────────────────────
 window.addEventListener('load', async function() {
@@ -279,26 +280,31 @@ window.addEventListener('load', async function() {
     if (age > 43200000) { localStorage.removeItem('converto_auth_v2'); window.location.href = 'login.html'; return; }
   }
 
-  slug = stored.slug || new URLSearchParams(location.search).get('m') || 'ynhald';
+  slug = stored.slug || new URLSearchParams(location.search).get('m') || '';
+  if (!slug) { window.location.href = 'hub.html'; return; }
   document.getElementById('navSlug').textContent = slug;
 
+  // Supabase init (optional)
   try {
     var cfg = window.SP_CONFIG;
     if (cfg) {
       var key = cfg.SUPABASE_ANON_KEY || cfg.SUPABASE_KEY;
       if (key && key.indexOf('XXXX') === -1) sb = window.supabase.createClient(cfg.SUPABASE_URL, key);
     }
-  } catch(e) { console.error(e); }
+  } catch(e) {}
 
-  if (sb) {
-    var r = await sb.from('merchants').select('*').eq('slug', slug).single();
-    if (r.data) {
-      merchant = r.data;
-      document.getElementById('navName').textContent = merchant.name;
-      var siteBase = (window.SP_CONFIG && window.SP_CONFIG.SITE_URL) || window.location.origin;
-      document.getElementById('partnerRegLink').textContent = siteBase + '/agentes.html?m=' + slug;
+  // Händler über Railway API laden (kein Supabase nötig)
+  try {
+    var mr = await fetch(API + '/api/merchants/' + slug);
+    if (mr.ok) {
+      var mdata = await mr.json();
+      if (mdata && mdata.id) {
+        merchant = mdata;
+        document.getElementById('navName').textContent = merchant.name || slug;
+        document.getElementById('partnerRegLink').textContent = window.location.origin + '/agentes.html?m=' + slug;
+      }
     }
-  }
+  } catch(e) { console.error('Merchant:', e.message); }
 
   document.getElementById('app').classList.add('show');
   loadAll();
@@ -425,10 +431,10 @@ function statusBadge(s) {
 function loadAll() { loadDashboard(); loadPartnersDropdown(); loadProductsDropdown(); }
 
 function loadDashboard() {
-  if (!sb || !merchant) return;
+  if (!merchant) return;
   var today = new Date(); today.setHours(0,0,0,0);
   var monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-  sb.from('sales').select('*, agents(name,referral_code)').eq('merchant_id', merchant.id)
+  if (sb) { sb.from('sales').select('*, agents(name,referral_code)').eq('merchant_id', merchant.id)
     .order('created_at', {ascending:false}).then(function(r) {
     var sales = r.data || [];
     document.getElementById('d-sales-today').textContent = sales.filter(function(s){ return new Date(s.created_at) >= today; }).length;
@@ -475,9 +481,10 @@ function clearLink() { document.getElementById('pl-phone').value=''; document.ge
 function copyPartnerLink() { navigator.clipboard.writeText(document.getElementById('partnerRegLink').textContent).then(function(){ showToast('✅ Kopiert!'); }); }
 
 function loadProducts() {
-  if (!sb || !merchant) return;
-  sb.from('merchant_products').select('*').eq('merchant_id', merchant.id).order('sort_order',{ascending:true}).then(function(r){
-    products = r.data || [];
+  if (!merchant) return;
+  fetch(API + '/api/products/' + merchant.id).then(function(r){return r.json();}).then(function(data){
+    products = data || [];
+    var r = {data: products};
     document.getElementById('pl-product').innerHTML = '<option value="">— Produkt —</option>' +
       products.map(function(p){ return '<option value="'+p.stripe_link+'" data-price="'+p.price+'">'+p.name+' ('+fmtNum(p.price)+' '+(merchant.currency||'RD$')+')</option>'; }).join('');
     if (!products.length) { document.getElementById('productsList').innerHTML = '<div class="msg">Noch keine Produkte.</div>'; return; }
@@ -495,9 +502,9 @@ function loadProducts() {
 }
 
 function loadProductsDropdown() {
-  if (!sb || !merchant) return;
-  sb.from('merchant_products').select('*').eq('merchant_id', merchant.id).order('sort_order',{ascending:true}).then(function(r){
-    document.getElementById('s-product').innerHTML = '<option value="">— Produkt wählen —</option>' + (r.data||[]).map(function(p){ return '<option value="'+p.id+'">'+p.name+'</option>'; }).join('');
+  if (!merchant) return;
+  fetch(API + '/api/products/' + merchant.id).then(function(r){return r.json();}).then(function(data){
+    document.getElementById('s-product').innerHTML = '<option value="">— Produkt wählen —</option>' + (data||[]).map(function(p){ return '<option value="'+p.id+'">'+p.name+'</option>'; }).join('');
   });
 }
 
@@ -548,8 +555,12 @@ function saveProduct() {
       stripe_link:document.getElementById('p-stripe').value.trim()||null,sort_order:parseInt(document.getElementById('p-sort').value)||1,
       available:document.getElementById('p-available').value==='true',status:'active'};
     if (imgUrl) payload.image_url=imgUrl;
-    var op=pid?sb.from('merchant_products').update(payload).eq('id',pid):sb.from('merchant_products').insert(payload);
-    op.then(function(r){ if(r.error){document.getElementById('p-save-status').innerHTML='<span style="color:var(--red)">Fehler: '+r.error.message+'</span>';return;} showToast('✅ Gespeichert!'); closeProductForm(); loadProducts(); loadProductsDropdown(); });
+    var method = pid ? 'PUT' : 'POST';
+    var url = pid ? API+'/api/products/'+pid : API+'/api/products';
+    fetch(url,{method:method,headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+      .then(function(r){return r.json();}).then(function(d){
+        if(d.error){document.getElementById('p-save-status').innerHTML='<span style="color:var(--red)">Fehler: '+d.error+'</span>';return;}
+        showToast('✅ Gespeichert!'); closeProductForm(); loadProducts(); loadProductsDropdown(); });
   }
   if (imgFile) {
     var ext=imgFile.name.split('.').pop();
@@ -560,7 +571,7 @@ function saveProduct() {
   } else doSave(document.getElementById('p-img-url').value||null);
 }
 
-function deleteProduct(id) { if(!sb) return; if(!confirm('Produkt löschen?')) return; sb.from('merchant_products').delete().eq('id',id).then(function(){ showToast('Gelöscht'); loadProducts(); }); }
+function deleteProduct(id) { if(!confirm('Produkt löschen?')) return; fetch(API+'/api/products/'+id,{method:'DELETE'}).then(function(){ showToast('Gelöscht'); loadProducts(); }); }
 
 function loadPartnersDropdown() {
   if (!sb||!merchant) return;
@@ -585,7 +596,9 @@ function loadPartners() {
 function loadSales() {
   if (!sb||!merchant) return;
   var filter=document.getElementById('salesFilter').value;
-  var query=sb.from('sales').select('*, agents(name,referral_code), merchant_products(name)').eq('merchant_id',merchant.id).order('created_at',{ascending:false});
+  if (!merchant) return;
+  var query=sb ? sb.from('sales').select('*, agents(name,referral_code), merchant_products(name)').eq('merchant_id',merchant.id).order('created_at',{ascending:false}) : null;
+  if (!query) { document.getElementById('salesList').innerHTML='<tr><td colspan="7" class="msg">Supabase nicht verfügbar</td></tr>'; return; }
   if (filter==='today') { var t=new Date(); t.setHours(0,0,0,0); query=query.gte('created_at',t.toISOString()); }
   else if (filter==='month') { var m=new Date(); m=new Date(m.getFullYear(),m.getMonth(),1); query=query.gte('created_at',m.toISOString()); }
   query.then(function(r){
