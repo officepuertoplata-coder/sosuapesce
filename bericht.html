@@ -118,6 +118,16 @@ async function loadSession() {
     const r = await fetch(API + '/api/vk/session/' + TOKEN);
     session = await r.json();
     if (!r.ok) { document.getElementById('content').innerHTML = '<div class="loading">❌ ' + (session.error || 'Session nicht gefunden') + '</div>'; return; }
+
+    // Wenn paid=1 in URL aber Status noch open → Webhook noch nicht da → als analyzing behandeln
+    if (new URLSearchParams(location.search).get('paid') === '1' && session.status === 'open') {
+      session.status = 'analyzing';
+    }
+    // Wenn done → direkt zur Ergebnisseite
+    if (session.status === 'done' && new URLSearchParams(location.search).get('paid') === '1') {
+      window.location.href = 'ergebnis.html?s=' + TOKEN;
+      return;
+    }
     render();
   } catch(e) {
     document.getElementById('content').innerHTML = '<div class="loading">❌ Verbindungsfehler</div>';
@@ -142,7 +152,32 @@ function render() {
     analyzing: '🔍 KI analysiert deine Artikel...',
     done: '✅ Bericht fertig! Du hast eine WhatsApp erhalten.'
   }[session.status] || '';
-  html += `<div class="status-banner ${bannerClass}">${bannerMsg}</div>`;
+  html += '<div class="status-banner ' + bannerClass + '">' + bannerMsg + '</div>';
+
+  // Warte-Screen während Analyse
+  if (session.status === 'analyzing' || session.status === 'paid') {
+    html += '<div style="background:#fff;border-radius:12px;padding:32px 24px;text-align:center;margin-bottom:16px;border:1.5px solid #e5e7eb;">' +
+      '<div style="font-size:2.5rem;margin-bottom:12px;">🔍</div>' +
+      '<h2 style="font-size:1rem;font-weight:900;margin-bottom:8px;color:#1b4332;">KI analysiert deine Artikel</h2>' +
+      '<p style="font-size:.84rem;color:#6b7280;margin-bottom:20px;">Claude wertet deine Fotos aus und erstellt Verkaufstexte,<br>Preisvorschläge und Keywords für jedes Produkt.</p>' +
+      '<div style="display:flex;flex-direction:column;gap:8px;max-width:280px;margin:0 auto 20px;">' +
+        '<div style="display:flex;align-items:center;gap:10px;background:#f0fdf4;border-radius:8px;padding:10px 14px;">' +
+          '<span>📸</span><span style="font-size:.82rem;">Fotos werden analysiert</span>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;gap:10px;background:#f0fdf4;border-radius:8px;padding:10px 14px;">' +
+          '<span>✍️</span><span style="font-size:.82rem;">Verkaufstexte werden erstellt</span>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;gap:10px;background:#f0fdf4;border-radius:8px;padding:10px 14px;">' +
+          '<span>💰</span><span style="font-size:.82rem;">Preisvorschläge werden berechnet</span>' +
+        '</div>' +
+      '</div>' +
+      '<p style="font-size:.78rem;color:#6b7280;">Diese Seite aktualisiert sich automatisch.<br>Du bekommst auch eine WhatsApp wenn alles fertig ist.</p>' +
+      '<div style="margin-top:16px;"><div style="width:40px;height:40px;border:3px solid #e5e7eb;border-top-color:#25D366;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto;"></div></div>' +
+    '</div>';
+    setTimeout(function(){ loadSession(); }, 8000);
+    document.getElementById('content').innerHTML = html;
+    return;
+  }
 
   // Link zum Ergebnis wenn fertig
   if (session.status === 'done') {
@@ -307,9 +342,24 @@ function showToast(msg) {
   setTimeout(()=>t.classList.remove('show'), 3000);
 }
 
-// Polling wenn Analyse läuft
-if (['paid','analyzing'].includes(new URLSearchParams(location.search).get('status'))) {
-  setInterval(loadSession, 10000);
+async function checkResult() {
+  showToast('⏳ Prüfe...');
+  await loadSession();
+}
+
+async function autoCheckResult() {
+  const r = await fetch(API + '/api/vk/session/' + TOKEN);
+  const d = await r.json();
+  if (d.status === 'done') {
+    window.location.href = 'ergebnis.html?s=' + TOKEN;
+  } else if (d.status === 'analyzing' || d.status === 'paid') {
+    setTimeout(autoCheckResult, 8000);
+  }
+}
+
+// Auto-start polling if paid=1 in URL
+if (new URLSearchParams(location.search).get('paid') === '1') {
+  setTimeout(autoCheckResult, 5000);
 }
 </script>
 </body>
