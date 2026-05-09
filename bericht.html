@@ -348,18 +348,23 @@ async function checkResult() {
 }
 
 async function autoCheckResult() {
-  const r = await fetch(API + '/api/vk/session/' + TOKEN);
-  const d = await r.json();
-  if (d.status === 'done') {
-    window.location.href = 'ergebnis.html?s=' + TOKEN;
-  } else if (d.status === 'analyzing' || d.status === 'paid') {
+  try {
+    const r = await fetch(API + '/api/vk/session/' + TOKEN);
+    const d = await r.json();
+    if (d.status === 'done') {
+      window.location.href = 'ergebnis.html?s=' + TOKEN;
+    } else {
+      // Weiter polling solange nicht done (open/paid/analyzing)
+      setTimeout(autoCheckResult, 6000);
+    }
+  } catch(e) {
     setTimeout(autoCheckResult, 8000);
   }
 }
 
 // Auto-start polling if paid=1 in URL
 if (new URLSearchParams(location.search).get('paid') === '1') {
-  setTimeout(autoCheckResult, 5000);
+  setTimeout(autoCheckResult, 4000);
 }
 </script>
 </body>
