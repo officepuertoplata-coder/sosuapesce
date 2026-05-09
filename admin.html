@@ -177,50 +177,42 @@ tr:hover td{background:#f9fafb;}
 <div class="toast" id="toast"></div>
 
 <script>
-const API = 'https://converto-server-production.up.railway.app';
-const KEY  = 'converto_auth_v2';
-let merchant = null;
-let slug     = '';
-let products = [];
-let partners = [];
+var API = 'https://converto-server-production.up.railway.app';
+var KEY = 'converto_auth_v2';
+var merchant = null;
+var slug = '';
+var products = [];
+var partners = [];
 
-// ── BOOT ──────────────────────────────────────────────────
 (async function boot() {
-  // Auth
-  let auth = null;
+  var auth = null;
   try { auth = JSON.parse(localStorage.getItem(KEY)||'null'); } catch(e){}
   if (!auth || !auth.role) { location.href = 'login.html?redirect=' + encodeURIComponent(location.href); return; }
   if (auth.loggedInAt && Date.now() - new Date(auth.loggedInAt).getTime() > 43200000) {
     localStorage.removeItem(KEY); location.href = 'login.html'; return;
   }
-
-  // Slug
-  slug = auth.slug || new URLSearchParams(location.search).get('m') || '';
+  slug = auth.slug || new URLSearchParams(location.search).get('m') || (auth.merchants && auth.merchants[0] && auth.merchants[0].slug) || '';
   if (!slug) { location.href = 'hub.html'; return; }
   document.getElementById('navSlug').textContent = slug;
-
-  // Händler laden
   try {
-    const r = await fetch(API + '/api/merchants/' + slug);
-    const d = await r.json();
+    var r = await fetch(API + '/api/merchants/' + slug);
+    var d = await r.json();
     if (d && d.id) {
       merchant = d;
       document.getElementById('navName').textContent = merchant.name || slug;
       document.getElementById('merchantInfo').innerHTML =
-        `<div style="padding:18px;font-size:.88rem;line-height:2.2;">
-          <b>Name:</b> ${merchant.name||'—'} &nbsp;·&nbsp;
-          <b>Slug:</b> <span class="codetag">${merchant.slug||'—'}</span><br>
-          <b>Währung:</b> ${merchant.currency||'€'} &nbsp;·&nbsp;
-          <b>WhatsApp:</b> ${merchant.wa_number||merchant.whatsapp_number||'—'}<br>
-          <b>Landingpage:</b> <a href="http://converdino.com/${merchant.slug}" target="_blank" style="color:var(--g3);">converdino.com/${merchant.slug}</a>
-        </div>`;
-    } else throw new Error('Kein Händler');
+        '<div style="padding:18px;font-size:.88rem;line-height:2.2;">' +
+        '<b>Name:</b> ' + (merchant.name||'—') + ' &nbsp;&middot;&nbsp; ' +
+        '<b>Slug:</b> <span class="codetag">' + (merchant.slug||'—') + '</span><br>' +
+        '<b>Währung:</b> ' + (merchant.currency||'EUR') + ' &nbsp;&middot;&nbsp; ' +
+        '<b>WhatsApp:</b> ' + (merchant.wa_number||merchant.whatsapp_number||'—') + '<br>' +
+        '<b>Landingpage:</b> <a href="http://converdino.com/' + merchant.slug + '" target="_blank" style="color:var(--g3);">converdino.com/' + merchant.slug + '</a>' +
+        '</div>';
+    } else throw new Error('Kein Händler gefunden');
   } catch(e) {
-    document.getElementById('merchantInfo').innerHTML =
-      '<div style="padding:18px;color:var(--red);">❌ Händler konnte nicht geladen werden: ' + e.message + '<br>API: ' + API + '/api/merchants/' + slug + '</div>';
+    document.getElementById('merchantInfo').innerHTML = '<div style="padding:18px;color:var(--red);">❌ ' + e.message + '</div>';
     document.getElementById('navName').textContent = slug;
   }
-
   await loadProducts();
   await loadPartners();
 })();
@@ -228,16 +220,16 @@ let partners = [];
 function doLogout() { localStorage.removeItem(KEY); location.href = 'login.html'; }
 
 function showPage(id, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tbtn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.tbtn').forEach(function(b){b.classList.remove('active');});
   document.getElementById('page-' + id).classList.add('active');
   if (btn) btn.classList.add('active');
 }
 
 function showToast(msg) {
-  const t = document.getElementById('toast');
+  var t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
+  setTimeout(function(){t.classList.remove('show');}, 3000);
 }
 
 function fmtNum(n) { return (parseFloat(n)||0).toLocaleString('de-AT',{minimumFractionDigits:2,maximumFractionDigits:2}); }
@@ -247,7 +239,7 @@ async function loadProducts() {
   if (!merchant) return;
   document.getElementById('productsList').innerHTML = '<div class="loading">Lade...</div>';
   try {
-    const r = await fetch(API + '/api/products/' + merchant.id);
+    var r = await fetch(API + '/api/products/' + merchant.id);
     products = await r.json() || [];
     renderProducts();
   } catch(e) {
@@ -256,95 +248,102 @@ async function loadProducts() {
 }
 
 function renderProducts() {
-  const el = document.getElementById('productsList');
-  if (!products.length) { el.innerHTML = '<div class="loading">Noch keine Produkte. Klicke "+ Neues Produkt".</div>'; return; }
-  el.innerHTML = '<div class="prod-grid">' + products.map(p => `
-    <div class="pc">
-      ${p.image_url ? `<img src="${p.image_url}" alt="${p.name}">` : '<div class="pc-ph">🛒</div>'}
-      <div class="pc-b">
-        <div class="pc-name">${p.name||'—'}</div>
-        <div class="pc-price">${fmtNum(p.price)} ${merchant?.currency||'€'}</div>
-        <span class="tag ${p.purchasable!==false?'tag-buy':'tag-ask'}">${p.purchasable!==false?'🛒 Kaufbar':'📋 Anfrage'}</span>
-        <span class="badge ${p.available!==false?'b-on':'b-off'}" style="margin-left:4px;">${p.available!==false?'Aktiv':'Inaktiv'}</span>
-        ${p.short_description?`<div style="font-size:.76rem;color:var(--mu);margin:5px 0;">${p.short_description}</div>`:''}
-        <div style="display:flex;gap:6px;margin-top:8px;">
-          <button class="btn btn-gold btn-sm" style="flex:1;" onclick="editProduct('${p.id}')">✏️ Bearbeiten</button>
-          <button class="btn btn-red btn-sm" onclick="deleteProduct('${p.id}')">🗑️</button>
-        </div>
-      </div>
-    </div>`).join('') + '</div>';
+  var el = document.getElementById('productsList');
+  if (!products.length) { el.innerHTML = '<div class="loading">Noch keine Produkte.</div>'; return; }
+  var cur = merchant ? (merchant.currency || 'EUR') : 'EUR';
+  var html = '<div class="prod-grid">';
+  for (var i = 0; i < products.length; i++) {
+    var p = products[i];
+    var pid = p.id;
+    var img = p.image_url ? '<img src="' + p.image_url + '" alt="Produkt">' : '<div class="pc-ph">&#128722;</div>';
+    var typ = p.purchasable !== false ? '<span class="tag tag-buy">&#128722; Kaufbar</span>' : '<span class="tag tag-ask">&#128203; Anfrage</span>';
+    var avl = p.available !== false ? '<span class="badge b-on">Aktiv</span>' : '<span class="badge b-off">Inaktiv</span>';
+    var dsc = p.short_description ? '<div style="font-size:.76rem;color:var(--mu);margin:5px 0;">' + p.short_description + '</div>' : '';
+    html += '<div class="pc">' + img + '<div class="pc-b">'
+      + '<div class="pc-name">' + (p.name||'—') + '</div>'
+      + '<div class="pc-price">' + fmtNum(p.price) + ' ' + cur + '</div>'
+      + typ + ' ' + avl + dsc
+      + '<div style="display:flex;gap:6px;margin-top:8px;">'
+      + '<button class="btn btn-gold btn-sm" style="flex:1;" onclick="editProduct(\`' + pid + '\`)">&#9999; Bearbeiten</button>'
+      + '<button class="btn btn-red btn-sm" onclick="deleteProduct(\`' + pid + '\`)">&#128465;</button>'
+      + '</div></div></div>';
+  }
+  html += '</div>';
+  el.innerHTML = html;
 }
 
 function openProdModal() {
-  ['p-id','p-name','p-price','p-unit','p-short','p-stripe','p-img'].forEach(id => {
-    const el = document.getElementById(id); if (el) el.value = '';
+  ['p-id','p-name','p-price','p-unit','p-short','p-stripe','p-img'].forEach(function(id){
+    var el = document.getElementById(id); if (el) el.value = '';
   });
   document.getElementById('p-avail').value = 'true';
   document.getElementById('p-purch').value = 'true';
   document.getElementById('p-err').textContent = '';
-  document.getElementById('prodModalTitle').textContent = '➕ Neues Produkt';
+  document.getElementById('prodModalTitle').textContent = '+ Neues Produkt';
   document.getElementById('prodModal').classList.add('open');
 }
 
 function editProduct(id) {
-  const p = products.find(x => x.id === id); if (!p) return;
-  document.getElementById('p-id').value    = p.id;
-  document.getElementById('p-name').value  = p.name||'';
-  document.getElementById('p-price').value = p.price||'';
-  document.getElementById('p-unit').value  = p.unit_label||p.unit||'';
-  document.getElementById('p-short').value = p.short_description||'';
-  document.getElementById('p-stripe').value= p.stripe_link||'';
-  document.getElementById('p-img').value   = p.image_url||'';
-  document.getElementById('p-avail').value = p.available===false?'false':'true';
-  document.getElementById('p-purch').value = p.purchasable===false?'false':'true';
+  var p = null;
+  for (var i = 0; i < products.length; i++) { if (products[i].id === id) { p = products[i]; break; } }
+  if (!p) return;
+  document.getElementById('p-id').value     = p.id;
+  document.getElementById('p-name').value   = p.name||'';
+  document.getElementById('p-price').value  = p.price||'';
+  document.getElementById('p-unit').value   = p.unit_label||p.unit||'';
+  document.getElementById('p-short').value  = p.short_description||'';
+  document.getElementById('p-stripe').value = p.stripe_link||'';
+  document.getElementById('p-img').value    = p.image_url||'';
+  document.getElementById('p-avail').value  = p.available===false ? 'false' : 'true';
+  document.getElementById('p-purch').value  = p.purchasable===false ? 'false' : 'true';
   document.getElementById('p-err').textContent = '';
-  document.getElementById('prodModalTitle').textContent = '✏️ Produkt bearbeiten';
+  document.getElementById('prodModalTitle').textContent = 'Produkt bearbeiten';
   document.getElementById('prodModal').classList.add('open');
 }
 
 function closeProdModal() { document.getElementById('prodModal').classList.remove('open'); }
 
 async function saveProduct() {
-  const name = document.getElementById('p-name').value.trim();
+  var name = document.getElementById('p-name').value.trim();
   if (!name) { document.getElementById('p-err').textContent = 'Name ist Pflicht'; return; }
   if (!merchant) { document.getElementById('p-err').textContent = 'Kein Händler'; return; }
-  const pid   = document.getElementById('p-id').value;
-  const unit  = document.getElementById('p-unit').value.trim() || 'Stück';
-  const body  = {
-    merchant_id: merchant.id, name,
+  var pid  = document.getElementById('p-id').value;
+  var unit = document.getElementById('p-unit').value.trim() || 'Stück';
+  var body = {
+    merchant_id: merchant.id, name: name,
     price: parseFloat(document.getElementById('p-price').value)||0,
-    unit_label: unit, unit,
+    unit_label: unit, unit: unit,
     short_description: document.getElementById('p-short').value.trim()||null,
     stripe_link: document.getElementById('p-stripe').value.trim()||null,
     image_url: document.getElementById('p-img').value.trim()||null,
-    available:  document.getElementById('p-avail').value === 'true',
+    available: document.getElementById('p-avail').value === 'true',
     purchasable: document.getElementById('p-purch').value === 'true',
     status: 'active', sort_order: 1
   };
   try {
-    const r = await fetch(API + '/api/products/' + (pid||''), {
+    var r = await fetch(API + '/api/products/' + (pid||''), {
       method: pid ? 'PUT' : 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify(body)
     });
-    const d = await r.json();
+    var d = await r.json();
     if (d.error) { document.getElementById('p-err').textContent = d.error; return; }
     closeProdModal();
-    showToast('✅ Produkt gespeichert!');
+    showToast('Produkt gespeichert!');
     await loadProducts();
   } catch(e) { document.getElementById('p-err').textContent = e.message; }
 }
 
 async function deleteProduct(id) {
-  if (!confirm('Produkt löschen?')) return;
+  if (!confirm('Produkt loeschen?')) return;
   await fetch(API + '/api/products/' + id, {method:'DELETE'});
-  showToast('Gelöscht');
+  showToast('Geloescht');
   await loadProducts();
 }
 
 // ── PARTNER ───────────────────────────────────────────────
 function togglePForm() {
-  const f = document.getElementById('pForm');
+  var f = document.getElementById('pForm');
   f.style.display = f.style.display === 'none' ? 'block' : 'none';
   document.getElementById('np-err').textContent = '';
 }
@@ -353,7 +352,7 @@ async function loadPartners() {
   if (!merchant) return;
   document.getElementById('partnersList').innerHTML = '<tr><td colspan="6" class="msg">Lade...</td></tr>';
   try {
-    const r = await fetch(API + '/api/partners/' + merchant.id);
+    var r = await fetch(API + '/api/partners/' + merchant.id);
     partners = await r.json() || [];
     renderPartners();
   } catch(e) {
@@ -362,48 +361,55 @@ async function loadPartners() {
 }
 
 function renderPartners() {
-  const tbody = document.getElementById('partnersList');
+  var tbody = document.getElementById('partnersList');
   if (!partners.length) {
-    tbody.innerHTML = '<tr><td colspan="6" class="msg">Noch keine Partner angelegt. Klicke "+ Neu".</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="msg">Noch keine Partner. Klicke + Neu.</td></tr>';
     return;
   }
-  tbody.innerHTML = partners.map(p => {
-    const comm = p.commission_type === 'percentage'
-      ? (p.commission_value||0) + '%'
-      : fmtNum(p.commission_value) + ' ' + (merchant?.currency||'€');
-    return `<tr>
-      <td><strong>${p.name||'—'}</strong><br><small style="color:var(--mu)">${p.email||''}</small></td>
-      <td><span class="codetag">${p.referral_code||'—'}</span></td>
-      <td>${p.phone||'—'}</td>
-      <td>${comm}</td>
-      <td><span class="badge ${p.status==='active'?'b-on':'b-off'}">${p.status==='active'?'Aktiv':'Pausiert'}</span></td>
-      <td style="white-space:nowrap;">
-        <button class="btn btn-out btn-sm" onclick="togglePartner('${p.id}','${p.status}')">${p.status==='active'?'⏸':'▶'}</button>
-        <button class="btn btn-red btn-sm" onclick="delPartner('${p.id}','${(p.name||'').replace(/'/g,'')}')">🗑️</button>
-      </td>
-    </tr>`;
-  }).join('');
+  var cur = merchant ? (merchant.currency || 'EUR') : 'EUR';
+  var rows = '';
+  for (var i = 0; i < partners.length; i++) {
+    var p = partners[i];
+    var pid = p.id;
+    var pst = p.status || 'active';
+    var comm = pst === 'percentage' ? (p.commission_value||0) + '%' : fmtNum(p.commission_value) + ' ' + cur;
+    var badge = pst === 'active' ? '<span class="badge b-on">Aktiv</span>' : '<span class="badge b-off">Pausiert</span>';
+    var tog = pst === 'active' ? '&#9208;' : '&#9654;';
+    var safeName = (p.name||'').replace(/["']/g,'');
+    rows += '<tr>'
+      + '<td><strong>' + (p.name||'—') + '</strong><br><small style="color:var(--mu)">' + (p.email||'') + '</small></td>'
+      + '<td><span class="codetag">' + (p.referral_code||'—') + '</span></td>'
+      + '<td>' + (p.phone||'—') + '</td>'
+      + '<td>' + comm + '</td>'
+      + '<td>' + badge + '</td>'
+      + '<td style="white-space:nowrap;">'
+      + '<button class="btn btn-out btn-sm" onclick="togglePartner(\`' + pid + '\`,\`' + pst + '\`)">' + tog + '</button> '
+      + '<button class="btn btn-red btn-sm" onclick="delPartner(\`' + pid + '\`,\`' + safeName + '\`)">&#128465;</button>'
+      + '</td></tr>';
+  }
+  tbody.innerHTML = rows;
 }
 
 async function savePartner() {
-  const name = document.getElementById('np-name').value.trim();
+  var name = document.getElementById('np-name').value.trim();
   if (!name) { document.getElementById('np-err').textContent = 'Name ist Pflicht'; return; }
-  if (!merchant) { document.getElementById('np-err').textContent = 'Kein Händler'; return; }
+  if (!merchant) { document.getElementById('np-err').textContent = 'Kein Haendler'; return; }
   document.getElementById('np-err').textContent = '';
   try {
-    const r = await fetch(API + '/api/partners', {
+    var r = await fetch(API + '/api/partners', {
       method: 'POST', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
-        merchant_id: merchant.id, name,
+        merchant_id: merchant.id,
+        name: name,
         phone: document.getElementById('np-phone').value.trim()||null,
         email: document.getElementById('np-email').value.trim()||null,
         commission_type: document.getElementById('np-ctype').value,
         commission_value: parseFloat(document.getElementById('np-cval').value)||10
       })
     });
-    const d = await r.json();
+    var d = await r.json();
     if (!d.success) { document.getElementById('np-err').textContent = d.error||'Fehler'; return; }
-    showToast('✅ Partner "' + d.partner.name + '" · Code: ' + d.partner.referral_code);
+    showToast('Partner angelegt: ' + d.partner.name + ' · Code: ' + d.partner.referral_code);
     document.getElementById('np-name').value = '';
     document.getElementById('np-phone').value = '';
     document.getElementById('np-email').value = '';
@@ -413,16 +419,16 @@ async function savePartner() {
 }
 
 async function togglePartner(id, status) {
-  const s = status === 'active' ? 'paused' : 'active';
-  await fetch(API+'/api/partners/'+id, {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:s})});
-  showToast(s === 'active' ? '▶ Aktiv' : '⏸ Pausiert');
+  var s = status === 'active' ? 'paused' : 'active';
+  await fetch(API + '/api/partners/' + id, {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:s})});
+  showToast(s === 'active' ? 'Aktiv' : 'Pausiert');
   await loadPartners();
 }
 
 async function delPartner(id, name) {
-  if (!confirm('Partner "'+name+'" löschen?')) return;
-  await fetch(API+'/api/partners/'+id, {method:'DELETE'});
-  showToast('Gelöscht');
+  if (!confirm('Partner loeschen?')) return;
+  await fetch(API + '/api/partners/' + id, {method:'DELETE'});
+  showToast('Geloescht');
   await loadPartners();
 }
 </script>
