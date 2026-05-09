@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bestellungen – Converdino</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--wa:#25D366;--bg:#0a1f12;--card:#111f15;--card2:#162a1a;--border:rgba(37,211,102,0.15);--txt:#e8f5ec;--muted:#5d8a6a;--gold:#f4a100;--red:#ef4444;--blue:#3b82f6;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;}
+nav{background:rgba(10,31,18,0.95);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;gap:0;position:sticky;top:0;z-index:100;}
+.nav-brand{font-weight:900;font-size:1rem;color:var(--wa);margin-right:16px;}
+.nav-brand span{color:var(--txt);}
+.nav-slug{background:var(--gold);color:#000;font-size:.65rem;font-weight:800;padding:2px 7px;border-radius:4px;margin-left:6px;}
+.nav-right{margin-left:auto;display:flex;gap:8px;}
+.btn-nav{background:none;border:1px solid var(--border);color:var(--muted);padding:5px 12px;border-radius:7px;cursor:pointer;font-size:.78rem;font-family:'Nunito',sans-serif;text-decoration:none;display:flex;align-items:center;}
+.btn-nav:hover{border-color:var(--wa);color:var(--txt);}
+.main{max-width:1100px;margin:0 auto;padding:24px 20px;}
+.page-title{font-size:1.4rem;font-weight:900;margin-bottom:4px;}
+.page-sub{font-size:.82rem;color:var(--muted);margin-bottom:24px;}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
+.stat-val{font-size:1.6rem;font-weight:900;line-height:1;}
+.stat-lbl{font-size:.72rem;color:var(--muted);margin-top:4px;}
+.stat.green .stat-val{color:var(--wa);}
+.stat.gold .stat-val{color:var(--gold);}
+.stat.blue .stat-val{color:#93c5fd;}
+.filters{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
+.filter-btn{padding:7px 14px;border-radius:8px;border:1.5px solid var(--border);background:var(--card2);color:var(--muted);font-size:.8rem;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;}
+.filter-btn:hover,.filter-btn.active{border-color:var(--wa);color:var(--wa);background:rgba(37,211,102,0.08);}
+.search-input{padding:7px 14px;border-radius:8px;border:1.5px solid var(--border);background:var(--card2);color:var(--txt);font-size:.82rem;font-family:'Nunito',sans-serif;outline:none;width:200px;}
+.search-input:focus{border-color:var(--wa);}
+.refresh-btn{padding:7px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;font-size:16px;margin-left:auto;}
+.refresh-btn:hover{border-color:var(--wa);color:var(--wa);}
+.order-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-bottom:12px;transition:border-color .2s;}
+.order-card:hover{border-color:rgba(37,211,102,0.3);}
+.order-card.status-new{border-left:3px solid var(--wa);}
+.order-card.status-preparing{border-left:3px solid var(--gold);}
+.order-card.status-ready{border-left:3px solid #8b5cf6;}
+.order-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.order-num{font-size:.88rem;font-weight:900;color:var(--wa);}
+.status-badge{font-size:.65rem;font-weight:800;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px;}
+.s-new{background:rgba(37,211,102,0.15);color:var(--wa);}
+.s-confirmed{background:rgba(59,130,246,0.15);color:#93c5fd;}
+.s-preparing{background:rgba(244,161,0,0.15);color:var(--gold);}
+.s-ready{background:rgba(139,92,246,0.15);color:#c4b5fd;}
+.s-delivered{background:rgba(37,211,102,0.08);color:#6ee7b7;}
+.s-cancelled{background:rgba(239,68,68,0.12);color:var(--red);}
+.order-body{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.info-block label{display:block;font-size:.63rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px;}
+.info-block p{font-size:.85rem;}
+.items-box{background:var(--card2);border-radius:8px;padding:10px 12px;}
+.items-title{font-size:.63rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;}
+.item-row{display:flex;justify-content:space-between;font-size:.82rem;padding:3px 0;border-bottom:1px solid rgba(37,211,102,0.05);}
+.item-row:last-of-type{border-bottom:none;}
+.total-row{display:flex;justify-content:space-between;font-size:.9rem;font-weight:900;padding-top:8px;margin-top:6px;border-top:1px solid var(--border);}
+.actions{display:flex;gap:8px;flex-wrap:wrap;}
+.act-btn{padding:8px 14px;border-radius:8px;border:none;font-size:.78rem;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;}
+.btn-confirm{background:rgba(59,130,246,0.12);color:#93c5fd;border:1.5px solid rgba(59,130,246,0.25);}
+.btn-confirm:hover{background:var(--blue);color:#fff;border-color:var(--blue);}
+.btn-prepare{background:rgba(244,161,0,0.12);color:var(--gold);border:1.5px solid rgba(244,161,0,0.25);}
+.btn-prepare:hover{background:var(--gold);color:#000;border-color:var(--gold);}
+.btn-ready{background:rgba(139,92,246,0.12);color:#c4b5fd;border:1.5px solid rgba(139,92,246,0.25);}
+.btn-ready:hover{background:#8b5cf6;color:#fff;border-color:#8b5cf6;}
+.btn-deliver{background:rgba(37,211,102,0.12);color:var(--wa);border:1.5px solid var(--border);}
+.btn-deliver:hover{background:var(--wa);color:#fff;}
+.btn-wa{background:#25D366;color:#fff;border:none;}
+.btn-wa:hover{background:#128C7E;}
+.btn-cancel{background:transparent;color:var(--red);border:1.5px solid rgba(239,68,68,0.4);font-size:.72rem;padding:6px 10px;}
+.btn-cancel:hover{background:var(--red);color:#fff;border-color:var(--red);}
+.empty{text-align:center;padding:60px 20px;color:var(--muted);}
+.empty-icon{font-size:48px;margin-bottom:12px;opacity:.4;}
+.loading{text-align:center;padding:60px;}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--wa);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+#toast{position:fixed;bottom:24px;right:24px;background:var(--wa);color:#fff;padding:10px 18px;border-radius:10px;font-size:.85rem;font-weight:700;transform:translateY(80px);opacity:0;transition:all .3s;z-index:999;}
+#toast.show{transform:translateY(0);opacity:1;}
+#toast.error{background:var(--red);}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--wa);box-shadow:0 0 6px var(--wa);animation:pulse 2s infinite;display:inline-block;margin-right:6px;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@media(max-width:700px){.stats{grid-template-columns:1fr 1fr;}.order-body{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">Con<span>verdino</span> <span class="nav-slug" id="navSlug"></span></div>
+  <div class="nav-right">
+    <a href="hub.html" class="btn-nav">← Hub</a>
+    <button class="btn-nav" onclick="doLogout()">Ausloggen</button>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="page-title">📦 Bestellungen</div>
+  <div class="page-sub"><span class="live-dot"></span><span id="pageSub">Lade...</span></div>
+
+  <div class="stats">
+    <div class="stat green"><div class="stat-val" id="statNew">—</div><div class="stat-lbl">Neue Bestellungen</div></div>
+    <div class="stat"><div class="stat-val" id="statActive">—</div><div class="stat-lbl">In Bearbeitung</div></div>
+    <div class="stat gold"><div class="stat-val" id="statToday">—</div><div class="stat-lbl">Heute gesamt</div></div>
+    <div class="stat blue"><div class="stat-val" id="statRevenue">—</div><div class="stat-lbl">Umsatz heute</div></div>
+  </div>
+
+  <div class="filters">
+    <button class="filter-btn active" onclick="setFilter('all',this)">Alle</button>
+    <button class="filter-btn" onclick="setFilter('new',this)">🟢 Neu</button>
+    <button class="filter-btn" onclick="setFilter('confirmed',this)">🔵 Bestätigt</button>
+    <button class="filter-btn" onclick="setFilter('preparing',this)">🟡 Zubereitung</button>
+    <button class="filter-btn" onclick="setFilter('ready',this)">🟣 Bereit</button>
+    <button class="filter-btn" onclick="setFilter('delivered',this)">✅ Geliefert</button>
+    <input class="search-input" id="searchInput" placeholder="🔍 Suche..." oninput="filterOrders()">
+    <button class="refresh-btn" onclick="loadOrders()" title="Aktualisieren">↺</button>
+  </div>
+
+  <div id="ordersContainer">
+    <div class="loading"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API = 'https://converto-server-production.up.railway.app';
+const KEY = 'converto_auth_v2';
+let merchantId = null, merchantSlug = '', merchant = null;
+let allOrders = [], currentFilter = 'all';
+
+window.onload = async function() {
+  let auth = null;
+  try { auth = JSON.parse(localStorage.getItem(KEY)||'null'); } catch(e) {}
+  if (!auth||!auth.role) { window.location.href='login.html?redirect='+encodeURIComponent(location.href); return; }
+  if (auth.loggedInAt && Date.now()-new Date(auth.loggedInAt).getTime()>43200000) { localStorage.removeItem(KEY); window.location.href='login.html'; return; }
+
+  merchantId   = auth.merchantId || new URLSearchParams(location.search).get('mid') || null;
+  merchantSlug = auth.slug       || new URLSearchParams(location.search).get('m')   || '';
+  document.getElementById('navSlug').textContent = merchantSlug;
+
+  if (merchantSlug) {
+    try {
+      const r = await fetch(API+'/api/merchants/'+merchantSlug);
+      merchant = await r.json();
+      if (merchant.id) merchantId = merchant.id;
+    } catch(e) {}
+  }
+
+  document.getElementById('pageSub').textContent = (merchant?.name||merchantSlug) + ' · Auto-Refresh alle 30s';
+  loadOrders();
+  setInterval(loadOrders, 30000);
+};
+
+function doLogout() { localStorage.removeItem(KEY); window.location.href='login.html'; }
+
+async function loadOrders() {
+  if (!merchantId) { document.getElementById('ordersContainer').innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><p>Kein Händler ausgewählt</p></div>'; return; }
+  try {
+    const r = await fetch(API+'/api/orders/'+merchantId);
+    allOrders = await r.json();
+    updateStats();
+    filterOrders();
+  } catch(e) { showToast('⚠️ Fehler beim Laden', true); }
+}
+
+function updateStats() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const tod = allOrders.filter(o => new Date(o.created_at) >= today);
+  document.getElementById('statNew').textContent    = allOrders.filter(o=>o.status==='new').length;
+  document.getElementById('statActive').textContent = allOrders.filter(o=>['confirmed','preparing','ready'].includes(o.status)).length;
+  document.getElementById('statToday').textContent  = tod.length;
+  document.getElementById('statRevenue').textContent = tod.reduce((s,o)=>s+(parseFloat(o.total)||0),0).toFixed(2)+'€';
+}
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  filterOrders();
+}
+
+function filterOrders() {
+  const q = (document.getElementById('searchInput').value||'').toLowerCase();
+  let list = currentFilter==='all' ? allOrders : allOrders.filter(o=>o.status===currentFilter);
+  if (q) list = list.filter(o =>
+    (o.order_number||'').toLowerCase().includes(q)||
+    (o.customer_name||'').toLowerCase().includes(q)||
+    (o.customer_wa||'').toLowerCase().includes(q)||
+    (o.delivery_address||'').toLowerCase().includes(q));
+  renderOrders(list);
+}
+
+function renderOrders(orders) {
+  const el = document.getElementById('ordersContainer');
+  if (!orders.length) { el.innerHTML='<div class="empty"><div class="empty-icon">📦</div><p>Keine Bestellungen</p></div>'; return; }
+  const labels = {new:'Neu',confirmed:'Bestätigt',preparing:'In Zubereitung',ready:'Bereit',delivered:'Geliefert',cancelled:'Storniert'};
+  el.innerHTML = orders.map(o => {
+    const items = Array.isArray(o.items)?o.items:[];
+    const time  = new Date(o.created_at).toLocaleString('de-AT',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+    const waNum = (o.customer_wa||'').replace(/[^0-9]/g,'');
+    const waLink= waNum?`https://wa.me/${waNum}?text=Hallo+${encodeURIComponent(o.customer_name||'')}`:null;
+    const itemsHtml = items.map(i=>`<div class="item-row"><span>${i.name} × ${i.quantity} ${i.unit_label||''}</span><span>${(parseFloat(i.total)||0).toFixed(2)}€</span></div>`).join('');
+    const acts = [];
+    if (o.status==='new')       acts.push(`<button class="act-btn btn-confirm" onclick="updateStatus('${o.id}','confirmed')">✅ Bestätigen</button>`);
+    if (o.status==='confirmed') acts.push(`<button class="act-btn btn-prepare" onclick="updateStatus('${o.id}','preparing')">👨‍🍳 Zubereitung</button>`);
+    if (o.status==='preparing') acts.push(`<button class="act-btn btn-ready"   onclick="updateStatus('${o.id}','ready')">✅ Bereit</button>`);
+    if (o.status==='ready')     acts.push(`<button class="act-btn btn-deliver" onclick="updateStatus('${o.id}','delivered')">🎉 Übergeben</button>`);
+    if (waLink) acts.push(`<button class="act-btn btn-wa" onclick="window.open('${waLink}','_blank')">💬 WhatsApp</button>`);
+    if (!['delivered','cancelled'].includes(o.status)) acts.push(`<button class="act-btn btn-cancel" onclick="updateStatus('${o.id}','cancelled')">✕ Stornieren</button>`);
+
+    return `<div class="order-card status-${o.status}">
+      <div class="order-header">
+        <span class="order-num">#${o.order_number||o.id.substring(0,8)}</span>
+        <span class="status-badge s-${o.status}">${labels[o.status]||o.status}</span>
+        <span style="font-size:.75rem;color:var(--muted);">${o.delivery_type==='delivery'?'🚚 Lieferung':'🏪 Abholung'}</span>
+        <span style="font-size:.72rem;color:var(--muted);margin-left:auto;">${time}</span>
+      </div>
+      <div class="order-body">
+        <div>
+          <div class="info-block" style="margin-bottom:10px;"><label>Kunde</label><p>${o.customer_name||'—'}</p></div>
+          <div class="info-block" style="margin-bottom:10px;"><label>WhatsApp</label><p>${o.customer_wa||'—'}</p></div>
+          ${o.delivery_address?`<div class="info-block" style="margin-bottom:10px;"><label>Lieferadresse</label><p>${o.delivery_address}</p></div>`:''}
+          ${o.note?`<div class="info-block"><label>Notiz</label><p style="color:var(--gold);">${o.note}</p></div>`:''}
+        </div>
+        <div class="items-box">
+          <div class="items-title">Artikel</div>
+          ${itemsHtml||'<div style="color:var(--muted);font-size:.8rem;">Keine Artikel</div>'}
+          <div class="total-row"><span>Gesamt</span><span style="color:var(--wa);">${(parseFloat(o.total)||0).toFixed(2)}€</span></div>
+          ${o.delivery_fee>0?`<div style="font-size:.72rem;color:var(--muted);margin-top:4px;">inkl. Liefergebühr: ${parseFloat(o.delivery_fee).toFixed(2)}€</div>`:''}
+        </div>
+      </div>
+      <div class="actions">${acts.join('')}</div>
+    </div>`;
+  }).join('');
+}
+
+async function updateStatus(orderId, newStatus) {
+  const labels = {confirmed:'Bestätigt',preparing:'In Zubereitung',ready:'Bereit',delivered:'Geliefert',cancelled:'Storniert'};
+  try {
+    const r = await fetch(`${API}/api/orders/${orderId}/status`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:newStatus})});
+    const d = await r.json();
+    if (!d.success) throw new Error(d.error);
+    showToast('✅ '+( labels[newStatus]||newStatus));
+    const idx = allOrders.findIndex(o=>o.id===orderId);
+    if (idx>=0) allOrders[idx].status=newStatus;
+    filterOrders(); updateStats();
+  } catch(e) { showToast('⚠️ '+e.message, true); }
+}
+
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = isError?'error':''; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>

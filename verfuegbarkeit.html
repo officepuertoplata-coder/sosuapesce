@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Verfügbarkeit – Converdino</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--wa:#25D366;--bg:#0a1f12;--card:#111f15;--card2:#162a1a;--border:rgba(37,211,102,0.15);--txt:#e8f5ec;--muted:#5d8a6a;--gold:#f4a100;--red:#ef4444;--blue:#3b82f6;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;padding-bottom:80px;}
+nav{background:rgba(10,31,18,0.95);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;position:sticky;top:0;z-index:100;}
+.nav-brand{font-weight:900;font-size:.95rem;color:var(--wa);margin-right:12px;}
+.nav-brand span{color:var(--txt);}
+.nav-slug{background:var(--gold);color:#000;font-size:.6rem;font-weight:800;padding:2px 6px;border-radius:4px;}
+.nav-right{margin-left:auto;display:flex;gap:6px;}
+.btn-nav{background:none;border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:.75rem;font-family:'Nunito',sans-serif;text-decoration:none;display:flex;align-items:center;}
+.btn-nav:hover{border-color:var(--wa);color:var(--txt);}
+.main{max-width:680px;margin:0 auto;padding:16px;}
+
+/* HEADER CARD */
+.header-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;}
+.field-group{margin-bottom:14px;}
+.field-group label{display:block;font-size:.65rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;}
+.field-group input,.field-group select,.field-group textarea{width:100%;padding:9px 12px;background:var(--card2);border:1.5px solid rgba(37,211,102,0.12);border-radius:9px;color:var(--txt);font-size:.88rem;font-family:'Nunito',sans-serif;outline:none;transition:border-color .2s;}
+.field-group input:focus,.field-group select:focus,.field-group textarea:focus{border-color:var(--wa);}
+.field-group select option{background:var(--card2);}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.period-extra{display:none;margin-top:8px;}
+.period-extra.show{display:grid;}
+
+/* LIEFEROPTIONEN */
+.delivery-opts{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.delivery-opt{display:flex;align-items:center;gap:6px;background:var(--card2);border:1.5px solid rgba(37,211,102,0.12);border-radius:9px;padding:8px 12px;cursor:pointer;font-size:.82rem;font-weight:700;transition:all .2s;flex:1;justify-content:center;}
+.delivery-opt:hover{border-color:var(--wa);}
+.delivery-opt.active{border-color:var(--wa);background:rgba(37,211,102,0.1);color:var(--wa);}
+.delivery-opt input{accent-color:var(--wa);width:14px;height:14px;}
+.delivery-fee{display:none;margin-top:6px;}
+.delivery-fee.show{display:flex;align-items:center;gap:8px;}
+.delivery-fee input{flex:1;padding:8px 10px;background:var(--card2);border:1.5px solid rgba(37,211,102,0.12);border-radius:8px;color:var(--txt);font-size:.85rem;font-family:'Nunito',sans-serif;outline:none;}
+.delivery-fee input:focus{border-color:var(--wa);}
+
+/* SECTION */
+.section-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px;}
+.section-hd{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;background:rgba(37,211,102,0.05);border-bottom:1px solid var(--border);}
+.section-hd h3{font-size:.88rem;font-weight:800;}
+
+/* PRODUCT ROW */
+.product-row{padding:13px 16px;border-bottom:1px solid rgba(37,211,102,0.06);display:flex;align-items:center;gap:12px;}
+.product-row:last-child{border-bottom:none;}
+.product-row.inactive{opacity:.5;}
+.toggle-wrap{flex-shrink:0;}
+.tog{position:relative;width:36px;height:20px;}
+.tog input{opacity:0;width:0;height:0;}
+.tog-sl{position:absolute;inset:0;background:rgba(255,255,255,.1);border-radius:20px;cursor:pointer;transition:.2s;}
+.tog-sl:before{content:'';position:absolute;width:16px;height:16px;left:2px;top:2px;background:var(--muted);border-radius:50%;transition:.2s;}
+.tog input:checked+.tog-sl{background:var(--wa);}
+.tog input:checked+.tog-sl:before{transform:translateX(16px);background:#fff;}
+.prod-info{flex:1;min-width:0;}
+.prod-name{font-size:.85rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.prod-price{font-size:.72rem;color:var(--muted);margin-top:2px;}
+.prod-badges{display:flex;gap:4px;margin-top:3px;}
+.badge-sm{font-size:.6rem;font-weight:800;padding:2px 6px;border-radius:10px;}
+.badge-kaufbar{background:rgba(37,211,102,0.15);color:var(--wa);}
+.badge-anfrage{background:rgba(244,161,0,0.15);color:var(--gold);}
+.badge-qr{background:rgba(139,92,246,0.15);color:#c4b5fd;}
+.qty-control{display:flex;align-items:center;gap:0;background:var(--card2);border:1px solid rgba(37,211,102,0.15);border-radius:8px;overflow:hidden;flex-shrink:0;}
+.qty-btn{width:30px;height:30px;background:none;border:none;color:var(--wa);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:800;transition:background .15s;}
+.qty-btn:hover{background:rgba(37,211,102,0.1);}
+.qty-input{width:48px;text-align:center;border:none;border-left:1px solid rgba(37,211,102,0.15);border-right:1px solid rgba(37,211,102,0.15);background:#fff;color:#000;font-size:.85rem;font-weight:700;padding:5px 3px;font-family:'Nunito',sans-serif;outline:none;}
+.qty-unit{font-size:.65rem;color:var(--muted);padding:0 6px;white-space:nowrap;}
+.perm-toggle{display:flex;align-items:center;gap:6px;flex-shrink:0;font-size:.72rem;color:var(--muted);cursor:pointer;}
+.perm-toggle input{accent-color:var(--wa);}
+.perm-toggle.active{color:var(--wa);}
+
+/* ADD ADHOC */
+.add-row{padding:10px 16px;border-top:1px dashed rgba(37,211,102,0.15);}
+.add-btn{width:100%;background:none;border:1.5px dashed rgba(37,211,102,0.2);border-radius:8px;padding:9px;font-size:.8rem;color:var(--muted);cursor:pointer;font-family:'Nunito',sans-serif;transition:all .15s;}
+.add-btn:hover{border-color:var(--wa);color:var(--wa);}
+.adhoc-form{padding:12px 16px;background:var(--card2);border-top:1px solid var(--border);display:none;}
+.adhoc-form.show{display:block;}
+.adhoc-grid{display:grid;grid-template-columns:1fr 80px 70px;gap:8px;margin-bottom:8px;}
+.adhoc-input{padding:8px 10px;background:var(--bg);border:1.5px solid rgba(37,211,102,0.15);border-radius:7px;color:var(--txt);font-size:.82rem;font-family:'Nunito',sans-serif;outline:none;width:100%;}
+.adhoc-input:focus{border-color:var(--wa);}
+.adhoc-actions{display:flex;gap:6px;}
+
+/* BUTTONS */
+.btn{padding:9px 18px;border-radius:9px;border:none;font-size:.85rem;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;}
+.btn-primary{background:var(--wa);color:#fff;}
+.btn-primary:hover{background:#128C7E;}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+.btn-ghost{background:var(--card2);color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover{color:var(--txt);border-color:var(--wa);}
+.btn-sm{padding:6px 12px;font-size:.76rem;}
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* BOTTOM BAR */
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);padding:10px 16px;display:flex;gap:10px;z-index:50;}
+.bottom-bar-inner{max-width:680px;margin:0 auto;width:100%;display:flex;gap:10px;}
+
+/* TOAST */
+#toast{position:fixed;bottom:72px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--card);border:1px solid var(--wa);color:var(--wa);padding:9px 18px;border-radius:20px;font-size:.82rem;font-weight:700;transition:all .25s;opacity:0;z-index:999;white-space:nowrap;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+#toast.error{border-color:var(--red);color:var(--red);}
+.loading{text-align:center;padding:40px;color:var(--muted);}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-brand">Con<span>verdino</span> <span class="nav-slug" id="navSlug"></span></div>
+  <div class="nav-right">
+    <a href="hub.html" class="btn-nav">← Hub</a>
+    <button class="btn-nav" onclick="doLogout()">Ausloggen</button>
+  </div>
+</nav>
+
+<div class="main">
+
+  <!-- HEADER: Titel + Zeitraum -->
+  <div class="header-card">
+    <div class="field-group">
+      <label>📋 Titel des Angebots</label>
+      <input type="text" id="availTitle" placeholder='z.B. "Tagesangebot", "Angebot der Woche", "Sonderangebot"'>
+    </div>
+
+    <div class="field-group">
+      <label>📅 Zeitraum</label>
+      <select id="periodType" onchange="onPeriodChange()">
+        <option value="today">📆 Heute</option>
+        <option value="range">📅 Von – Bis (Datum)</option>
+        <option value="permanent">♾️ Permanent (bis manuell deaktiviert)</option>
+      </select>
+      <div class="period-extra row2" id="periodRange">
+        <div>
+          <label style="font-size:.62rem;color:var(--muted);display:block;margin-bottom:4px;">VON</label>
+          <input type="date" id="periodFrom">
+        </div>
+        <div>
+          <label style="font-size:.62rem;color:var(--muted);display:block;margin-bottom:4px;">BIS</label>
+          <input type="date" id="periodTo">
+        </div>
+      </div>
+    </div>
+
+    <div class="field-group" style="margin-bottom:0;">
+      <label>📝 Notiz für Kunden (optional)</label>
+      <textarea id="noteText" rows="2" placeholder="z.B. Heute extra frische Ware! Abholung ab 9 Uhr."></textarea>
+    </div>
+  </div>
+
+  <!-- LIEFEROPTIONEN -->
+  <div class="section-card">
+    <div class="section-hd"><h3>🚚 Lieferoptionen</h3></div>
+    <div style="padding:14px 16px;">
+      <div class="delivery-opts">
+        <label class="delivery-opt active" id="opt-pickup">
+          <input type="checkbox" checked onchange="toggleDelivery('pickup',this)"> 🏪 Abholung
+        </label>
+        <label class="delivery-opt" id="opt-delivery">
+          <input type="checkbox" onchange="toggleDelivery('delivery',this)"> 🚚 Lieferung
+        </label>
+        <label class="delivery-opt" id="opt-qr">
+          <input type="checkbox" onchange="toggleDelivery('qr',this)"> 📱 QR-Code
+        </label>
+      </div>
+      <div class="delivery-fee" id="deliveryFeeRow">
+        <span style="font-size:.8rem;color:var(--muted);">Liefergebühr:</span>
+        <input type="number" id="deliveryFee" placeholder="0.00" step="0.50" min="0" value="0">
+        <span style="font-size:.8rem;color:var(--muted);">€</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARTIKEL -->
+  <div class="section-card">
+    <div class="section-hd">
+      <h3>📦 Artikel</h3>
+      <span id="activeCount" style="font-size:.72rem;color:var(--muted);background:var(--card2);padding:3px 8px;border-radius:10px;">0 aktiv</span>
+    </div>
+    <div id="productList"><div class="loading">Lade Artikel...</div></div>
+    <div class="add-row">
+      <button class="add-btn" onclick="toggleAdhoc()">+ Zusätzlichen Artikel für diese Verfügbarkeit hinzufügen</button>
+    </div>
+    <div class="adhoc-form" id="adhocForm">
+      <div class="adhoc-grid">
+        <input class="adhoc-input" id="adhocName" placeholder="Artikelname">
+        <input class="adhoc-input" id="adhocPrice" type="number" placeholder="Preis €" step="0.01">
+        <input class="adhoc-input" id="adhocUnit" placeholder="Einheit">
+      </div>
+      <div class="adhoc-grid">
+        <input class="adhoc-input" id="adhocQty" type="number" placeholder="Menge" step="0.5">
+        <div style="display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--muted);">
+          <input type="checkbox" id="adhocPerm" accent-color="var(--wa)">♾️ Unbegrenzt
+        </div>
+        <div></div>
+      </div>
+      <div class="adhoc-actions">
+        <button class="btn btn-ghost btn-sm" onclick="toggleAdhoc()">Abbrechen</button>
+        <button class="btn btn-primary btn-sm" onclick="addAdhocProduct()">Hinzufügen</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM BAR -->
+<div class="bottom-bar">
+  <div class="bottom-bar-inner">
+    <button class="btn btn-primary" style="flex:1" id="saveBtn" onclick="saveAvailability()">💾 Speichern</button>
+    <button class="btn btn-ghost btn-sm" onclick="loadYesterday()" style="white-space:nowrap;">📋 Gestern</button>
+    <button class="btn btn-ghost btn-sm" onclick="resetAll()">↺</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API = 'https://converto-server-production.up.railway.app';
+const KEY = 'converto_auth_v2';
+let merchant = null, slug = '', availabilityId = null;
+let products = [];
+let deliveryOpts = { pickup: true, delivery: false, qr: false };
+
+// ── AUTH ──────────────────────────────────────────────────
+window.onload = async function() {
+  let stored = null;
+  try { stored = JSON.parse(localStorage.getItem(KEY)||'null'); } catch(e) {}
+  if (!stored||!stored.role) { window.location.href='login.html?redirect='+encodeURIComponent(location.href); return; }
+  slug = stored.slug || new URLSearchParams(location.search).get('m') || 'ynhald';
+  document.getElementById('navSlug').textContent = slug;
+
+  try {
+    const r = await fetch(API+'/api/merchants/'+slug);
+    merchant = await r.json();
+  } catch(e) { showToast('Verbindungsfehler', true); return; }
+
+  // Datum setzen
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('periodFrom').value = today;
+  document.getElementById('periodTo').value = today;
+
+  await loadAvailability();
+};
+
+function doLogout() { localStorage.removeItem(KEY); window.location.href='login.html'; }
+
+// ── PERIOD ────────────────────────────────────────────────
+function onPeriodChange() {
+  const type = document.getElementById('periodType').value;
+  document.getElementById('periodRange').classList.toggle('show', type === 'range');
+}
+
+// ── DELIVERY ──────────────────────────────────────────────
+function toggleDelivery(type, cb) {
+  deliveryOpts[type] = cb.checked;
+  document.getElementById('opt-'+type).classList.toggle('active', cb.checked);
+  document.getElementById('deliveryFeeRow').classList.toggle('show', deliveryOpts.delivery);
+}
+
+// ── LOAD ──────────────────────────────────────────────────
+async function loadAvailability() {
+  try {
+    const r = await fetch(API+'/api/availability/today/'+merchant.id);
+    const avail = await r.json();
+    availabilityId = avail?.id || null;
+
+    if (avail) {
+      document.getElementById('availTitle').value = avail.title || 'Tagesangebot';
+      if (avail.period_type) document.getElementById('periodType').value = avail.period_type;
+      if (avail.period_from) document.getElementById('periodFrom').value = avail.period_from;
+      if (avail.period_to) document.getElementById('periodTo').value = avail.period_to;
+      if (avail.note) document.getElementById('noteText').value = avail.note;
+      if (avail.delivery_active) {
+        deliveryOpts.delivery = true;
+        document.getElementById('opt-delivery').querySelector('input').checked = true;
+        document.getElementById('opt-delivery').classList.add('active');
+        document.getElementById('deliveryFeeRow').classList.add('show');
+      }
+      if (avail.delivery_qr) {
+        deliveryOpts.qr = true;
+        document.getElementById('opt-qr').querySelector('input').checked = true;
+        document.getElementById('opt-qr').classList.add('active');
+      }
+      onPeriodChange();
+    }
+    products = avail?.daily_products || [];
+    if (!products.length) await loadBaseProducts();
+    renderProducts();
+  } catch(e) { showToast('Fehler beim Laden', true); }
+}
+
+async function loadBaseProducts() {
+  const r = await fetch(API+'/api/products/'+merchant.id);
+  const base = await r.json();
+  products = (base||[]).map(p => ({
+    product_id: p.id, name: p.name, price_today: p.price||0,
+    unit: p.unit||'piece', unit_label: p.unit_label||'Stück',
+    quantity_start: 0, active: false, step_quantity: p.step_quantity||1,
+    unlimited: false, purchasable: p.purchasable !== false
+  }));
+}
+
+async function loadYesterday() {
+  const r = await fetch(API+'/api/availability/yesterday/'+merchant.id);
+  const d = await r.json();
+  if (!d || !d.daily_products) { showToast('Keine Daten von gestern'); return; }
+  products = d.daily_products.map(p => ({ ...p, active: false, quantity_start: p.quantity_start||0 }));
+  if (d.note) document.getElementById('noteText').value = d.note;
+  renderProducts(); updateStats(); showToast('✅ Gestern geladen – Mengen anpassen!');
+}
+
+function resetAll() {
+  products.forEach(p => { p.active = false; p.quantity_start = 0; p.unlimited = false; });
+  renderProducts(); updateStats();
+}
+
+// ── RENDER ────────────────────────────────────────────────
+function renderProducts() {
+  const list = document.getElementById('productList');
+  if (!products.length) { list.innerHTML='<div class="loading">Noch keine Artikel. Lege zuerst Produkte im Admin an.</div>'; return; }
+  list.innerHTML = products.map((p,i) => `
+    <div class="product-row ${p.active?'':'inactive'}" id="prow-${i}">
+      <div class="toggle-wrap">
+        <label class="tog">
+          <input type="checkbox" ${p.active?'checked':''} onchange="toggleProduct(${i})">
+          <span class="tog-sl"></span>
+        </label>
+      </div>
+      <div class="prod-info">
+        <div class="prod-name">${p.name}</div>
+        <div class="prod-price">${(p.price_today||0).toFixed(2)}€ · ${p.unit_label||'Stück'}</div>
+        <div class="prod-badges">
+          ${p.purchasable !== false ? '<span class="badge-sm badge-kaufbar">kaufbar</span>' : '<span class="badge-sm badge-anfrage">nur Anfrage</span>'}
+          ${deliveryOpts.qr ? '<span class="badge-sm badge-qr">QR</span>' : ''}
+        </div>
+      </div>
+      <div class="qty-control">
+        <button class="qty-btn" onclick="changeQty(${i},-1)" ${p.unlimited?'disabled':''}>−</button>
+        <input class="qty-input" id="qty-${i}" type="number" value="${p.unlimited?'∞':p.quantity_start||0}"
+          step="${p.step_quantity||1}" min="0" ${p.unlimited?'disabled':''} onchange="onQtyChange(${i})">
+        <button class="qty-btn" onclick="changeQty(${i},1)" ${p.unlimited?'disabled':''}>+</button>
+        ${p.unit_label?`<span class="qty-unit">${p.unit_label}</span>`:''}
+      </div>
+      <label class="perm-toggle ${p.unlimited?'active':''}" title="Unbegrenzte Menge">
+        <input type="checkbox" ${p.unlimited?'checked':''} onchange="toggleUnlimited(${i})"> ♾️
+      </label>
+    </div>`).join('');
+  updateStats();
+}
+
+function toggleProduct(i) {
+  products[i].active = !products[i].active;
+  if (products[i].active && !products[i].unlimited && (products[i].quantity_start||0) === 0) {
+    products[i].quantity_start = products[i].step_quantity || 1;
+  }
+  renderProducts();
+}
+
+function changeQty(i, delta) {
+  if (products[i].unlimited) return;
+  const step = products[i].step_quantity || 1;
+  products[i].quantity_start = Math.max(0, (products[i].quantity_start||0) + delta * step);
+  if (products[i].quantity_start > 0) products[i].active = true;
+  renderProducts();
+}
+
+function onQtyChange(i) {
+  const val = parseFloat(document.getElementById('qty-'+i).value) || 0;
+  products[i].quantity_start = val;
+  if (val > 0) products[i].active = true;
+  else products[i].active = false;
+  renderProducts();
+}
+
+function toggleUnlimited(i) {
+  products[i].unlimited = !products[i].unlimited;
+  if (products[i].unlimited) products[i].active = true;
+  renderProducts();
+}
+
+function updateStats() {
+  const active = products.filter(p => p.active).length;
+  document.getElementById('activeCount').textContent = active + ' aktiv';
+}
+
+// ── ADHOC ─────────────────────────────────────────────────
+function toggleAdhoc() {
+  document.getElementById('adhocForm').classList.toggle('show');
+}
+
+function addAdhocProduct() {
+  const name = document.getElementById('adhocName').value.trim();
+  const price = parseFloat(document.getElementById('adhocPrice').value)||0;
+  const unit = document.getElementById('adhocUnit').value.trim() || 'Stück';
+  const qty = parseFloat(document.getElementById('adhocQty').value)||0;
+  const perm = document.getElementById('adhocPerm').checked;
+  if (!name) { showToast('Bitte Artikelname eingeben', true); return; }
+  if (!perm && qty <= 0) { showToast('Bitte Menge eingeben', true); return; }
+  products.push({ product_id: null, name, price_today: price, unit: 'piece', unit_label: unit,
+    quantity_start: qty, active: true, step_quantity: 1, unlimited: perm, purchasable: true, adhoc: true });
+  ['adhocName','adhocPrice','adhocUnit','adhocQty'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('adhocPerm').checked = false;
+  document.getElementById('adhocForm').classList.remove('show');
+  renderProducts(); showToast('✅ Artikel hinzugefügt');
+}
+
+// ── SAVE ──────────────────────────────────────────────────
+async function saveAvailability() {
+  if (!merchant) return;
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Speichern...';
+
+  const periodType = document.getElementById('periodType').value;
+  const today = new Date().toISOString().split('T')[0];
+
+  try {
+    const payload = {
+      merchant_id: merchant.id,
+      date: today,
+      title: document.getElementById('availTitle').value || 'Tagesangebot',
+      period_type: periodType,
+      period_from: periodType === 'range' ? document.getElementById('periodFrom').value : (periodType === 'today' ? today : null),
+      period_to: periodType === 'range' ? document.getElementById('periodTo').value : null,
+      delivery_active: deliveryOpts.delivery,
+      pickup_active: deliveryOpts.pickup,
+      delivery_qr: deliveryOpts.qr,
+      available_until: '20:00',
+      delivery_fee: parseFloat(document.getElementById('deliveryFee').value)||0,
+      note: document.getElementById('noteText').value,
+      published: true,
+      products: products.map(p => ({ ...p, quantity_start: p.unlimited ? 9999 : (p.quantity_start||0) }))
+    };
+
+    const r = await fetch(API+'/api/availability', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+    });
+    const data = await r.json();
+    if (!data.success) throw new Error(data.error||'Fehler');
+    availabilityId = data.availability.id;
+    showToast('✅ Verfügbarkeit gespeichert!');
+  } catch(e) {
+    showToast('⚠️ ' + e.message, true);
+  }
+  btn.disabled = false;
+  btn.innerHTML = '💾 Speichern';
+}
+
+// ── TOAST ─────────────────────────────────────────────────
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = isError ? 'error' : '';
+  t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>

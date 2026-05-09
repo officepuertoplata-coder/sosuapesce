@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QR Entwertung – Converdino</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<style>
+:root{--wa:#25D366;--bg:#0a1f12;--card:#111f15;--card2:#162a1a;--border:rgba(37,211,102,0.15);--txt:#e8f5ec;--muted:#5d8a6a;--gold:#f4a100;--red:#ef4444;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:0;}
+
+/* LOGIN */
+.login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;width:100%;padding:20px;}
+.login-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px 28px;width:100%;max-width:360px;text-align:center;}
+.login-icon{font-size:40px;margin-bottom:12px;}
+.login-title{font-size:1.2rem;font-weight:900;margin-bottom:6px;}
+.login-sub{font-size:.8rem;color:var(--muted);margin-bottom:20px;}
+.login-input{width:100%;padding:10px 14px;background:var(--card2);border:1.5px solid rgba(37,211,102,0.15);border-radius:9px;color:var(--txt);font-size:.9rem;font-family:'Nunito',sans-serif;outline:none;margin-bottom:10px;}
+.login-input:focus{border-color:var(--wa);}
+.login-btn{width:100%;padding:12px;background:var(--wa);color:#fff;border:none;border-radius:9px;font-size:.95rem;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;}
+.login-btn:hover{background:#128C7E;}
+.login-err{color:var(--red);font-size:.8rem;min-height:18px;margin-top:4px;}
+
+/* APP */
+#app{display:none;width:100%;max-width:480px;padding:0;}
+nav{background:rgba(10,31,18,0.95);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;width:100%;position:sticky;top:0;z-index:100;}
+.nav-brand{font-weight:900;font-size:.95rem;color:var(--wa);}
+.nav-brand span{color:var(--txt);}
+.nav-right{margin-left:auto;}
+.btn-sm{padding:5px 11px;border-radius:7px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;font-size:.75rem;font-family:'Nunito',sans-serif;}
+.btn-sm:hover{border-color:var(--wa);color:var(--txt);}
+
+.main{padding:16px;width:100%;}
+
+/* CAMERA */
+.camera-wrap{position:relative;width:100%;border-radius:14px;overflow:hidden;background:#000;margin-bottom:16px;}
+#video{width:100%;display:block;}
+.scan-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+.scan-frame{width:200px;height:200px;border:2px solid var(--wa);border-radius:12px;box-shadow:0 0 0 1000px rgba(0,0,0,0.5);}
+.scan-line{position:absolute;width:180px;height:2px;background:var(--wa);border-radius:1px;animation:scanline 2s ease-in-out infinite;}
+@keyframes scanline{0%,100%{top:calc(50% - 90px)}50%{top:calc(50% + 90px)}}
+#canvas{display:none;}
+
+/* MANUAL INPUT */
+.manual-input{display:flex;gap:8px;margin-bottom:16px;}
+.manual-input input{flex:1;padding:10px 12px;background:var(--card);border:1.5px solid var(--border);border-radius:9px;color:var(--txt);font-size:.88rem;font-family:'Nunito',sans-serif;outline:none;}
+.manual-input input:focus{border-color:var(--wa);}
+.manual-input button{padding:10px 16px;background:var(--wa);color:#fff;border:none;border-radius:9px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;white-space:nowrap;}
+
+/* RESULT CARD */
+.result-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px;text-align:center;}
+.result-card.success{border-color:var(--wa);}
+.result-card.error{border-color:var(--red);}
+.result-card.warning{border-color:var(--gold);}
+.result-icon{font-size:48px;margin-bottom:12px;}
+.result-title{font-size:1.1rem;font-weight:900;margin-bottom:8px;}
+.result-info{font-size:.82rem;color:var(--muted);line-height:1.7;}
+.result-info strong{color:var(--txt);}
+.redeem-btn{width:100%;margin-top:14px;padding:14px;background:var(--wa);color:#fff;border:none;border-radius:10px;font-size:.95rem;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;}
+.redeem-btn:hover{background:#128C7E;}
+.redeem-btn:disabled{opacity:.5;cursor:not-allowed;}
+.status-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.72rem;font-weight:800;margin-bottom:10px;}
+.s-open{background:rgba(37,211,102,0.15);color:var(--wa);}
+.s-redeemed{background:rgba(59,130,246,0.15);color:#93c5fd;}
+.s-expired{background:rgba(239,68,68,0.12);color:var(--red);}
+
+/* HISTORY */
+.hist-section{margin-top:20px;}
+.hist-title{font-size:.7rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;}
+.hist-item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;}
+.hist-code{font-family:monospace;font-size:.75rem;color:var(--wa);}
+.hist-info{flex:1;min-width:0;}
+.hist-name{font-size:.82rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hist-time{font-size:.7rem;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <div class="login-icon">📱</div>
+    <div class="login-title">QR Entwertung</div>
+    <div class="login-sub">Nur für berechtigte Mitarbeiter</div>
+    <input class="login-input" type="text" id="loginUser" placeholder="Benutzername" autocomplete="username">
+    <input class="login-input" type="password" id="loginPass" placeholder="Passwort" autocomplete="current-password"
+      onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="login-err" id="loginErr"></div>
+    <button class="login-btn" onclick="doLogin()">Einloggen</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <nav>
+    <div class="nav-brand">Con<span>verdino</span> · QR-Scanner</div>
+    <div class="nav-right">
+      <button class="btn-sm" onclick="doLogout()">Ausloggen</button>
+    </div>
+  </nav>
+
+  <div class="main">
+
+    <!-- KAMERA -->
+    <div class="camera-wrap" id="cameraWrap">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="canvas"></canvas>
+      <div class="scan-overlay">
+        <div class="scan-frame">
+          <div class="scan-line"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MANUELL -->
+    <div class="manual-input">
+      <input type="text" id="manualCode" placeholder="QR-Code manuell eingeben..." onkeydown="if(event.key==='Enter')checkManual()">
+      <button onclick="checkManual()">Prüfen</button>
+    </div>
+
+    <!-- ERGEBNIS -->
+    <div id="resultArea"></div>
+
+    <!-- LETZTE ENTWERTUNGEN -->
+    <div class="hist-section">
+      <div class="hist-title">Letzte Entwertungen (diese Session)</div>
+      <div id="histList"><div style="color:var(--muted);font-size:.8rem;">Noch keine Entwertungen</div></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const API = 'https://converto-server-production.up.railway.app';
+const KEY = 'converto_auth_v2';
+let scanUser = null;
+let scanActive = false;
+let lastCode = '';
+let history = [];
+let videoStream = null;
+
+// ── LOGIN ─────────────────────────────────────────────────
+async function doLogin() {
+  const username = document.getElementById('loginUser').value.trim();
+  const password = document.getElementById('loginPass').value;
+  if (!username||!password) { document.getElementById('loginErr').textContent='Bitte alle Felder ausfüllen'; return; }
+
+  try {
+    const r = await fetch(API+'/api/auth/login', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ username, password })
+    });
+    const d = await r.json();
+    if (!d.success) { document.getElementById('loginErr').textContent = d.error||'Fehler'; return; }
+
+    scanUser = username;
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    document.getElementById('app').style.flexDirection = 'column';
+    startCamera();
+  } catch(e) {
+    document.getElementById('loginErr').textContent = 'Verbindungsfehler';
+  }
+}
+
+function doLogout() {
+  scanUser = null;
+  if (videoStream) { videoStream.getTracks().forEach(t=>t.stop()); videoStream = null; }
+  document.getElementById('loginWrap').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('resultArea').innerHTML = '';
+  document.getElementById('loginPass').value = '';
+}
+
+// ── KAMERA ────────────────────────────────────────────────
+async function startCamera() {
+  try {
+    videoStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+    });
+    const video = document.getElementById('video');
+    video.srcObject = videoStream;
+    video.addEventListener('loadedmetadata', () => { video.play(); scanActive = true; requestAnimationFrame(scanFrame); });
+  } catch(e) {
+    document.getElementById('cameraWrap').innerHTML = '<div style="padding:30px;text-align:center;color:var(--muted);font-size:.82rem;">📷 Kamera nicht verfügbar<br>Bitte QR-Code manuell eingeben</div>';
+  }
+}
+
+function scanFrame() {
+  if (!scanActive) return;
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  if (video.readyState === video.HAVE_ENOUGH_DATA) {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'dontInvert' });
+    if (code && code.data && code.data !== lastCode) {
+      lastCode = code.data;
+      checkCode(code.data);
+      setTimeout(() => { lastCode = ''; }, 3000);
+    }
+  }
+  requestAnimationFrame(scanFrame);
+}
+
+// ── CHECK CODE ────────────────────────────────────────────
+async function checkManual() {
+  const code = document.getElementById('manualCode').value.trim();
+  if (!code) return;
+  await checkCode(code);
+  document.getElementById('manualCode').value = '';
+}
+
+async function checkCode(code) {
+  document.getElementById('resultArea').innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);">⏳ Prüfe...</div>';
+  try {
+    const r = await fetch(API+'/api/qr/'+encodeURIComponent(code));
+    const qr = await r.json();
+    if (!r.ok || qr.error) { showResult('error', '❌', 'Nicht gefunden', qr.error||'QR Code ungültig', null); return; }
+    showResult(qr.status === 'open' ? 'success' : qr.status === 'redeemed' ? 'warning' : 'error',
+      qr.status === 'open' ? '✅' : qr.status === 'redeemed' ? '⚠️' : '❌',
+      qr.status === 'open' ? 'Gültig – Jetzt entwerten' : qr.status === 'redeemed' ? 'Bereits eingelöst' : 'Abgelaufen',
+      qr, qr.status === 'open' ? qr : null);
+  } catch(e) { showResult('error','❌','Fehler',{product_name:'Verbindungsfehler'},null); }
+}
+
+function showResult(type, icon, title, qr, redeemable) {
+  const statusLabel = {open:'Offen',redeemed:'Eingelöst',expired:'Abgelaufen'}[qr.status]||qr.status;
+  const statusClass = {open:'s-open',redeemed:'s-redeemed',expired:'s-expired'}[qr.status]||'';
+  const redeemedInfo = qr.redeemed_at ? `<br>Eingelöst: <strong>${new Date(qr.redeemed_at).toLocaleString('de-AT')}</strong> von <strong>${qr.redeemed_by||'?'}</strong>` : '';
+
+  document.getElementById('resultArea').innerHTML = `
+    <div class="result-card ${type}">
+      <div class="result-icon">${icon}</div>
+      <div class="status-badge ${statusClass}">${statusLabel}</div>
+      <div class="result-title">${title}</div>
+      <div class="result-info">
+        Produkt: <strong>${qr.product_name||'—'}</strong><br>
+        Kunde: <strong>${qr.customer_name||'—'}</strong><br>
+        Code: <strong style="font-family:monospace;font-size:.8rem;">${qr.code||'—'}</strong>
+        ${qr.valid_until?`<br>Gültig bis: <strong>${qr.valid_until}</strong>`:''}
+        ${redeemedInfo}
+      </div>
+      ${redeemable ? `<button class="redeem-btn" id="redeemBtn" onclick="redeemCode('${qr.code}')">✅ Jetzt entwerten</button>` : ''}
+    </div>`;
+}
+
+async function redeemCode(code) {
+  const btn = document.getElementById('redeemBtn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Entwerte...'; }
+  try {
+    const r = await fetch(API+'/api/qr/redeem', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ code, redeemed_by: scanUser })
+    });
+    const d = await r.json();
+    if (!d.success) { showResult('error','❌','Fehler',d.qr||{status:'error',code,product_name:'',customer_name:''},null); return; }
+    showResult('success','🎉','Erfolgreich eingelöst!', d.qr, null);
+    addHistory(d.qr);
+  } catch(e) {
+    if (btn) { btn.disabled = false; btn.textContent = '✅ Jetzt entwerten'; }
+  }
+}
+
+function addHistory(qr) {
+  history.unshift(qr);
+  const list = document.getElementById('histList');
+  list.innerHTML = history.slice(0,5).map(q => `
+    <div class="hist-item">
+      <span style="font-size:20px;">✅</span>
+      <div class="hist-info">
+        <div class="hist-name">${q.product_name||'—'} · ${q.customer_name||'—'}</div>
+        <div class="hist-time">${new Date(q.redeemed_at||new Date()).toLocaleTimeString('de-AT')}</div>
+      </div>
+      <span class="hist-code">${q.code}</span>
+    </div>`).join('');
+}
+</script>
+</body>
+</html>

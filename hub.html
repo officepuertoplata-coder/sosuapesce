@@ -230,11 +230,11 @@ function buildHub() {
   html += `<div class="section-label">Tagesgeschäft</div>
   <div class="grid">
 
-    <a class="card green" href="haendler-session.html">
+    <a class="card green" href="verfuegbarkeit.html">
       <span class="card-tag tag-daily">Täglich</span>
       <div class="card-icon">📋</div>
-      <div class="card-title">Tagesverfügbarkeit</div>
-      <div class="card-desc">Artikel & Mengen für heute erfassen und für Kunden publizieren.</div>
+      <div class="card-title">Verfügbarkeit</div>
+      <div class="card-desc">Artikel, Mengen & Zeitraum erfassen. Direkt auf Landingpage referenziert.</div>
       <div class="card-action">Erfassen →</div>
     </a>
 
@@ -268,7 +268,7 @@ function buildHub() {
       <div class="card-action">Einstellungen →</div>
     </a>
 
-    <a class="card gold" href="agentes.html?m=${slug}">
+    <a class="card gold" href="admin.html?m=${slug}&tab=partners">
       <span class="card-tag tag-admin">Partner</span>
       <div class="card-icon">🤝</div>
       <div class="card-title">Partner</div>
@@ -288,8 +288,16 @@ function buildHub() {
       <span class="card-tag tag-public">Public</span>
       <div class="card-icon">🌐</div>
       <div class="card-title">Landingpage</div>
-      <div class="card-desc" id="lpDesc">Öffentliche Seite für Kunden mit Tagesangebot und Referral Links.</div>
+      <div class="card-desc" id="lpDesc">Öffentliche Seite für Kunden mit aktuellem Angebot.</div>
       <div class="card-action">Bearbeiten →</div>
+    </a>
+
+    <a class="card purple" href="scan.html">
+      <span class="card-tag tag-super">QR</span>
+      <div class="card-icon">📱</div>
+      <div class="card-title">QR Entwertung</div>
+      <div class="card-desc">Tickets und digitale Produkte vor Ort per Kamera entwerten.</div>
+      <div class="card-action">Scanner öffnen →</div>
     </a>
 
   </div>`;
