@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Meine Aufträge – Verkaufsreport</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--wa:#25D366;--bg:#f5f5f5;--card:#fff;--border:#e5e7eb;--txt:#1a1a1a;--mu:#6b7280;--gold:#f4a100;--red:#ef4444;--r:12px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;}
+header{background:var(--wa);color:#fff;padding:16px 20px;}
+.header-inner{max-width:600px;margin:0 auto;}
+.logo{font-weight:900;font-size:1.1rem;}
+.logo span{opacity:.8;font-size:.78rem;display:block;font-weight:600;margin-top:2px;}
+.main{max-width:600px;margin:0 auto;padding:16px;}
+.loading{text-align:center;padding:60px;color:var(--mu);}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--wa);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* AUFTRAG CARD */
+.auftrag{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden;transition:all .2s;}
+.auftrag:hover{border-color:var(--wa);box-shadow:0 4px 12px rgba(37,211,102,.15);}
+.auftrag-header{padding:14px 16px;display:flex;align-items:center;gap:12px;}
+.auftrag-icon{width:44px;height:44px;border-radius:10px;overflow:hidden;flex-shrink:0;background:#f0fdf4;display:flex;align-items:center;justify-content:center;font-size:1.4rem;}
+.auftrag-icon img{width:100%;height:100%;object-fit:cover;}
+.auftrag-info{flex:1;}
+.auftrag-title{font-weight:800;font-size:.92rem;margin-bottom:3px;}
+.auftrag-meta{font-size:.76rem;color:var(--mu);}
+.auftrag-status{flex-shrink:0;text-align:right;}
+.badge{display:inline-block;padding:3px 9px;border-radius:10px;font-size:.68rem;font-weight:700;}
+.s-open{background:#f0fdf4;color:#15803d;border:1px solid #86efac;}
+.s-analyzing{background:#fef9c3;color:#a16207;border:1px solid #fde047;}
+.s-done{background:#dcfce7;color:#15803d;border:1px solid #86efac;}
+.s-paid{background:#dbeafe;color:#1d4ed8;border:1px solid #93c5fd;}
+.auftrag-price{font-size:.82rem;font-weight:800;color:var(--wa);margin-top:3px;}
+.auftrag-footer{border-top:1px solid var(--border);padding:10px 16px;display:flex;gap:8px;}
+.auftrag-btn{flex:1;padding:9px;border-radius:8px;border:none;font-size:.82rem;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;text-decoration:none;text-align:center;display:block;}
+.btn-primary{background:var(--wa);color:#fff;}
+.btn-secondary{background:#f3f4f6;color:var(--txt);}
+.auftrag-photos{display:flex;gap:6px;padding:0 16px 12px;}
+.auftrag-photos img{width:48px;height:48px;border-radius:6px;object-fit:cover;}
+.auftrag-photos .more{width:48px;height:48px;border-radius:6px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-size:.72rem;color:var(--mu);font-weight:800;}
+
+.empty{text-align:center;padding:60px 20px;color:var(--mu);}
+.empty-icon{font-size:3rem;margin-bottom:12px;}
+.hint{background:#f0fdf4;border:1.5px solid #86efac;border-radius:var(--r);padding:14px 16px;margin-bottom:16px;font-size:.84rem;color:#15803d;display:flex;align-items:center;gap:10px;}
+
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:20px;font-size:.85rem;font-weight:700;transition:all .3s;opacity:0;z-index:999;}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      📊 Meine Verkaufsreports
+      <span id="headerSub">Lade...</span>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+  <div id="content"><div class="loading"><div class="spinner"></div>Lade deine Aufträge...</div></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API = 'https://converto-server-production.up.railway.app';
+const phone = new URLSearchParams(location.search).get('p');
+
+if (!phone) {
+  document.getElementById('content').innerHTML = '<div class="loading">❌ Kein gültiger Link</div>';
+} else {
+  loadAuftraege();
+}
+
+async function loadAuftraege() {
+  try {
+    const r = await fetch(API + '/api/vk/sessions/phone/' + encodeURIComponent(phone));
+    const sessions = await r.json();
+
+    if (!sessions.length) {
+      document.getElementById('headerSub').textContent = 'Keine Aufträge';
+      document.getElementById('content').innerHTML = `
+        <div class="empty">
+          <div class="empty-icon">📦</div>
+          <strong>Noch keine Aufträge</strong><br>
+          <span style="font-size:.82rem;">Schicke ein Foto per WhatsApp um zu starten.</span>
+        </div>`;
+      return;
+    }
+
+    document.getElementById('headerSub').textContent = sessions.length + ' Auftrag' + (sessions.length !== 1 ? 'räge' : '');
+
+    let html = `<div class="hint">💡 Tippe auf einen Auftrag um ihn zu öffnen oder das Ergebnis anzusehen.</div>`;
+
+    sessions.forEach((s, i) => {
+      const articles = s.vk_articles || [];
+      const allPhotos = articles.flatMap(a => a.vk_photos || []);
+      const previewPhotos = allPhotos.slice(0, 3);
+      const moreCount = allPhotos.length - 3;
+
+      const statusLabel = {
+        open: '📝 Offen',
+        paid: '💳 Bezahlt',
+        analyzing: '🔍 Analyse läuft',
+        done: '✅ Fertig',
+        expired: '⛔ Abgelaufen'
+      }[s.status] || s.status;
+
+      const statusClass = 's-' + (s.status === 'expired' ? 'open' : s.status);
+      const date = new Date(s.created_at).toLocaleDateString('de-AT', {day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
+      const price = (s.total_price || 0).toFixed(2);
+
+      // First photo as icon
+      const firstPhoto = allPhotos[0];
+      const iconHtml = firstPhoto
+        ? `<img src="${firstPhoto.public_url}" alt="Foto">`
+        : '📦';
+
+      html += `<div class="auftrag">
+        <div class="auftrag-header">
+          <div class="auftrag-icon">${firstPhoto ? `<img src="${firstPhoto.public_url}" alt="">` : '📦'}</div>
+          <div class="auftrag-info">
+            <div class="auftrag-title">${articles.length} Artikel${articles.length > 0 ? ' – ' + articles.map(a => a.title||'Artikel').join(', ').substring(0,40) : ''}</div>
+            <div class="auftrag-meta">${date} · ${allPhotos.length} Foto${allPhotos.length !== 1 ? 's' : ''}</div>
+          </div>
+          <div class="auftrag-status">
+            <div class="badge ${statusClass}">${statusLabel}</div>
+            ${s.paid_at ? `<div class="auftrag-price">€${price}</div>` : ''}
+          </div>
+        </div>`;
+
+      // Photo strip
+      if (previewPhotos.length > 1) {
+        html += `<div class="auftrag-photos">`;
+        previewPhotos.forEach(p => {
+          html += `<img src="${p.public_url}" alt="">`;
+        });
+        if (moreCount > 0) {
+          html += `<div class="more">+${moreCount}</div>`;
+        }
+        html += `</div>`;
+      }
+
+      // Action buttons
+      html += `<div class="auftrag-footer">`;
+      if (s.status === 'done') {
+        html += `<a class="auftrag-btn btn-primary" href="ergebnis.html?s=${s.token}">📋 Ergebnis ansehen</a>`;
+        html += `<a class="auftrag-btn btn-secondary" href="bericht.html?s=${s.token}">Auftrag</a>`;
+      } else if (s.status === 'analyzing') {
+        html += `<a class="auftrag-btn btn-secondary" href="bericht.html?s=${s.token}" style="background:#fef9c3;color:#a16207;">🔍 Analyse läuft...</a>`;
+      } else if (s.status === 'open') {
+        html += `<a class="auftrag-btn btn-primary" href="bericht.html?s=${s.token}">Auftrag öffnen →</a>`;
+      } else {
+        html += `<a class="auftrag-btn btn-secondary" href="bericht.html?s=${s.token}">Öffnen</a>`;
+      }
+      html += `</div></div>`;
+    });
+
+    document.getElementById('content').innerHTML = html;
+  } catch(e) {
+    document.getElementById('content').innerHTML = '<div class="loading">❌ Verbindungsfehler: ' + e.message + '</div>';
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
