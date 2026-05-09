@@ -302,6 +302,18 @@ function buildHub() {
 
   </div>`;
 
+  // ── VERKAUFSREPORT ───────────────────────────────────────
+  html += \`<div class="section-label">Verkaufsreport</div>
+  <div class="grid">
+    <a class="card green" href="vk-admin.html">
+      <span class="card-tag tag-live">KI</span>
+      <div class="card-icon">📊</div>
+      <div class="card-title">Verkaufsreport</div>
+      <div class="card-desc">Kunden schicken Fotos per WhatsApp – KI erstellt Verkaufstexte, Preisvorschläge und Inserate.</div>
+      <div class="card-action">Aufträge verwalten →</div>
+    </a>
+  </div>\`;
+
   // ── SUPERADMIN BEREICH ────────────────────────────────────
   if (auth.role === 'superadmin') {
     html += `<div class="section-label">Plattform (Superadmin)</div>

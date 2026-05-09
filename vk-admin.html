@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Verkaufsreport Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--wa:#25D366;--g2:#1b4332;--bg:#f0f2f0;--card:#fff;--border:#e5e7eb;--mu:#6b7280;--txt:#1a1a1a;--gold:#f4a100;--red:#ef4444;--r:10px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;}
+nav{background:var(--g2);color:#fff;display:flex;align-items:center;gap:6px;padding:0 20px;height:52px;position:sticky;top:0;z-index:100;}
+.nav-brand{font-weight:900;font-size:.95rem;color:var(--wa);margin-right:16px;}
+.tbtn{background:none;border:none;color:rgba(255,255,255,.75);cursor:pointer;padding:5px 10px;border-radius:6px;font-size:.8rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;transition:all .15s;}
+.tbtn:hover,.tbtn.active{background:rgba(255,255,255,.15);color:#fff;}
+.nav-right{margin-left:auto;}
+.main{max-width:1100px;margin:0 auto;padding:20px;}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px;}
+.stat{background:var(--card);border-radius:var(--r);padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.07);border-top:3px solid var(--wa);}
+.stat.gold{border-top-color:var(--gold);}
+.stat.red{border-top-color:var(--red);}
+.stat-val{font-size:1.6rem;font-weight:900;color:var(--g2);}
+.stat-lbl{font-size:.72rem;color:var(--mu);margin-top:3px;}
+
+/* TABLE */
+.table-box{background:var(--card);border-radius:var(--r);box-shadow:0 1px 4px rgba(0,0,0,.08);overflow:hidden;margin-bottom:20px;}
+.table-hd{background:var(--g2);color:#fff;padding:13px 18px;display:flex;align-items:center;justify-content:space-between;}
+.table-hd h2{font-size:.92rem;font-weight:800;}
+.filters{display:flex;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.filter-btn{padding:5px 12px;border-radius:6px;border:1.5px solid var(--border);background:none;font-size:.78rem;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;}
+.filter-btn.active{border-color:var(--wa);color:var(--wa);background:#f0fdf4;}
+table{width:100%;border-collapse:collapse;}
+th{padding:9px 14px;text-align:left;font-size:.68rem;color:var(--mu);font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);}
+td{padding:10px 14px;font-size:.84rem;border-bottom:1px solid var(--border);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#f9fafb;}
+.msg{text-align:center;color:var(--mu);padding:28px;}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.68rem;font-weight:700;}
+.s-open{background:#dcfce7;color:#15803d;}
+.s-paid{background:#dbeafe;color:#1d4ed8;}
+.s-analyzing{background:#fef9c3;color:#a16207;}
+.s-done{background:#dcfce7;color:#15803d;}
+.s-expired,.s-deleted{background:#f3f4f6;color:#6b7280;}
+.s-error{background:#fee2e2;color:#dc2626;}
+.btn{border:none;padding:5px 10px;border-radius:6px;font-size:.76rem;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .15s;}
+.btn-g{background:var(--wa);color:#fff;}
+.btn-gold{background:var(--gold);color:#000;}
+.btn-red{background:transparent;color:var(--red);border:1px solid var(--red);}
+.btn-red:hover{background:var(--red);color:#fff;}
+.btn-sm{padding:3px 8px;font-size:.72rem;}
+.phone{font-family:monospace;font-size:.82rem;}
+#toast{position:fixed;bottom:24px;right:24px;background:var(--wa);color:#fff;padding:10px 16px;border-radius:10px;font-size:.85rem;font-weight:700;transform:translateY(80px);opacity:0;transition:all .3s;z-index:999;}
+#toast.show{transform:translateY(0);opacity:1;}
+.loading{text-align:center;padding:30px;color:var(--mu);}
+@media(max-width:700px){.stats{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">📊 Verkaufsreport Admin</div>
+  <a href="hub.html" class="tbtn">← Hub</a>
+  <button class="tbtn" onclick="loadAll()">↺ Aktualisieren</button>
+  <div class="nav-right">
+    <button class="tbtn" onclick="doLogout()">Ausloggen</button>
+  </div>
+</nav>
+
+<div class="main">
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat"><div class="stat-val" id="s-total">—</div><div class="stat-lbl">Aufträge gesamt</div></div>
+    <div class="stat"><div class="stat-val" id="s-today">—</div><div class="stat-lbl">Heute</div></div>
+    <div class="stat gold"><div class="stat-val" id="s-rev-month">—</div><div class="stat-lbl">Umsatz Monat</div></div>
+    <div class="stat gold"><div class="stat-val" id="s-rev-total">—</div><div class="stat-lbl">Umsatz gesamt</div></div>
+    <div class="stat"><div class="stat-val" id="s-open">—</div><div class="stat-lbl">Offen / Aktiv</div></div>
+  </div>
+
+  <!-- AUFTRÄGE -->
+  <div class="table-box">
+    <div class="table-hd">
+      <h2>📋 Alle Aufträge</h2>
+      <button class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;" onclick="loadAll()">↺</button>
+    </div>
+    <div class="filters">
+      <button class="filter-btn active" onclick="setFilter('all',this)">Alle</button>
+      <button class="filter-btn" onclick="setFilter('open',this)">🟢 Offen</button>
+      <button class="filter-btn" onclick="setFilter('analyzing',this)">🟡 Analyse</button>
+      <button class="filter-btn" onclick="setFilter('done',this)">✅ Fertig</button>
+      <button class="filter-btn" onclick="setFilter('expired',this)">⛔ Abgelaufen</button>
+    </div>
+    <table>
+      <thead><tr>
+        <th>Erstellt</th><th>Telefon</th><th>Artikel</th>
+        <th>Preis</th><th>Status</th><th>Löschen</th><th>Aktionen</th>
+      </tr></thead>
+      <tbody id="sessionsTable"><tr><td colspan="7" class="msg">Lade...</td></tr></tbody>
+    </table>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API = 'https://converto-server-production.up.railway.app';
+const KEY = 'converto_auth_v2';
+let sessions = [];
+let currentFilter = 'all';
+
+// Auth Check
+(function() {
+  let auth = null;
+  try { auth = JSON.parse(localStorage.getItem(KEY)||'null'); } catch(e){}
+  if (!auth || auth.role !== 'superadmin') { location.href = 'login.html'; return; }
+})();
+
+function doLogout() { localStorage.removeItem(KEY); location.href = 'login.html'; }
+
+window.onload = loadAll;
+
+async function loadAll() {
+  await Promise.all([loadStats(), loadSessions()]);
+}
+
+async function loadStats() {
+  try {
+    const r = await fetch(API + '/api/vk/admin/stats');
+    const d = await r.json();
+    document.getElementById('s-total').textContent = d.total || 0;
+    document.getElementById('s-today').textContent = d.today || 0;
+    document.getElementById('s-rev-month').textContent = '€' + (d.revenue_month||0).toFixed(2);
+    document.getElementById('s-rev-total').textContent = '€' + (d.revenue_total||0).toFixed(2);
+    document.getElementById('s-open').textContent = (d.by_status?.open||0) + ' / ' + (d.by_status?.analyzing||0);
+  } catch(e) { console.error(e); }
+}
+
+async function loadSessions() {
+  try {
+    const r = await fetch(API + '/api/vk/admin/sessions');
+    sessions = await r.json() || [];
+    renderSessions();
+  } catch(e) {
+    document.getElementById('sessionsTable').innerHTML = '<tr><td colspan="7" class="msg" style="color:var(--red);">Fehler beim Laden</td></tr>';
+  }
+}
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSessions();
+}
+
+function renderSessions() {
+  const list = currentFilter === 'all' ? sessions : sessions.filter(s => s.status === currentFilter);
+  const tbody = document.getElementById('sessionsTable');
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="7" class="msg">Keine Aufträge</td></tr>'; return; }
+
+  tbody.innerHTML = list.map(s => {
+    const articles = s.vk_articles || [];
+    const created = new Date(s.created_at).toLocaleString('de-AT', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+    const deleteAt = s.delete_at ? new Date(s.delete_at).toLocaleDateString('de-AT') : '—';
+    const daysLeft = s.delete_at ? Math.ceil((new Date(s.delete_at)-Date.now())/(1000*60*60*24)) : null;
+    const deleteDisplay = daysLeft !== null ? (daysLeft <= 1 ? `<span style="color:var(--red);font-weight:800;">${deleteAt} (${daysLeft}d)</span>` : deleteAt) : '—';
+    const statusBadge = `<span class="badge s-${s.status}">${{open:'Offen',paid:'Bezahlt',analyzing:'Analyse',done:'Fertig',expired:'Abgelaufen',deleted:'Gelöscht',error:'Fehler'}[s.status]||s.status}</span>`;
+
+    return `<tr>
+      <td style="font-size:.78rem;">${created}</td>
+      <td><span class="phone">${s.phone}</span></td>
+      <td style="text-align:center;">${articles.length}</td>
+      <td>€${(s.total_price||0).toFixed(2)}</td>
+      <td>${statusBadge}</td>
+      <td style="font-size:.78rem;">${deleteDisplay}</td>
+      <td style="white-space:nowrap;display:flex;gap:4px;flex-wrap:wrap;">
+        <a href="bericht.html?s=${s.token}" target="_blank" class="btn btn-sm" style="background:#f3f4f6;">🔗</a>
+        ${s.status === 'done' ? `<a href="ergebnis.html?s=${s.token}" target="_blank" class="btn btn-sm btn-g">📋</a>` : ''}
+        ${['open','paid','error'].includes(s.status) ? `<button class="btn btn-sm btn-gold" onclick="analyzeSession('${s.id}')">🔍 Analysieren</button>` : ''}
+        <button class="btn btn-sm" style="background:#eff6ff;color:#1d4ed8;" onclick="extendSession('${s.id}')">+7d</button>
+        <button class="btn btn-sm btn-red" onclick="deleteSession('${s.id}','${s.phone}')">🗑️</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+async function analyzeSession(id) {
+  if (!confirm('Analyse jetzt starten?')) return;
+  showToast('⏳ Analyse gestartet...');
+  await fetch(API + '/api/vk/admin/analyze/' + id, {method:'POST'});
+  showToast('✅ Analyse läuft – WhatsApp wird gesendet');
+  setTimeout(loadAll, 3000);
+}
+
+async function extendSession(id) {
+  await fetch(API + '/api/vk/admin/session/' + id + '/extend', {
+    method:'PUT', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ days: 7 })
+  });
+  showToast('✅ Session um 7 Tage verlängert');
+  loadSessions();
+}
+
+async function deleteSession(id, phone) {
+  if (!confirm('Session von ' + phone + ' wirklich löschen? Alle Daten und Fotos werden gelöscht!')) return;
+  await fetch(API + '/api/vk/admin/session/' + id, {method:'DELETE'});
+  showToast('✅ Gelöscht');
+  loadSessions();
+  loadStats();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>

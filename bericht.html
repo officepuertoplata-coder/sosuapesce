@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mein Verkaufsreport</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--wa:#25D366;--bg:#f5f5f5;--card:#fff;--border:#e5e7eb;--txt:#1a1a1a;--mu:#6b7280;--gold:#f4a100;--red:#ef4444;--green:#22c55e;--r:12px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;padding-bottom:100px;}
+header{background:var(--wa);color:#fff;padding:16px 20px;position:sticky;top:0;z-index:100;}
+.header-inner{max-width:680px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;}
+.logo{font-weight:900;font-size:1.1rem;}
+.logo span{opacity:.8;font-size:.75rem;display:block;font-weight:600;}
+.main{max-width:680px;margin:0 auto;padding:16px;}
+
+/* STATUS BANNER */
+.status-banner{border-radius:var(--r);padding:14px 16px;margin-bottom:16px;font-size:.88rem;font-weight:700;}
+.s-open{background:#f0fdf4;border:1.5px solid var(--wa);color:#15803d;}
+.s-paid{background:#eff6ff;border:1.5px solid #3b82f6;color:#1d4ed8;}
+.s-analyzing{background:#fef9c3;border:1.5px solid var(--gold);color:#a16207;}
+.s-done{background:#f0fdf4;border:1.5px solid var(--green);color:#15803d;}
+
+/* ARTIKEL CARD */
+.article-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:14px;overflow:hidden;}
+.article-header{padding:13px 16px;background:#fafafa;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.article-num{background:var(--wa);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;flex-shrink:0;}
+.article-title{flex:1;font-weight:800;font-size:.9rem;}
+.article-title input{border:none;background:none;font-family:'Nunito',sans-serif;font-weight:800;font-size:.9rem;width:100%;outline:none;color:var(--txt);}
+.del-btn{background:none;border:none;color:var(--mu);cursor:pointer;font-size:16px;padding:4px;}
+.del-btn:hover{color:var(--red);}
+
+/* FOTOS */
+.photos-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:14px 16px;}
+.photo-slot{aspect-ratio:1;border-radius:8px;border:2px dashed var(--border);background:#fafafa;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;transition:all .2s;}
+.photo-slot:hover{border-color:var(--wa);background:#f0fdf4;}
+.photo-slot img{width:100%;height:100%;object-fit:cover;}
+.photo-slot .add-icon{font-size:24px;color:var(--mu);}
+.photo-slot .del-photo{position:absolute;top:4px;right:4px;background:rgba(239,68,68,.9);color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:12px;cursor:pointer;display:none;align-items:center;justify-content:center;}
+.photo-slot:hover .del-photo{display:flex;}
+.photo-count{font-size:.72rem;color:var(--mu);padding:0 16px 10px;text-align:right;}
+
+/* DATENHALTUNG */
+.extended-row{padding:10px 16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.extended-row label{font-size:.82rem;color:var(--txt);cursor:pointer;display:flex;align-items:center;gap:8px;}
+.extended-row .ext-price{font-size:.72rem;color:var(--gold);font-weight:700;}
+.tog{position:relative;width:36px;height:20px;flex-shrink:0;}
+.tog input{opacity:0;width:0;height:0;}
+.tog-sl{position:absolute;inset:0;background:#ddd;border-radius:20px;cursor:pointer;transition:.2s;}
+.tog-sl:before{content:'';position:absolute;width:16px;height:16px;left:2px;top:2px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.tog input:checked+.tog-sl{background:var(--wa);}
+.tog input:checked+.tog-sl:before{transform:translateX(16px);}
+
+/* ADD ARTICLE */
+.add-article-btn{width:100%;background:none;border:2px dashed var(--border);border-radius:var(--r);padding:14px;font-size:.88rem;color:var(--mu);cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;transition:all .2s;margin-bottom:14px;}
+.add-article-btn:hover{border-color:var(--wa);color:var(--wa);background:#f0fdf4;}
+
+/* PREIS */
+.price-box{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:14px;}
+.price-title{font-size:.75rem;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;}
+.price-row{display:flex;justify-content:space-between;font-size:.85rem;padding:3px 0;color:var(--mu);}
+.price-total{display:flex;justify-content:space-between;font-size:1.1rem;font-weight:900;padding-top:10px;margin-top:8px;border-top:2px solid var(--border);}
+.price-total span:last-child{color:var(--wa);}
+
+/* CHECKOUT BTN */
+.checkout-btn{width:100%;background:var(--wa);color:#fff;border:none;border-radius:var(--r);padding:16px;font-size:1rem;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;margin-bottom:8px;}
+.checkout-btn:hover{background:#128C7E;}
+.checkout-btn:disabled{opacity:.5;cursor:not-allowed;}
+
+/* LOADING */
+.loading{text-align:center;padding:60px 20px;color:var(--mu);}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--wa);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:20px;font-size:.85rem;font-weight:700;transition:all .3s;opacity:0;z-index:999;}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+input[type=file]{display:none;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      📊 Verkaufsreport
+      <span id="headerSub">Lade...</span>
+    </div>
+    <div id="headerPrice" style="font-size:1.2rem;font-weight:900;"></div>
+  </div>
+</header>
+
+<div class="main">
+  <div id="content"><div class="loading"><div class="spinner"></div>Lade deinen Auftrag...</div></div>
+</div>
+
+<div id="toast"></div>
+<input type="file" id="fileInput" accept="image/*" capture="environment">
+
+<script>
+const API = 'https://converto-server-production.up.railway.app';
+const params = new URLSearchParams(location.search);
+const TOKEN = params.get('s');
+let session = null;
+let currentArticleId = null;
+
+if (!TOKEN) {
+  document.getElementById('content').innerHTML = '<div class="loading">❌ Kein gültiger Link</div>';
+} else {
+  loadSession();
+  if (params.get('paid') === '1') showToast('✅ Zahlung erhalten! Analyse läuft...');
+}
+
+async function loadSession() {
+  try {
+    const r = await fetch(API + '/api/vk/session/' + TOKEN);
+    session = await r.json();
+    if (!r.ok) { document.getElementById('content').innerHTML = '<div class="loading">❌ ' + (session.error || 'Session nicht gefunden') + '</div>'; return; }
+    render();
+  } catch(e) {
+    document.getElementById('content').innerHTML = '<div class="loading">❌ Verbindungsfehler</div>';
+  }
+}
+
+function render() {
+  if (!session) return;
+  const articles = session.articles || [];
+  const isPaid = ['paid','analyzing','done'].includes(session.status);
+
+  document.getElementById('headerSub').textContent = articles.length + ' Artikel · ' + getStatusLabel(session.status);
+  document.getElementById('headerPrice').textContent = '€' + (session.price || 0).toFixed(2);
+
+  let html = '';
+
+  // Status Banner
+  const bannerClass = session.status === 'done' ? 's-done' : session.status === 'analyzing' ? 's-analyzing' : session.status === 'paid' ? 's-paid' : 's-open';
+  const bannerMsg = {
+    open: '📝 Füge deine Artikel hinzu und bestelle deinen Bericht',
+    paid: '💳 Zahlung erhalten – Bericht wird vorbereitet',
+    analyzing: '🔍 KI analysiert deine Artikel...',
+    done: '✅ Bericht fertig! Du hast eine WhatsApp erhalten.'
+  }[session.status] || '';
+  html += `<div class="status-banner ${bannerClass}">${bannerMsg}</div>`;
+
+  // Link zum Ergebnis wenn fertig
+  if (session.status === 'done') {
+    html += `<a href="ergebnis.html?s=${TOKEN}" style="display:block;background:var(--wa);color:#fff;text-align:center;padding:14px;border-radius:var(--r);font-weight:900;text-decoration:none;margin-bottom:14px;font-size:1rem;">📋 Bericht ansehen →</a>`;
+  }
+
+  // Artikel
+  articles.forEach((a, i) => {
+    const photos = a.vk_photos || [];
+    html += `<div class="article-card">
+      <div class="article-header">
+        <div class="article-num">${i+1}</div>
+        <div class="article-title">
+          ${!isPaid ? `<input value="${a.title||''}" placeholder="Artikelname" onblur="updateTitle('${a.id}',this.value)" onkeydown="if(event.key==='Enter')this.blur()">` : `<span>${a.title||'Artikel '+(i+1)}</span>`}
+        </div>
+        ${!isPaid && articles.length > 1 ? `<button class="del-btn" onclick="deleteArticle('${a.id}')">🗑️</button>` : ''}
+      </div>
+      <div class="photos-grid">`;
+
+    for (let j = 0; j < 4; j++) {
+      const photo = photos[j];
+      if (photo) {
+        html += `<div class="photo-slot">
+          <img src="${photo.public_url}" alt="Foto ${j+1}">
+          ${!isPaid ? `<button class="del-photo" onclick="deletePhoto('${photo.id}','${a.id}')">✕</button>` : ''}
+        </div>`;
+      } else if (!isPaid) {
+        html += `<div class="photo-slot" onclick="openFileInput('${a.id}')"><span class="add-icon">📷</span></div>`;
+      } else {
+        html += `<div class="photo-slot" style="opacity:.3;cursor:default;"></div>`;
+      }
+    }
+
+    html += `</div>
+      <div class="photo-count">${photos.length}/4 Fotos · ${photos.length === 0 ? '⚠️ Mindestens 1 Foto nötig' : photos.length === 4 ? 'Maximum erreicht' : (4-photos.length) + ' weitere möglich'}</div>`;
+
+    if (!isPaid) {
+      html += `<div class="extended-row">
+        <label>
+          <label class="tog"><input type="checkbox" ${a.extended?'checked':''} onchange="toggleExtended('${a.id}',this.checked)"><span class="tog-sl"></span></label>
+          7 Tage Datenhaltung (statt 3)
+        </label>
+        <span class="ext-price">+1,00€</span>
+      </div>`;
+    }
+    html += `</div>`;
+  });
+
+  if (!isPaid) {
+    html += `<button class="add-article-btn" onclick="addArticle()">+ Weiteren Artikel hinzufügen</button>`;
+    html += renderPrice(articles, session.price);
+    const hasPhotos = articles.every(a => (a.vk_photos||[]).length > 0);
+    html += `<button class="checkout-btn" ${!hasPhotos?'disabled':''} onclick="checkout()">${!hasPhotos ? '⚠️ Jedes Artikel braucht mindestens 1 Foto' : '💳 Jetzt bestellen · €' + (session.price||0).toFixed(2)}</button>`;
+    html += `<p style="text-align:center;font-size:.75rem;color:var(--mu);">Sicher bezahlen via Stripe · Daten werden nach 3 oder 7 Tagen gelöscht</p>`;
+  }
+
+  document.getElementById('content').innerHTML = html;
+}
+
+function renderPrice(articles, total) {
+  let html = `<div class="price-box"><div class="price-title">Preisübersicht</div>`;
+  html += `<div class="price-row"><span>Grundpreis</span><span>1,00€</span></div>`;
+  articles.forEach((a, i) => {
+    const photos = a.vk_photos || [];
+    const extraPhotos = Math.max(0, photos.length - 1);
+    html += `<div class="price-row"><span>Artikel ${i+1} (${photos.length} Foto${photos.length!==1?'s':''})</span><span>${(1 + extraPhotos*0.25).toFixed(2)}€</span></div>`;
+    if (a.extended) html += `<div class="price-row"><span style="padding-left:12px;">+ 7 Tage Datenhaltung</span><span>1,00€</span></div>`;
+  });
+  html += `<div class="price-total"><span>Gesamt</span><span>€${(total||0).toFixed(2)}</span></div></div>`;
+  return html;
+}
+
+function getStatusLabel(s) {
+  return {open:'Offen',paid:'Bezahlt',analyzing:'Analyse läuft',done:'Fertig',expired:'Abgelaufen'}[s]||s;
+}
+
+async function addArticle() {
+  const r = await fetch(API + '/api/vk/article', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ token: TOKEN, title: 'Artikel ' + ((session.articles||[]).length+1) })
+  });
+  const d = await r.json();
+  if (d.success) { await loadSession(); showToast('✅ Artikel hinzugefügt'); }
+  else showToast('⚠️ ' + d.error);
+}
+
+async function deleteArticle(id) {
+  if (!confirm('Artikel wirklich löschen?')) return;
+  await fetch(API + '/api/vk/article/' + id, {method:'DELETE'});
+  await loadSession();
+}
+
+async function updateTitle(id, title) {
+  // Optimistic update - just reload on blur
+  await fetch(API + '/api/vk/article/' + id, {
+    method: 'PUT', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ title })
+  });
+}
+
+function openFileInput(articleId) {
+  currentArticleId = articleId;
+  const a = (session.articles||[]).find(x => x.id === articleId);
+  if ((a?.vk_photos||[]).length >= 4) { showToast('⚠️ Maximal 4 Fotos pro Artikel'); return; }
+  document.getElementById('fileInput').click();
+}
+
+document.getElementById('fileInput').addEventListener('change', async function(e) {
+  const file = e.target.files[0];
+  if (!file || !currentArticleId) return;
+  if (file.size > 10 * 1024 * 1024) { showToast('⚠️ Bild max. 10 MB'); return; }
+
+  showToast('⏳ Foto wird hochgeladen...');
+  const reader = new FileReader();
+  reader.onload = async function(ev) {
+    const base64 = ev.target.result.split(',')[1];
+    const r = await fetch(API + '/api/vk/photo', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        article_id: currentArticleId,
+        session_id: session.id,
+        image_base64: base64,
+        content_type: file.type
+      })
+    });
+    const d = await r.json();
+    if (d.success) { showToast('✅ Foto hochgeladen!'); await loadSession(); }
+    else showToast('⚠️ ' + d.error);
+  };
+  reader.readAsDataURL(file);
+  this.value = '';
+});
+
+async function deletePhoto(photoId, articleId) {
+  await fetch(API + '/api/vk/photo/' + photoId, {method:'DELETE'});
+  await loadSession();
+}
+
+async function toggleExtended(articleId, extended) {
+  await fetch(API + '/api/vk/article/' + articleId + '/extended', {
+    method:'PUT', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ extended })
+  });
+  await loadSession();
+}
+
+async function checkout() {
+  const btn = document.querySelector('.checkout-btn');
+  btn.disabled = true; btn.textContent = '⏳ Weiterleitung...';
+  const r = await fetch(API + '/api/vk/checkout', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ token: TOKEN })
+  });
+  const d = await r.json();
+  if (d.url) window.location.href = d.url;
+  else { showToast('⚠️ ' + (d.error||'Fehler')); btn.disabled=false; btn.textContent='💳 Jetzt bestellen'; }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+// Polling wenn Analyse läuft
+if (['paid','analyzing'].includes(new URLSearchParams(location.search).get('status'))) {
+  setInterval(loadSession, 10000);
+}
+</script>
+</body>
+</html>
