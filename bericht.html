@@ -105,10 +105,57 @@ async function loadSession() {
     const res = await fetch(API + '/api/vk/session/' + sessionToken);
     if (!res.ok) throw new Error('Session nicht gefunden (Status ' + res.status + ')');
     sessionData = await res.json();
+
+    // Wenn paid=1 in URL aber Status noch 'open' → warten & polling
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('paid') === '1' && sessionData.status === 'open') {
+      showAnalyzing();
+      pollStatus();
+      return;
+    }
+
     render();
   } catch (err) {
     showError('Fehler beim Laden: ' + err.message);
   }
+}
+
+function showAnalyzing() {
+  document.getElementById('app').innerHTML = [
+    '<div class="card" style="text-align:center;padding:40px 20px;">',
+    '  <div class="spinner-ring" style="margin:0 auto 16px;"></div>',
+    '  <div style="font-size:1.1rem;font-weight:600;color:#2d7a4f;margin-bottom:8px;">✅ Zahlung erhalten!</div>',
+    '  <div style="color:#6b7280;">Dein Verkaufsreport wird analysiert...<br>Diese Seite aktualisiert sich automatisch.</div>',
+    '</div>'
+  ].join('');
+}
+
+async function pollStatus() {
+  // Stripe direkt befragen (Webhook-Fallback fuer Test/Live)
+  try {
+    await fetch(API + '/api/vk/check-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: sessionToken })
+    });
+  } catch(e) {}
+
+  var attempts = 0;
+  var interval = setInterval(async function() {
+    attempts++;
+    try {
+      var res = await fetch(API + '/api/vk/session/' + sessionToken);
+      var data = await res.json();
+      if (data.status === 'analyzing' || data.status === 'done') {
+        clearInterval(interval);
+        window.location.href = 'ergebnis.html?s=' + sessionToken;
+      }
+    } catch(e) {}
+    if (attempts >= 60) {
+      clearInterval(interval);
+      showError('Analyse dauert laenger. Bitte direkt aufrufen: ergebnis.html?s=' + sessionToken);
+    }
+  }, 5000);
 }
 
 // ── RENDER ──────────────────────────────────────────────────
