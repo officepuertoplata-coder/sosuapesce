@@ -2,459 +2,409 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mein Verkaufsreport</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verkaufsreport</title>
 <style>
-:root{--wa:#25D366;--bg:#f5f5f5;--card:#fff;--border:#e5e7eb;--txt:#1a1a1a;--mu:#6b7280;--gold:#f4a100;--red:#ef4444;--green:#22c55e;--r:12px;}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;padding-bottom:100px;}
-header{background:var(--wa);color:#fff;padding:16px 20px;position:sticky;top:0;z-index:100;}
-.header-inner{max-width:680px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;}
-.logo{font-weight:900;font-size:1.1rem;}
-.logo span{opacity:.8;font-size:.75rem;display:block;font-weight:600;}
-.main{max-width:680px;margin:0 auto;padding:16px;}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; min-height: 100vh; }
 
-/* STATUS BANNER */
-.status-banner{border-radius:var(--r);padding:14px 16px;margin-bottom:16px;font-size:.88rem;font-weight:700;}
-.s-open{background:#f0fdf4;border:1.5px solid var(--wa);color:#15803d;}
-.s-paid{background:#eff6ff;border:1.5px solid #3b82f6;color:#1d4ed8;}
-.s-analyzing{background:#fef9c3;border:1.5px solid var(--gold);color:#a16207;}
-.s-done{background:#f0fdf4;border:1.5px solid var(--green);color:#15803d;}
+  .header { background: #2d7a4f; color: white; padding: 16px 20px; display: flex; align-items: center; gap: 12px; }
+  .header h1 { font-size: 1.2rem; font-weight: 600; }
+  .header .logo { font-size: 1.5rem; }
 
-/* ARTIKEL CARD */
-.article-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:14px;overflow:hidden;}
-.article-header{padding:13px 16px;background:#fafafa;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
-.article-num{background:var(--wa);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;flex-shrink:0;}
-.article-title{flex:1;font-weight:800;font-size:.9rem;}
-.article-title input{border:none;background:none;font-family:'Nunito',sans-serif;font-weight:800;font-size:.9rem;width:100%;outline:none;color:var(--txt);}
-.del-btn{background:none;border:none;color:var(--mu);cursor:pointer;font-size:16px;padding:4px;}
-.del-btn:hover{color:var(--red);}
+  .container { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
 
-/* FOTOS */
-.photos-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:14px 16px;}
-.photo-slot{aspect-ratio:1;border-radius:8px;border:2px dashed var(--border);background:#fafafa;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;transition:all .2s;}
-.photo-slot:hover{border-color:var(--wa);background:#f0fdf4;}
-.photo-slot img{width:100%;height:100%;object-fit:cover;}
-.photo-slot .add-icon{font-size:24px;color:var(--mu);}
-.photo-slot .del-photo{position:absolute;top:4px;right:4px;background:rgba(239,68,68,.9);color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:12px;cursor:pointer;display:none;align-items:center;justify-content:center;}
-.photo-slot:hover .del-photo{display:flex;}
-.photo-count{font-size:.72rem;color:var(--mu);padding:0 16px 10px;text-align:right;}
+  .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .card-title { font-size: .85rem; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 14px; }
 
-/* DATENHALTUNG */
-.extended-row{padding:10px 16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.extended-row label{font-size:.82rem;color:var(--txt);cursor:pointer;display:flex;align-items:center;gap:8px;}
-.extended-row .ext-price{font-size:.72rem;color:var(--gold);font-weight:700;}
-.tog{position:relative;width:36px;height:20px;flex-shrink:0;}
-.tog input{opacity:0;width:0;height:0;}
-.tog-sl{position:absolute;inset:0;background:#ddd;border-radius:20px;cursor:pointer;transition:.2s;}
-.tog-sl:before{content:'';position:absolute;width:16px;height:16px;left:2px;top:2px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
-.tog input:checked+.tog-sl{background:var(--wa);}
-.tog input:checked+.tog-sl:before{transform:translateX(16px);}
+  .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: .8rem; font-weight: 600; }
+  .status-open      { background: #fef3c7; color: #92400e; }
+  .status-paid      { background: #dbeafe; color: #1e40af; }
+  .status-analyzing { background: #ede9fe; color: #5b21b6; }
+  .status-done      { background: #d1fae5; color: #065f46; }
+  .status-error     { background: #fee2e2; color: #991b1b; }
 
-/* ADD ARTICLE */
-.add-article-btn{width:100%;background:none;border:2px dashed var(--border);border-radius:var(--r);padding:14px;font-size:.88rem;color:var(--mu);cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;transition:all .2s;margin-bottom:14px;}
-.add-article-btn:hover{border-color:var(--wa);color:var(--wa);background:#f0fdf4;}
+  .article-card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; margin-bottom: 12px; }
+  .article-title { font-weight: 600; color: #1f2937; margin-bottom: 8px; }
+  .photo-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .photo-thumb { width: 72px; height: 72px; border-radius: 8px; object-fit: cover; border: 1px solid #e5e7eb; }
+  .photo-add { width: 72px; height: 72px; border-radius: 8px; border: 2px dashed #d1d5db; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; color: #9ca3af; font-size: .7rem; text-align: center; background: #f9fafb; transition: border-color .2s; }
+  .photo-add:hover { border-color: #2d7a4f; color: #2d7a4f; }
+  .photo-add span { font-size: 1.5rem; line-height: 1; }
 
-/* PREIS */
-.price-box{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:14px;}
-.price-title{font-size:.75rem;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;}
-.price-row{display:flex;justify-content:space-between;font-size:.85rem;padding:3px 0;color:var(--mu);}
-.price-total{display:flex;justify-content:space-between;font-size:1.1rem;font-weight:900;padding-top:10px;margin-top:8px;border-top:2px solid var(--border);}
-.price-total span:last-child{color:var(--wa);}
+  .price-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f3f4f6; font-size: .9rem; }
+  .price-row:last-child { border-bottom: none; }
+  .price-total { font-size: 1.2rem; font-weight: 700; color: #2d7a4f; }
 
-/* CHECKOUT BTN */
-.checkout-btn{width:100%;background:var(--wa);color:#fff;border:none;border-radius:var(--r);padding:16px;font-size:1rem;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;margin-bottom:8px;}
-.checkout-btn:hover{background:#128C7E;}
-.checkout-btn:disabled{opacity:.5;cursor:not-allowed;}
+  .coupon-row { display: flex; gap: 8px; margin-top: 12px; }
+  .coupon-row input { flex: 1; padding: 10px 14px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: .9rem; text-transform: uppercase; }
+  .coupon-row input:focus { outline: none; border-color: #2d7a4f; }
+  .btn-coupon { padding: 10px 18px; background: #f3f4f6; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: .85rem; white-space: nowrap; }
+  .btn-coupon:hover { background: #e5e7eb; }
+  .coupon-msg { font-size: .82rem; margin-top: 6px; }
+  .coupon-ok  { color: #065f46; }
+  .coupon-err { color: #991b1b; }
 
-/* LOADING */
-.loading{text-align:center;padding:60px 20px;color:var(--mu);}
-.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--wa);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px;}
-@keyframes spin{to{transform:rotate(360deg)}}
+  .btn-pay { display: block; width: 100%; padding: 16px; background: #2d7a4f; color: white; border: none; border-radius: 10px; font-size: 1.05rem; font-weight: 700; cursor: pointer; text-align: center; margin-top: 16px; transition: background .2s; }
+  .btn-pay:hover { background: #245f3d; }
+  .btn-pay:disabled { background: #9ca3af; cursor: not-allowed; }
 
-/* TOAST */
-#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:20px;font-size:.85rem;font-weight:700;transition:all .3s;opacity:0;z-index:999;}
-#toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+  .btn-free { background: #059669; }
+  .btn-free:hover { background: #047857; }
 
-input[type=file]{display:none;}
-.photo-hint{font-size:.75rem;color:#15803d;background:#f0fdf4;border-radius:6px;padding:6px 12px;margin:0 12px 4px;font-weight:600;}
-.notes-field{padding:10px 14px 12px;border-top:1px solid var(--border);}
-.notes-field label{display:block;font-size:.72rem;font-weight:800;color:var(--mu);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px;}
-.notes-field textarea{width:100%;padding:9px 11px;border:1.5px solid var(--border);border-radius:8px;font-size:.85rem;font-family:'Nunito',sans-serif;resize:vertical;min-height:70px;outline:none;}
-.notes-field textarea:focus{border-color:var(--wa);}
-.notes-hint{font-size:.7rem;color:var(--mu);margin-top:4px;display:block;}
-.notes-readonly p{font-size:.85rem;background:#f9fafb;padding:8px 10px;border-radius:6px;}
-.coupon-box{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:14px;}
-.coupon-box label{display:block;font-size:.72rem;font-weight:800;color:var(--mu);margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px;}
-.coupon-row{display:flex;gap:8px;}
-.coupon-row input{flex:1;padding:9px 11px;border:1.5px solid var(--border);border-radius:8px;font-size:.88rem;font-family:'Nunito',sans-serif;text-transform:uppercase;outline:none;}
-.coupon-row input:focus{border-color:var(--wa);}
-.coupon-row button{background:var(--g2);color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:.82rem;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;}
-.coupon-success{background:#f0fdf4;border:1.5px solid var(--wa);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.82rem;color:#15803d;font-weight:700;}
-.coupon-error{background:#fef2f2;border:1.5px solid #fecaca;border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.82rem;color:var(--red);font-weight:700;}
+  .spinner { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; gap: 16px; color: #6b7280; }
+  .spinner-ring { width: 40px; height: 40px; border: 3px solid #e5e7eb; border-top-color: #2d7a4f; border-radius: 50%; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error-box { background: #fee2e2; border-left: 4px solid #dc2626; border-radius: 8px; padding: 16px; color: #991b1b; }
+
+  .info-row { display: flex; justify-content: space-between; font-size: .88rem; color: #4b5563; padding: 4px 0; }
+  .info-label { color: #9ca3af; }
+
+  .file-input-hidden { display: none; }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="header-inner">
-    <div class="logo">
-      📊 Verkaufsreport
-      <span id="headerSub">Lade...</span>
-    </div>
-    <div id="headerPrice" style="font-size:1.2rem;font-weight:900;"></div>
-  </div>
-</header>
-
-<div class="main">
-  <div id="content"><div class="loading"><div class="spinner"></div>Lade deinen Auftrag...</div></div>
+<div class="header">
+  <div class="logo">🔍</div>
+  <h1>Verkaufsreport</h1>
 </div>
 
-<div id="toast"></div>
-<input type="file" id="fileInput" accept="image/*">
+<div class="container" id="app">
+  <div class="spinner">
+    <div class="spinner-ring"></div>
+    <div>Lade deinen Auftrag...</div>
+  </div>
+</div>
 
 <script>
+// ── CONFIG ──────────────────────────────────────────────────
 const API = 'https://converto-server-production.up.railway.app';
-const params = new URLSearchParams(location.search);
-const TOKEN = params.get('s');
-let session = null;
-let currentArticleId = null;
 
-if (!TOKEN) {
-  document.getElementById('content').innerHTML = '<div class="loading">❌ Kein gültiger Link</div>';
-} else {
+// ── STATE ───────────────────────────────────────────────────
+let sessionToken = null;
+let sessionData  = null;
+let couponApplied = null;
+
+// ── INIT ────────────────────────────────────────────────────
+(function init() {
+  const params = new URLSearchParams(window.location.search);
+  sessionToken = params.get('s');
+  if (!sessionToken) {
+    showError('Kein Auftrag gefunden. Bitte den Link aus WhatsApp verwenden.');
+    return;
+  }
   loadSession();
-  if (params.get('paid') === '1') showToast('✅ Zahlung erhalten! Analyse läuft...');
-}
+})();
 
+// ── LOAD SESSION ────────────────────────────────────────────
 async function loadSession() {
   try {
-    const r = await fetch(API + '/api/vk/session/' + TOKEN);
-    session = await r.json();
-    if (!r.ok) { document.getElementById('content').innerHTML = '<div class="loading">❌ ' + (session.error || 'Session nicht gefunden') + '</div>'; return; }
-
-    // Wenn paid=1 in URL aber Status noch open → Webhook noch nicht da → als analyzing behandeln
-    if (new URLSearchParams(location.search).get('paid') === '1' && session.status === 'open') {
-      session.status = 'analyzing';
-    }
-    // Wenn done → direkt zur Ergebnisseite
-    if (session.status === 'done' && new URLSearchParams(location.search).get('paid') === '1') {
-      window.location.href = 'ergebnis.html?s=' + TOKEN;
-      return;
-    }
+    const res = await fetch(API + '/api/vk/session/' + sessionToken);
+    if (!res.ok) throw new Error('Session nicht gefunden (Status ' + res.status + ')');
+    sessionData = await res.json();
     render();
-  } catch(e) {
-    document.getElementById('content').innerHTML = '<div class="loading">❌ Verbindungsfehler</div>';
+  } catch (err) {
+    showError('Fehler beim Laden: ' + err.message);
   }
 }
 
+// ── RENDER ──────────────────────────────────────────────────
 function render() {
-  if (!session) return;
-  const articles = session.articles || [];
-  const isPaid = ['paid','analyzing','done'].includes(session.status);
+  const s = sessionData;
+  if (!s) return;
 
-  document.getElementById('headerSub').textContent = articles.length + ' Artikel · ' + getStatusLabel(session.status);
-  document.getElementById('headerPrice').textContent = '€' + (session.price || 0).toFixed(2);
-
-  let html = '';
-
-  // Status Banner
-  const bannerClass = session.status === 'done' ? 's-done' : session.status === 'analyzing' ? 's-analyzing' : session.status === 'paid' ? 's-paid' : 's-open';
-  const bannerMsg = {
-    open: '📝 Füge deine Artikel hinzu und bestelle deinen Bericht',
-    paid: '💳 Zahlung erhalten – Bericht wird vorbereitet',
-    analyzing: '🔍 KI analysiert deine Artikel...',
-    done: '✅ Bericht fertig! Du hast eine WhatsApp erhalten.'
-  }[session.status] || '';
-  html += '<div class="status-banner ' + bannerClass + '">' + bannerMsg + '</div>';
-
-  // Warte-Screen während Analyse
-  if (session.status === 'analyzing' || session.status === 'paid') {
-    html += '<div style="background:#fff;border-radius:12px;padding:32px 24px;text-align:center;margin-bottom:16px;border:1.5px solid #e5e7eb;">' +
-      '<div style="font-size:2.5rem;margin-bottom:12px;">🔍</div>' +
-      '<h2 style="font-size:1rem;font-weight:900;margin-bottom:8px;color:#1b4332;">KI analysiert deine Artikel</h2>' +
-      '<p style="font-size:.84rem;color:#6b7280;margin-bottom:20px;">Claude wertet deine Fotos aus und erstellt Verkaufstexte,<br>Preisvorschläge und Keywords für jedes Produkt.</p>' +
-      '<div style="display:flex;flex-direction:column;gap:8px;max-width:280px;margin:0 auto 20px;">' +
-        '<div style="display:flex;align-items:center;gap:10px;background:#f0fdf4;border-radius:8px;padding:10px 14px;">' +
-          '<span>📸</span><span style="font-size:.82rem;">Fotos werden analysiert</span>' +
-        '</div>' +
-        '<div style="display:flex;align-items:center;gap:10px;background:#f0fdf4;border-radius:8px;padding:10px 14px;">' +
-          '<span>✍️</span><span style="font-size:.82rem;">Verkaufstexte werden erstellt</span>' +
-        '</div>' +
-        '<div style="display:flex;align-items:center;gap:10px;background:#f0fdf4;border-radius:8px;padding:10px 14px;">' +
-          '<span>💰</span><span style="font-size:.82rem;">Preisvorschläge werden berechnet</span>' +
-        '</div>' +
-      '</div>' +
-      '<p style="font-size:.78rem;color:#6b7280;">Diese Seite aktualisiert sich automatisch.<br>Du bekommst auch eine WhatsApp wenn alles fertig ist.</p>' +
-      '<div style="margin-top:16px;"><div style="width:40px;height:40px;border:3px solid #e5e7eb;border-top-color:#25D366;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto;"></div></div>' +
-    '</div>';
-    setTimeout(function(){ loadSession(); }, 8000);
-    document.getElementById('content').innerHTML = html;
+  // Weitergeleitet wenn schon bezahlt / fertig
+  if (s.status === 'done' || s.status === 'analyzing') {
+    window.location.href = 'ergebnis.html?s=' + sessionToken;
     return;
   }
 
-  // Link zum Ergebnis wenn fertig
-  if (session.status === 'done') {
-    html += `<a href="ergebnis.html?s=${TOKEN}" style="display:block;background:var(--wa);color:#fff;text-align:center;padding:14px;border-radius:var(--r);font-weight:900;text-decoration:none;margin-bottom:14px;font-size:1rem;">📋 Bericht ansehen →</a>`;
+  const price  = calcPrice(s.vk_articles || []);
+  const app    = document.getElementById('app');
+
+  app.innerHTML = buildHTML(s, price);
+  attachEvents();
+}
+
+function buildHTML(s, price) {
+  const articles = s.vk_articles || [];
+
+  return [
+    // Session Info
+    '<div class="card">',
+    '  <div class="card-title">Dein Auftrag</div>',
+    '  <div class="info-row"><span class="info-label">Status</span><span class="status-badge status-' + s.status + '">' + labelStatus(s.status) + '</span></div>',
+    '  <div class="info-row"><span class="info-label">Telefon</span><span>+' + (s.phone || '') + '</span></div>',
+    '  <div class="info-row"><span class="info-label">Artikel</span><span>' + articles.length + ' Artikel</span></div>',
+    '</div>',
+
+    // Artikel
+    articles.length > 0
+      ? '<div class="card"><div class="card-title">Artikel & Fotos</div>' + articles.map(buildArticleHTML).join('') + '</div>'
+      : '',
+
+    // Preisübersicht + Zahlung
+    '<div class="card">',
+    '  <div class="card-title">Zusammenfassung</div>',
+    buildPriceRows(articles, price),
+    '  <div id="coupon-section">' + buildCouponSection() + '</div>',
+    '  <button class="btn-pay" id="btn-pay" onclick="startPayment()">💳 Jetzt bezahlen &nbsp;€' + price.toFixed(2) + '</button>',
+    '</div>',
+  ].join('\n');
+}
+
+function buildArticleHTML(a, idx) {
+  const photos = a.vk_photos || [];
+  const photoHTML = photos.map(function(p) {
+    return '<img class="photo-thumb" src="' + p.public_url + '" alt="Foto">';
+  }).join('');
+
+  const canAdd = photos.length < 4;
+  const addBtn = canAdd
+    ? '<label class="photo-add" onclick="triggerUpload(\'' + a.id + '\')"><span>+</span>Foto</label>'
+    : '';
+
+  return [
+    '<div class="article-card" data-article-id="' + a.id + '">',
+    '  <div class="article-title">📦 ' + (a.title || 'Artikel ' + (idx + 1)) + '</div>',
+    '  <div class="photo-row">',
+    photoHTML,
+    addBtn,
+    '  </div>',
+    '  <div style="font-size:.8rem;color:#9ca3af;">' + photos.length + ' von 4 Fotos · ' + (a.extended ? '7 Tage' : '3 Tage') + ' Aufbewahrung</div>',
+    '</div>',
+  ].join('\n');
+}
+
+function buildPriceRows(articles, total) {
+  const rows = [
+    '<div class="price-row"><span>Grundpreis</span><span>€1.00</span></div>',
+  ];
+  articles.forEach(function(a) {
+    const photos = a.vk_photos || [];
+    rows.push('<div class="price-row"><span>' + (a.title || 'Artikel') + '</span><span>€1.00</span></div>');
+    const extra = Math.max(0, photos.length - 1);
+    if (extra > 0) {
+      rows.push('<div class="price-row"><span>&nbsp;&nbsp;+ ' + extra + ' weitere Fotos</span><span>€' + (extra * 0.25).toFixed(2) + '</span></div>');
+    }
+    if (a.extended) {
+      rows.push('<div class="price-row"><span>&nbsp;&nbsp;+ Verlängert (7 Tage)</span><span>€1.00</span></div>');
+    }
+  });
+
+  if (couponApplied && couponApplied.discount > 0) {
+    rows.push('<div class="price-row" style="color:#059669;"><span>🎟️ Gutschein (' + couponApplied.code + ')</span><span>-€' + couponApplied.discount.toFixed(2) + '</span></div>');
   }
 
-  // Artikel
-  articles.forEach((a, i) => {
-    const photos = a.vk_photos || [];
-    html += `<div class="article-card">
-      <div class="article-header">
-        <div class="article-num">${i+1}</div>
-        <div class="article-title">
-          ${!isPaid ? `<input value="${a.title||''}" placeholder="Artikelname" onblur="updateTitle('${a.id}',this.value)" onkeydown="if(event.key==='Enter')this.blur()">` : `<span>${a.title||'Artikel '+(i+1)}</span>`}
-        </div>
-        ${!isPaid && articles.length > 1 ? `<button class="del-btn" onclick="deleteArticle('${a.id}')">🗑️</button>` : ''}
-      </div>
-      <div class="photos-grid">`;
+  const finalTotal = couponApplied ? Math.max(0, total - (couponApplied.discount || 0)) : total;
+  rows.push('<div class="price-row"><span style="font-weight:700;">Gesamt</span><span class="price-total">€' + finalTotal.toFixed(2) + '</span></div>');
+  return rows.join('\n');
+}
 
-    for (let j = 0; j < 4; j++) {
-      const photo = photos[j];
-      if (photo) {
-        var pid2 = photo.id;
-        var aid2 = a.id;
-        html += '<div class="photo-slot">' +
-          '<img src="' + photo.public_url + '" alt="Foto ' + (j+1) + '">' +
-          (!isPaid ? '<button class="del-photo" onclick="deletePhoto(\'' + pid2 + '\',\'' + aid2 + '\')">✕</button>' : '') +
-          '</div>';
-      } else if (!isPaid) {
-        html += `<div class="photo-slot" onclick="openFileInput('${a.id}')"><span class="add-icon">📷</span></div>`;
-      } else {
-        html += `<div class="photo-slot" style="opacity:.3;cursor:default;"></div>`;
+function buildCouponSection() {
+  return [
+    '<div class="coupon-row">',
+    '  <input type="text" id="coupon-input" placeholder="Gutschein-Code" maxlength="20">',
+    '  <button class="btn-coupon" id="btn-coupon" onclick="validateCoupon()">Einlösen</button>',
+    '</div>',
+    '<div class="coupon-msg" id="coupon-msg"></div>',
+  ].join('\n');
+}
+
+// ── PRICE CALC ──────────────────────────────────────────────
+function calcPrice(articles) {
+  var total = 1.00;
+  articles.forEach(function(a) {
+    total += 1.00;
+    var photos = a.vk_photos || [];
+    var extra = Math.max(0, photos.length - 1);
+    total += extra * 0.25;
+    if (a.extended) total += 1.00;
+  });
+  return Math.round(total * 100) / 100;
+}
+
+// ── STATUS LABEL ────────────────────────────────────────────
+function labelStatus(s) {
+  var map = { open: 'Offen', paid: 'Bezahlt', analyzing: 'In Analyse', done: 'Fertig', error: 'Fehler', expired: 'Abgelaufen' };
+  return map[s] || s;
+}
+
+// ── EVENTS ──────────────────────────────────────────────────
+function attachEvents() {
+  var input = document.getElementById('coupon-input');
+  if (input) {
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        validateCoupon();
+      }
+    });
+    input.addEventListener('input', function() {
+      this.value = this.value.toUpperCase();
+    });
+  }
+}
+
+// ── COUPON ──────────────────────────────────────────────────
+async function validateCoupon() {
+  var input = document.getElementById('coupon-input');
+  var msg   = document.getElementById('coupon-msg');
+  var btn   = document.getElementById('btn-coupon');
+  if (!input || !msg) return;
+
+  var code = input.value.trim().toUpperCase();
+  if (!code) return;
+
+  btn.disabled = true;
+  btn.textContent = '...';
+  msg.textContent = '';
+
+  try {
+    var res = await fetch(API + '/api/vk/coupon/validate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: code, token: sessionToken })
+    });
+    var data = await res.json();
+
+    if (!res.ok || !data.coupon) {
+      msg.className = 'coupon-msg coupon-err';
+      msg.textContent = data.error || 'Ungültiger Code';
+      btn.disabled = false;
+      btn.textContent = 'Einlösen';
+      return;
+    }
+
+    couponApplied = { code: code, discount: data.coupon.discount, is_free: data.coupon.is_free };
+
+    msg.className = 'coupon-msg coupon-ok';
+    msg.textContent = '✓ Gutschein aktiv – Rabatt: €' + data.coupon.discount.toFixed(2);
+
+    btn.disabled = false;
+    btn.textContent = '✓';
+
+    // Re-render Preiszeilen
+    var price = calcPrice(sessionData.vk_articles || []);
+    var card  = document.querySelector('.card:last-child');
+    if (card) {
+      var old = card.querySelector('.card-title');
+      if (old) {
+        var next = old.nextSibling;
+        while (next && next !== document.getElementById('coupon-section')) {
+          var tmp = next.nextSibling;
+          card.removeChild(next);
+          next = tmp;
+        }
+        var frag = document.createRange().createContextualFragment(buildPriceRows(sessionData.vk_articles || [], price));
+        old.after(frag);
       }
     }
 
-    html += '</div>';
-    // Foto Hinweistext
-    html += '<div class="photo-hint">📸 Tipp: Je mehr Details auf deinen Fotos (Typenschilder, Zustand, Marke), desto genauer wird der Verkaufstext!</div>';
-    html += '<div class="photo-count">' + photos.length + '/4 Fotos · ' + (photos.length === 0 ? '⚠️ Mindestens 1 Foto nötig' : photos.length === 4 ? 'Maximum erreicht' : (4-photos.length) + ' weitere möglich') + '</div>';
-    // Freitextfeld pro Artikel
-    if (!isPaid) {
-      html += '<div class="notes-field">' +
-        '<label>📝 Zusätzliche Infos (optional)</label>' +
-        '<textarea id="notes-' + a.id + '" placeholder="z.B. Marke, Modell, Baujahr, Zustand, Besonderheiten, Maße..." onblur="saveNotes(\'' + a.id + '\')">' + (a.notes||'') + '</textarea>' +
-        '<span class="notes-hint">Diese Infos helfen der KI einen noch besseren Verkaufstext zu erstellen</span>' +
-        '</div>';
-    } else if (a.notes) {
-      html += '<div class="notes-field notes-readonly"><label>📝 Angaben</label><p>' + a.notes + '</p></div>';
+    // Falls gratis → Button ändern
+    var btnPay = document.getElementById('btn-pay');
+    if (btnPay) {
+      var finalPrice = Math.max(0, price - (couponApplied.discount || 0));
+      if (finalPrice <= 0) {
+        btnPay.className = 'btn-pay btn-free';
+        btnPay.textContent = '🎉 Kostenlos einlösen';
+        btnPay.onclick = redeemFree;
+      } else {
+        btnPay.textContent = '💳 Jetzt bezahlen  €' + finalPrice.toFixed(2);
+      }
     }
-
-    if (!isPaid) {
-      html += `<div class="extended-row">
-        <label>
-          <label class="tog"><input type="checkbox" ${a.extended?'checked':''} onchange="toggleExtended('${a.id}',this.checked)"><span class="tog-sl"></span></label>
-          7 Tage Datenhaltung (statt 3)
-        </label>
-        <span class="ext-price">+1,00€</span>
-      </div>`;
-    }
-    html += `</div>`;
-  });
-
-  if (!isPaid) {
-    html += '<button class="add-article-btn" onclick="addArticle()">+ Weiteren Artikel hinzufügen</button>';
-    html += renderCouponField();
-    html += renderPrice(articles, session.price);
-    const hasPhotos = articles.every(a => (a.vk_photos||[]).length > 0);
-    html += `<button class="checkout-btn" ${!hasPhotos?'disabled':''} onclick="checkout()">${!hasPhotos ? '⚠️ Jedes Artikel braucht mindestens 1 Foto' : '💳 Jetzt bestellen · €' + (session.price||0).toFixed(2)}</button>`;
-    html += `<p style="text-align:center;font-size:.75rem;color:var(--mu);">Sicher bezahlen via Stripe · Daten werden nach 3 oder 7 Tagen gelöscht</p>`;
+  } catch (err) {
+    msg.className = 'coupon-msg coupon-err';
+    msg.textContent = 'Fehler: ' + err.message;
+    btn.disabled = false;
+    btn.textContent = 'Einlösen';
   }
-
-  document.getElementById('content').innerHTML = html;
 }
 
-function renderPrice(articles, total) {
-  let html = `<div class="price-box"><div class="price-title">Preisübersicht</div>`;
-  html += `<div class="price-row"><span>Grundpreis</span><span>1,00€</span></div>`;
-  articles.forEach((a, i) => {
-    const photos = a.vk_photos || [];
-    const extraPhotos = Math.max(0, photos.length - 1);
-    html += `<div class="price-row"><span>Artikel ${i+1} (${photos.length} Foto${photos.length!==1?'s':''})</span><span>${(1 + extraPhotos*0.25).toFixed(2)}€</span></div>`;
-    if (a.extended) html += `<div class="price-row"><span style="padding-left:12px;">+ 7 Tage Datenhaltung</span><span>1,00€</span></div>`;
-  });
-  html += `<div class="price-total"><span>Gesamt</span><span>€${(total||0).toFixed(2)}</span></div></div>`;
-  return html;
-}
-
-function getStatusLabel(s) {
-  return {open:'Offen',paid:'Bezahlt',analyzing:'Analyse läuft',done:'Fertig',expired:'Abgelaufen'}[s]||s;
-}
-
-async function addArticle() {
-  const r = await fetch(API + '/api/vk/article', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ token: TOKEN, title: 'Artikel ' + ((session.articles||[]).length+1) })
-  });
-  const d = await r.json();
-  if (d.success) { await loadSession(); showToast('✅ Artikel hinzugefügt'); }
-  else showToast('⚠️ ' + d.error);
-}
-
-async function deleteArticle(id) {
-  if (!confirm('Artikel wirklich löschen?')) return;
-  await fetch(API + '/api/vk/article/' + id, {method:'DELETE'});
-  await loadSession();
-}
-
-async function updateTitle(id, title) {
-  // Optimistic update - just reload on blur
-  await fetch(API + '/api/vk/article/' + id, {
-    method: 'PUT', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ title })
-  });
-}
-
-function openFileInput(articleId) {
-  currentArticleId = articleId;
-  const a = (session.articles||[]).find(x => x.id === articleId);
-  if ((a?.vk_photos||[]).length >= 4) { showToast('⚠️ Maximal 4 Fotos pro Artikel'); return; }
-  document.getElementById('fileInput').click();
-}
-
-document.getElementById('fileInput').addEventListener('change', async function(e) {
-  const file = e.target.files[0];
-  if (!file || !currentArticleId) return;
-  if (file.size > 10 * 1024 * 1024) { showToast('⚠️ Bild max. 10 MB'); return; }
-
-  showToast('⏳ Foto wird hochgeladen...');
-  const reader = new FileReader();
-  reader.onload = async function(ev) {
-    const base64 = ev.target.result.split(',')[1];
-    const r = await fetch(API + '/api/vk/photo', {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        article_id: currentArticleId,
-        session_id: session.id,
-        image_base64: base64,
-        content_type: file.type
-      })
-    });
-    const d = await r.json();
-    if (d.success) { showToast('✅ Foto hochgeladen!'); await loadSession(); }
-    else showToast('⚠️ ' + d.error);
+// ── FOTO UPLOAD ─────────────────────────────────────────────
+function triggerUpload(articleId) {
+  var inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'image/*';
+  inp.onchange = function() {
+    if (inp.files && inp.files[0]) {
+      uploadPhoto(articleId, inp.files[0]);
+    }
   };
-  reader.readAsDataURL(file);
-  this.value = '';
-});
-
-async function deletePhoto(photoId, articleId) {
-  await fetch(API + '/api/vk/photo/' + photoId, {method:'DELETE'});
-  await loadSession();
+  inp.click();
 }
 
-async function toggleExtended(articleId, extended) {
-  await fetch(API + '/api/vk/article/' + articleId + '/extended', {
-    method:'PUT', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ extended })
-  });
-  await loadSession();
-}
-
-async function checkout() {
-  var btn = document.querySelector('.checkout-btn');
-  btn.disabled = true; btn.textContent = '⏳ Weiterleitung...';
-
-  // Gutschein 100% gratis?
-  if (activeCoupon && activeCoupon.is_free) {
-    var r2 = await fetch(API + '/api/vk/coupon/redeem', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ code: activeCoupon.code, token: TOKEN })
-    });
-    var d2 = await r2.json();
-    if (d2.success && d2.is_free) { window.location.href = 'bericht.html?s=' + TOKEN + '&paid=1'; return; }
-  }
-
-  var body = { token: TOKEN };
-  if (activeCoupon) body.coupon_code = activeCoupon.code;
-
-  var r = await fetch(API + '/api/vk/checkout', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify(body)
-  });
-  var d = await r.json();
-  if (d.url) window.location.href = d.url;
-  else { showToast('⚠️ ' + (d.error||'Fehler')); btn.disabled=false; btn.textContent='💳 Jetzt bestellen'; }
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 3000);
-}
-
-function renderCouponField() {
-  return '<div class="coupon-box">' +
-    '<label>🎟️ Gutschein-Code (optional)</label>' +
-    '<div style="display:flex;gap:8px;margin-bottom:6px;">' +
-    '<input id="couponInput" placeholder="z.B. TEST100" maxlength="20" style="flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.9rem;font-family:Nunito,sans-serif;text-transform:uppercase;outline:none;" onkeydown="if(event.key==='Enter')validateCoupon()">' +
-    '<button onclick="validateCoupon()" style="background:#1b4332;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:.85rem;font-weight:800;cursor:pointer;font-family:Nunito,sans-serif;white-space:nowrap;min-width:90px;">✓ Einlösen</button>' +
-    '</div>' +
-    '<div id="couponMsg"></div>' +
-    '</div>';
-}
-
-var activeCoupon = null;
-
-async function validateCoupon() {
-  var code = document.getElementById('couponInput').value.trim().toUpperCase();
-  if (!code) return;
-  var msg = document.getElementById('couponMsg');
-  msg.innerHTML = '<span style="color:var(--mu);font-size:.8rem;">⏳ Prüfe...</span>';
+async function uploadPhoto(articleId, file) {
   try {
-    var r = await fetch(API + '/api/vk/coupon/validate', {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ code, token: TOKEN })
-    });
-    var d = await r.json();
-    if (!d.success) { msg.innerHTML = '<div class="coupon-error">❌ ' + d.error + '</div>'; activeCoupon = null; return; }
-    activeCoupon = d.coupon;
-    var txt = d.coupon.is_free ? '🎁 100% Gratis – kein Checkout nötig!' :
-      '✅ ' + (d.coupon.type === 'percent' ? d.coupon.value + '% Rabatt' : d.coupon.value + '€ Rabatt') + ' – Du sparst ' + d.coupon.discount.toFixed(2) + '€';
-    msg.innerHTML = '<div class="coupon-success">' + txt + '</div>';
-    // Preis neu laden
-    await loadSession();
-  } catch(e) { msg.innerHTML = '<div class="coupon-error">❌ Fehler: ' + e.message + '</div>'; }
-}
+    var form = new FormData();
+    form.append('photo', file);
+    form.append('article_id', articleId);
+    form.append('token', sessionToken);
 
-async function saveNotes(articleId) {
-  var ta = document.getElementById('notes-' + articleId);
-  if (!ta) return;
-  var notes = ta.value.trim();
-  try {
-    await fetch(API + '/api/vk/article/' + articleId + '/notes', {
-      method: 'PUT', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ notes })
-    });
-  } catch(e) { console.error('Save notes error:', e.message); }
-}
+    var res = await fetch(API + '/api/vk/photo/upload', { method: 'POST', body: form });
+    if (!res.ok) throw new Error('Upload fehlgeschlagen');
 
-async function checkResult() {
-  showToast('⏳ Prüfe...');
-  await loadSession();
-}
-
-async function autoCheckResult() {
-  try {
-    const r = await fetch(API + '/api/vk/session/' + TOKEN);
-    const d = await r.json();
-    if (d.status === 'done') {
-      window.location.href = 'ergebnis.html?s=' + TOKEN;
-    } else {
-      // Weiter polling solange nicht done (open/paid/analyzing)
-      setTimeout(autoCheckResult, 6000);
-    }
-  } catch(e) {
-    setTimeout(autoCheckResult, 8000);
+    // Session neu laden
+    var r2 = await fetch(API + '/api/vk/session/' + sessionToken);
+    sessionData = await r2.json();
+    render();
+  } catch (err) {
+    alert('Foto-Upload Fehler: ' + err.message);
   }
 }
 
-// Auto-start polling if paid=1 in URL
-if (new URLSearchParams(location.search).get('paid') === '1') {
-  setTimeout(autoCheckResult, 4000);
+// ── PAYMENT ─────────────────────────────────────────────────
+async function startPayment() {
+  var btn = document.getElementById('btn-pay');
+  if (btn) { btn.disabled = true; btn.textContent = 'Wird vorbereitet...'; }
+
+  try {
+    var body = { token: sessionToken };
+    if (couponApplied) body.coupon_code = couponApplied.code;
+
+    var res = await fetch(API + '/api/vk/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    var data = await res.json();
+
+    if (!res.ok || !data.url) throw new Error(data.error || 'Checkout fehlgeschlagen');
+
+    window.location.href = data.url;
+  } catch (err) {
+    alert('Fehler: ' + err.message);
+    if (btn) { btn.disabled = false; btn.textContent = '💳 Jetzt bezahlen'; }
+  }
+}
+
+// ── FREE REDEEM ─────────────────────────────────────────────
+async function redeemFree() {
+  var btn = document.getElementById('btn-pay');
+  if (btn) { btn.disabled = true; btn.textContent = 'Wird eingelöst...'; }
+
+  try {
+    var res = await fetch(API + '/api/vk/coupon/redeem', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: couponApplied.code, token: sessionToken })
+    });
+    var data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Einlösen fehlgeschlagen');
+
+    // Weiterleitung zur Ergebnisseite
+    window.location.href = 'ergebnis.html?s=' + sessionToken;
+  } catch (err) {
+    alert('Fehler: ' + err.message);
+    if (btn) { btn.disabled = false; btn.textContent = '🎉 Kostenlos einlösen'; }
+  }
+}
+
+// ── ERROR ────────────────────────────────────────────────────
+function showError(msg) {
+  document.getElementById('app').innerHTML =
+    '<div class="card"><div class="error-box">⚠️ ' + msg + '</div></div>';
 }
 </script>
 </body>
