@@ -122,7 +122,7 @@ function render() {
     return;
   }
 
-  const price  = calcPrice(s.vk_articles || []);
+  const price  = calcPrice(s.articles || []);
   const app    = document.getElementById('app');
 
   app.innerHTML = buildHTML(s, price);
@@ -130,7 +130,7 @@ function render() {
 }
 
 function buildHTML(s, price) {
-  const articles = s.vk_articles || [];
+  const articles = s.articles || [];
 
   return [
     // Session Info
@@ -287,7 +287,7 @@ async function validateCoupon() {
     btn.textContent = '✓';
 
     // Re-render Preiszeilen
-    var price = calcPrice(sessionData.vk_articles || []);
+    var price = calcPrice(sessionData.articles || []);
     var card  = document.querySelector('.card:last-child');
     if (card) {
       var old = card.querySelector('.card-title');
@@ -298,7 +298,7 @@ async function validateCoupon() {
           card.removeChild(next);
           next = tmp;
         }
-        var frag = document.createRange().createContextualFragment(buildPriceRows(sessionData.vk_articles || [], price));
+        var frag = document.createRange().createContextualFragment(buildPriceRows(sessionData.articles || [], price));
         old.after(frag);
       }
     }
