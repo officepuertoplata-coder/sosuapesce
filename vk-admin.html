@@ -283,8 +283,8 @@ async function loadCoupons() {
         '<td>' + expires + '</td>' +
         '<td><span class="badge ' + (c.active && !isExpired && !isFull ? 's-open' : 's-expired') + '">' + (c.active && !isExpired && !isFull ? 'Aktiv' : 'Inaktiv') + '</span></td>' +
         '<td style="white-space:nowrap;">' +
-          '<button class="btn btn-sm ' + (c.active ? 'btn-out' : 'btn-g') + '" onclick="toggleCoupon('' + c.id + '',' + c.active + ')">' + (c.active ? '⏸' : '▶') + '</button> ' +
-          '<button class="btn btn-sm btn-red" onclick="deleteCoupon('' + c.id + '','' + c.code + '')">🗑️</button>' +
+          '<button class="btn btn-sm ' + (c.active ? 'btn-out' : 'btn-g') + '" onclick="toggleCoupon(\`' + c.id + '\`,' + c.active + ')">' + (c.active ? '&#9208;' : '&#9654;') + '</button> ' +
+          '<button class="btn btn-sm btn-red" onclick="deleteCoupon(\`' + c.id + '\`,\`' + c.code + '\`)">&#128465;</button>' +
         '</td></tr>';
     }).join('');
   } catch(e) { console.error(e); }
