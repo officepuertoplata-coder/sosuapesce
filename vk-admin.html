@@ -73,6 +73,7 @@ tr:hover td{background:#f9fafb;}
 <div class="main">
 
   <!-- STATS -->
+<div id="section-orders">
   <div class="stats">
     <div class="stat"><div class="stat-val" id="s-total">—</div><div class="stat-lbl">Aufträge gesamt</div></div>
     <div class="stat"><div class="stat-val" id="s-today">—</div><div class="stat-lbl">Heute</div></div>
@@ -102,6 +103,8 @@ tr:hover td{background:#f9fafb;}
       <tbody id="sessionsTable"><tr><td colspan="7" class="msg">Lade...</td></tr></tbody>
     </table>
   </div>
+
+</div><!-- /section-orders -->
 
 <!-- GUTSCHEINE -->
   <div id="section-coupons" style="display:none;">
@@ -256,8 +259,12 @@ function showSection(name) {
   document.getElementById('section-coupons').style.display = name === 'coupons' ? 'block' : 'none';
   document.getElementById('section-orders').style.display = name === 'coupons' ? 'none' : 'block';
   document.querySelectorAll('.tbtn').forEach(b => b.classList.remove('active'));
-  if (name === 'coupons') document.getElementById('btnCoupons').classList.add('active');
-  else document.getElementById('btnOrders').classList.add('active');
+  if (name === 'coupons') {
+    document.getElementById('btnCoupons').classList.add('active');
+    loadCoupons();
+  } else {
+    document.getElementById('btnOrders').classList.add('active');
+  }
 }
 
 function toggleNewCoupon() {
