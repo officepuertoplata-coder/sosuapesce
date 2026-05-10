@@ -63,6 +63,7 @@ tr:hover td{background:#f9fafb;}
   <div class="nav-brand">📊 Verkaufsreport Admin</div>
   <a href="hub.html" class="tbtn">← Hub</a>
   <button class="tbtn" onclick="loadAll()">↺ Aktualisieren</button>
+  <button class="tbtn" onclick="showSection('coupons')" id="btnCoupons">🎟️ Gutscheine</button>
   <div class="nav-right">
     <button class="tbtn" onclick="doLogout()">Ausloggen</button>
   </div>
@@ -99,6 +100,45 @@ tr:hover td{background:#f9fafb;}
       </tr></thead>
       <tbody id="sessionsTable"><tr><td colspan="7" class="msg">Lade...</td></tr></tbody>
     </table>
+  </div>
+
+<!-- GUTSCHEINE -->
+  <div id="section-coupons" style="display:none;">
+    <div class="table-box">
+      <div class="table-hd">
+        <h2>🎟️ Gutschein-Codes</h2>
+        <button class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;" onclick="toggleNewCoupon()">+ Neu</button>
+      </div>
+      <div id="newCouponForm" style="display:none;padding:18px;background:#f9fafb;border-bottom:1px solid var(--border);">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;">
+          <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">CODE (leer = zufällig)</label>
+            <input id="nc-code" placeholder="z.B. SUMMER25" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;text-transform:uppercase;"></div>
+          <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">TYP</label>
+            <select id="nc-type" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;">
+              <option value="free">🎁 100% Gratis</option>
+              <option value="percent">% Prozent</option>
+              <option value="fixed">€ Fixbetrag</option>
+            </select></div>
+          <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">WERT (% oder €)</label>
+            <input id="nc-value" type="number" value="100" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
+          <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">MAX. VERWENDUNGEN</label>
+            <input id="nc-uses" type="number" placeholder="leer = unbegrenzt" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
+          <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">GÜLTIG BIS</label>
+            <input id="nc-expires" type="date" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
+          <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">BESCHREIBUNG</label>
+            <input id="nc-desc" placeholder="Interne Notiz" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button class="btn btn-out" onclick="toggleNewCoupon()">Abbrechen</button>
+          <button class="btn btn-g" onclick="createCoupon()">✅ Erstellen</button>
+        </div>
+        <div id="nc-err" style="color:var(--red);font-size:.78rem;margin-top:6px;"></div>
+      </div>
+      <table>
+        <thead><tr><th>Code</th><th>Typ</th><th>Wert</th><th>Verwendet</th><th>Max</th><th>Gültig bis</th><th>Status</th><th>Aktionen</th></tr></thead>
+        <tbody id="couponsList"><tr><td colspan="8" class="msg">Lade...</td></tr></tbody>
+      </table>
+    </div>
   </div>
 
 </div>
@@ -209,6 +249,82 @@ async function deleteSession(id, phone) {
   showToast('✅ Gelöscht');
   loadSessions();
   loadStats();
+}
+
+function showSection(name) {
+  document.getElementById('section-coupons').style.display = name === 'coupons' ? 'block' : 'none';
+  document.querySelector('.table-box').style.display = name === 'coupons' ? 'none' : 'block';
+  document.querySelectorAll('.tbtn').forEach(b => b.classList.remove('active'));
+  if (name === 'coupons') document.getElementById('btnCoupons').classList.add('active');
+}
+
+function toggleNewCoupon() {
+  var f = document.getElementById('newCouponForm');
+  f.style.display = f.style.display === 'none' ? 'block' : 'none';
+}
+
+async function loadCoupons() {
+  try {
+    var r = await fetch(API + '/api/vk/admin/coupons');
+    var coupons = await r.json() || [];
+    var tbody = document.getElementById('couponsList');
+    if (!coupons.length) { tbody.innerHTML = '<tr><td colspan="8" class="msg">Keine Gutscheine</td></tr>'; return; }
+    tbody.innerHTML = coupons.map(function(c) {
+      var typeLabel = {free:'🎁 Gratis', percent:'% ' + c.value, fixed:'€ ' + c.value}[c.type] || c.type;
+      var expires = c.expires_at ? new Date(c.expires_at).toLocaleDateString('de-AT') : '∞';
+      var isExpired = c.expires_at && new Date(c.expires_at) < new Date();
+      var isFull = c.max_uses && c.used_count >= c.max_uses;
+      return '<tr>' +
+        '<td><strong style="font-family:monospace;">' + c.code + '</strong>' + (c.description ? '<br><small style="color:var(--mu)">' + c.description + '</small>' : '') + '</td>' +
+        '<td>' + typeLabel + '</td>' +
+        '<td>' + (c.type === 'free' ? '—' : c.type === 'percent' ? c.value + '%' : c.value + '€') + '</td>' +
+        '<td style="text-align:center;">' + (c.used_count||0) + '</td>' +
+        '<td style="text-align:center;">' + (c.max_uses||'∞') + '</td>' +
+        '<td>' + expires + '</td>' +
+        '<td><span class="badge ' + (c.active && !isExpired && !isFull ? 's-open' : 's-expired') + '">' + (c.active && !isExpired && !isFull ? 'Aktiv' : 'Inaktiv') + '</span></td>' +
+        '<td style="white-space:nowrap;">' +
+          '<button class="btn btn-sm ' + (c.active ? 'btn-out' : 'btn-g') + '" onclick="toggleCoupon('' + c.id + '',' + c.active + ')">' + (c.active ? '⏸' : '▶') + '</button> ' +
+          '<button class="btn btn-sm btn-red" onclick="deleteCoupon('' + c.id + '','' + c.code + '')">🗑️</button>' +
+        '</td></tr>';
+    }).join('');
+  } catch(e) { console.error(e); }
+}
+
+async function createCoupon() {
+  var code = document.getElementById('nc-code').value.trim().toUpperCase();
+  var type = document.getElementById('nc-type').value;
+  var value = parseFloat(document.getElementById('nc-value').value)||100;
+  var maxUses = parseInt(document.getElementById('nc-uses').value)||null;
+  var expires = document.getElementById('nc-expires').value||null;
+  var desc = document.getElementById('nc-desc').value.trim()||null;
+  document.getElementById('nc-err').textContent = '';
+  try {
+    var r = await fetch(API + '/api/vk/admin/coupons', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ code, type, value, max_uses: maxUses, expires_at: expires, description: desc })
+    });
+    var d = await r.json();
+    if (!d.success) { document.getElementById('nc-err').textContent = d.error; return; }
+    showToast('✅ Code "' + d.coupon.code + '" erstellt!');
+    document.getElementById('newCouponForm').style.display = 'none';
+    loadCoupons();
+  } catch(e) { document.getElementById('nc-err').textContent = e.message; }
+}
+
+async function toggleCoupon(id, active) {
+  await fetch(API + '/api/vk/admin/coupons/' + id, {
+    method:'PUT', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ active: !active })
+  });
+  showToast(!active ? '▶ Aktiv' : '⏸ Pausiert');
+  loadCoupons();
+}
+
+async function deleteCoupon(id, code) {
+  if (!confirm('Code "' + code + '" löschen?')) return;
+  await fetch(API + '/api/vk/admin/coupons/' + id, { method:'DELETE' });
+  showToast('Gelöscht');
+  loadCoupons();
 }
 
 function showToast(msg) {
