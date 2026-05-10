@@ -385,13 +385,26 @@ function triggerUpload(articleId) {
 
 async function uploadPhoto(articleId, file) {
   try {
-    var form = new FormData();
-    form.append('photo', file);
-    form.append('article_id', articleId);
-    form.append('token', sessionToken);
+    // Datei als Base64 lesen
+    var base64 = await new Promise(function(resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function() { resolve(reader.result.split(',')[1]); };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
 
-    var res = await fetch(API + '/api/vk/photo/upload', { method: 'POST', body: form });
-    if (!res.ok) throw new Error('Upload fehlgeschlagen');
+    var res = await fetch(API + '/api/vk/photo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        article_id: articleId,
+        session_id: sessionData.id,
+        image_base64: base64,
+        content_type: file.type || 'image/jpeg'
+      })
+    });
+    var data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Upload fehlgeschlagen');
 
     // Session neu laden
     var r2 = await fetch(API + '/api/vk/session/' + sessionToken);
