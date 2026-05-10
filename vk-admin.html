@@ -63,6 +63,7 @@ tr:hover td{background:#f9fafb;}
   <div class="nav-brand">📊 Verkaufsreport Admin</div>
   <a href="hub.html" class="tbtn">← Hub</a>
   <button class="tbtn" onclick="loadAll()">↺ Aktualisieren</button>
+  <button class="tbtn active" onclick="showSection('orders')" id="btnOrders">📋 Aufträge</button>
   <button class="tbtn" onclick="showSection('coupons')" id="btnCoupons">🎟️ Gutscheine</button>
   <div class="nav-right">
     <button class="tbtn" onclick="doLogout()">Ausloggen</button>
@@ -253,9 +254,10 @@ async function deleteSession(id, phone) {
 
 function showSection(name) {
   document.getElementById('section-coupons').style.display = name === 'coupons' ? 'block' : 'none';
-  document.querySelector('.table-box').style.display = name === 'coupons' ? 'none' : 'block';
+  document.getElementById('section-orders').style.display = name === 'coupons' ? 'none' : 'block';
   document.querySelectorAll('.tbtn').forEach(b => b.classList.remove('active'));
   if (name === 'coupons') document.getElementById('btnCoupons').classList.add('active');
+  else document.getElementById('btnOrders').classList.add('active');
 }
 
 function toggleNewCoupon() {
