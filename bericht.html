@@ -27,10 +27,34 @@
   .article-card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; margin-bottom: 12px; }
   .article-title { font-weight: 600; color: #1f2937; margin-bottom: 8px; }
   .photo-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
-  .photo-thumb { width: 72px; height: 72px; border-radius: 8px; object-fit: cover; border: 1px solid #e5e7eb; }
-  .photo-add { width: 72px; height: 72px; border-radius: 8px; border: 2px dashed #d1d5db; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; color: #9ca3af; font-size: .7rem; text-align: center; background: #f9fafb; transition: border-color .2s; }
+
+  .photo-wrap { position: relative; width: 72px; height: 72px; }
+  .photo-thumb { width: 72px; height: 72px; border-radius: 8px; object-fit: cover; border: 1px solid #e5e7eb; display: block; }
+  .photo-delete {
+    position: absolute; top: -6px; right: -6px;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: #ef4444; color: white; border: 2px solid white;
+    font-size: 11px; cursor: pointer; font-weight: 700;
+    box-shadow: 0 1px 4px rgba(0,0,0,.2);
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+  }
+  .photo-delete:hover { background: #dc2626; }
+
+  .photo-add {
+    width: 72px; height: 72px; border-radius: 8px;
+    border: 2px dashed #d1d5db;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; color: #9ca3af; font-size: .7rem; text-align: center;
+    background: #f9fafb; transition: border-color .2s; user-select: none;
+  }
   .photo-add:hover { border-color: #2d7a4f; color: #2d7a4f; }
   .photo-add span { font-size: 1.5rem; line-height: 1; }
+
+  .upload-progress { margin-top: 8px; }
+  .progress-bar-wrap { background: #f3f4f6; border-radius: 6px; height: 6px; overflow: hidden; margin-bottom: 4px; }
+  .progress-bar { height: 6px; background: #2d7a4f; border-radius: 6px; transition: width .2s; }
+  .progress-label { font-size: .75rem; color: #6b7280; }
 
   .price-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f3f4f6; font-size: .9rem; }
   .price-row:last-child { border-bottom: none; }
@@ -49,7 +73,6 @@
   .btn-pay { display: block; width: 100%; padding: 16px; background: #2d7a4f; color: white; border: none; border-radius: 10px; font-size: 1.05rem; font-weight: 700; cursor: pointer; text-align: center; margin-top: 16px; transition: background .2s; }
   .btn-pay:hover { background: #245f3d; }
   .btn-pay:disabled { background: #9ca3af; cursor: not-allowed; }
-
   .btn-free { background: #059669; }
   .btn-free:hover { background: #047857; }
 
@@ -58,11 +81,8 @@
   @keyframes spin { to { transform: rotate(360deg); } }
 
   .error-box { background: #fee2e2; border-left: 4px solid #dc2626; border-radius: 8px; padding: 16px; color: #991b1b; }
-
   .info-row { display: flex; justify-content: space-between; font-size: .88rem; color: #4b5563; padding: 4px 0; }
   .info-label { color: #9ca3af; }
-
-  .file-input-hidden { display: none; }
 </style>
 </head>
 <body>
@@ -80,44 +100,27 @@
 </div>
 
 <script>
-// ── CONFIG ──────────────────────────────────────────────────
 const API = 'https://converto-server-production.up.railway.app';
-
-// ── STATE ───────────────────────────────────────────────────
 let sessionToken = null;
 let sessionData  = null;
 let couponApplied = null;
 
-// ── INIT ────────────────────────────────────────────────────
 (function init() {
   const params = new URLSearchParams(window.location.search);
   sessionToken = params.get('s');
-  if (!sessionToken) {
-    showError('Kein Auftrag gefunden. Bitte den Link aus WhatsApp verwenden.');
-    return;
-  }
+  if (!sessionToken) { showError('Kein Auftrag gefunden. Bitte den Link aus WhatsApp verwenden.'); return; }
   loadSession();
 })();
 
-// ── LOAD SESSION ────────────────────────────────────────────
 async function loadSession() {
   try {
     const res = await fetch(API + '/api/vk/session/' + sessionToken);
     if (!res.ok) throw new Error('Session nicht gefunden (Status ' + res.status + ')');
     sessionData = await res.json();
-
-    // Wenn paid=1 in URL aber Status noch 'open' → warten & polling
     const params = new URLSearchParams(window.location.search);
-    if (params.get('paid') === '1' && sessionData.status === 'open') {
-      showAnalyzing();
-      pollStatus();
-      return;
-    }
-
+    if (params.get('paid') === '1' && sessionData.status === 'open') { showAnalyzing(); pollStatus(); return; }
     render();
-  } catch (err) {
-    showError('Fehler beim Laden: ' + err.message);
-  }
+  } catch (err) { showError('Fehler beim Laden: ' + err.message); }
 }
 
 function showAnalyzing() {
@@ -131,69 +134,40 @@ function showAnalyzing() {
 }
 
 async function pollStatus() {
-  // Stripe direkt befragen (Webhook-Fallback fuer Test/Live)
-  try {
-    await fetch(API + '/api/vk/check-payment', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: sessionToken })
-    });
-  } catch(e) {}
-
+  try { await fetch(API + '/api/vk/check-payment', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: sessionToken }) }); } catch(e) {}
   var attempts = 0;
   var interval = setInterval(async function() {
     attempts++;
     try {
       var res = await fetch(API + '/api/vk/session/' + sessionToken);
       var data = await res.json();
-      if (data.status === 'analyzing' || data.status === 'done') {
-        clearInterval(interval);
-        window.location.href = 'ergebnis.html?s=' + sessionToken;
-      }
+      if (data.status === 'analyzing' || data.status === 'done') { clearInterval(interval); window.location.href = 'ergebnis.html?s=' + sessionToken; }
     } catch(e) {}
-    if (attempts >= 60) {
-      clearInterval(interval);
-      showError('Analyse dauert laenger. Bitte direkt aufrufen: ergebnis.html?s=' + sessionToken);
-    }
+    if (attempts >= 60) { clearInterval(interval); showError('Analyse dauert länger. Direkt aufrufen: ergebnis.html?s=' + sessionToken); }
   }, 5000);
 }
 
-// ── RENDER ──────────────────────────────────────────────────
 function render() {
   const s = sessionData;
   if (!s) return;
-
-  // Weitergeleitet wenn schon bezahlt / fertig
-  if (s.status === 'done' || s.status === 'analyzing') {
-    window.location.href = 'ergebnis.html?s=' + sessionToken;
-    return;
-  }
-
-  const price  = calcPrice(s.articles || []);
-  const app    = document.getElementById('app');
-
-  app.innerHTML = buildHTML(s, price);
+  if (s.status === 'done' || s.status === 'analyzing') { window.location.href = 'ergebnis.html?s=' + sessionToken; return; }
+  const price = calcPrice(s.articles || []);
+  document.getElementById('app').innerHTML = buildHTML(s, price);
   attachEvents();
 }
 
 function buildHTML(s, price) {
   const articles = s.articles || [];
-
   return [
-    // Session Info
     '<div class="card">',
     '  <div class="card-title">Dein Auftrag</div>',
     '  <div class="info-row"><span class="info-label">Status</span><span class="status-badge status-' + s.status + '">' + labelStatus(s.status) + '</span></div>',
     '  <div class="info-row"><span class="info-label">Telefon</span><span>+' + (s.phone || '') + '</span></div>',
     '  <div class="info-row"><span class="info-label">Artikel</span><span>' + articles.length + ' Artikel</span></div>',
     '</div>',
-
-    // Artikel
     articles.length > 0
       ? '<div class="card"><div class="card-title">Artikel & Fotos</div>' + articles.map(buildArticleHTML).join('') + '</div>'
       : '',
-
-    // Preisübersicht + Zahlung
     '<div class="card">',
     '  <div class="card-title">Zusammenfassung</div>',
     buildPriceRows(articles, price),
@@ -205,47 +179,46 @@ function buildHTML(s, price) {
 
 function buildArticleHTML(a, idx) {
   const photos = a.vk_photos || [];
+  const canAdd = photos.length < 4;
+
   const photoHTML = photos.map(function(p) {
-    return '<img class="photo-thumb" src="' + p.public_url + '" alt="Foto">';
+    return [
+      '<div class="photo-wrap">',
+      '  <img class="photo-thumb" src="' + p.public_url + '" alt="Foto">',
+      '  <div class="photo-delete" onclick="deletePhoto(\'' + p.id + '\')" title="Foto löschen">✕</div>',
+      '</div>'
+    ].join('');
   }).join('');
 
-  const canAdd = photos.length < 4;
   const addBtn = canAdd
-    ? '<label class="photo-add" onclick="triggerUpload(\'' + a.id + '\')"><span>+</span>Foto</label>'
+    ? '<div class="photo-add" onclick="triggerUpload(\'' + a.id + '\', ' + photos.length + ')"><span>+</span>' + (photos.length === 0 ? 'Fotos' : 'Mehr') + '</div>'
     : '';
 
   return [
-    '<div class="article-card" data-article-id="' + a.id + '">',
+    '<div class="article-card" id="article-' + a.id + '">',
     '  <div class="article-title">📦 ' + (a.title || 'Artikel ' + (idx + 1)) + '</div>',
-    '  <div class="photo-row">',
+    '  <div class="photo-row" id="photos-' + a.id + '">',
     photoHTML,
     addBtn,
     '  </div>',
+    '  <div id="progress-' + a.id + '"></div>',
     '  <div style="font-size:.8rem;color:#9ca3af;">' + photos.length + ' von 4 Fotos · ' + (a.extended ? '7 Tage' : '3 Tage') + ' Aufbewahrung</div>',
     '</div>',
   ].join('\n');
 }
 
 function buildPriceRows(articles, total) {
-  const rows = [
-    '<div class="price-row"><span>Grundpreis</span><span>€1.00</span></div>',
-  ];
+  const rows = ['<div class="price-row"><span>Grundpreis</span><span>€1.00</span></div>'];
   articles.forEach(function(a) {
     const photos = a.vk_photos || [];
     rows.push('<div class="price-row"><span>' + (a.title || 'Artikel') + '</span><span>€1.00</span></div>');
     const extra = Math.max(0, photos.length - 1);
-    if (extra > 0) {
-      rows.push('<div class="price-row"><span>&nbsp;&nbsp;+ ' + extra + ' weitere Fotos</span><span>€' + (extra * 0.25).toFixed(2) + '</span></div>');
-    }
-    if (a.extended) {
-      rows.push('<div class="price-row"><span>&nbsp;&nbsp;+ Verlängert (7 Tage)</span><span>€1.00</span></div>');
-    }
+    if (extra > 0) rows.push('<div class="price-row"><span>&nbsp;&nbsp;+ ' + extra + ' weitere Fotos</span><span>€' + (extra * 0.25).toFixed(2) + '</span></div>');
+    if (a.extended) rows.push('<div class="price-row"><span>&nbsp;&nbsp;+ Verlängert (7 Tage)</span><span>€1.00</span></div>');
   });
-
   if (couponApplied && couponApplied.discount > 0) {
     rows.push('<div class="price-row" style="color:#059669;"><span>🎟️ Gutschein (' + couponApplied.code + ')</span><span>-€' + couponApplied.discount.toFixed(2) + '</span></div>');
   }
-
   const finalTotal = couponApplied ? Math.max(0, total - (couponApplied.discount || 0)) : total;
   rows.push('<div class="price-row"><span style="font-weight:700;">Gesamt</span><span class="price-total">€' + finalTotal.toFixed(2) + '</span></div>');
   return rows.join('\n');
@@ -261,211 +234,171 @@ function buildCouponSection() {
   ].join('\n');
 }
 
-// ── PRICE CALC ──────────────────────────────────────────────
 function calcPrice(articles) {
   var total = 1.00;
   articles.forEach(function(a) {
     total += 1.00;
-    var photos = a.vk_photos || [];
-    var extra = Math.max(0, photos.length - 1);
+    var extra = Math.max(0, (a.vk_photos || []).length - 1);
     total += extra * 0.25;
     if (a.extended) total += 1.00;
   });
   return Math.round(total * 100) / 100;
 }
 
-// ── STATUS LABEL ────────────────────────────────────────────
 function labelStatus(s) {
-  var map = { open: 'Offen', paid: 'Bezahlt', analyzing: 'In Analyse', done: 'Fertig', error: 'Fehler', expired: 'Abgelaufen' };
-  return map[s] || s;
+  return { open: 'Offen', paid: 'Bezahlt', analyzing: 'In Analyse', done: 'Fertig', error: 'Fehler', expired: 'Abgelaufen' }[s] || s;
 }
 
-// ── EVENTS ──────────────────────────────────────────────────
 function attachEvents() {
   var input = document.getElementById('coupon-input');
   if (input) {
-    input.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') {
-        validateCoupon();
-      }
-    });
-    input.addEventListener('input', function() {
-      this.value = this.value.toUpperCase();
-    });
+    input.addEventListener('keydown', function(e) { if (e.key === 'Enter') validateCoupon(); });
+    input.addEventListener('input', function() { this.value = this.value.toUpperCase(); });
   }
 }
 
-// ── COUPON ──────────────────────────────────────────────────
+// ── MULTI FOTO UPLOAD ────────────────────────────────────────
+function triggerUpload(articleId, currentCount) {
+  var remaining = 4 - currentCount;
+  if (remaining <= 0) { alert('Maximal 4 Fotos pro Artikel erreicht.'); return; }
+
+  var inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'image/*';
+  inp.multiple = true;
+  inp.onchange = async function() {
+    if (!inp.files || inp.files.length === 0) return;
+    var files = Array.from(inp.files).slice(0, remaining);
+    if (inp.files.length > remaining) {
+      alert('Nur noch ' + remaining + ' Foto(s) möglich. Es werden die ersten ' + remaining + ' hochgeladen.');
+    }
+    await uploadPhotos(articleId, files);
+  };
+  inp.click();
+}
+
+async function uploadPhotos(articleId, files) {
+  var progressEl = document.getElementById('progress-' + articleId);
+  if (progressEl) {
+    progressEl.innerHTML = [
+      '<div class="upload-progress">',
+      '  <div class="progress-bar-wrap"><div class="progress-bar" id="pbar-' + articleId + '" style="width:0%"></div></div>',
+      '  <div class="progress-label" id="plabel-' + articleId + '">0 / ' + files.length + ' hochgeladen</div>',
+      '</div>'
+    ].join('');
+  }
+
+  var errors = 0;
+  for (var i = 0; i < files.length; i++) {
+    try {
+      var base64 = await new Promise(function(resolve, reject) {
+        var reader = new FileReader();
+        reader.onload = function() { resolve(reader.result.split(',')[1]); };
+        reader.onerror = reject;
+        reader.readAsDataURL(files[i]);
+      });
+      var res = await fetch(API + '/api/vk/photo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ article_id: articleId, session_id: sessionData.id, image_base64: base64, content_type: files[i].type || 'image/jpeg' })
+      });
+      var data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Upload fehlgeschlagen');
+    } catch (err) {
+      errors++;
+      console.error('Upload Fehler:', err.message);
+    }
+    // Fortschritt
+    var pct = Math.round(((i + 1) / files.length) * 100);
+    var pbar = document.getElementById('pbar-' + articleId);
+    var plabel = document.getElementById('plabel-' + articleId);
+    if (pbar) pbar.style.width = pct + '%';
+    if (plabel) plabel.textContent = (i + 1) + ' / ' + files.length + ' hochgeladen';
+  }
+
+  // Session neu laden
+  var r2 = await fetch(API + '/api/vk/session/' + sessionToken);
+  sessionData = await r2.json();
+  render();
+  if (errors > 0) alert(errors + ' Foto(s) konnten nicht hochgeladen werden.');
+}
+
+// ── FOTO LÖSCHEN ─────────────────────────────────────────────
+async function deletePhoto(photoId) {
+  if (!confirm('Dieses Foto wirklich löschen?')) return;
+  try {
+    var res = await fetch(API + '/api/vk/photo/' + photoId, { method: 'DELETE' });
+    if (!res.ok) { var d = await res.json(); throw new Error(d.error || 'Löschen fehlgeschlagen'); }
+    var r2 = await fetch(API + '/api/vk/session/' + sessionToken);
+    sessionData = await r2.json();
+    render();
+  } catch (err) { alert('Fehler beim Löschen: ' + err.message); }
+}
+
+// ── COUPON ────────────────────────────────────────────────────
 async function validateCoupon() {
   var input = document.getElementById('coupon-input');
   var msg   = document.getElementById('coupon-msg');
   var btn   = document.getElementById('btn-coupon');
   if (!input || !msg) return;
-
   var code = input.value.trim().toUpperCase();
   if (!code) return;
-
-  btn.disabled = true;
-  btn.textContent = '...';
-  msg.textContent = '';
-
+  btn.disabled = true; btn.textContent = '...'; msg.textContent = '';
   try {
-    var res = await fetch(API + '/api/vk/coupon/validate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code: code, token: sessionToken })
-    });
+    var res = await fetch(API + '/api/vk/coupon/validate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: code, token: sessionToken }) });
     var data = await res.json();
-
-    if (!res.ok || !data.coupon) {
-      msg.className = 'coupon-msg coupon-err';
-      msg.textContent = data.error || 'Ungültiger Code';
-      btn.disabled = false;
-      btn.textContent = 'Einlösen';
-      return;
-    }
-
+    if (!res.ok || !data.coupon) { msg.className = 'coupon-msg coupon-err'; msg.textContent = data.error || 'Ungültiger Code'; btn.disabled = false; btn.textContent = 'Einlösen'; return; }
     couponApplied = { code: code, discount: data.coupon.discount, is_free: data.coupon.is_free };
-
     msg.className = 'coupon-msg coupon-ok';
     msg.textContent = '✓ Gutschein aktiv – Rabatt: €' + data.coupon.discount.toFixed(2);
-
-    btn.disabled = false;
-    btn.textContent = '✓';
-
-    // Re-render Preiszeilen
+    btn.disabled = false; btn.textContent = '✓';
     var price = calcPrice(sessionData.articles || []);
-    var card  = document.querySelector('.card:last-child');
+    var card = document.querySelector('.card:last-child');
     if (card) {
       var old = card.querySelector('.card-title');
       if (old) {
         var next = old.nextSibling;
-        while (next && next !== document.getElementById('coupon-section')) {
-          var tmp = next.nextSibling;
-          card.removeChild(next);
-          next = tmp;
-        }
+        while (next && next !== document.getElementById('coupon-section')) { var tmp = next.nextSibling; card.removeChild(next); next = tmp; }
         var frag = document.createRange().createContextualFragment(buildPriceRows(sessionData.articles || [], price));
         old.after(frag);
       }
     }
-
-    // Falls gratis → Button ändern
     var btnPay = document.getElementById('btn-pay');
     if (btnPay) {
       var finalPrice = Math.max(0, price - (couponApplied.discount || 0));
-      if (finalPrice <= 0) {
-        btnPay.className = 'btn-pay btn-free';
-        btnPay.textContent = '🎉 Kostenlos einlösen';
-        btnPay.onclick = redeemFree;
-      } else {
-        btnPay.textContent = '💳 Jetzt bezahlen  €' + finalPrice.toFixed(2);
-      }
+      if (finalPrice <= 0) { btnPay.className = 'btn-pay btn-free'; btnPay.textContent = '🎉 Kostenlos einlösen'; btnPay.onclick = redeemFree; }
+      else { btnPay.textContent = '💳 Jetzt bezahlen  €' + finalPrice.toFixed(2); }
     }
-  } catch (err) {
-    msg.className = 'coupon-msg coupon-err';
-    msg.textContent = 'Fehler: ' + err.message;
-    btn.disabled = false;
-    btn.textContent = 'Einlösen';
-  }
+  } catch (err) { msg.className = 'coupon-msg coupon-err'; msg.textContent = 'Fehler: ' + err.message; btn.disabled = false; btn.textContent = 'Einlösen'; }
 }
 
-// ── FOTO UPLOAD ─────────────────────────────────────────────
-function triggerUpload(articleId) {
-  var inp = document.createElement('input');
-  inp.type = 'file';
-  inp.accept = 'image/*';
-  inp.onchange = function() {
-    if (inp.files && inp.files[0]) {
-      uploadPhoto(articleId, inp.files[0]);
-    }
-  };
-  inp.click();
-}
-
-async function uploadPhoto(articleId, file) {
-  try {
-    // Datei als Base64 lesen
-    var base64 = await new Promise(function(resolve, reject) {
-      var reader = new FileReader();
-      reader.onload = function() { resolve(reader.result.split(',')[1]); };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-
-    var res = await fetch(API + '/api/vk/photo', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        article_id: articleId,
-        session_id: sessionData.id,
-        image_base64: base64,
-        content_type: file.type || 'image/jpeg'
-      })
-    });
-    var data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Upload fehlgeschlagen');
-
-    // Session neu laden
-    var r2 = await fetch(API + '/api/vk/session/' + sessionToken);
-    sessionData = await r2.json();
-    render();
-  } catch (err) {
-    alert('Foto-Upload Fehler: ' + err.message);
-  }
-}
-
-// ── PAYMENT ─────────────────────────────────────────────────
+// ── PAYMENT ──────────────────────────────────────────────────
 async function startPayment() {
   var btn = document.getElementById('btn-pay');
   if (btn) { btn.disabled = true; btn.textContent = 'Wird vorbereitet...'; }
-
   try {
     var body = { token: sessionToken };
     if (couponApplied) body.coupon_code = couponApplied.code;
-
-    var res = await fetch(API + '/api/vk/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
+    var res = await fetch(API + '/api/vk/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     var data = await res.json();
-
     if (!res.ok || !data.url) throw new Error(data.error || 'Checkout fehlgeschlagen');
-
     window.location.href = data.url;
-  } catch (err) {
-    alert('Fehler: ' + err.message);
-    if (btn) { btn.disabled = false; btn.textContent = '💳 Jetzt bezahlen'; }
-  }
+  } catch (err) { alert('Fehler: ' + err.message); if (btn) { btn.disabled = false; btn.textContent = '💳 Jetzt bezahlen'; } }
 }
 
-// ── FREE REDEEM ─────────────────────────────────────────────
 async function redeemFree() {
   var btn = document.getElementById('btn-pay');
   if (btn) { btn.disabled = true; btn.textContent = 'Wird eingelöst...'; }
-
   try {
-    var res = await fetch(API + '/api/vk/coupon/redeem', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code: couponApplied.code, token: sessionToken })
-    });
+    var res = await fetch(API + '/api/vk/coupon/redeem', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: couponApplied.code, token: sessionToken }) });
     var data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Einlösen fehlgeschlagen');
-
-    // Weiterleitung zur Ergebnisseite
     window.location.href = 'ergebnis.html?s=' + sessionToken;
-  } catch (err) {
-    alert('Fehler: ' + err.message);
-    if (btn) { btn.disabled = false; btn.textContent = '🎉 Kostenlos einlösen'; }
-  }
+  } catch (err) { alert('Fehler: ' + err.message); if (btn) { btn.disabled = false; btn.textContent = '🎉 Kostenlos einlösen'; } }
 }
 
-// ── ERROR ────────────────────────────────────────────────────
 function showError(msg) {
-  document.getElementById('app').innerHTML =
-    '<div class="card"><div class="error-box">⚠️ ' + msg + '</div></div>';
+  document.getElementById('app').innerHTML = '<div class="card"><div class="error-box">⚠️ ' + msg + '</div></div>';
 }
 </script>
 </body>
