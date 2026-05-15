@@ -157,6 +157,7 @@ const API = 'https://converto-server-production.up.railway.app';
 let sessionToken = null;
 let sessionData  = null;
 let couponApplied = null;
+let businessDiscount = null;
 // Zwischenspeicher für Notizen (wird beim Tippen gespeichert)
 const notesCache = {};
 
@@ -174,6 +175,12 @@ async function loadSession() {
     sessionData = await res.json();
     const params = new URLSearchParams(window.location.search);
     if (params.get('paid') === '1' && sessionData.status === 'open') { showAnalyzing(); pollStatus(); return; }
+    // Business-Rabatt laden
+    try {
+      const dr = await fetch(API + '/api/vk/session/' + sessionToken + '/discount');
+      const dd = await dr.json();
+      if (dd.has_discount) { businessDiscount = dd; }
+    } catch(e) {}
     render();
   } catch (err) { showError('Fehler beim Laden: ' + err.message); }
 }
@@ -214,6 +221,8 @@ function render() {
 function buildHTML(s, price) {
   const articles = s.articles || [];
   return [
+    // Business-Rabatt Banner
+    businessDiscount && businessDiscount.has_discount ? '<div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;font-size:.88rem;color:#15803d;font-weight:700;">🏢 Firmenrabatt aktiv: <strong>' + businessDiscount.percent + '% Rabatt</strong>' + (businessDiscount.company ? ' für ' + businessDiscount.company : '') + ' – wird automatisch angewendet</div>' : '',
     '<div class="card">',
     '  <div class="card-title">Dein Auftrag</div>',
     '  <div class="info-row"><span class="info-label">Status</span><span class="status-badge status-' + s.status + '">' + labelStatus(s.status) + '</span></div>',
@@ -243,7 +252,7 @@ function buildHTML(s, price) {
     '<div class="card">',
     '  <div class="card-title">Zusammenfassung</div>',
     buildPriceRows(articles, price),
-    '  <div id="coupon-section">' + buildCouponSection() + '</div>',
+    '  <div id="coupon-section">' + (businessDiscount && businessDiscount.has_discount ? '' : buildCouponSection()) + '</div>',
     '  <button class="btn-pay" id="btn-pay" onclick="startPayment()">💳 Jetzt bezahlen &nbsp;€' + price.toFixed(2) + '</button>',
     '</div>',
   ].join('\n');
@@ -321,6 +330,13 @@ function buildPriceRows(articles, total) {
     }
     if (a.extended) rows.push('<div class="price-row"><span>&nbsp;&nbsp;+ Verlängert (7 Tage)</span><span>€1.00</span></div>');
   });
+  if (businessDiscount && businessDiscount.has_discount) {
+    var bizDisc = Math.round(total * businessDiscount.percent / 100 * 100) / 100;
+    rows.push('<div class="price-row" style="color:#059669;"><span>🏢 Firmenrabatt (' + businessDiscount.percent + '%)</span><span>-€' + bizDisc.toFixed(2) + '</span></div>');
+    var finalTotal = Math.max(0.50, total - bizDisc);
+    rows.push('<div class="price-row"><span style="font-weight:700;">Gesamt</span><span class="price-total">€' + finalTotal.toFixed(2) + '</span></div>');
+    return rows.join('\n');
+  }
   if (couponApplied && couponApplied.discount > 0) {
     rows.push('<div class="price-row" style="color:#059669;"><span>🎟️ Gutschein (' + couponApplied.code + ')</span><span>-€' + couponApplied.discount.toFixed(2) + '</span></div>');
   }
