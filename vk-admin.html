@@ -430,12 +430,14 @@ async function loadBusinessDiscounts() {
     var list = await r.json() || [];
     var tbody = document.getElementById('businessList');
     if (!list.length) { tbody.innerHTML = '<tr><td colspan="8" class="msg">Keine Firmenrabatte</td></tr>'; return; }
-    tbody.innerHTML = list.map(function(b) {
+    tbody.innerHTML = '';
+    list.forEach(function(b) {
       var until = b.valid_until ? new Date(b.valid_until).toLocaleDateString('de-AT') : '∞';
       var isExpired = b.valid_until && new Date(b.valid_until) < new Date();
       var isFull = b.max_uses && b.used_count >= b.max_uses;
       var isActive = b.active && !isExpired && !isFull;
-      return '<tr>' +
+      var tr = document.createElement('tr');
+      tr.innerHTML =
         '<td><strong>' + b.company_name + '</strong>' + (b.notes ? '<br><small style="color:var(--mu)">' + b.notes + '</small>' : '') + '</td>' +
         '<td><span class="phone">' + b.phone + '</span></td>' +
         '<td style="font-weight:800;color:#059669;">' + b.discount_percent + '%</td>' +
@@ -444,10 +446,15 @@ async function loadBusinessDiscounts() {
         '<td>' + until + '</td>' +
         '<td><span class="badge ' + (isActive?'s-open':'s-expired') + '">' + (isActive?'Aktiv':'Inaktiv') + '</span></td>' +
         '<td style="white-space:nowrap;">' +
-          '<button class="btn btn-sm ' + (b.active?'':'btn-g') + '" onclick="toggleBusinessDiscount('' + b.id + '',' + b.active + ')">' + (b.active?'⏸':'▶') + '</button> ' +
-          '<button class="btn btn-sm btn-red" onclick="deleteBusinessDiscount('' + b.id + '','' + b.company_name + '')">🗑️</button>' +
-        '</td></tr>';
-    }).join('');
+          '<button class="btn btn-sm" style="margin-right:4px;">' + (b.active?'⏸':'▶') + '</button>' +
+          '<button class="btn btn-sm btn-red">🗑️</button>' +
+        '</td>';
+      // Add event listeners via JS (keine onclick-Strings nötig)
+      var btns = tr.querySelectorAll('button');
+      btns[0].addEventListener('click', function() { toggleBusinessDiscount(b.id, b.active); });
+      btns[1].addEventListener('click', function() { deleteBusinessDiscount(b.id, b.company_name); });
+      tbody.appendChild(tr);
+    });
   } catch(e) { console.error(e); }
 }
 
