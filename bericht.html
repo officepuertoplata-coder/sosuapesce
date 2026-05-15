@@ -311,10 +311,14 @@ function buildArticleHTML(a, idx) {
 function buildPriceRows(articles, total) {
   const rows = ['<div class="price-row"><span>Grundpreis</span><span>€1.00</span></div>'];
   articles.forEach(function(a) {
-    const photos = a.vk_photos || [];
-    rows.push('<div class="price-row"><span>' + escHtml(a.title || 'Artikel') + '</span><span>€1.00</span></div>');
-    const extra = Math.max(0, photos.length - 1);
-    if (extra > 0) rows.push('<div class="price-row"><span>&nbsp;&nbsp;+ ' + extra + ' weitere Fotos</span><span>€' + (extra * 0.25).toFixed(2) + '</span></div>');
+    var photoCount = (a.vk_photos || []).length;
+    if (photoCount > 0) {
+      rows.push('<div class="price-row"><span>' + escHtml(a.title || 'Artikel') + ' – 1. Foto</span><span>€1.00</span></div>');
+      var extra = photoCount - 1;
+      if (extra > 0) rows.push('<div class="price-row"><span>&nbsp;&nbsp;+ ' + extra + ' weitere Foto' + (extra>1?'s':'') + '</span><span>€' + (extra * 0.25).toFixed(2) + '</span></div>');
+    } else {
+      rows.push('<div class="price-row" style="color:#9ca3af;"><span>' + escHtml(a.title || 'Artikel') + ' – noch kein Foto</span><span>€0.00</span></div>');
+    }
     if (a.extended) rows.push('<div class="price-row"><span>&nbsp;&nbsp;+ Verlängert (7 Tage)</span><span>€1.00</span></div>');
   });
   if (couponApplied && couponApplied.discount > 0) {
@@ -336,11 +340,13 @@ function buildCouponSection() {
 }
 
 function calcPrice(articles) {
-  var total = 1.00;
+  var total = 1.00; // Grundpreis
   articles.forEach(function(a) {
-    total += 1.00;
-    var extra = Math.max(0, (a.vk_photos || []).length - 1);
-    total += extra * 0.25;
+    var photos = (a.vk_photos || []).length;
+    if (photos > 0) {
+      total += 1.00;                     // 1. Foto = 1€
+      total += Math.max(0, photos-1) * 0.25; // weitere Fotos 0.25€
+    }
     if (a.extended) total += 1.00;
   });
   return Math.round(total * 100) / 100;
