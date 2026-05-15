@@ -218,6 +218,14 @@ function render() {
   attachEvents();
 }
 
+function getBusinessBanner() {
+  if (!businessDiscount || !businessDiscount.has_discount) return '';
+  return '<div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:12px 16px;margin-bottom:12px;font-size:.88rem;color:#15803d;font-weight:700;">' +
+    '🏢 Firmenrabatt aktiv: ' + businessDiscount.percent + '% Rabatt' +
+    (businessDiscount.company ? ' für ' + businessDiscount.company : '') +
+    ' – wird automatisch angewendet</div>';
+}
+
 function buildHTML(s, price) {
   const articles = s.articles || [];
   return [
@@ -585,4 +593,4 @@ function showError(msg) {
 }
 </script>
 </body>
-</html>
+</html>    getBusinessBanner(),
