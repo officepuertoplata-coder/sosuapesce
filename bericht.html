@@ -341,14 +341,14 @@ function buildPriceRows(articles, total) {
   if (businessDiscount && businessDiscount.has_discount) {
     var bizDisc = Math.round(total * businessDiscount.percent / 100 * 100) / 100;
     rows.push('<div class="price-row" style="color:#059669;"><span>🏢 Firmenrabatt (' + businessDiscount.percent + '%)</span><span>-€' + bizDisc.toFixed(2) + '</span></div>');
-    var finalTotal = Math.max(0.50, total - bizDisc);
-    rows.push('<div class="price-row"><span style="font-weight:700;">Gesamt</span><span class="price-total">€' + finalTotal.toFixed(2) + '</span></div>');
+    var bizTotal = Math.max(0.50, total - bizDisc);
+    rows.push('<div class="price-row"><span style="font-weight:700;">Gesamt</span><span class="price-total">€' + bizTotal.toFixed(2) + '</span></div>');
     return rows.join('\n');
   }
   if (couponApplied && couponApplied.discount > 0) {
     rows.push('<div class="price-row" style="color:#059669;"><span>🎟️ Gutschein (' + couponApplied.code + ')</span><span>-€' + couponApplied.discount.toFixed(2) + '</span></div>');
   }
-  const finalTotal = couponApplied ? Math.max(0, total - (couponApplied.discount || 0)) : total;
+  var finalTotal = couponApplied ? Math.max(0, total - (couponApplied.discount || 0)) : total;
   rows.push('<div class="price-row"><span style="font-weight:700;">Gesamt</span><span class="price-total">€' + finalTotal.toFixed(2) + '</span></div>');
   return rows.join('\n');
 }
