@@ -18,28 +18,26 @@ header{background:var(--wa);color:#fff;padding:16px 20px;}
 .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--wa);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px;}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* DELETE COUNTDOWN */
 .delete-banner{background:#fef2f2;border:1.5px solid #fecaca;border-radius:var(--r);padding:12px 16px;margin-bottom:16px;font-size:.82rem;color:#991b1b;display:flex;align-items:center;gap:8px;}
 
-/* ARTICLE RESULT */
 .article-result{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:20px;overflow:hidden;}
 .article-header{background:var(--wa);color:#fff;padding:14px 18px;display:flex;align-items:center;gap:10px;}
 .article-num{background:rgba(255,255,255,.2);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;flex-shrink:0;}
 .article-title{font-size:.95rem;font-weight:800;flex:1;}
 
-/* FOTOS */
 .photos-strip{display:flex;gap:8px;padding:14px 16px;overflow-x:auto;}
 .photos-strip img{height:90px;width:90px;object-fit:cover;border-radius:8px;flex-shrink:0;}
 
-/* SECTIONS */
 .section{padding:14px 16px;border-top:1px solid var(--border);}
 .section-title{font-size:.68rem;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;}
-.copy-field{background:#f9fafb;border:1.5px solid var(--border);border-radius:8px;padding:12px;font-size:.88rem;line-height:1.6;position:relative;cursor:pointer;transition:all .2s;}
-.copy-field:hover{border-color:var(--wa);background:#f0fdf4;}
-.copy-btn{position:absolute;top:8px;right:8px;background:var(--wa);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;}
-.copy-btn:active{background:#128C7E;}
 
-/* PREIS */
+/* ── COPY FIELD – Bug 13 Fix: kein JSON.stringify in onclick ── */
+.copy-field{background:#f9fafb;border:1.5px solid var(--border);border-radius:8px;padding:12px;font-size:.88rem;line-height:1.6;position:relative;margin-bottom:8px;cursor:pointer;transition:all .2s;}
+.copy-field:hover{border-color:var(--wa);background:#f0fdf4;}
+.copy-field .cf-label{font-size:.7rem;color:var(--mu);font-weight:700;margin-bottom:4px;}
+.copy-field .cf-text{white-space:pre-wrap;word-break:break-word;}
+.copy-btn{position:absolute;top:8px;right:8px;background:var(--wa);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;pointer-events:none;}
+
 .price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:4px;}
 .price-card{background:#f9fafb;border:1.5px solid var(--border);border-radius:8px;padding:12px;text-align:center;cursor:pointer;transition:all .2s;}
 .price-card:hover{border-color:var(--wa);background:#f0fdf4;}
@@ -47,33 +45,31 @@ header{background:var(--wa);color:#fff;padding:16px 20px;}
 .price-card .price-lbl{font-size:.68rem;color:var(--mu);font-weight:700;}
 .price-card .price-range{font-size:.72rem;color:var(--mu);}
 
-/* BULLETS */
 .bullet-list{display:flex;flex-direction:column;gap:6px;}
 .bullet-item{display:flex;align-items:flex-start;gap:8px;background:#f9fafb;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;transition:all .2s;}
 .bullet-item:hover{border-color:var(--wa);background:#f0fdf4;}
 .bullet-dot{color:var(--wa);font-weight:900;flex-shrink:0;}
 .bullet-text{font-size:.85rem;flex:1;}
 
-/* KEYWORDS */
 .keywords{display:flex;flex-wrap:wrap;gap:6px;}
 .keyword{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;padding:4px 10px;border-radius:20px;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;}
 .keyword:hover{background:#dbeafe;}
 .keyword.copied{background:#dcfce7;border-color:#86efac;color:#15803d;}
 
-/* TIPS */
 .tip-list{display:flex;flex-direction:column;gap:6px;}
 .tip{background:#fefce8;border:1.5px solid #fef08a;border-radius:8px;padding:10px 12px;font-size:.85rem;display:flex;gap:8px;}
 .tip-icon{flex-shrink:0;}
 
-/* PDF BTN */
 .pdf-section{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:20px;text-align:center;margin-top:20px;}
 .pdf-btn{background:var(--gold);color:#fff;border:none;border-radius:var(--r);padding:14px 28px;font-size:1rem;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;}
 .pdf-btn:hover{background:#e09200;}
 .pdf-note{font-size:.78rem;color:var(--mu);margin-top:8px;}
 
-/* TOAST */
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:20px;font-size:.85rem;font-weight:700;transition:all .3s;opacity:0;z-index:999;}
 #toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+.copy-all-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:.76rem;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:8px;}
+.copy-all-btn:hover{border-color:var(--wa);color:var(--wa);}
 
 @media(max-width:480px){.price-grid{grid-template-columns:1fr 1fr;}}
 </style>
@@ -111,7 +107,6 @@ async function loadResults() {
   try {
     const r = await fetch(API + '/api/vk/results/' + TOKEN);
     const d = await r.json();
-
     if (!r.ok) {
       if (d.status === 'analyzing' || d.status === 'paid') {
         document.getElementById('content').innerHTML = `
@@ -126,7 +121,6 @@ async function loadResults() {
       document.getElementById('content').innerHTML = '<div class="loading">❌ ' + (d.error || 'Fehler beim Laden') + '</div>';
       return;
     }
-
     sessionData = d;
     render(d);
   } catch(e) {
@@ -141,176 +135,193 @@ function render(data) {
 
   document.getElementById('headerSub').textContent = articles.length + ' Artikel analysiert';
   if (deleteAt) {
-    document.getElementById('deleteInfo').textContent = `🗑️ Löschen in ${daysLeft} Tagen\n(${deleteAt.toLocaleDateString('de-AT')})`;
+    document.getElementById('deleteInfo').textContent = '🗑️ Löschen in ' + daysLeft + ' Tagen (' + deleteAt.toLocaleDateString('de-AT') + ')';
   }
 
   let html = '';
-
   if (daysLeft !== null && daysLeft <= 2) {
-    html += `<div class="delete-banner">⚠️ Deine Daten werden in <strong>${daysLeft} Tag${daysLeft!==1?'en':''}</strong> automatisch gelöscht. Kopiere alles was du brauchst!</div>`;
+    html += '<div class="delete-banner">⚠️ Deine Daten werden in <strong>' + daysLeft + ' Tag' + (daysLeft!==1?'en':'') + '</strong> automatisch gelöscht. Kopiere alles was du brauchst!</div>';
   }
 
-  articles.forEach((a, i) => {
+  articles.forEach(function(a, i) {
     const photos = a.vk_photos || [];
     const analysis = a.analysis || {};
 
-    html += `<div class="article-result">
-      <div class="article-header">
-        <div class="article-num">${i+1}</div>
-        <div class="article-title">${a.title || 'Artikel '+(i+1)}</div>
-      </div>`;
+    html += '<div class="article-result">';
+    html += '<div class="article-header">';
+    html += '<div class="article-num">' + (i+1) + '</div>';
+    html += '<div class="article-title">' + escHtml(a.title || 'Artikel '+(i+1)) + '</div>';
+    html += '</div>';
 
-    // Fotos
     if (photos.length) {
-      html += `<div class="photos-strip">`;
-      photos.forEach(p => { html += `<img src="${p.public_url}" alt="Foto">`; });
-      html += `</div>`;
+      html += '<div class="photos-strip">';
+      photos.forEach(function(p) { html += '<img src="' + p.public_url + '" alt="Foto">'; });
+      html += '</div>';
     }
 
     if (!analysis || Object.keys(analysis).length === 0 || a.status !== 'analyzed') {
-      html += `<div class="section"><div class="loading" style="padding:20px;">⏳ Analyse noch ausstehend...</div></div>`;
+      html += '<div class="section"><div class="loading" style="padding:20px;">⏳ Analyse noch ausstehend...</div></div>';
     } else {
 
       // TITEL
-      html += `<div class="section">
-        <div class="section-title">📝 Titel-Varianten</div>`;
+      html += '<div class="section"><div class="section-title">📝 Titel-Varianten</div>';
       if (analysis.title_short) html += copyField(analysis.title_short, 'Kurztitel (max. 60 Zeichen)');
       if (analysis.title_long)  html += copyField(analysis.title_long, 'Ausführlicher Titel');
       if (analysis.title_quick) html += copyField(analysis.title_quick, 'Quick-Sale Titel');
-      html += `</div>`;
+      html += '</div>';
 
       // PREISE
       if (analysis.price_recommended || analysis.price_min || analysis.price_max) {
-        html += `<div class="section">
-          <div class="section-title">💰 Preisvorschlag</div>
-          <div class="price-grid">
-            <div class="price-card" onclick="copyText('${analysis.price_min}€')">
-              <div class="price-val">${analysis.price_min}€</div>
-              <div class="price-lbl">Mindestpreis</div>
-              <div class="price-range">Quick-Sale</div>
-            </div>
-            <div class="price-card" onclick="copyText('${analysis.price_recommended}€')">
-              <div class="price-val" style="font-size:1.4rem;">${analysis.price_recommended}€</div>
-              <div class="price-lbl">Empfohlen</div>
-              <div class="price-range">Bestes Verhältnis</div>
-            </div>
-            <div class="price-card" onclick="copyText('${analysis.price_max}€')">
-              <div class="price-val">${analysis.price_max}€</div>
-              <div class="price-lbl">Maximalpreis</div>
-              <div class="price-range">Geduld nötig</div>
-            </div>
-          </div>
-          ${analysis.price_reasoning ? `<p style="font-size:.8rem;color:var(--mu);margin-top:8px;padding:0 4px;">💡 ${analysis.price_reasoning}</p>` : ''}
-        </div>`;
+        html += '<div class="section"><div class="section-title">💰 Preisvorschlag</div>';
+        var pid1='cp_'+Math.random().toString(36).substr(2,8), pid2='cp_'+Math.random().toString(36).substr(2,8), pid3='cp_'+Math.random().toString(36).substr(2,8);
+        _copyStore[pid1]=String(analysis.price_min)+'€'; _copyStore[pid2]=String(analysis.price_recommended)+'€'; _copyStore[pid3]=String(analysis.price_max)+'€';
+        html += '<div class="price-grid">';
+        html += '<div class="price-card" onclick="copyById(\'' + pid1 + '\')"><div class="price-val">' + escHtml(String(analysis.price_min)) + '€</div><div class="price-lbl">Mindestpreis</div><div class="price-range">Quick-Sale</div></div>';
+        html += '<div class="price-card" onclick="copyById(\'' + pid2 + '\')"><div class="price-val" style="font-size:1.4rem;">' + escHtml(String(analysis.price_recommended)) + '€</div><div class="price-lbl">Empfohlen</div><div class="price-range">Bestes Verhältnis</div></div>';
+        html += '<div class="price-card" onclick="copyById(\'' + pid3 + '\')"><div class="price-val">' + escHtml(String(analysis.price_max)) + '€</div><div class="price-lbl">Maximalpreis</div><div class="price-range">Geduld nötig</div></div>';
+        html += '</div>';
+        if (analysis.price_reasoning) html += '<p style="font-size:.8rem;color:var(--mu);margin-top:8px;padding:0 4px;">💡 ' + escHtml(analysis.price_reasoning) + '</p>';
+        html += '</div>';
       }
 
       // KURZBESCHREIBUNG
       if (analysis.short_desc) {
-        html += `<div class="section">
-          <div class="section-title">📄 Kurzbeschreibung</div>
-          ${copyField(analysis.short_desc)}
-        </div>`;
+        html += '<div class="section"><div class="section-title">📄 Kurzbeschreibung</div>' + copyField(analysis.short_desc) + '</div>';
       }
 
       // LANGBESCHREIBUNG
       if (analysis.long_desc) {
-        html += `<div class="section">
-          <div class="section-title">📋 Ausführliche Beschreibung</div>
-          ${copyField(analysis.long_desc)}
-        </div>`;
+        html += '<div class="section"><div class="section-title">📋 Ausführliche Beschreibung</div>' + copyField(analysis.long_desc) + '</div>';
       }
 
       // BULLET POINTS
       if (analysis.bullet_points && analysis.bullet_points.length) {
-        const bulletsText = analysis.bullet_points.map(b => '• ' + b).join('\n');
-        html += `<div class="section">
-          <div class="section-title">✨ Highlights (Bullet Points) <button onclick="copyText(${JSON.stringify(bulletsText)})" style="background:var(--wa);color:#fff;border:none;border-radius:6px;padding:2px 8px;font-size:.7rem;cursor:pointer;margin-left:6px;">Alle kopieren</button></div>
-          <div class="bullet-list">`;
-        analysis.bullet_points.forEach(b => {
-          html += `<div class="bullet-item" onclick="copyText(${JSON.stringify(b)})">
-            <span class="bullet-dot">•</span>
-            <span class="bullet-text">${b}</span>
-          </div>`;
+        const bulletsText = analysis.bullet_points.map(function(b){ return '• ' + b; }).join('\n');
+        var allbid = 'cp_' + Math.random().toString(36).substr(2,8);
+        _copyStore[allbid] = bulletsText;
+        html += '<div class="section">';
+        html += '<div class="section-title">✨ Highlights (Bullet Points) <button class="copy-all-btn" type="button" onclick="copyById(\'' + allbid + '\')">Alle kopieren</button></div>';
+        html += '<div class="bullet-list">';
+        analysis.bullet_points.forEach(function(b) {
+          var bid = 'cp_' + Math.random().toString(36).substr(2,8);
+          _copyStore[bid] = b;
+          html += '<div class="bullet-item" onclick="copyById(\'' + bid + '\')""><span class="bullet-dot">•</span><span class="bullet-text">' + escHtml(b) + '</span></div>';
         });
-        html += `</div></div>`;
+        html += '</div></div>';
       }
 
       // KEYWORDS
       if (analysis.keywords && analysis.keywords.length) {
-        html += `<div class="section">
-          <div class="section-title">🔍 Keywords / Tags</div>
-          <div class="keywords">`;
-        analysis.keywords.forEach(k => {
-          html += `<span class="keyword" onclick="copyKeyword(this,'${k}')">${k}</span>`;
+        const allKw = analysis.keywords.join(', ');
+        var allkid = 'cp_' + Math.random().toString(36).substr(2,8);
+        _copyStore[allkid] = allKw;
+        html += '<div class="section"><div class="section-title">🔍 Keywords / Tags</div><div class="keywords">';
+        analysis.keywords.forEach(function(k) {
+          var kid = 'cp_' + Math.random().toString(36).substr(2,8);
+          _copyStore[kid] = k;
+          html += '<span class="keyword" onclick="copyKeyword(this, \'' + kid + '\')">' + escHtml(k) + '</span>';
         });
-        html += `</div>
-          <button onclick="copyText(${JSON.stringify(analysis.keywords.join(', '))})" style="margin-top:8px;background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:.76rem;cursor:pointer;font-family:'Nunito',sans-serif;">Alle Keywords kopieren</button>
-        </div>`;
+        html += '</div>';
+        html += '<button class="copy-all-btn" type="button" onclick="copyById(\'' + allkid + '\')">Alle Keywords kopieren</button>';
+        html += '</div>';
       }
 
       // ZUSTAND
       if (analysis.condition) {
-        html += `<div class="section">
-          <div class="section-title">📊 Zustand</div>
-          ${copyField(analysis.condition)}
-        </div>`;
+        html += '<div class="section"><div class="section-title">📊 Zustand</div>' + copyField(analysis.condition) + '</div>';
       }
 
       // TIPPS
       if (analysis.tips && analysis.tips.length) {
-        html += `<div class="section">
-          <div class="section-title">💡 Verkaufstipps</div>
-          <div class="tip-list">`;
-        analysis.tips.forEach(t => {
-          html += `<div class="tip"><span class="tip-icon">💡</span><span>${t}</span></div>`;
+        html += '<div class="section"><div class="section-title">💡 Verkaufstipps</div><div class="tip-list">';
+        analysis.tips.forEach(function(t) {
+          html += '<div class="tip"><span class="tip-icon">💡</span><span>' + escHtml(t) + '</span></div>';
         });
-        html += `</div></div>`;
+        html += '</div></div>';
       }
-
     }
 
-    html += `</div>`; // article-result
+    html += '</div>'; // article-result
   });
 
-  // PDF Download
-  html += `<div class="pdf-section">
-    <button class="pdf-btn" onclick="downloadPDF()">📄 Als PDF herunterladen</button>
-    <div class="pdf-note">Alle Ergebnisse in einem übersichtlichen Dokument</div>
-    ${daysLeft ? `<div class="pdf-note" style="margin-top:4px;">⚠️ Daten werden in ${daysLeft} Tagen gelöscht</div>` : ''}
-  </div>`;
+  // PDF
+  html += '<div class="pdf-section">';
+  html += '<button class="pdf-btn" onclick="downloadPDF()">📄 Als PDF herunterladen</button>';
+  html += '<div class="pdf-note">Alle Ergebnisse in einem übersichtlichen Dokument</div>';
+  if (daysLeft) html += '<div class="pdf-note" style="margin-top:4px;">⚠️ Daten werden in ' + daysLeft + ' Tagen gelöscht</div>';
+  html += '</div>';
 
   document.getElementById('content').innerHTML = html;
 }
 
+// ── Copy Store: Text in JS-Objekt, nur ID im HTML ───────────
+var _copyStore = {};
+
 function copyField(text, label) {
-  const id = 'cf' + Math.random().toString(36).substring(2,8);
-  return `<div class="copy-field" onclick="copyText(${JSON.stringify(text)},this)" style="margin-bottom:8px;">
-    ${label ? `<div style="font-size:.7rem;color:var(--mu);font-weight:700;margin-bottom:4px;">${label}</div>` : ''}
-    <div style="white-space:pre-wrap;">${text}</div>
-    <button class="copy-btn">📋 Kopieren</button>
-  </div>`;
+  var id = 'cp_' + Math.random().toString(36).substr(2, 8);
+  _copyStore[id] = text;
+  var safeHtml = escHtml(text);
+  var labelHtml = label ? '<div class="cf-label">' + escHtml(label) + '</div>' : '';
+  return '<div class="copy-field" onclick="copyById(\'' + id + '\')" style="cursor:pointer;">' +
+    labelHtml +
+    '<div class="cf-text">' + safeHtml + '</div>' +
+    '<button class="copy-btn" type="button">📋 Kopieren</button>' +
+    '</div>';
+}
+
+function copyById(id) {
+  var text = _copyStore[id];
+  if (text === undefined) return;
+  copyText(text);
 }
 
 function copyText(text, el) {
-  navigator.clipboard.writeText(text).then(() => {
+  navigator.clipboard.writeText(text).then(function() {
     showToast('✅ Kopiert!');
     if (el) {
+      var orig = el.style.borderColor;
       el.style.borderColor = 'var(--wa)';
       el.style.background = '#f0fdf4';
-      setTimeout(() => { el.style.borderColor=''; el.style.background=''; }, 1500);
+      setTimeout(function() { el.style.borderColor = orig; el.style.background = ''; }, 1500);
     }
-  }).catch(() => {
-    const ta = document.createElement('textarea');
-    ta.value = text; document.body.appendChild(ta); ta.select();
-    document.execCommand('copy'); document.body.removeChild(ta);
+  }).catch(function() {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
     showToast('✅ Kopiert!');
   });
 }
 
-function copyKeyword(el, kw) {
+function copyKeyword(el, id) {
+  var kw = _copyStore[id] || '';
   copyText(kw);
   el.classList.add('copied');
-  setTimeout(() => el.classList.remove('copied'), 1500);
+  setTimeout(function() { el.classList.remove('copied'); }, 1500);
+}
+
+// HTML escaping – verhindert XSS und Rendering-Fehler
+function escHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/\n/g, '<br>');
+}
+
+// Attribut-Escaping für data-copy
+function escAttr(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 async function downloadPDF() {
@@ -319,9 +330,10 @@ async function downloadPDF() {
 }
 
 function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2500);
 }
 </script>
 </body>
