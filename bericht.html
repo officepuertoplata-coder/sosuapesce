@@ -221,7 +221,9 @@ function render() {
 function getDisplayPrice(price) {
   if (businessDiscount && businessDiscount.has_discount) {
     var disc = Math.round(price * businessDiscount.percent / 100 * 100) / 100;
-    return Math.max(0.50, price - disc);
+    var result = price - disc;
+    if (businessDiscount.percent >= 100) return 0; // 100% = gratis
+    return Math.max(0.50, result);
   }
   return price;
 }
@@ -349,7 +351,7 @@ function buildPriceRows(articles, total) {
   if (businessDiscount && businessDiscount.has_discount) {
     var bizDisc = Math.round(total * businessDiscount.percent / 100 * 100) / 100;
     rows.push('<div class="price-row" style="color:#059669;"><span>🏢 Firmenrabatt (' + businessDiscount.percent + '%)</span><span>-€' + bizDisc.toFixed(2) + '</span></div>');
-    var bizTotal = Math.max(0.50, total - bizDisc);
+    var bizTotal = businessDiscount.percent >= 100 ? 0 : Math.max(0.50, total - bizDisc);
     rows.push('<div class="price-row"><span style="font-weight:700;">Gesamt</span><span class="price-total">€' + bizTotal.toFixed(2) + '</span></div>');
     return rows.join('\n');
   }
