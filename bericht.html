@@ -24,10 +24,30 @@
   .status-done      { background: #d1fae5; color: #065f46; }
   .status-error     { background: #fee2e2; color: #991b1b; }
 
+  /* ── ARTIKEL CARD ── */
   .article-card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; margin-bottom: 12px; }
-  .article-title { font-weight: 600; color: #1f2937; margin-bottom: 8px; }
-  .photo-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
 
+  /* Editierbarer Titel */
+  .article-title-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .article-title-input {
+    font-weight: 600; color: #1f2937; font-size: .95rem;
+    border: 1.5px solid transparent; border-radius: 6px;
+    padding: 4px 8px; flex: 1; background: transparent;
+    font-family: inherit; transition: border-color .2s;
+  }
+  .article-title-input:hover { border-color: #d1d5db; background: #f9fafb; }
+  .article-title-input:focus { outline: none; border-color: #2d7a4f; background: #f0fdf4; }
+
+  /* Erklärungsbox */
+  .hint-box {
+    background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 8px;
+    padding: 12px 14px; margin-bottom: 14px; font-size: .82rem; color: #15803d;
+    line-height: 1.5;
+  }
+  .hint-box strong { display: block; margin-bottom: 4px; font-size: .85rem; }
+
+  /* Fotos */
+  .photo-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
   .photo-wrap { position: relative; width: 72px; height: 72px; }
   .photo-thumb { width: 72px; height: 72px; border-radius: 8px; object-fit: cover; border: 1px solid #e5e7eb; display: block; }
   .photo-delete {
@@ -40,7 +60,6 @@
     transition: background .15s;
   }
   .photo-delete:hover { background: #dc2626; }
-
   .photo-add {
     width: 72px; height: 72px; border-radius: 8px;
     border: 2px dashed #d1d5db;
@@ -51,11 +70,45 @@
   .photo-add:hover { border-color: #2d7a4f; color: #2d7a4f; }
   .photo-add span { font-size: 1.5rem; line-height: 1; }
 
+  /* Upload Fortschritt */
   .upload-progress { margin-top: 8px; }
   .progress-bar-wrap { background: #f3f4f6; border-radius: 6px; height: 6px; overflow: hidden; margin-bottom: 4px; }
   .progress-bar { height: 6px; background: #2d7a4f; border-radius: 6px; transition: width .2s; }
   .progress-label { font-size: .75rem; color: #6b7280; }
 
+  /* Infofelder */
+  .info-fields { margin-top: 10px; }
+  .info-field-label { font-size: .75rem; font-weight: 600; color: #9ca3af; margin-bottom: 4px; }
+  .info-field-textarea {
+    width: 100%; border: 1.5px solid #e5e7eb; border-radius: 8px;
+    padding: 10px 12px; font-size: .85rem; font-family: inherit;
+    resize: vertical; min-height: 70px; color: #1f2937;
+    transition: border-color .2s;
+  }
+  .info-field-textarea:focus { outline: none; border-color: #2d7a4f; }
+  .info-field-textarea::placeholder { color: #d1d5db; }
+
+  .article-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+  .article-meta { font-size: .8rem; color: #9ca3af; }
+  .btn-delete-article {
+    background: none; border: 1px solid #fecaca; color: #ef4444;
+    border-radius: 6px; padding: 4px 10px; font-size: .75rem;
+    cursor: pointer; font-family: inherit; transition: all .15s;
+  }
+  .btn-delete-article:hover { background: #fee2e2; }
+
+  /* Neue Position Button */
+  .btn-add-position {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; padding: 14px; border: 2px dashed #86efac;
+    border-radius: 10px; background: #f0fdf4; color: #15803d;
+    font-size: .92rem; font-weight: 700; cursor: pointer;
+    font-family: inherit; transition: all .2s; margin-bottom: 4px;
+  }
+  .btn-add-position:hover { background: #dcfce7; border-color: #2d7a4f; }
+  .btn-add-position:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* Preis & Zahlung */
   .price-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f3f4f6; font-size: .9rem; }
   .price-row:last-child { border-bottom: none; }
   .price-total { font-size: 1.2rem; font-weight: 700; color: #2d7a4f; }
@@ -104,6 +157,8 @@ const API = 'https://converto-server-production.up.railway.app';
 let sessionToken = null;
 let sessionData  = null;
 let couponApplied = null;
+// Zwischenspeicher für Notizen (wird beim Tippen gespeichert)
+const notesCache = {};
 
 (function init() {
   const params = new URLSearchParams(window.location.search);
@@ -163,11 +218,28 @@ function buildHTML(s, price) {
     '  <div class="card-title">Dein Auftrag</div>',
     '  <div class="info-row"><span class="info-label">Status</span><span class="status-badge status-' + s.status + '">' + labelStatus(s.status) + '</span></div>',
     '  <div class="info-row"><span class="info-label">Telefon</span><span>+' + (s.phone || '') + '</span></div>',
-    '  <div class="info-row"><span class="info-label">Artikel</span><span>' + articles.length + ' Artikel</span></div>',
+    '  <div class="info-row"><span class="info-label">Positionen</span><span>' + articles.length + ' Artikel</span></div>',
     '</div>',
-    articles.length > 0
-      ? '<div class="card"><div class="card-title">Artikel & Fotos</div>' + articles.map(buildArticleHTML).join('') + '</div>'
-      : '',
+
+    '<div class="card">',
+    '  <div class="card-title">Artikel & Fotos</div>',
+
+    // Erklärungstext über dem ersten Artikel
+    '  <div class="hint-box">',
+    '    <strong>📸 So bekommst du das beste Ergebnis:</strong>',
+    '    Fotografiere jeden Artikel aus verschiedenen Perspektiven: Vorderseite, Rückseite, Seiten, Details.',
+    '    Zeige Typenschilder, Beschriftungen, Seriennummern und Altersangaben. Bei Fahrzeugen den Tachostand.',
+    '    Je mehr Infos die KI sieht, desto besser der Verkaufstext.',
+    '  </div>',
+
+    articles.map(buildArticleHTML).join(''),
+
+    // Neue Position Button
+    '  <button class="btn-add-position" id="btn-add-pos" onclick="addPosition()">',
+    '    <span style="font-size:1.3rem;">+</span> Neue Position hinzufügen',
+    '  </button>',
+    '</div>',
+
     '<div class="card">',
     '  <div class="card-title">Zusammenfassung</div>',
     buildPriceRows(articles, price),
@@ -194,15 +266,44 @@ function buildArticleHTML(a, idx) {
     ? '<div class="photo-add" onclick="triggerUpload(\'' + a.id + '\', ' + photos.length + ')"><span>+</span>' + (photos.length === 0 ? 'Fotos' : 'Mehr') + '</div>'
     : '';
 
+  // Gespeicherte Notizen aus Cache oder aus DB
+  const notes = notesCache[a.id] !== undefined ? notesCache[a.id] : (a.notes || '');
+
   return [
     '<div class="article-card" id="article-' + a.id + '">',
-    '  <div class="article-title">📦 ' + (a.title || 'Artikel ' + (idx + 1)) + '</div>',
+
+    // Editierbarer Titel
+    '  <div class="article-title-row">',
+    '    <span style="font-size:.85rem;color:#9ca3af;font-weight:700;">#' + (idx + 1) + '</span>',
+    '    <input class="article-title-input" type="text" value="' + escAttr(a.title || 'Artikel ' + (idx + 1)) + '"',
+    '      onblur="saveTitle(\'' + a.id + '\', this.value)"',
+    '      onkeydown="if(event.key===\'Enter\')this.blur()"',
+    '      placeholder="Artikelbezeichnung..." />',
+    '  </div>',
+
+    // Fotos
     '  <div class="photo-row" id="photos-' + a.id + '">',
     photoHTML,
     addBtn,
     '  </div>',
     '  <div id="progress-' + a.id + '"></div>',
-    '  <div style="font-size:.8rem;color:#9ca3af;">' + photos.length + ' von 4 Fotos · ' + (a.extended ? '7 Tage' : '3 Tage') + ' Aufbewahrung</div>',
+
+    // Infofelder
+    '  <div class="info-fields">',
+    '    <div class="info-field-label">ℹ️ Zusatzinfos für die KI (optional)</div>',
+    '    <textarea class="info-field-textarea"',
+    '      id="notes-' + a.id + '"',
+    '      placeholder="z.B. Größe M, Zustand sehr gut, Baujahr 2019, 45.000 km, Originalverpackung vorhanden..."',
+    '      onblur="saveNotes(\'' + a.id + '\', this.value)"',
+    '      oninput="notesCache[\'' + a.id + '\']=this.value">' + escHtml(notes) + '</textarea>',
+    '  </div>',
+
+    // Footer
+    '  <div class="article-footer">',
+    '    <div class="article-meta">' + photos.length + ' von 4 Fotos · ' + (a.extended ? '7 Tage' : '3 Tage') + ' Aufbewahrung</div>',
+    '    <button class="btn-delete-article" onclick="deleteArticle(\'' + a.id + '\')">🗑 Löschen</button>',
+    '  </div>',
+
     '</div>',
   ].join('\n');
 }
@@ -211,7 +312,7 @@ function buildPriceRows(articles, total) {
   const rows = ['<div class="price-row"><span>Grundpreis</span><span>€1.00</span></div>'];
   articles.forEach(function(a) {
     const photos = a.vk_photos || [];
-    rows.push('<div class="price-row"><span>' + (a.title || 'Artikel') + '</span><span>€1.00</span></div>');
+    rows.push('<div class="price-row"><span>' + escHtml(a.title || 'Artikel') + '</span><span>€1.00</span></div>');
     const extra = Math.max(0, photos.length - 1);
     if (extra > 0) rows.push('<div class="price-row"><span>&nbsp;&nbsp;+ ' + extra + ' weitere Fotos</span><span>€' + (extra * 0.25).toFixed(2) + '</span></div>');
     if (a.extended) rows.push('<div class="price-row"><span>&nbsp;&nbsp;+ Verlängert (7 Tage)</span><span>€1.00</span></div>');
@@ -257,21 +358,84 @@ function attachEvents() {
   }
 }
 
-// ── MULTI FOTO UPLOAD ────────────────────────────────────────
+// ── NEUE POSITION ─────────────────────────────────────────────
+async function addPosition() {
+  var btn = document.getElementById('btn-add-pos');
+  if (btn) { btn.disabled = true; btn.textContent = 'Wird angelegt...'; }
+  try {
+    var res = await fetch(API + '/api/vk/article', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: sessionToken, title: 'Neuer Artikel' })
+    });
+    var data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Fehler');
+    // Session neu laden
+    var r2 = await fetch(API + '/api/vk/session/' + sessionToken);
+    sessionData = await r2.json();
+    render();
+    // Zum neuen Artikel scrollen
+    setTimeout(function() {
+      var el = document.getElementById('article-' + data.article.id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+  } catch (err) {
+    alert('Fehler: ' + err.message);
+    if (btn) { btn.disabled = false; btn.innerHTML = '<span style="font-size:1.3rem;">+</span> Neue Position hinzufügen'; }
+  }
+}
+
+// ── ARTIKEL TITEL SPEICHERN ───────────────────────────────────
+async function saveTitle(articleId, newTitle) {
+  var title = newTitle.trim();
+  if (!title) return;
+  try {
+    await fetch(API + '/api/vk/article/' + articleId + '/notes', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: title })
+    });
+    // Lokalen State updaten ohne neu zu laden
+    if (sessionData && sessionData.articles) {
+      sessionData.articles.forEach(function(a) { if (a.id === articleId) a.title = title; });
+    }
+  } catch(e) { console.error('Titel speichern:', e.message); }
+}
+
+// ── NOTIZEN SPEICHERN ─────────────────────────────────────────
+async function saveNotes(articleId, notes) {
+  notesCache[articleId] = notes;
+  try {
+    await fetch(API + '/api/vk/article/' + articleId + '/notes', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notes: notes })
+    });
+  } catch(e) { console.error('Notizen speichern:', e.message); }
+}
+
+// ── ARTIKEL LÖSCHEN ───────────────────────────────────────────
+async function deleteArticle(articleId) {
+  if (!confirm('Diese Position wirklich löschen?')) return;
+  try {
+    var res = await fetch(API + '/api/vk/article/' + articleId, { method: 'DELETE' });
+    if (!res.ok) { var d = await res.json(); throw new Error(d.error || 'Fehler'); }
+    var r2 = await fetch(API + '/api/vk/session/' + sessionToken);
+    sessionData = await r2.json();
+    render();
+  } catch (err) { alert('Fehler: ' + err.message); }
+}
+
+// ── MULTI FOTO UPLOAD ─────────────────────────────────────────
 function triggerUpload(articleId, currentCount) {
   var remaining = 4 - currentCount;
   if (remaining <= 0) { alert('Maximal 4 Fotos pro Artikel erreicht.'); return; }
-
   var inp = document.createElement('input');
-  inp.type = 'file';
-  inp.accept = 'image/*';
-  inp.multiple = true;
+  inp.type = 'file'; inp.accept = 'image/*'; inp.multiple = true;
   inp.onchange = async function() {
     if (!inp.files || inp.files.length === 0) return;
     var files = Array.from(inp.files).slice(0, remaining);
-    if (inp.files.length > remaining) {
-      alert('Nur noch ' + remaining + ' Foto(s) möglich. Es werden die ersten ' + remaining + ' hochgeladen.');
-    }
+    if (inp.files.length > remaining) alert('Nur noch ' + remaining + ' Foto(s) möglich. Es werden die ersten ' + remaining + ' hochgeladen.');
     await uploadPhotos(articleId, files);
   };
   inp.click();
@@ -280,14 +444,8 @@ function triggerUpload(articleId, currentCount) {
 async function uploadPhotos(articleId, files) {
   var progressEl = document.getElementById('progress-' + articleId);
   if (progressEl) {
-    progressEl.innerHTML = [
-      '<div class="upload-progress">',
-      '  <div class="progress-bar-wrap"><div class="progress-bar" id="pbar-' + articleId + '" style="width:0%"></div></div>',
-      '  <div class="progress-label" id="plabel-' + articleId + '">0 / ' + files.length + ' hochgeladen</div>',
-      '</div>'
-    ].join('');
+    progressEl.innerHTML = '<div class="upload-progress"><div class="progress-bar-wrap"><div class="progress-bar" id="pbar-' + articleId + '" style="width:0%"></div></div><div class="progress-label" id="plabel-' + articleId + '">0 / ' + files.length + ' hochgeladen</div></div>';
   }
-
   var errors = 0;
   for (var i = 0; i < files.length; i++) {
     try {
@@ -298,32 +456,25 @@ async function uploadPhotos(articleId, files) {
         reader.readAsDataURL(files[i]);
       });
       var res = await fetch(API + '/api/vk/photo', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ article_id: articleId, session_id: sessionData.id, image_base64: base64, content_type: files[i].type || 'image/jpeg' })
       });
       var data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Upload fehlgeschlagen');
-    } catch (err) {
-      errors++;
-      console.error('Upload Fehler:', err.message);
-    }
-    // Fortschritt
+    } catch (err) { errors++; console.error('Upload Fehler:', err.message); }
     var pct = Math.round(((i + 1) / files.length) * 100);
     var pbar = document.getElementById('pbar-' + articleId);
     var plabel = document.getElementById('plabel-' + articleId);
     if (pbar) pbar.style.width = pct + '%';
     if (plabel) plabel.textContent = (i + 1) + ' / ' + files.length + ' hochgeladen';
   }
-
-  // Session neu laden
   var r2 = await fetch(API + '/api/vk/session/' + sessionToken);
   sessionData = await r2.json();
   render();
   if (errors > 0) alert(errors + ' Foto(s) konnten nicht hochgeladen werden.');
 }
 
-// ── FOTO LÖSCHEN ─────────────────────────────────────────────
+// ── FOTO LÖSCHEN ──────────────────────────────────────────────
 async function deletePhoto(photoId) {
   if (!confirm('Dieses Foto wirklich löschen?')) return;
   try {
@@ -372,7 +523,7 @@ async function validateCoupon() {
   } catch (err) { msg.className = 'coupon-msg coupon-err'; msg.textContent = 'Fehler: ' + err.message; btn.disabled = false; btn.textContent = 'Einlösen'; }
 }
 
-// ── PAYMENT ──────────────────────────────────────────────────
+// ── PAYMENT ───────────────────────────────────────────────────
 async function startPayment() {
   var btn = document.getElementById('btn-pay');
   if (btn) { btn.disabled = true; btn.textContent = 'Wird vorbereitet...'; }
@@ -395,6 +546,16 @@ async function redeemFree() {
     if (!res.ok) throw new Error(data.error || 'Einlösen fehlgeschlagen');
     window.location.href = 'ergebnis.html?s=' + sessionToken;
   } catch (err) { alert('Fehler: ' + err.message); if (btn) { btn.disabled = false; btn.textContent = '🎉 Kostenlos einlösen'; } }
+}
+
+// ── HELPERS ───────────────────────────────────────────────────
+function escHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
 function showError(msg) {
