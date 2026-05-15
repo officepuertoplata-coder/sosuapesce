@@ -72,6 +72,10 @@ tr:hover td{background:#f9fafb;}
   <div id="section-orders">
 
     <!-- STATS: 5 neue Karten -->
+    <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
+      <button class="btn btn-sm" id="btnCleanup" onclick="runCleanup()" style="background:#f0fdf4;color:#15803d;border:1px solid #86efac;">🧹 Cleanup jetzt ausführen</button>
+      <span id="cleanupStatus" style="font-size:.75rem;color:var(--mu);margin-left:10px;line-height:28px;"></span>
+    </div>
     <div class="stats">
       <div class="stat">
         <div class="stat-val" id="s-valid">—</div>
@@ -180,6 +184,33 @@ window.onload = loadAll;
 
 async function loadAll() {
   await Promise.all([loadStats(), loadSessions()]);
+  // Cleanup automatisch im Hintergrund ausführen
+  runCleanup(true);
+}
+
+async function runCleanup(silent) {
+  var btn = document.getElementById('btnCleanup');
+  var status = document.getElementById('cleanupStatus');
+  if (!silent) { if (btn) btn.textContent = '⏳ Läuft...'; }
+  try {
+    var r = await fetch(API + '/api/vk/cron/cleanup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-cron-secret': 'converdino-cron-2026-xyz' }
+    });
+    var d = await r.json();
+    if (d.success) {
+      var msg = '✅ ' + d.deleted + ' gelöscht, ' + d.fixed + ' repariert';
+      if (status) status.textContent = msg;
+      if (!silent) showToast(msg);
+      // Stats neu laden wenn was gelöscht wurde
+      if (d.deleted > 0 || d.fixed > 0) {
+        await Promise.all([loadStats(), loadSessions()]);
+      }
+    }
+  } catch(e) {
+    if (!silent) showToast('❌ Cleanup Fehler: ' + e.message);
+  }
+  if (btn) btn.textContent = '🧹 Cleanup jetzt ausführen';
 }
 
 async function loadStats() {
