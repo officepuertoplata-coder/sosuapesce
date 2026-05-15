@@ -22,6 +22,9 @@ header{background:var(--wa);color:#fff;padding:16px 20px;}
 .article-header{background:var(--wa);color:#fff;padding:14px 18px;display:flex;align-items:center;gap:10px;}
 .article-num{background:rgba(255,255,255,.2);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;flex-shrink:0;}
 .article-title-h{font-size:.95rem;font-weight:800;flex:1;}
+.article-title-input{font-size:.95rem;font-weight:800;flex:1;background:transparent;border:1.5px solid transparent;border-radius:6px;padding:2px 6px;color:#fff;font-family:inherit;cursor:pointer;min-width:0;}
+.article-title-input:hover{border-color:rgba(255,255,255,.4);}
+.article-title-input:focus{outline:none;border-color:rgba(255,255,255,.8);background:rgba(255,255,255,.1);}
 .photos-strip{display:flex;gap:8px;padding:14px 16px;overflow-x:auto;}
 .photos-strip img{height:90px;width:90px;object-fit:cover;border-radius:8px;flex-shrink:0;}
 .section{padding:14px 16px;border-top:1px solid var(--border);}
@@ -142,8 +145,14 @@ function render(data) {
     const an = a.analysis || {};
 
     html += '<div class="article-result">';
+    var titleId = 'title_' + a.id;
     html += '<div class="article-header"><div class="article-num">' + (i+1) + '</div>';
-    html += '<div class="article-title-h">' + esc(a.title || 'Artikel '+(i+1)) + '</div></div>';
+    html += '<input class="article-title-input" id="' + titleId + '" type="text" value="' + esc(a.title || 'Artikel '+(i+1)) + '" ' +
+      'data-article-id="' + a.id + '" ' +
+      'onblur="saveArticleTitle(this)" ' +
+      'onkeydown="if(event.key==='Enter')this.blur()" ' +
+      'placeholder="Artikelbezeichnung...">' +
+      '</div>';
 
     if (photos.length) {
       html += '<div class="photos-strip">';
@@ -300,6 +309,20 @@ function esc(str) {
     .replace(/</g,'&lt;')
     .replace(/>/g,'&gt;')
     .replace(/"/g,'&quot;');
+}
+
+async function saveArticleTitle(input) {
+  var articleId = input.getAttribute('data-article-id');
+  var newTitle = input.value.trim();
+  if (!newTitle || !articleId) return;
+  try {
+    await fetch(API + '/api/vk/article/' + articleId + '/notes', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: newTitle })
+    });
+    showToast('✅ Titel gespeichert');
+  } catch(e) { console.error('Titel speichern:', e.message); }
 }
 
 function showToast(msg) {
