@@ -6,7 +6,7 @@
 <title>Dein Verkaufsreport</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root{--wa:#25D366;--bg:#f5f5f5;--card:#fff;--border:#e5e7eb;--txt:#1a1a1a;--mu:#6b7280;--gold:#f4a100;--red:#ef4444;--r:12px;}
+:root{--wa:#25D366;--bg:#f5f5f5;--card:#fff;--border:#e5e7eb;--txt:#1a1a1a;--mu:#6b7280;--gold:#f4a100;--r:12px;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;padding-bottom:40px;}
 header{background:var(--wa);color:#fff;padding:16px 20px;}
@@ -17,36 +17,33 @@ header{background:var(--wa);color:#fff;padding:16px 20px;}
 .loading{text-align:center;padding:60px;color:var(--mu);}
 .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--wa);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px;}
 @keyframes spin{to{transform:rotate(360deg)}}
-
 .delete-banner{background:#fef2f2;border:1.5px solid #fecaca;border-radius:var(--r);padding:12px 16px;margin-bottom:16px;font-size:.82rem;color:#991b1b;display:flex;align-items:center;gap:8px;}
-
 .article-result{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:20px;overflow:hidden;}
 .article-header{background:var(--wa);color:#fff;padding:14px 18px;display:flex;align-items:center;gap:10px;}
 .article-num{background:rgba(255,255,255,.2);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;flex-shrink:0;}
-.article-title{font-size:.95rem;font-weight:800;flex:1;}
-
+.article-title-h{font-size:.95rem;font-weight:800;flex:1;}
 .photos-strip{display:flex;gap:8px;padding:14px 16px;overflow-x:auto;}
 .photos-strip img{height:90px;width:90px;object-fit:cover;border-radius:8px;flex-shrink:0;}
-
 .section{padding:14px 16px;border-top:1px solid var(--border);}
 .section-title{font-size:.68rem;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;}
 
-/* ── COPY FIELD – Bug 13 Fix: kein JSON.stringify in onclick ── */
-.copy-field{background:#f9fafb;border:1.5px solid var(--border);border-radius:8px;padding:12px;font-size:.88rem;line-height:1.6;position:relative;margin-bottom:8px;cursor:pointer;transition:all .2s;}
+/* Copy fields */
+.copy-field{background:#f9fafb;border:1.5px solid var(--border);border-radius:8px;padding:12px;font-size:.88rem;line-height:1.6;position:relative;margin-bottom:8px;cursor:pointer;transition:border-color .2s,background .2s;}
 .copy-field:hover{border-color:var(--wa);background:#f0fdf4;}
-.copy-field .cf-label{font-size:.7rem;color:var(--mu);font-weight:700;margin-bottom:4px;}
-.copy-field .cf-text{white-space:pre-wrap;word-break:break-word;}
+.copy-field.copied{border-color:var(--wa);background:#f0fdf4;}
+.cf-label{font-size:.7rem;color:var(--mu);font-weight:700;margin-bottom:4px;}
+.cf-text{white-space:pre-wrap;word-break:break-word;padding-right:80px;}
 .copy-btn{position:absolute;top:8px;right:8px;background:var(--wa);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;pointer-events:none;}
 
 .price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:4px;}
-.price-card{background:#f9fafb;border:1.5px solid var(--border);border-radius:8px;padding:12px;text-align:center;cursor:pointer;transition:all .2s;}
+.price-card{background:#f9fafb;border:1.5px solid var(--border);border-radius:8px;padding:12px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;}
 .price-card:hover{border-color:var(--wa);background:#f0fdf4;}
-.price-card .price-val{font-size:1.2rem;font-weight:900;color:var(--wa);margin-bottom:2px;}
-.price-card .price-lbl{font-size:.68rem;color:var(--mu);font-weight:700;}
-.price-card .price-range{font-size:.72rem;color:var(--mu);}
+.price-val{font-size:1.2rem;font-weight:900;color:var(--wa);margin-bottom:2px;}
+.price-lbl{font-size:.68rem;color:var(--mu);font-weight:700;}
+.price-range{font-size:.72rem;color:var(--mu);}
 
 .bullet-list{display:flex;flex-direction:column;gap:6px;}
-.bullet-item{display:flex;align-items:flex-start;gap:8px;background:#f9fafb;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;transition:all .2s;}
+.bullet-item{display:flex;align-items:flex-start;gap:8px;background:#f9fafb;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;transition:border-color .2s,background .2s;}
 .bullet-item:hover{border-color:var(--wa);background:#f0fdf4;}
 .bullet-dot{color:var(--wa);font-weight:900;flex-shrink:0;}
 .bullet-text{font-size:.85rem;flex:1;}
@@ -58,44 +55,45 @@ header{background:var(--wa);color:#fff;padding:16px 20px;}
 
 .tip-list{display:flex;flex-direction:column;gap:6px;}
 .tip{background:#fefce8;border:1.5px solid #fef08a;border-radius:8px;padding:10px 12px;font-size:.85rem;display:flex;gap:8px;}
-.tip-icon{flex-shrink:0;}
+
+.copy-all-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:.76rem;cursor:pointer;font-family:'Nunito',sans-serif;margin-left:6px;}
+.copy-all-btn:hover{border-color:var(--wa);color:var(--wa);}
 
 .pdf-section{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:20px;text-align:center;margin-top:20px;}
-.pdf-btn{background:var(--gold);color:#fff;border:none;border-radius:var(--r);padding:14px 28px;font-size:1rem;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;}
+.pdf-btn{background:var(--gold);color:#fff;border:none;border-radius:var(--r);padding:14px 28px;font-size:1rem;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;transition:background .2s;}
 .pdf-btn:hover{background:#e09200;}
 .pdf-note{font-size:.78rem;color:var(--mu);margin-top:8px;}
 
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:20px;font-size:.85rem;font-weight:700;transition:all .3s;opacity:0;z-index:999;}
 #toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
 
-.copy-all-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:.76rem;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:8px;}
-.copy-all-btn:hover{border-color:var(--wa);color:var(--wa);}
-
 @media(max-width:480px){.price-grid{grid-template-columns:1fr 1fr;}}
 </style>
 </head>
 <body>
-
 <header>
   <div class="header-inner">
-    <div class="logo">
-      📊 Dein Verkaufsreport
-      <span id="headerSub">Lade...</span>
-    </div>
+    <div class="logo">📊 Dein Verkaufsreport<span id="headerSub">Lade...</span></div>
     <div id="deleteInfo" style="font-size:.78rem;opacity:.85;text-align:right;"></div>
   </div>
 </header>
-
 <div class="main" id="content">
   <div class="loading"><div class="spinner"></div>Lade Ergebnisse...</div>
 </div>
-
 <div id="toast"></div>
 
 <script>
 const API = 'https://converto-server-production.up.railway.app';
 const TOKEN = new URLSearchParams(location.search).get('s');
-let sessionData = null;
+
+// ── Copy Store: Texte in JS gespeichert, KEIN Text in HTML-Attributen ──
+const _store = {};
+let _storeIdx = 0;
+function storeText(text) {
+  var id = 'c' + (++_storeIdx);
+  _store[id] = text;
+  return id;
+}
 
 if (!TOKEN) {
   document.getElementById('content').innerHTML = '<div class="loading">❌ Kein gültiger Link</div>';
@@ -109,19 +107,15 @@ async function loadResults() {
     const d = await r.json();
     if (!r.ok) {
       if (d.status === 'analyzing' || d.status === 'paid') {
-        document.getElementById('content').innerHTML = `
-          <div class="loading">
-            <div class="spinner"></div>
-            <strong>Analyse läuft...</strong><br>
-            <span style="font-size:.82rem;margin-top:8px;display:block;">Wir analysieren deine Artikel. Das dauert 1-2 Minuten.<br>Diese Seite aktualisiert sich automatisch.</span>
-          </div>`;
+        document.getElementById('content').innerHTML =
+          '<div class="loading"><div class="spinner"></div><strong>Analyse läuft...</strong><br>' +
+          '<span style="font-size:.82rem;margin-top:8px;display:block;">Wir analysieren deine Artikel. Das dauert 1-2 Minuten.<br>Diese Seite aktualisiert sich automatisch.</span></div>';
         setTimeout(loadResults, 8000);
         return;
       }
       document.getElementById('content').innerHTML = '<div class="loading">❌ ' + (d.error || 'Fehler beim Laden') + '</div>';
       return;
     }
-    sessionData = d;
     render(d);
   } catch(e) {
     document.getElementById('content').innerHTML = '<div class="loading">❌ Verbindungsfehler</div>';
@@ -138,20 +132,18 @@ function render(data) {
     document.getElementById('deleteInfo').textContent = '🗑️ Löschen in ' + daysLeft + ' Tagen (' + deleteAt.toLocaleDateString('de-AT') + ')';
   }
 
-  let html = '';
+  var html = '';
   if (daysLeft !== null && daysLeft <= 2) {
     html += '<div class="delete-banner">⚠️ Deine Daten werden in <strong>' + daysLeft + ' Tag' + (daysLeft!==1?'en':'') + '</strong> automatisch gelöscht. Kopiere alles was du brauchst!</div>';
   }
 
   articles.forEach(function(a, i) {
     const photos = a.vk_photos || [];
-    const analysis = a.analysis || {};
+    const an = a.analysis || {};
 
     html += '<div class="article-result">';
-    html += '<div class="article-header">';
-    html += '<div class="article-num">' + (i+1) + '</div>';
-    html += '<div class="article-title">' + escHtml(a.title || 'Artikel '+(i+1)) + '</div>';
-    html += '</div>';
+    html += '<div class="article-header"><div class="article-num">' + (i+1) + '</div>';
+    html += '<div class="article-title-h">' + esc(a.title || 'Artikel '+(i+1)) + '</div></div>';
 
     if (photos.length) {
       html += '<div class="photos-strip">';
@@ -159,174 +151,155 @@ function render(data) {
       html += '</div>';
     }
 
-    if (!analysis || Object.keys(analysis).length === 0 || a.status !== 'analyzed') {
+    if (!an || Object.keys(an).length === 0 || a.status !== 'analyzed') {
       html += '<div class="section"><div class="loading" style="padding:20px;">⏳ Analyse noch ausstehend...</div></div>';
     } else {
 
       // TITEL
       html += '<div class="section"><div class="section-title">📝 Titel-Varianten</div>';
-      if (analysis.title_short) html += copyField(analysis.title_short, 'Kurztitel (max. 60 Zeichen)');
-      if (analysis.title_long)  html += copyField(analysis.title_long, 'Ausführlicher Titel');
-      if (analysis.title_quick) html += copyField(analysis.title_quick, 'Quick-Sale Titel');
+      if (an.title_short) html += copyField(an.title_short, 'Kurztitel (max. 60 Zeichen)');
+      if (an.title_long)  html += copyField(an.title_long,  'Ausführlicher Titel');
+      if (an.title_quick) html += copyField(an.title_quick, 'Quick-Sale Titel');
       html += '</div>';
 
       // PREISE
-      if (analysis.price_recommended || analysis.price_min || analysis.price_max) {
-        html += '<div class="section"><div class="section-title">💰 Preisvorschlag</div>';
-        var pid1='cp_'+Math.random().toString(36).substr(2,8), pid2='cp_'+Math.random().toString(36).substr(2,8), pid3='cp_'+Math.random().toString(36).substr(2,8);
-        _copyStore[pid1]=String(analysis.price_min)+'€'; _copyStore[pid2]=String(analysis.price_recommended)+'€'; _copyStore[pid3]=String(analysis.price_max)+'€';
-        html += '<div class="price-grid">';
-        html += '<div class="price-card" onclick="copyById(\'' + pid1 + '\')"><div class="price-val">' + escHtml(String(analysis.price_min)) + '€</div><div class="price-lbl">Mindestpreis</div><div class="price-range">Quick-Sale</div></div>';
-        html += '<div class="price-card" onclick="copyById(\'' + pid2 + '\')"><div class="price-val" style="font-size:1.4rem;">' + escHtml(String(analysis.price_recommended)) + '€</div><div class="price-lbl">Empfohlen</div><div class="price-range">Bestes Verhältnis</div></div>';
-        html += '<div class="price-card" onclick="copyById(\'' + pid3 + '\')"><div class="price-val">' + escHtml(String(analysis.price_max)) + '€</div><div class="price-lbl">Maximalpreis</div><div class="price-range">Geduld nötig</div></div>';
+      if (an.price_min || an.price_recommended || an.price_max) {
+        var p1=storeText(an.price_min+'€'), p2=storeText(an.price_recommended+'€'), p3=storeText(an.price_max+'€');
+        html += '<div class="section"><div class="section-title">💰 Preisvorschlag</div><div class="price-grid">';
+        html += '<div class="price-card" data-cid="'+p1+'"><div class="price-val">'+esc(String(an.price_min||0))+'€</div><div class="price-lbl">Mindestpreis</div><div class="price-range">Quick-Sale</div></div>';
+        html += '<div class="price-card" data-cid="'+p2+'"><div class="price-val" style="font-size:1.4rem;">'+esc(String(an.price_recommended||0))+'€</div><div class="price-lbl">Empfohlen</div><div class="price-range">Bestes Verhältnis</div></div>';
+        html += '<div class="price-card" data-cid="'+p3+'"><div class="price-val">'+esc(String(an.price_max||0))+'€</div><div class="price-lbl">Maximalpreis</div><div class="price-range">Geduld nötig</div></div>';
         html += '</div>';
-        if (analysis.price_reasoning) html += '<p style="font-size:.8rem;color:var(--mu);margin-top:8px;padding:0 4px;">💡 ' + escHtml(analysis.price_reasoning) + '</p>';
+        if (an.price_reasoning) html += '<p style="font-size:.8rem;color:var(--mu);margin-top:8px;padding:0 4px;">💡 ' + esc(an.price_reasoning) + '</p>';
         html += '</div>';
       }
 
       // KURZBESCHREIBUNG
-      if (analysis.short_desc) {
-        html += '<div class="section"><div class="section-title">📄 Kurzbeschreibung</div>' + copyField(analysis.short_desc) + '</div>';
-      }
+      if (an.short_desc) html += '<div class="section"><div class="section-title">📄 Kurzbeschreibung</div>' + copyField(an.short_desc) + '</div>';
 
       // LANGBESCHREIBUNG
-      if (analysis.long_desc) {
-        html += '<div class="section"><div class="section-title">📋 Ausführliche Beschreibung</div>' + copyField(analysis.long_desc) + '</div>';
-      }
+      if (an.long_desc) html += '<div class="section"><div class="section-title">📋 Ausführliche Beschreibung</div>' + copyField(an.long_desc) + '</div>';
 
       // BULLET POINTS
-      if (analysis.bullet_points && analysis.bullet_points.length) {
-        const bulletsText = analysis.bullet_points.map(function(b){ return '• ' + b; }).join('\n');
-        var allbid = 'cp_' + Math.random().toString(36).substr(2,8);
-        _copyStore[allbid] = bulletsText;
+      if (an.bullet_points && an.bullet_points.length) {
+        var bulletsText = an.bullet_points.map(function(b){return '• '+b;}).join('\n');
+        var allBid = storeText(bulletsText);
         html += '<div class="section">';
-        html += '<div class="section-title">✨ Highlights (Bullet Points) <button class="copy-all-btn" type="button" onclick="copyById(\'' + allbid + '\')">Alle kopieren</button></div>';
+        html += '<div class="section-title">✨ Highlights <button class="copy-all-btn" data-cid="'+allBid+'" type="button">Alle kopieren</button></div>';
         html += '<div class="bullet-list">';
-        analysis.bullet_points.forEach(function(b) {
-          var bid = 'cp_' + Math.random().toString(36).substr(2,8);
-          _copyStore[bid] = b;
-          html += '<div class="bullet-item" onclick="copyById(\'' + bid + '\')""><span class="bullet-dot">•</span><span class="bullet-text">' + escHtml(b) + '</span></div>';
+        an.bullet_points.forEach(function(b) {
+          var bid = storeText(b);
+          html += '<div class="bullet-item" data-cid="'+bid+'"><span class="bullet-dot">•</span><span class="bullet-text">'+esc(b)+'</span></div>';
         });
         html += '</div></div>';
       }
 
       // KEYWORDS
-      if (analysis.keywords && analysis.keywords.length) {
-        const allKw = analysis.keywords.join(', ');
-        var allkid = 'cp_' + Math.random().toString(36).substr(2,8);
-        _copyStore[allkid] = allKw;
+      if (an.keywords && an.keywords.length) {
+        var allKwId = storeText(an.keywords.join(', '));
         html += '<div class="section"><div class="section-title">🔍 Keywords / Tags</div><div class="keywords">';
-        analysis.keywords.forEach(function(k) {
-          var kid = 'cp_' + Math.random().toString(36).substr(2,8);
-          _copyStore[kid] = k;
-          html += '<span class="keyword" onclick="copyKeyword(this, \'' + kid + '\')">' + escHtml(k) + '</span>';
+        an.keywords.forEach(function(k) {
+          var kid = storeText(k);
+          html += '<span class="keyword" data-cid="'+kid+'">'+esc(k)+'</span>';
         });
-        html += '</div>';
-        html += '<button class="copy-all-btn" type="button" onclick="copyById(\'' + allkid + '\')">Alle Keywords kopieren</button>';
-        html += '</div>';
+        html += '</div><button class="copy-all-btn" data-cid="'+allKwId+'" type="button" style="margin-top:8px;">Alle Keywords kopieren</button></div>';
       }
 
       // ZUSTAND
-      if (analysis.condition) {
-        html += '<div class="section"><div class="section-title">📊 Zustand</div>' + copyField(analysis.condition) + '</div>';
-      }
+      if (an.condition) html += '<div class="section"><div class="section-title">📊 Zustand</div>' + copyField(an.condition) + '</div>';
 
       // TIPPS
-      if (analysis.tips && analysis.tips.length) {
+      if (an.tips && an.tips.length) {
         html += '<div class="section"><div class="section-title">💡 Verkaufstipps</div><div class="tip-list">';
-        analysis.tips.forEach(function(t) {
-          html += '<div class="tip"><span class="tip-icon">💡</span><span>' + escHtml(t) + '</span></div>';
+        an.tips.forEach(function(t) {
+          html += '<div class="tip"><span>💡</span><span>'+esc(t)+'</span></div>';
         });
         html += '</div></div>';
       }
     }
-
-    html += '</div>'; // article-result
+    html += '</div>';
   });
 
-  // PDF
-  html += '<div class="pdf-section">';
-  html += '<button class="pdf-btn" onclick="downloadPDF()">📄 Als PDF herunterladen</button>';
-  html += '<div class="pdf-note">Alle Ergebnisse in einem übersichtlichen Dokument</div>';
-  if (daysLeft) html += '<div class="pdf-note" style="margin-top:4px;">⚠️ Daten werden in ' + daysLeft + ' Tagen gelöscht</div>';
+  html += '<div class="pdf-section"><button class="pdf-btn" id="pdfBtn">📄 Als PDF herunterladen</button>';
+  if (daysLeft) html += '<div class="pdf-note">⚠️ Daten werden in '+daysLeft+' Tagen gelöscht</div>';
   html += '</div>';
 
   document.getElementById('content').innerHTML = html;
+
+  // ── Event Listener nach innerHTML setzen ──────────────────
+  // Alle kopierbaren Elemente über data-cid
+  document.querySelectorAll('[data-cid]').forEach(function(el) {
+    el.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var id = el.getAttribute('data-cid');
+      var text = _store[id];
+      if (text === undefined || text === null) return;
+      doCopy(text, el);
+    });
+  });
+
+  // PDF Button
+  var pdfBtn = document.getElementById('pdfBtn');
+  if (pdfBtn) pdfBtn.addEventListener('click', function() {
+    showToast('⏳ PDF wird erstellt...');
+    window.open(API + '/api/vk/pdf/' + TOKEN, '_blank');
+  });
 }
 
-// ── Copy Store: Text in JS-Objekt, nur ID im HTML ───────────
-var _copyStore = {};
-
+// ── copyField: gibt HTML zurück, speichert Text im Store ──────
 function copyField(text, label) {
-  var id = 'cp_' + Math.random().toString(36).substr(2, 8);
-  _copyStore[id] = text;
-  var safeHtml = escHtml(text);
-  var labelHtml = label ? '<div class="cf-label">' + escHtml(label) + '</div>' : '';
-  return '<div class="copy-field" onclick="copyById(\'' + id + '\')" style="cursor:pointer;">' +
-    labelHtml +
-    '<div class="cf-text">' + safeHtml + '</div>' +
+  var id = storeText(text);
+  return '<div class="copy-field" data-cid="' + id + '">' +
+    (label ? '<div class="cf-label">' + esc(label) + '</div>' : '') +
+    '<div class="cf-text">' + esc(text) + '</div>' +
     '<button class="copy-btn" type="button">📋 Kopieren</button>' +
     '</div>';
 }
 
-function copyById(id) {
-  var text = _copyStore[id];
-  if (text === undefined) return;
-  copyText(text);
+// ── Kopieren ausführen ─────────────────────────────────────────
+function doCopy(text, el) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function() {
+      flash(el);
+      showToast('✅ Kopiert!');
+    }).catch(function() {
+      fallbackCopy(text, el);
+    });
+  } else {
+    fallbackCopy(text, el);
+  }
 }
 
-function copyText(text, el) {
-  navigator.clipboard.writeText(text).then(function() {
-    showToast('✅ Kopiert!');
-    if (el) {
-      var orig = el.style.borderColor;
-      el.style.borderColor = 'var(--wa)';
-      el.style.background = '#f0fdf4';
-      setTimeout(function() { el.style.borderColor = orig; el.style.background = ''; }, 1500);
-    }
-  }).catch(function() {
-    var ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.opacity = '0';
-    document.body.appendChild(ta);
-    ta.select();
+function fallbackCopy(text, el) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none;';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try {
     document.execCommand('copy');
-    document.body.removeChild(ta);
+    flash(el);
     showToast('✅ Kopiert!');
-  });
+  } catch(e) {
+    showToast('❌ Kopieren fehlgeschlagen');
+  }
+  document.body.removeChild(ta);
 }
 
-function copyKeyword(el, id) {
-  var kw = _copyStore[id] || '';
-  copyText(kw);
+function flash(el) {
+  if (!el) return;
   el.classList.add('copied');
   setTimeout(function() { el.classList.remove('copied'); }, 1500);
 }
 
-// HTML escaping – verhindert XSS und Rendering-Fehler
-function escHtml(str) {
-  if (!str) return '';
+function esc(str) {
+  if (!str && str !== 0) return '';
   return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/\n/g, '<br>');
-}
-
-// Attribut-Escaping für data-copy
-function escAttr(str) {
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-async function downloadPDF() {
-  showToast('⏳ PDF wird erstellt...');
-  window.open(API + '/api/vk/pdf/' + TOKEN, '_blank');
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
 }
 
 function showToast(msg) {
