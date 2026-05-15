@@ -64,6 +64,7 @@ tr:hover td{background:#f9fafb;}
   <button class="tbtn" onclick="loadAll()">↺ Aktualisieren</button>
   <button class="tbtn active" onclick="showSection('orders')" id="btnOrders">📋 Aufträge</button>
   <button class="tbtn" onclick="showSection('coupons')" id="btnCoupons">🎟️ Gutscheine</button>
+  <button class="tbtn" onclick="showSection('business')" id="btnBusiness">🏢 Firmenrabatte</button>
   <div class="nav-right"><button class="tbtn" onclick="doLogout()">Ausloggen</button></div>
 </nav>
 
@@ -158,6 +159,41 @@ tr:hover td{background:#f9fafb;}
       <table>
         <thead><tr><th>Code</th><th>Typ</th><th>Wert</th><th>Verwendet</th><th>Max</th><th>Gültig bis</th><th>Status</th><th>Aktionen</th></tr></thead>
         <tbody id="couponsList"><tr><td colspan="8" class="msg">Lade...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- FIRMENRABATTE -->
+  <div id="section-business" style="display:none;">
+    <div class="table-box">
+      <div class="table-hd">
+        <h2>🏢 Firmenrabatte</h2>
+        <button class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;" onclick="toggleNewBusiness()">+ Neu</button>
+      </div>
+      <div id="newBusinessForm" style="display:none;padding:18px;background:#f9fafb;border-bottom:1px solid var(--border);">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;">
+          <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">FIRMENNAME</label>
+            <input id="nb-company" placeholder="z.B. IKEA Österreich" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
+          <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">TELEFONNUMMER (mit Ländercode)</label>
+            <input id="nb-phone" placeholder="z.B. 436761234567" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
+          <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">RABATT %</label>
+            <input id="nb-discount" type="number" min="1" max="100" value="20" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
+          <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">GÜLTIG BIS</label>
+            <input id="nb-until" type="date" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
+          <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">MAX. AUFTRÄGE (leer = unbegrenzt)</label>
+            <input id="nb-maxuses" type="number" placeholder="leer = unbegrenzt" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
+          <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">NOTIZ</label>
+            <input id="nb-notes" placeholder="Interne Notiz" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button class="btn" onclick="toggleNewBusiness()">Abbrechen</button>
+          <button class="btn btn-g" onclick="createBusinessDiscount()">✅ Erstellen</button>
+        </div>
+        <div id="nb-err" style="color:var(--red);font-size:.78rem;margin-top:6px;"></div>
+      </div>
+      <table>
+        <thead><tr><th>Firma</th><th>Telefon</th><th>Rabatt</th><th>Verwendet</th><th>Max</th><th>Gültig bis</th><th>Status</th><th>Aktionen</th></tr></thead>
+        <tbody id="businessList"><tr><td colspan="8" class="msg">Lade...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -304,10 +340,12 @@ async function deleteSession(id, phone) {
 }
 
 function showSection(name) {
-  document.getElementById('section-coupons').style.display = name === 'coupons' ? 'block' : 'none';
-  document.getElementById('section-orders').style.display  = name === 'coupons' ? 'none' : 'block';
+  document.getElementById('section-coupons').style.display  = name === 'coupons'  ? 'block' : 'none';
+  document.getElementById('section-business').style.display = name === 'business' ? 'block' : 'none';
+  document.getElementById('section-orders').style.display   = name === 'orders'   ? 'block' : 'none';
   document.querySelectorAll('.tbtn').forEach(b => b.classList.remove('active'));
   if (name === 'coupons') { document.getElementById('btnCoupons').classList.add('active'); loadCoupons(); }
+  else if (name === 'business') { document.getElementById('btnBusiness').classList.add('active'); loadBusinessDiscounts(); }
   else { document.getElementById('btnOrders').classList.add('active'); }
 }
 
@@ -379,6 +417,76 @@ async function deleteCoupon(id, code) {
   await fetch(API + '/api/vk/admin/coupons/' + id, { method:'DELETE' });
   showToast('Gelöscht');
   loadCoupons();
+}
+
+function toggleNewBusiness() {
+  var f = document.getElementById('newBusinessForm');
+  f.style.display = f.style.display === 'none' ? 'block' : 'none';
+}
+
+async function loadBusinessDiscounts() {
+  try {
+    var r = await fetch(API + '/api/vk/admin/business-discounts');
+    var list = await r.json() || [];
+    var tbody = document.getElementById('businessList');
+    if (!list.length) { tbody.innerHTML = '<tr><td colspan="8" class="msg">Keine Firmenrabatte</td></tr>'; return; }
+    tbody.innerHTML = list.map(function(b) {
+      var until = b.valid_until ? new Date(b.valid_until).toLocaleDateString('de-AT') : '∞';
+      var isExpired = b.valid_until && new Date(b.valid_until) < new Date();
+      var isFull = b.max_uses && b.used_count >= b.max_uses;
+      var isActive = b.active && !isExpired && !isFull;
+      return '<tr>' +
+        '<td><strong>' + b.company_name + '</strong>' + (b.notes ? '<br><small style="color:var(--mu)">' + b.notes + '</small>' : '') + '</td>' +
+        '<td><span class="phone">' + b.phone + '</span></td>' +
+        '<td style="font-weight:800;color:#059669;">' + b.discount_percent + '%</td>' +
+        '<td style="text-align:center;">' + (b.used_count||0) + '</td>' +
+        '<td style="text-align:center;">' + (b.max_uses||'∞') + '</td>' +
+        '<td>' + until + '</td>' +
+        '<td><span class="badge ' + (isActive?'s-open':'s-expired') + '">' + (isActive?'Aktiv':'Inaktiv') + '</span></td>' +
+        '<td style="white-space:nowrap;">' +
+          '<button class="btn btn-sm ' + (b.active?'':'btn-g') + '" onclick="toggleBusinessDiscount('' + b.id + '',' + b.active + ')">' + (b.active?'⏸':'▶') + '</button> ' +
+          '<button class="btn btn-sm btn-red" onclick="deleteBusinessDiscount('' + b.id + '','' + b.company_name + '')">🗑️</button>' +
+        '</td></tr>';
+    }).join('');
+  } catch(e) { console.error(e); }
+}
+
+async function createBusinessDiscount() {
+  var company = document.getElementById('nb-company').value.trim();
+  var phone = document.getElementById('nb-phone').value.trim().replace(/[^0-9+]/g,'');
+  var discount = parseInt(document.getElementById('nb-discount').value)||20;
+  var until = document.getElementById('nb-until').value||null;
+  var maxUses = parseInt(document.getElementById('nb-maxuses').value)||null;
+  var notes = document.getElementById('nb-notes').value.trim()||null;
+  document.getElementById('nb-err').textContent = '';
+  if (!company || !phone) { document.getElementById('nb-err').textContent = 'Firma und Telefon erforderlich'; return; }
+  try {
+    var r = await fetch(API + '/api/vk/admin/business-discounts', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ company_name: company, phone, discount_percent: discount, valid_until: until, max_uses: maxUses, notes })
+    });
+    var d = await r.json();
+    if (!d.success) { document.getElementById('nb-err').textContent = d.error; return; }
+    showToast('✅ Firmenrabatt für "' + company + '" erstellt!');
+    document.getElementById('newBusinessForm').style.display = 'none';
+    loadBusinessDiscounts();
+  } catch(e) { document.getElementById('nb-err').textContent = e.message; }
+}
+
+async function toggleBusinessDiscount(id, active) {
+  await fetch(API + '/api/vk/admin/business-discounts/' + id, {
+    method:'PUT', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ active: !active })
+  });
+  showToast(!active ? '▶ Aktiv' : '⏸ Pausiert');
+  loadBusinessDiscounts();
+}
+
+async function deleteBusinessDiscount(id, name) {
+  if (!confirm('Firmenrabatt für "' + name + '" löschen?')) return;
+  await fetch(API + '/api/vk/admin/business-discounts/' + id, { method:'DELETE' });
+  showToast('Gelöscht');
+  loadBusinessDiscounts();
 }
 
 function showToast(msg) {
