@@ -150,7 +150,7 @@ function render(data) {
     html += '<input class="article-title-input" id="' + titleId + '" type="text" value="' + esc(a.title || 'Artikel '+(i+1)) + '" ' +
       'data-article-id="' + a.id + '" ' +
       'onblur="saveArticleTitle(this)" ' +
-      'onkeydown="if(event.key==='Enter')this.blur()" ' +
+      'onkeydown="if(event.keyCode===13)this.blur()" ' +
       'placeholder="Artikelbezeichnung...">' +
       '</div>';
 
