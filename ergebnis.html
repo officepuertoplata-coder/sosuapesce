@@ -284,6 +284,13 @@ function render(data) {
     showToast('⏳ PDF wird erstellt...');
     window.open(API + '/api/vk/pdf/' + TOKEN, '_blank');
   });
+
+  // Auto-Refresh: wenn noch Artikel ausstehen
+  var pending = (data.articles || []).filter(function(a) { return a.status !== 'analyzed'; });
+  if (pending.length > 0) {
+    showToast('⏳ ' + pending.length + ' Artikel werden noch analysiert...');
+    setTimeout(function() { loadResults(); }, 8000);
+  }
 }
 
 // ── copyField: gibt HTML zurück, speichert Text im Store ──────
