@@ -10,8 +10,6 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(45,122,79,0.12) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(244,161,0,0.06) 0%,transparent 50%);pointer-events:none;z-index:0;}
-
-/* NAV */
 nav{position:relative;z-index:10;background:rgba(10,31,18,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;gap:0;}
 .nav-logo{font-weight:900;font-size:1.1rem;color:var(--wa);margin-right:20px;}
 .nav-logo span{color:var(--txt);}
@@ -23,28 +21,18 @@ nav{position:relative;z-index:10;background:rgba(10,31,18,0.95);backdrop-filter:
 .role-merchant{background:rgba(37,211,102,0.15);color:var(--wa);}
 .btn-logout{background:none;border:1px solid var(--border);color:var(--muted);padding:5px 12px;border-radius:8px;cursor:pointer;font-size:.78rem;font-family:'Nunito',sans-serif;transition:all .2s;}
 .btn-logout:hover{border-color:var(--red);color:var(--red);}
-
-/* MERCHANT SWITCHER (Superadmin + Staff only) */
 .merchant-bar{position:relative;z-index:10;display:flex;align-items:center;justify-content:center;gap:12px;padding:16px 24px;background:rgba(255,255,255,0.02);border-bottom:1px solid var(--border);}
 .merchant-bar label{font-size:.75rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;}
 .merchant-select{background:var(--card2);border:1.5px solid var(--border);color:var(--txt);padding:8px 14px;border-radius:8px;font-size:.88rem;font-family:'Nunito',sans-serif;outline:none;cursor:pointer;min-width:200px;}
 .merchant-select:focus{border-color:var(--wa);}
 .merchant-select option{background:var(--card2);}
-
-/* HEADER */
 .hub-header{position:relative;z-index:10;text-align:center;padding:32px 24px 24px;}
 .hub-title{font-size:1.8rem;font-weight:900;letter-spacing:-0.5px;margin-bottom:6px;}
 .hub-title em{font-style:normal;color:var(--wa);}
 .hub-sub{font-size:.85rem;color:var(--muted);}
-
-/* SECTION */
 .section-label{position:relative;z-index:10;padding:4px 24px 12px;max-width:1100px;margin:0 auto;font-size:.68rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace;display:flex;align-items:center;gap:10px;}
 .section-label::after{content:'';flex:1;height:1px;background:var(--border);}
-
-/* GRID */
 .grid{position:relative;z-index:10;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;padding:0 24px 20px;max-width:1100px;margin:0 auto;}
-
-/* CARD */
 .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;cursor:pointer;text-decoration:none;color:inherit;display:block;transition:all .25s;position:relative;overflow:hidden;}
 .card:hover{transform:translateY(-4px);border-color:rgba(37,211,102,0.4);box-shadow:0 16px 40px rgba(0,0,0,0.4);}
 .card.disabled{opacity:.4;pointer-events:none;}
@@ -53,8 +41,6 @@ nav{position:relative;z-index:10;background:rgba(10,31,18,0.95);backdrop-filter:
 .card-desc{font-size:.8rem;color:var(--muted);line-height:1.5;margin-bottom:16px;}
 .card-action{display:inline-flex;align-items:center;gap:6px;font-size:.76rem;font-weight:700;padding:6px 12px;border-radius:6px;}
 .card-tag{position:absolute;top:14px;right:14px;font-size:.6rem;font-weight:800;padding:3px 7px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase;font-family:'DM Mono',monospace;}
-
-/* Color variants */
 .green .card-icon{background:rgba(37,211,102,0.12);}
 .green .card-action{background:rgba(37,211,102,0.12);color:var(--wa);}
 .green:hover .card-action{background:var(--wa);color:#fff;}
@@ -69,31 +55,20 @@ nav{position:relative;z-index:10;background:rgba(10,31,18,0.95);backdrop-filter:
 .purple:hover .card-action{background:var(--purple);color:#fff;}
 .red-card .card-icon{background:rgba(239,68,68,0.12);}
 .red-card .card-action{background:rgba(239,68,68,0.12);color:#fca5a5;}
-
-/* Tags */
 .tag-live{background:rgba(34,197,94,0.15);color:#4ade80;}
 .tag-daily{background:rgba(37,211,102,0.15);color:var(--wa);}
 .tag-admin{background:rgba(244,161,0,0.15);color:var(--gold);}
 .tag-super{background:rgba(139,92,246,0.15);color:#c4b5fd;}
 .tag-public{background:rgba(59,130,246,0.15);color:#93c5fd;}
-
-/* LP Status card */
-.lp-status{font-size:.72rem;color:var(--muted);margin-top:4px;}
-
-/* Status indicator */
 .status-bar-top{position:relative;z-index:10;display:flex;justify-content:center;align-items:center;gap:8px;padding:8px;font-size:.72rem;color:var(--muted);font-family:'DM Mono',monospace;}
 .status-dot{width:7px;height:7px;border-radius:50%;background:var(--wa);box-shadow:0 0 6px var(--wa);animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-
-/* Footer */
 footer{position:relative;z-index:10;text-align:center;padding:24px;color:var(--muted);font-size:.72rem;font-family:'DM Mono',monospace;}
-
 @media(max-width:600px){.grid{padding:0 14px 20px;}.hub-header{padding:20px 14px 16px;}.merchant-bar{flex-wrap:wrap;}}
 </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
   <div class="nav-logo">Con<span>verdino</span></div>
   <div class="nav-right">
@@ -105,7 +80,6 @@ footer{position:relative;z-index:10;text-align:center;padding:24px;color:var(--m
   </div>
 </nav>
 
-<!-- MERCHANT SWITCHER (nur Superadmin + Staff) -->
 <div class="merchant-bar" id="merchantBar" style="display:none;">
   <label>Händler:</label>
   <select class="merchant-select" id="merchantSelect" onchange="switchMerchant()">
@@ -113,88 +87,53 @@ footer{position:relative;z-index:10;text-align:center;padding:24px;color:var(--m
   </select>
 </div>
 
-<!-- HEADER -->
 <div class="hub-header">
   <div class="hub-title">Dein <em>Kontrollzentrum</em></div>
   <div class="hub-sub" id="hubSub">Alle Bereiche auf einen Blick</div>
 </div>
 
-<!-- CONTENT -->
 <div id="hubContent"></div>
-
 <footer id="hubFooter"></footer>
 
 <script>
-const API   = 'https://converto-server-production.up.railway.app';
-const KEY   = 'converto_auth_v2';
-const BASE  = 'https://officepuertoplata-coder.github.io/sosuapesce';
+const API  = 'https://converto-server-production.up.railway.app';
+const KEY  = 'converto_auth_v2';
+const BASE = 'https://officepuertoplata-coder.github.io/sosuapesce';
 
-// ── AUTH CHECK ─────────────────────────────────────────────
 let auth = null;
 
 window.onload = async function() {
   try { auth = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e) {}
-
-  if (!auth || !auth.role) {
-    window.location.href = 'login.html';
-    return;
-  }
-
-  // Session check (12h)
+  if (!auth || !auth.role) { window.location.href = 'login.html'; return; }
   if (auth.loggedInAt) {
     const age = Date.now() - new Date(auth.loggedInAt).getTime();
-    if (age > 12 * 60 * 60 * 1000) {
-      localStorage.removeItem(KEY);
-      window.location.href = 'login.html';
-      return;
-    }
+    if (age > 12 * 60 * 60 * 1000) { localStorage.removeItem(KEY); window.location.href = 'login.html'; return; }
   }
-
-  // Nav aufbauen
   document.getElementById('navUser').textContent = auth.name || auth.username || '';
   const roleEl = document.getElementById('navRole');
   roleEl.textContent = { superadmin:'Superadmin', staff:'Mitarbeiter', merchant:'Händler' }[auth.role] || auth.role;
   roleEl.className = 'nav-role role-' + auth.role;
-
-  // Merchant Bar (nur für SA und Staff)
-  if (auth.role === 'superadmin' || auth.role === 'staff') {
-    buildMerchantBar();
-  }
-
-  // Hub Sub
-  if (auth.merchantName) {
-    document.getElementById('hubSub').textContent = auth.merchantName;
-  }
-
-  // Content aufbauen
+  if (auth.role === 'superadmin' || auth.role === 'staff') buildMerchantBar();
+  if (auth.merchantName) document.getElementById('hubSub').textContent = auth.merchantName;
   buildHub();
-
-  // API Status
   checkAPI();
 };
 
-function doLogout() {
-  localStorage.removeItem(KEY);
-  window.location.href = 'login.html';
-}
+function doLogout() { localStorage.removeItem(KEY); window.location.href = 'login.html'; }
 
-// ── MERCHANT SWITCHER ──────────────────────────────────────
 function buildMerchantBar() {
   const bar = document.getElementById('merchantBar');
   const sel = document.getElementById('merchantSelect');
   bar.style.display = 'flex';
-
   const merchants = auth.merchants || [];
   sel.innerHTML = merchants.map(m =>
-    `<option value="${m.id}" data-slug="${m.slug}" data-name="${m.name}" ${m.id === auth.merchantId ? 'selected' : ''}>${m.name}</option>`
+    '<option value="' + m.id + '" data-slug="' + m.slug + '" data-name="' + m.name + '" ' + (m.id === auth.merchantId ? 'selected' : '') + '>' + m.name + '</option>'
   ).join('');
-
-  // Superadmin: Händler anlegen Button
   if (auth.role === 'superadmin') {
     const addBtn = document.createElement('button');
     addBtn.textContent = '+ Händler anlegen';
     addBtn.style.cssText = 'background:var(--wa);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:.8rem;font-weight:800;cursor:pointer;font-family:Nunito,sans-serif;';
-    addBtn.onclick = () => window.location.href = 'superadmin.html';
+    addBtn.onclick = function() { window.location.href = 'superadmin.html'; };
     bar.appendChild(addBtn);
   }
 }
@@ -203,174 +142,83 @@ function switchMerchant() {
   const sel = document.getElementById('merchantSelect');
   const opt = sel.options[sel.selectedIndex];
   if (!opt.value) return;
-
   auth.merchantId   = opt.value;
   auth.merchantName = opt.dataset.name;
   auth.slug         = opt.dataset.slug;
   localStorage.setItem(KEY, JSON.stringify(auth));
-
   document.getElementById('hubSub').textContent = opt.dataset.name;
   buildHub();
 }
 
-// ── BUILD HUB ──────────────────────────────────────────────
 function buildHub() {
-  const slug       = auth.slug || '';
-  const merchantId = auth.merchantId || '';
-  const content    = document.getElementById('hubContent');
+  var slug       = auth.slug || '';
+  var merchantId = auth.merchantId || '';
+  var content    = document.getElementById('hubContent');
 
   if (!slug && auth.role !== 'superadmin') {
     content.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);">Bitte Händler auswählen</div>';
     return;
   }
 
-  let html = '';
+  var html = '';
 
-  // ── TAGESGESCHÄFT ────────────────────────────────────────
-  html += `<div class="section-label">Tagesgeschäft</div>
-  <div class="grid">
+  // TAGESGESCHÄFT
+  html += '<div class="section-label">Tagesgeschäft</div>';
+  html += '<div class="grid">';
+  html += '<a class="card green" href="verfuegbarkeit.html"><span class="card-tag tag-daily">Täglich</span><div class="card-icon">📋</div><div class="card-title">Verfügbarkeit</div><div class="card-desc">Artikel, Mengen & Zeitraum erfassen. Direkt auf Landingpage referenziert.</div><div class="card-action">Erfassen →</div></a>';
+  html += '<a class="card green" href="bestellungen.html?m=' + slug + '"><span class="card-tag tag-live">Live</span><div class="card-icon">📦</div><div class="card-title">Bestellungen</div><div class="card-desc">Eingehende Bestellungen verwalten, Status aktualisieren und Kunden benachrichtigen.</div><div class="card-action">Verwalten →</div></a>';
+  html += '<a class="card green" href="comm.html?m=' + slug + '"><span class="card-tag tag-live">Chat</span><div class="card-icon">💬</div><div class="card-title">Kommunikation</div><div class="card-desc">WhatsApp Nachrichten senden & empfangen, Konversationen und Übersetzung.</div><div class="card-action">Öffnen →</div></a>';
+  html += '</div>';
 
-    <a class="card green" href="verfuegbarkeit.html">
-      <span class="card-tag tag-daily">Täglich</span>
-      <div class="card-icon">📋</div>
-      <div class="card-title">Verfügbarkeit</div>
-      <div class="card-desc">Artikel, Mengen & Zeitraum erfassen. Direkt auf Landingpage referenziert.</div>
-      <div class="card-action">Erfassen →</div>
-    </a>
+  // VERWALTUNG
+  html += '<div class="section-label">Verwaltung</div>';
+  html += '<div class="grid">';
+  html += '<a class="card gold" href="admin.html?m=' + slug + '"><span class="card-tag tag-admin">Admin</span><div class="card-icon">⚙️</div><div class="card-title">Händler Admin</div><div class="card-desc">Produkte & Preise verwalten, Einstellungen, WhatsApp konfigurieren.</div><div class="card-action">Einstellungen →</div></a>';
+  html += '<a class="card gold" href="admin.html?m=' + slug + '&tab=partners"><span class="card-tag tag-admin">Partner</span><div class="card-icon">🤝</div><div class="card-title">Partner</div><div class="card-desc">Partner verwalten, Provisionen einsehen, Referral Codes generieren.</div><div class="card-action">Verwalten →</div></a>';
+  html += '<a class="card blue" href="subscribers.html?m=' + slug + '"><span class="card-tag" style="background:rgba(37,211,102,0.15);color:var(--wa);">Email & WA</span><div class="card-icon">📧</div><div class="card-title">Abonnenten</div><div class="card-desc">E-Mail & WhatsApp Abonnenten verwalten, hinzufügen und CSV exportieren.</div><div class="card-action">Verwalten →</div></a>';
+  html += '<a class="card green" id="lpCard" href="landingpage-builder.html?m=' + slug + '&mid=' + merchantId + '"><span class="card-tag tag-public">Public</span><div class="card-icon">🌐</div><div class="card-title">Landingpage</div><div class="card-desc" id="lpDesc">Öffentliche Seite für Kunden mit aktuellem Angebot.</div><div class="card-action">Bearbeiten →</div></a>';
+  html += '<a class="card purple" href="scan.html"><span class="card-tag tag-super">QR</span><div class="card-icon">📱</div><div class="card-title">QR Entwertung</div><div class="card-desc">Tickets und digitale Produkte vor Ort per Kamera entwerten.</div><div class="card-action">Scanner öffnen →</div></a>';
+  html += '</div>';
 
-    <a class="card green" href="bestellungen.html?m=${slug}">
-      <span class="card-tag tag-live">Live</span>
-      <div class="card-icon">📦</div>
-      <div class="card-title">Bestellungen</div>
-      <div class="card-desc">Eingehende Bestellungen verwalten, Status aktualisieren und Kunden benachrichtigen.</div>
-      <div class="card-action">Verwalten →</div>
-    </a>
+  // VERKAUFSREPORT
+  html += '<div class="section-label">Verkaufsreport</div>';
+  html += '<div class="grid">';
+  html += '<a class="card green" href="vk-admin.html"><span class="card-tag tag-live">KI</span><div class="card-icon">📊</div><div class="card-title">Verkaufsreport</div><div class="card-desc">Kunden schicken Fotos per WhatsApp – KI erstellt Verkaufstexte, Preisvorschläge und Inserate.</div><div class="card-action">Aufträge verwalten →</div></a>';
+  html += '</div>';
 
-    <a class="card green" href="comm.html?m=${slug}">
-      <span class="card-tag tag-live">Chat</span>
-      <div class="card-icon">💬</div>
-      <div class="card-title">Kommunikation</div>
-      <div class="card-desc">WhatsApp Nachrichten senden & empfangen, Konversationen und Übersetzung.</div>
-      <div class="card-action">Öffnen →</div>
-    </a>
-
-  </div>`;
-
-  // ── VERWALTUNG ────────────────────────────────────────────
-  html += `<div class="section-label">Verwaltung</div>
-  <div class="grid">
-
-    <a class="card gold" href="admin.html?m=${slug}">
-      <span class="card-tag tag-admin">Admin</span>
-      <div class="card-icon">⚙️</div>
-      <div class="card-title">Händler Admin</div>
-      <div class="card-desc">Produkte & Preise verwalten, Einstellungen, WhatsApp konfigurieren.</div>
-      <div class="card-action">Einstellungen →</div>
-    </a>
-
-    <a class="card gold" href="admin.html?m=${slug}&tab=partners">
-      <span class="card-tag tag-admin">Partner</span>
-      <div class="card-icon">🤝</div>
-      <div class="card-title">Partner</div>
-      <div class="card-desc">Partner verwalten, Provisionen einsehen, Referral Codes generieren.</div>
-      <div class="card-action">Verwalten →</div>
-    </a>
-
-    <a class="card blue" href="subscribers.html?m=${slug}">
-      <span class="card-tag" style="background:rgba(37,211,102,0.15);color:var(--wa);">Email & WA</span>
-      <div class="card-icon">📧</div>
-      <div class="card-title">Abonnenten</div>
-      <div class="card-desc">E-Mail & WhatsApp Abonnenten verwalten, hinzufügen und CSV exportieren.</div>
-      <div class="card-action">Verwalten →</div>
-    </a>
-
-    <a class="card green" id="lpCard" href="landingpage-builder.html?m=${slug}&mid=${merchantId}">
-      <span class="card-tag tag-public">Public</span>
-      <div class="card-icon">🌐</div>
-      <div class="card-title">Landingpage</div>
-      <div class="card-desc" id="lpDesc">Öffentliche Seite für Kunden mit aktuellem Angebot.</div>
-      <div class="card-action">Bearbeiten →</div>
-    </a>
-
-    <a class="card purple" href="scan.html">
-      <span class="card-tag tag-super">QR</span>
-      <div class="card-icon">📱</div>
-      <div class="card-title">QR Entwertung</div>
-      <div class="card-desc">Tickets und digitale Produkte vor Ort per Kamera entwerten.</div>
-      <div class="card-action">Scanner öffnen →</div>
-    </a>
-
-  </div>`;
-
-  // ── VERKAUFSREPORT ───────────────────────────────────────
-  html += \`<div class="section-label">Verkaufsreport</div>
-  <div class="grid">
-    <a class="card green" href="vk-admin.html">
-      <span class="card-tag tag-live">KI</span>
-      <div class="card-icon">📊</div>
-      <div class="card-title">Verkaufsreport</div>
-      <div class="card-desc">Kunden schicken Fotos per WhatsApp – KI erstellt Verkaufstexte, Preisvorschläge und Inserate.</div>
-      <div class="card-action">Aufträge verwalten →</div>
-    </a>
-  </div>\`;
-
-  // ── SUPERADMIN BEREICH ────────────────────────────────────
+  // SUPERADMIN
   if (auth.role === 'superadmin') {
-    html += `<div class="section-label">Plattform (Superadmin)</div>
-    <div class="grid">
-
-      <a class="card purple" href="superadmin.html">
-        <span class="card-tag tag-super">Super</span>
-        <div class="card-icon">👑</div>
-        <div class="card-title">Plattform-Verwaltung</div>
-        <div class="card-desc">Händler anlegen/verwalten, Mitarbeiter-Zugänge, Plattform-Übersicht.</div>
-        <div class="card-action">Plattform →</div>
-      </a>
-
-      <a class="card blue" href="https://supabase.com/dashboard/project/oxybanupdrfopjionekk" target="_blank">
-        <div class="card-icon">🗄️</div>
-        <div class="card-title">Supabase Datenbank</div>
-        <div class="card-desc">Alle Daten: Händler, Partner, Bestellungen, Konversationen, Nachrichten.</div>
-        <div class="card-action">Datenbank →</div>
-      </a>
-
-      <a class="card blue" href="https://railway.com/project/0a1f59f3-d677-494c-acfd-b45f287a730b" target="_blank">
-        <div class="card-icon">⚡</div>
-        <div class="card-title">Railway Server</div>
-        <div class="card-desc">Node.js API Server – Logs, Deployments, Environment Variables.</div>
-        <div class="card-action" id="apiStatus">Railway →</div>
-      </a>
-
-    </div>`;
+    html += '<div class="section-label">Plattform (Superadmin)</div>';
+    html += '<div class="grid">';
+    html += '<a class="card purple" href="superadmin.html"><span class="card-tag tag-super">Super</span><div class="card-icon">👑</div><div class="card-title">Plattform-Verwaltung</div><div class="card-desc">Händler anlegen/verwalten, Mitarbeiter-Zugänge, Plattform-Übersicht.</div><div class="card-action">Plattform →</div></a>';
+    html += '<a class="card blue" href="https://supabase.com/dashboard/project/oxybanupdrfopjionekk" target="_blank"><div class="card-icon">🗄️</div><div class="card-title">Supabase Datenbank</div><div class="card-desc">Alle Daten: Händler, Partner, Bestellungen, Konversationen, Nachrichten.</div><div class="card-action">Datenbank →</div></a>';
+    html += '<a class="card blue" href="https://railway.com/project/0a1f59f3-d677-494c-acfd-b45f287a730b" target="_blank"><div class="card-icon">⚡</div><div class="card-title">Railway Server</div><div class="card-desc">Node.js API Server – Logs, Deployments, Environment Variables.</div><div class="card-action" id="apiStatus">Railway →</div></a>';
+    html += '</div>';
   }
 
   content.innerHTML = html;
-
-  // Landingpage Status laden
   if (merchantId) loadLpStatus(merchantId);
 }
 
-// ── LANDINGPAGE STATUS ─────────────────────────────────────
 async function loadLpStatus(merchantId) {
   try {
-    const r = await fetch(API + '/api/pages/' + merchantId);
+    var r = await fetch(API + '/api/pages/' + merchantId);
     if (!r.ok) return;
-    const p = await r.json();
+    var p = await r.json();
     if (p && p.html_content) {
-      const size = Math.round(p.html_content.length / 1024);
-      const date = new Date(p.updated_at).toLocaleDateString('de-AT');
-      const status = p.published ? '🟢 Live' : '🟡 Draft';
-      const desc = document.getElementById('lpDesc');
-      if (desc) desc.innerHTML = `${status} · ${size} KB · ${date}<br><small style="opacity:.7">Klicken zum Bearbeiten</small>`;
+      var size = Math.round(p.html_content.length / 1024);
+      var date = new Date(p.updated_at).toLocaleDateString('de-AT');
+      var status = p.published ? '🟢 Live' : '🟡 Draft';
+      var desc = document.getElementById('lpDesc');
+      if (desc) desc.innerHTML = status + ' · ' + size + ' KB · ' + date + '<br><small style="opacity:.7">Klicken zum Bearbeiten</small>';
     }
   } catch(e) {}
 }
 
-// ── API STATUS ─────────────────────────────────────────────
 async function checkAPI() {
   try {
-    const r = await fetch(API + '/api/health');
-    const d = await r.json();
+    var r = await fetch(API + '/api/health');
+    var d = await r.json();
     document.getElementById('navStatus').textContent = 'Online ' + (d.version || '');
   } catch(e) {
     document.getElementById('navStatus').textContent = 'Offline';
