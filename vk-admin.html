@@ -334,7 +334,7 @@ function renderSessions() {
       '<td style="white-space:nowrap;display:flex;gap:4px;flex-wrap:wrap;">' +
         '<a href="bericht.html?s=' + s.token + '" target="_blank" class="btn btn-sm" style="background:#f3f4f6;">🔗</a>' +
         (s.status === 'done' ? '<a href="ergebnis.html?s=' + s.token + '" target="_blank" class="btn btn-sm btn-g">📋</a>' : '') +
-        (['open','paid','error'].includes(s.status) ? '<button class="btn btn-sm btn-gold" onclick="analyzeSession(\''+s.id+'\')">🔍 Analysieren</button>' : '') +
+        (['open','paid','error','done'].includes(s.status) ? '<button class="btn btn-sm btn-gold" onclick="analyzeSession(\''+s.id+'\')">🔍 Analysieren</button>' : '') +
         '<button class="btn btn-sm" style="background:#eff6ff;color:#1d4ed8;" onclick="extendSession(\''+s.id+'\')">+7d</button>' +
         '<button class="btn btn-sm btn-red" onclick="deleteSession(\''+s.id+'\',\''+s.phone+'\')">🗑️</button>' +
       '</td></tr>';
