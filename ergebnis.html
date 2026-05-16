@@ -61,6 +61,14 @@ header{background:var(--wa);color:#fff;padding:16px 20px;}
 
 .copy-all-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:.76rem;cursor:pointer;font-family:'Nunito',sans-serif;margin-left:6px;}
 .copy-all-btn:hover{border-color:var(--wa);color:var(--wa);}
+.market-box{background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:14px 16px;margin-bottom:8px;}
+.market-box.not-found{background:#f9fafb;border-color:var(--border);}
+.market-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0;}
+.market-stat{text-align:center;background:#fff;border-radius:8px;padding:10px;border:1px solid #86efac;}
+.market-stat-val{font-size:1.1rem;font-weight:900;color:var(--wa);}
+.market-stat-lbl{font-size:.68rem;color:var(--mu);margin-top:2px;}
+.market-assessment{font-size:.84rem;color:#15803d;margin-top:8px;font-weight:600;}
+.market-note{font-size:.82rem;color:var(--mu);font-style:italic;}
 
 .pdf-section{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:20px;text-align:center;margin-top:20px;}
 .pdf-btn{background:var(--gold);color:#fff;border:none;border-radius:var(--r);padding:14px 28px;font-size:1rem;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;transition:background .2s;}
@@ -212,6 +220,29 @@ function render(data) {
           html += '<span class="keyword" data-cid="'+kid+'">'+esc(k)+'</span>';
         });
         html += '</div><button class="copy-all-btn" data-cid="'+allKwId+'" type="button" style="margin-top:8px;">Alle Keywords kopieren</button></div>';
+      }
+
+      // MARKTVERGLEICH
+      if (an.market_comparison) {
+        var mc = an.market_comparison;
+        html += '<div class="section">';
+        html += '<div class="section-title">📊 Marktvergleich ' + (mc.platform ? '– ' + mc.platform : '') + '</div>';
+        if (mc.found && mc.listings_count > 0) {
+          html += '<div class="market-box">';
+          html += '<div class="market-grid">';
+          html += '<div class="market-stat"><div class="market-stat-val">€' + (mc.price_range_min||0) + '</div><div class="market-stat-lbl">Niedrigster Preis</div></div>';
+          html += '<div class="market-stat"><div class="market-stat-val">€' + (mc.price_avg||0) + '</div><div class="market-stat-lbl">Durchschnitt</div></div>';
+          html += '<div class="market-stat"><div class="market-stat-val">€' + (mc.price_range_max||0) + '</div><div class="market-stat-lbl">Höchster Preis</div></div>';
+          html += '</div>';
+          html += '<div style="font-size:.78rem;color:var(--mu);margin-top:6px;">📋 ' + mc.listings_count + ' aktuelle Angebote gefunden</div>';
+          if (mc.assessment) html += '<div class="market-assessment">💡 ' + esc(mc.assessment) + '</div>';
+          html += '</div>';
+        } else {
+          html += '<div class="market-box not-found">';
+          html += '<div class="market-note">🔍 ' + esc(mc.note || 'Derzeit keine vergleichbaren Angebote gefunden.') + '</div>';
+          html += '</div>';
+        }
+        html += '</div>';
       }
 
       // ZUSTAND
