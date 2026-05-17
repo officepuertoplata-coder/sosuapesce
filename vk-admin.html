@@ -684,6 +684,7 @@ async function sendSandboxMsg() {
 }
 
 function appendSandboxMsg(text, type) {
+  function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   var chat = document.getElementById('sandbox-chat');
   var styles = {
     buyer:  'align-self:flex-end;background:var(--wa);color:#fff;',
