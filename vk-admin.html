@@ -63,8 +63,9 @@ tr:hover td{background:#f9fafb;}
   <a href="hub.html" class="tbtn">← Hub</a>
   <button class="tbtn" onclick="loadAll()">↺ Aktualisieren</button>
   <button class="tbtn active" onclick="showSection('orders')" id="btnOrders">📋 Aufträge</button>
+  <button class="tbtn" onclick="showSection('verkaeufe')" id="btnVerkaeufe">💰 Verkäufe</button>
   <button class="tbtn" onclick="showSection('coupons')" id="btnCoupons">🎟️ Gutscheine</button>
-  <button class="tbtn" onclick="showSection('business')" id="btnBusiness">🏢 Firmenrabatte</button>
+  <button class="tbtn" onclick="showSection('business')" id="btnBusiness">🏢 Business</button>
   <div class="nav-right"><button class="tbtn" onclick="doLogout()">Ausloggen</button></div>
 </nav>
 
@@ -211,7 +212,7 @@ tr:hover td{background:#f9fafb;}
   <div id="section-business" style="display:none;">
     <div class="table-box">
       <div class="table-hd">
-        <h2>🏢 Firmenrabatte</h2>
+        <h2>🏢 Business</h2>
         <button class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;" onclick="toggleNewBusiness()">+ Neu</button>
       </div>
       <div id="newBusinessForm" style="display:none;padding:18px;background:#f9fafb;border-bottom:1px solid var(--border);">
@@ -486,12 +487,101 @@ function toggleNewBusiness() {
   f.style.display = f.style.display === 'none' ? 'block' : 'none';
 }
 
+async function loadVerkaeufe() {
+  try {
+    const r = await fetch(API + '/api/vk/admin/verkaeufe');
+    const data = await r.json();
+
+    // Summary
+    const totalOffen    = data.filter(v => v.payout_status === 'open').reduce((s,v) => s + (v.commission_amount||0), 0);
+    const totalErledigt = data.filter(v => v.payout_status === 'done').reduce((s,v) => s + (v.commission_amount||0), 0);
+    const totalSusp     = data.filter(v => v.payout_status === 'suspended').reduce((s,v) => s + (v.commission_amount||0), 0);
+
+    document.getElementById('verkaeufe-summary').innerHTML = [
+      '<div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:14px;text-align:center;"><div style="font-size:1.3rem;font-weight:900;color:#15803d;">€' + totalOffen.toFixed(2) + '</div><div style="font-size:.72rem;color:var(--mu);font-weight:700;margin-top:2px;">OFFEN</div></div>',
+      '<div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:14px;text-align:center;"><div style="font-size:1.3rem;font-weight:900;color:#059669;">€' + totalErledigt.toFixed(2) + '</div><div style="font-size:.72rem;color:var(--mu);font-weight:700;margin-top:2px;">AUSBEZAHLT</div></div>',
+      '<div style="background:#fef2f2;border:1.5px solid #fecaca;border-radius:10px;padding:14px;text-align:center;"><div style="font-size:1.3rem;font-weight:900;color:#ef4444;">€' + totalSusp.toFixed(2) + '</div><div style="font-size:.72rem;color:var(--mu);font-weight:700;margin-top:2px;">SUSPENDIERT</div></div>'
+    ].join('');
+
+    if (!data.length) {
+      document.getElementById('verkaeufe-list').innerHTML = '<div style="text-align:center;padding:40px;color:var(--mu);">Noch keine Verkäufe</div>';
+      return;
+    }
+
+    const now = new Date();
+    let html = '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:.82rem;">';
+    html += '<thead><tr style="border-bottom:2px solid var(--border);text-align:left;">';
+    html += '<th style="padding:8px 10px;color:var(--mu);font-size:.7rem;">VERKÄUFER</th>';
+    html += '<th style="padding:8px 10px;color:var(--mu);font-size:.7rem;">PRODUKT</th>';
+    html += '<th style="padding:8px 10px;color:var(--mu);font-size:.7rem;">VK-WERT</th>';
+    html += '<th style="padding:8px 10px;color:var(--mu);font-size:.7rem;">PROVISION</th>';
+    html += '<th style="padding:8px 10px;color:var(--mu);font-size:.7rem;">AUSZAHLUNG</th>';
+    html += '<th style="padding:8px 10px;color:var(--mu);font-size:.7rem;">STATUS</th>';
+    html += '<th style="padding:8px 10px;color:var(--mu);font-size:.7rem;">FÄLLIGKEIT</th>';
+    html += '<th style="padding:8px 10px;color:var(--mu);font-size:.7rem;">AKTION</th>';
+    html += '</tr></thead><tbody>';
+
+    data.forEach(function(v) {
+      const saleAmt   = parseFloat(v.sale_amount || 0);
+      const commAmt   = parseFloat(v.commission_amount || 0);
+      const payoutAmt = saleAmt - commAmt;
+      const dueAt     = v.payout_due_at ? new Date(v.payout_due_at) : null;
+      const soldAt    = v.sold_at ? new Date(v.sold_at) : null;
+      const isOverdue = dueAt && dueAt < now && v.payout_status === 'open';
+      const daysDue   = dueAt ? Math.ceil((now - dueAt) / (1000*60*60*24)) : 0;
+
+      const statusBadge = {
+        'open':      '<span style="background:#fef9c3;color:#a16207;padding:3px 8px;border-radius:12px;font-weight:700;font-size:.7rem;">Offen</span>',
+        'suspended': '<span style="background:#fee2e2;color:#dc2626;padding:3px 8px;border-radius:12px;font-weight:700;font-size:.7rem;">Suspendiert</span>',
+        'done':      '<span style="background:#dcfce7;color:#15803d;padding:3px 8px;border-radius:12px;font-weight:700;font-size:.7rem;">Erledigt</span>'
+      }[v.payout_status] || '';
+
+      const payoutColor = isOverdue ? 'color:#dc2626;font-weight:800;' : 'font-weight:700;';
+      const rowBg = isOverdue ? 'background:#fff7f7;' : '';
+
+      html += '<tr style="border-bottom:1px solid var(--border);' + rowBg + '">';
+      html += '<td style="padding:10px;">' + esc(v.seller_name || v.company_name || '-') + '</td>';
+      html += '<td style="padding:10px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(v.product_title || '-') + '</td>';
+      html += '<td style="padding:10px;font-weight:700;">€' + saleAmt.toFixed(2) + '</td>';
+      html += '<td style="padding:10px;font-weight:700;color:#15803d;">€' + commAmt.toFixed(2) + '</td>';
+      html += '<td style="padding:10px;' + payoutColor + '">€' + payoutAmt.toFixed(2) + (isOverdue ? ' ⚠️ ' + daysDue + 'd' : '') + '</td>';
+      html += '<td style="padding:10px;">' + statusBadge + '</td>';
+      html += '<td style="padding:10px;font-size:.75rem;color:var(--mu);">' + (dueAt ? dueAt.toLocaleDateString('de-AT') : '-') + '</td>';
+      html += '<td style="padding:10px;">';
+      if (v.payout_status === 'open') {
+        html += '<button onclick="setPayoutStatus('' + v.id + '', 'done')" style="padding:4px 8px;background:#15803d;color:#fff;border:none;border-radius:5px;font-size:.72rem;cursor:pointer;margin-right:4px;">Erledigt</button>';
+        html += '<button onclick="setPayoutStatus('' + v.id + '', 'suspended')" style="padding:4px 8px;background:#dc2626;color:#fff;border:none;border-radius:5px;font-size:.72rem;cursor:pointer;">Suspendieren</button>';
+      } else if (v.payout_status !== 'done') {
+        html += '<button onclick="setPayoutStatus('' + v.id + '', 'open')" style="padding:4px 8px;background:var(--wa);color:#fff;border:none;border-radius:5px;font-size:.72rem;cursor:pointer;">Reaktivieren</button>';
+      }
+      html += '</td>';
+      html += '</tr>';
+    });
+
+    html += '</tbody></table></div>';
+    document.getElementById('verkaeufe-list').innerHTML = html;
+  } catch(e) {
+    document.getElementById('verkaeufe-list').innerHTML = '<div style="color:red;">Fehler: ' + e.message + '</div>';
+  }
+}
+
+async function setPayoutStatus(lpId, status) {
+  try {
+    await fetch(API + '/api/vk/admin/verkaeufe/' + lpId + '/payout', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ payout_status: status })
+    });
+    loadVerkaeufe();
+  } catch(e) { alert('Fehler: ' + e.message); }
+}
+
 async function loadBusinessDiscounts() {
   try {
     var r = await fetch(API + '/api/vk/admin/business-discounts');
     var list = await r.json() || [];
     var tbody = document.getElementById('businessList');
-    if (!list.length) { tbody.innerHTML = '<tr><td colspan="8" class="msg">Keine Firmenrabatte</td></tr>'; return; }
+    if (!list.length) { tbody.innerHTML = '<tr><td colspan="8" class="msg">Keine Business</td></tr>'; return; }
     tbody.innerHTML = '';
     list.forEach(function(b) {
       var until = b.valid_until ? new Date(b.valid_until).toLocaleDateString('de-AT') : '∞';
