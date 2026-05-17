@@ -635,8 +635,8 @@ async function redeemFree() {
 
 // ── LP TOGGLE ────────────────────────────────────────────────
 function buildLPToggle(a) {
-  // Nur für Business-Kunden mit Landingpage-Freischaltung
-  if (!businessDiscount || !businessDiscount.landingpage_enabled) return '';
+  // Nur für Business-Kunden (mit oder ohne landingpage_enabled Flag)
+  if (!businessDiscount || !businessDiscount.has_discount) return '';
   // Nur wenn Fotos vorhanden
   if (!(a.vk_photos || []).length) return '';
 
