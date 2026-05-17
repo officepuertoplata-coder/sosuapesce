@@ -666,16 +666,20 @@ async function sendSandboxMsg() {
     var reply = data.reply;
     sandboxMessages.push({ role: 'assistant', content: reply });
 
+    // Natürliche Tipp-Verzögerung: ~50ms pro Zeichen, min 1s max 4s
+    var typingDelay = Math.min(4000, Math.max(1000, reply.length * 40));
+    await new Promise(function(r) { setTimeout(r, typingDelay); });
+
     // Payment Link erkannt?
     if (data.payment_link) {
-      appendSandboxMsg(reply.replace(/ZAHLUNG_LINK:\d+(\.\d+)?/, ''), 'bot');
-      appendSandboxMsg('💳 EINIGUNG! Bot würde Payment Link für EUR ' + data.payment_link.amount.toFixed(2) + ' senden.', 'system');
+      appendSandboxMsg(reply.replace(/ZAHLUNG_LINK:\d+(\.\d+)?/, '').trim(), 'bot');
+      appendSandboxMsg('EINIGUNG - Bot wuerde Payment Link senden: EUR ' + data.payment_link.amount.toFixed(2), 'system');
     } else {
       appendSandboxMsg(reply, 'bot');
     }
 
     // Model anzeigen
-    var modelBadge = data.model && data.model.includes('opus') ? '🧠 Opus (Verhandlung)' : '⚡ Haiku (FAQ)';
+    var modelBadge = data.model && data.model.includes('opus') ? 'Opus (Preisverhandlung)' : 'Haiku (Produktfrage)';
     chat.innerHTML += '<div style="text-align:center;font-size:.68rem;color:var(--mu);margin-top:-4px;">' + modelBadge + '</div>';
   } catch(e) {
     document.getElementById(typingId)?.remove();
