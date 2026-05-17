@@ -503,6 +503,7 @@ function toggleNewBusiness() {
 
 async function loadVerkaeufe() {
   try {
+    function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
     const r = await fetch(API + '/api/vk/admin/verkaeufe');
     const data = await r.json();
     if (!Array.isArray(data)) throw new Error(data.error || 'Server Fehler');
