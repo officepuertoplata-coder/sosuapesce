@@ -188,6 +188,16 @@ tr:hover td{background:#f9fafb;}
             <input type="checkbox" id="eb-lp-enabled" style="width:16px;height:16px;accent-color:var(--wa);">
             <label for="eb-lp-enabled" style="font-size:.82rem;font-weight:700;cursor:pointer;">🌐 Landingpage + Bot aktivieren</label>
           </div>
+          <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">E-MAIL (Verkäufer)</label>
+            <input id="eb-seller-email" type="email" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
+          <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">STRASSE + NR</label>
+            <input id="eb-seller-address" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
+          <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">PLZ</label>
+            <input id="eb-seller-zip" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
+          <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">ORT</label>
+            <input id="eb-seller-city" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
+          <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">UID-NUMMER (optional)</label>
+            <input id="eb-seller-uid" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
         </div>
         <div style="display:flex;gap:8px;justify-content:flex-end;">
           <button class="btn" onclick="closeEditModal()">Abbrechen</button>
@@ -226,6 +236,16 @@ tr:hover td{background:#f9fafb;}
             <input type="checkbox" id="nb-lp-enabled" style="width:16px;height:16px;accent-color:var(--wa);">
             <label for="nb-lp-enabled" style="font-size:.82rem;font-weight:700;cursor:pointer;color:var(--wa);">🌐 Landingpage + Bot</label>
           </div>
+          <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">E-MAIL (Verkäufer)</label>
+            <input id="nb-seller-email" type="email" placeholder="firma@beispiel.at" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
+          <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">STRASSE + NR</label>
+            <input id="nb-seller-address" placeholder="Musterstraße 1" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
+          <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">PLZ</label>
+            <input id="nb-seller-zip" placeholder="1010" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
+          <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">ORT</label>
+            <input id="nb-seller-city" placeholder="Wien" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
+          <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">UID-NUMMER (optional)</label>
+            <input id="nb-seller-uid" placeholder="ATU12345678" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
         </div>
         <div style="display:flex;gap:8px;justify-content:flex-end;">
           <button class="btn" onclick="toggleNewBusiness()">Abbrechen</button>
@@ -510,15 +530,20 @@ async function createBusinessDiscount() {
   var until      = document.getElementById('nb-until').value||null;
   var maxUses    = parseInt(document.getElementById('nb-maxuses').value)||null;
   var notes      = document.getElementById('nb-notes').value.trim()||null;
-  var commission = parseInt(document.getElementById('nb-commission').value)||0;
-  var wiseEmail  = document.getElementById('nb-wise').value.trim()||null;
-  var lpEnabled  = document.getElementById('nb-lp-enabled').checked;
+  var commission   = parseInt(document.getElementById('nb-commission').value)||0;
+  var wiseEmail    = document.getElementById('nb-wise').value.trim()||null;
+  var lpEnabled    = document.getElementById('nb-lp-enabled').checked;
+  var sellerEmail  = document.getElementById('nb-seller-email').value.trim()||null;
+  var sellerAddr   = document.getElementById('nb-seller-address').value.trim()||null;
+  var sellerZip    = document.getElementById('nb-seller-zip').value.trim()||null;
+  var sellerCity   = document.getElementById('nb-seller-city').value.trim()||null;
+  var sellerUid    = document.getElementById('nb-seller-uid').value.trim()||null;
   document.getElementById('nb-err').textContent = '';
   if (!company || !phone) { document.getElementById('nb-err').textContent = 'Firma und Telefon erforderlich'; return; }
   try {
     var r = await fetch(API + '/api/vk/admin/business-discounts', {
       method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ company_name: company, phone, discount_percent: discount, valid_until: until, max_uses: maxUses, notes, sales_commission_percent: commission, wise_email: wiseEmail, landingpage_enabled: lpEnabled })
+      body: JSON.stringify({ company_name: company, phone, discount_percent: discount, valid_until: until, max_uses: maxUses, notes, sales_commission_percent: commission, wise_email: wiseEmail, landingpage_enabled: lpEnabled, seller_email: sellerEmail, seller_address: sellerAddr, seller_zip: sellerZip, seller_city: sellerCity, seller_uid: sellerUid })
     });
     var d = await r.json();
     if (!d.success) { document.getElementById('nb-err').textContent = d.error; return; }
@@ -554,9 +579,14 @@ function editBusinessDiscount(b) {
   document.getElementById('eb-until').value      = b.valid_until ? b.valid_until.split('T')[0] : '';
   document.getElementById('eb-maxuses').value    = b.max_uses || '';
   document.getElementById('eb-notes').value      = b.notes || '';
-  document.getElementById('eb-commission').value = b.sales_commission_percent || 0;
-  document.getElementById('eb-wise').value       = b.wise_email || '';
-  document.getElementById('eb-lp-enabled').checked = !!b.landingpage_enabled;
+  document.getElementById('eb-commission').value    = b.sales_commission_percent || 0;
+  document.getElementById('eb-wise').value           = b.wise_email || '';
+  document.getElementById('eb-lp-enabled').checked   = !!b.landingpage_enabled;
+  document.getElementById('eb-seller-email').value   = b.seller_email || '';
+  document.getElementById('eb-seller-address').value = b.seller_address || '';
+  document.getElementById('eb-seller-zip').value     = b.seller_zip || '';
+  document.getElementById('eb-seller-city').value    = b.seller_city || '';
+  document.getElementById('eb-seller-uid').value     = b.seller_uid || '';
   document.getElementById('eb-err').textContent = '';
   var modal = document.getElementById('editBusinessModal');
   modal.style.display = 'flex';
@@ -575,14 +605,19 @@ async function saveBusinessDiscount() {
   var until      = document.getElementById('eb-until').value || null;
   var maxUses    = parseInt(document.getElementById('eb-maxuses').value)||null;
   var notes      = document.getElementById('eb-notes').value.trim()||null;
-  var commission = parseInt(document.getElementById('eb-commission').value)||0;
-  var wiseEmail  = document.getElementById('eb-wise').value.trim()||null;
-  var lpEnabled  = document.getElementById('eb-lp-enabled').checked;
+  var commission   = parseInt(document.getElementById('eb-commission').value)||0;
+  var wiseEmail    = document.getElementById('eb-wise').value.trim()||null;
+  var lpEnabled    = document.getElementById('eb-lp-enabled').checked;
+  var sellerEmail  = document.getElementById('eb-seller-email').value.trim()||null;
+  var sellerAddr   = document.getElementById('eb-seller-address').value.trim()||null;
+  var sellerZip    = document.getElementById('eb-seller-zip').value.trim()||null;
+  var sellerCity   = document.getElementById('eb-seller-city').value.trim()||null;
+  var sellerUid    = document.getElementById('eb-seller-uid').value.trim()||null;
   document.getElementById('eb-err').textContent = '';
   try {
     var r = await fetch(API + '/api/vk/admin/business-discounts/' + _editingBusinessId, {
       method: 'PUT', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ company_name: company, phone, discount_percent: discount, valid_until: until, max_uses: maxUses, notes, sales_commission_percent: commission, wise_email: wiseEmail, landingpage_enabled: lpEnabled })
+      body: JSON.stringify({ company_name: company, phone, discount_percent: discount, valid_until: until, max_uses: maxUses, notes, sales_commission_percent: commission, wise_email: wiseEmail, landingpage_enabled: lpEnabled, seller_email: sellerEmail, seller_address: sellerAddr, seller_zip: sellerZip, seller_city: sellerCity, seller_uid: sellerUid })
     });
     var d = await r.json();
     if (!d.success) { document.getElementById('eb-err').textContent = d.error; return; }
