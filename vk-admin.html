@@ -180,6 +180,14 @@ tr:hover td{background:#f9fafb;}
             <input id="eb-maxuses" type="number" placeholder="leer = unbegrenzt" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
           <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">NOTIZ</label>
             <input id="eb-notes" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
+          <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">PROVISION % (Verkauf)</label>
+            <input id="eb-commission" type="number" min="0" max="50" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
+          <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">WISE E-MAIL</label>
+            <input id="eb-wise" type="email" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
+          <div style="display:flex;align-items:center;gap:10px;background:#f9fafb;border:1.5px solid var(--border);border-radius:7px;padding:10px;grid-column:span 2;">
+            <input type="checkbox" id="eb-lp-enabled" style="width:16px;height:16px;accent-color:var(--wa);">
+            <label for="eb-lp-enabled" style="font-size:.82rem;font-weight:700;cursor:pointer;">🌐 Landingpage + Bot aktivieren</label>
+          </div>
         </div>
         <div style="display:flex;gap:8px;justify-content:flex-end;">
           <button class="btn" onclick="closeEditModal()">Abbrechen</button>
@@ -204,12 +212,20 @@ tr:hover td{background:#f9fafb;}
             <input id="nb-phone" placeholder="z.B. 436761234567" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
           <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">RABATT %</label>
             <input id="nb-discount" type="number" min="1" max="100" value="20" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
+          <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">PROVISION % (Verkauf)</label>
+            <input id="nb-commission" type="number" min="0" max="50" value="0" placeholder="z.B. 8" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
+          <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">WISE E-MAIL (Auszahlung)</label>
+            <input id="nb-wise" type="email" placeholder="firma@wise.com" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
           <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">GÜLTIG BIS</label>
             <input id="nb-until" type="date" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
           <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">MAX. AUFTRÄGE (leer = unbegrenzt)</label>
             <input id="nb-maxuses" type="number" placeholder="leer = unbegrenzt" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
           <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">NOTIZ</label>
             <input id="nb-notes" placeholder="Interne Notiz" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
+          <div style="display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--wa);border-radius:7px;padding:10px;">
+            <input type="checkbox" id="nb-lp-enabled" style="width:16px;height:16px;accent-color:var(--wa);">
+            <label for="nb-lp-enabled" style="font-size:.82rem;font-weight:700;cursor:pointer;color:var(--wa);">🌐 Landingpage + Bot</label>
+          </div>
         </div>
         <div style="display:flex;gap:8px;justify-content:flex-end;">
           <button class="btn" onclick="toggleNewBusiness()">Abbrechen</button>
@@ -218,7 +234,7 @@ tr:hover td{background:#f9fafb;}
         <div id="nb-err" style="color:var(--red);font-size:.78rem;margin-top:6px;"></div>
       </div>
       <table>
-        <thead><tr><th>Firma</th><th>Telefon</th><th>Rabatt</th><th>Verwendet</th><th>Max</th><th>Gültig bis</th><th>Status</th><th>Aktionen</th></tr></thead>
+        <thead><tr><th>Firma</th><th>Telefon</th><th>Rabatt</th><th>Provision</th><th>LP/Bot</th><th>Verwendet</th><th>Gültig bis</th><th>Status</th><th>Aktionen</th></tr></thead>
         <tbody id="businessList"><tr><td colspan="8" class="msg">Lade...</td></tr></tbody>
       </table>
     </div>
@@ -464,11 +480,12 @@ async function loadBusinessDiscounts() {
       var isActive = b.active && !isExpired && !isFull;
       var tr = document.createElement('tr');
       tr.innerHTML =
-        '<td><strong>' + b.company_name + '</strong>' + (b.notes ? '<br><small style="color:var(--mu)">' + b.notes + '</small>' : '') + '</td>' +
+        '<td><strong>' + b.company_name + '</strong>' + (b.notes ? '<br><small style="color:var(--mu)">' + b.notes + '</small>' : '') + (b.wise_email ? '<br><small style="color:var(--mu)">💳 ' + b.wise_email + '</small>' : '') + '</td>' +
         '<td><span class="phone">' + b.phone + '</span></td>' +
         '<td style="font-weight:800;color:#059669;">' + b.discount_percent + '%</td>' +
+        '<td style="text-align:center;">' + (b.sales_commission_percent||0) + '%</td>' +
+        '<td style="text-align:center;">' + (b.landingpage_enabled ? '✅' : '—') + '</td>' +
         '<td style="text-align:center;">' + (b.used_count||0) + '</td>' +
-        '<td style="text-align:center;">' + (b.max_uses||'∞') + '</td>' +
         '<td>' + until + '</td>' +
         '<td><span class="badge ' + (isActive?'s-open':'s-expired') + '">' + (isActive?'Aktiv':'Inaktiv') + '</span></td>' +
         '<td style="white-space:nowrap;">' +
@@ -487,18 +504,21 @@ async function loadBusinessDiscounts() {
 }
 
 async function createBusinessDiscount() {
-  var company = document.getElementById('nb-company').value.trim();
-  var phone = document.getElementById('nb-phone').value.trim().replace(/[^0-9+]/g,'');
-  var discount = parseInt(document.getElementById('nb-discount').value)||20;
-  var until = document.getElementById('nb-until').value||null;
-  var maxUses = parseInt(document.getElementById('nb-maxuses').value)||null;
-  var notes = document.getElementById('nb-notes').value.trim()||null;
+  var company    = document.getElementById('nb-company').value.trim();
+  var phone      = document.getElementById('nb-phone').value.trim().replace(/[^0-9+]/g,'');
+  var discount   = parseInt(document.getElementById('nb-discount').value)||20;
+  var until      = document.getElementById('nb-until').value||null;
+  var maxUses    = parseInt(document.getElementById('nb-maxuses').value)||null;
+  var notes      = document.getElementById('nb-notes').value.trim()||null;
+  var commission = parseInt(document.getElementById('nb-commission').value)||0;
+  var wiseEmail  = document.getElementById('nb-wise').value.trim()||null;
+  var lpEnabled  = document.getElementById('nb-lp-enabled').checked;
   document.getElementById('nb-err').textContent = '';
   if (!company || !phone) { document.getElementById('nb-err').textContent = 'Firma und Telefon erforderlich'; return; }
   try {
     var r = await fetch(API + '/api/vk/admin/business-discounts', {
       method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ company_name: company, phone, discount_percent: discount, valid_until: until, max_uses: maxUses, notes })
+      body: JSON.stringify({ company_name: company, phone, discount_percent: discount, valid_until: until, max_uses: maxUses, notes, sales_commission_percent: commission, wise_email: wiseEmail, landingpage_enabled: lpEnabled })
     });
     var d = await r.json();
     if (!d.success) { document.getElementById('nb-err').textContent = d.error; return; }
@@ -528,12 +548,15 @@ var _editingBusinessId = null;
 
 function editBusinessDiscount(b) {
   _editingBusinessId = b.id;
-  document.getElementById('eb-company').value  = b.company_name || '';
-  document.getElementById('eb-phone').value    = b.phone || '';
-  document.getElementById('eb-discount').value = b.discount_percent || 20;
-  document.getElementById('eb-until').value    = b.valid_until ? b.valid_until.split('T')[0] : '';
-  document.getElementById('eb-maxuses').value  = b.max_uses || '';
-  document.getElementById('eb-notes').value    = b.notes || '';
+  document.getElementById('eb-company').value    = b.company_name || '';
+  document.getElementById('eb-phone').value      = b.phone || '';
+  document.getElementById('eb-discount').value   = b.discount_percent || 20;
+  document.getElementById('eb-until').value      = b.valid_until ? b.valid_until.split('T')[0] : '';
+  document.getElementById('eb-maxuses').value    = b.max_uses || '';
+  document.getElementById('eb-notes').value      = b.notes || '';
+  document.getElementById('eb-commission').value = b.sales_commission_percent || 0;
+  document.getElementById('eb-wise').value       = b.wise_email || '';
+  document.getElementById('eb-lp-enabled').checked = !!b.landingpage_enabled;
   document.getElementById('eb-err').textContent = '';
   var modal = document.getElementById('editBusinessModal');
   modal.style.display = 'flex';
@@ -546,17 +569,20 @@ function closeEditModal() {
 
 async function saveBusinessDiscount() {
   if (!_editingBusinessId) return;
-  var company  = document.getElementById('eb-company').value.trim();
-  var phone    = document.getElementById('eb-phone').value.trim().replace(/[^0-9+]/g,'');
-  var discount = parseInt(document.getElementById('eb-discount').value)||20;
-  var until    = document.getElementById('eb-until').value || null;
-  var maxUses  = parseInt(document.getElementById('eb-maxuses').value)||null;
-  var notes    = document.getElementById('eb-notes').value.trim()||null;
+  var company    = document.getElementById('eb-company').value.trim();
+  var phone      = document.getElementById('eb-phone').value.trim().replace(/[^0-9+]/g,'');
+  var discount   = parseInt(document.getElementById('eb-discount').value)||20;
+  var until      = document.getElementById('eb-until').value || null;
+  var maxUses    = parseInt(document.getElementById('eb-maxuses').value)||null;
+  var notes      = document.getElementById('eb-notes').value.trim()||null;
+  var commission = parseInt(document.getElementById('eb-commission').value)||0;
+  var wiseEmail  = document.getElementById('eb-wise').value.trim()||null;
+  var lpEnabled  = document.getElementById('eb-lp-enabled').checked;
   document.getElementById('eb-err').textContent = '';
   try {
     var r = await fetch(API + '/api/vk/admin/business-discounts/' + _editingBusinessId, {
       method: 'PUT', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ company_name: company, phone, discount_percent: discount, valid_until: until, max_uses: maxUses, notes })
+      body: JSON.stringify({ company_name: company, phone, discount_percent: discount, valid_until: until, max_uses: maxUses, notes, sales_commission_percent: commission, wise_email: wiseEmail, landingpage_enabled: lpEnabled })
     });
     var d = await r.json();
     if (!d.success) { document.getElementById('eb-err').textContent = d.error; return; }
