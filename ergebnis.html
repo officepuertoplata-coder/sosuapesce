@@ -125,13 +125,25 @@ function buildLPButton(article) {
     var an = article.analysis || {};
     if (lp && lp.status === 'active') {
       var url = 'https://p.converdino.com/p/' + lp.slug;
-      return '<div style="margin-top:10px;padding:12px 14px;background:#dcfce7;border:1.5px solid #25D366;border-radius:10px;">' +
-        '<div style="font-size:.8rem;font-weight:800;color:#15803d;margin-bottom:6px;">Landingpage aktiv</div>' +
-        '<a href="' + url + '" target="_blank" style="font-size:.85rem;color:#15803d;word-break:break-all;">' + url + '</a>' +
-        '<div style="display:flex;gap:8px;margin-top:10px;">' +
-        '<button data-action="copy-lp" data-url="' + url + '" style="flex:1;padding:8px;background:#25D366;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:.8rem;">Link kopieren</button>' +
-        '<button data-action="deactivate-lp" data-lpid="' + lp.id + '" style="padding:8px 12px;background:none;border:1px solid #fecaca;color:#ef4444;border-radius:8px;font-size:.8rem;cursor:pointer;">Deaktivieren</button>' +
-        '</div></div>';
+      var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=' + encodeURIComponent(url) + '&color=1b4332&bgcolor=ffffff&margin=10';
+      var labelUrl = API + '/api/vk/lp/label/' + lp.slug;
+      return '<div style="margin-top:10px;padding:16px;background:#dcfce7;border:1.5px solid #25D366;border-radius:12px;">' +
+        '<div style="font-size:.8rem;font-weight:800;color:#15803d;margin-bottom:10px;">Landingpage aktiv</div>' +
+        '<div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;">' +
+          '<div style="flex-shrink:0;text-align:center;">' +
+            '<img src="' + qrUrl + '" style="width:120px;height:120px;border-radius:8px;border:2px solid #86efac;display:block;" alt="QR Code">' +
+            '<div style="font-size:.68rem;color:#15803d;font-weight:700;margin-top:4px;">Scan &rarr; Produktseite</div>' +
+          '</div>' +
+          '<div style="flex:1;min-width:180px;">' +
+            '<a href="' + url + '" target="_blank" style="font-size:.82rem;color:#15803d;word-break:break-all;display:block;margin-bottom:10px;">' + url + '</a>' +
+            '<div style="display:flex;flex-direction:column;gap:6px;">' +
+              '<button data-action="copy-lp" data-url="' + url + '" style="padding:8px 12px;background:#25D366;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:.8rem;text-align:left;">Link kopieren</button>' +
+              '<a href="' + labelUrl + '" target="_blank" style="padding:8px 12px;background:#1b4332;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:.8rem;text-decoration:none;display:block;">Produktetikett drucken</a>' +
+              '<button data-action="deactivate-lp" data-lpid="' + lp.id + '" style="padding:6px 12px;background:none;border:1px solid #fecaca;color:#ef4444;border-radius:8px;font-size:.75rem;cursor:pointer;text-align:left;">Deaktivieren</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
     }
     if (article.lp_booked) {
       window._lpModalData = window._lpModalData || {};
