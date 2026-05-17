@@ -126,7 +126,18 @@ tr:hover td{background:#f9fafb;}
   </div>
 
   <!-- GUTSCHEINE -->
-  <div id="section-coupons" style="display:none;">
+  <div id="section-verkaeufe" style="display:none;">
+  <div class="card" style="margin:16px 0;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div class="card-title" style="font-size:1rem;font-weight:800;">Verkaufe &amp; Provisionen</div>
+      <button onclick="loadVerkaeufe()" style="padding:6px 14px;background:var(--wa);color:#fff;border:none;border-radius:7px;font-size:.8rem;cursor:pointer;font-weight:700;">Aktualisieren</button>
+    </div>
+    <div id="verkaeufe-summary" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;"></div>
+    <div id="verkaeufe-list"><div style="text-align:center;padding:40px;color:var(--mu);">Lade Verkaufe...</div></div>
+  </div>
+</div>
+
+<div id="section-coupons" style="display:none;">
     <div class="table-box">
       <div class="table-hd">
         <h2>🎟️ Gutschein-Codes</h2>
