@@ -315,7 +315,11 @@ function render(data) {
   });
   var pdfBtn = document.getElementById('pdfBtn');
   if (pdfBtn) pdfBtn.addEventListener('click', function() { window.open(API+'/api/vk/pdf/'+TOKEN,'_blank'); });
-  if (data.status === 'analyzing') setTimeout(loadResults, 8000);
+  // Auto-Refresh wenn Session analysiert oder Artikel noch ausstehend
+  var pending = (data.articles || []).filter(function(a) { return a.status !== 'analyzed'; });
+  if (data.status === 'analyzing' || pending.length > 0) {
+    setTimeout(loadResults, 6000);
+  }
 }
 
 function copyField(text, label) {
