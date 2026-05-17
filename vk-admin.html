@@ -143,8 +143,10 @@ tr:hover td{background:#f9fafb;}
     <div class="card-title" style="font-size:1rem;font-weight:800;margin-bottom:16px;">🤖 Bot Sandbox – LP Verkauf testen</div>
     <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
       <div style="flex:1;min-width:200px;">
-        <label style="font-size:.72rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">LP SLUG</label>
-        <input id="sandbox-slug" placeholder="z.B. artikel-805-x54u0" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.85rem;font-family:inherit;">
+        <label style="font-size:.72rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">LANDINGPAGE</label>
+        <select id="sandbox-slug" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.85rem;font-family:inherit;" onchange="resetSandbox()">
+          <option value="">-- LP laden...</option>
+        </select>
       </div>
       <div style="flex:1;min-width:200px;">
         <label style="font-size:.72rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">VERHANDLUNGS-LEVEL</label>
@@ -454,7 +456,7 @@ function showSection(name) {
   if (name === 'coupons') { document.getElementById('btnCoupons').classList.add('active'); loadCoupons(); }
   else if (name === 'business')  { document.getElementById('btnBusiness').classList.add('active');  loadBusinessDiscounts(); }
   else if (name === 'verkaeufe')   { document.getElementById('btnVerkaeufe').classList.add('active'); loadVerkaeufe(); }
-  else if (name === 'botsandbox') { document.getElementById('btnBotsandbox').classList.add('active'); }
+  else if (name === 'botsandbox') { document.getElementById('btnBotsandbox').classList.add('active'); loadSandboxLPs(); }
   else { document.getElementById('btnOrders').classList.add('active'); loadOrders(); }
 }
 
@@ -697,6 +699,22 @@ function resetSandbox() {
   sandboxMessages = [];
   var chat = document.getElementById('sandbox-chat');
   chat.innerHTML = '<div style="text-align:center;color:var(--mu);font-size:.82rem;padding:20px;">Konversation zurückgesetzt.</div>';
+}
+
+async function loadSandboxLPs() {
+  try {
+    var r = await fetch(API + '/api/vk/admin/active-lps');
+    var lps = await r.json();
+    var sel = document.getElementById('sandbox-slug');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">-- LP auswählen --</option>';
+    (lps || []).forEach(function(lp) {
+      var opt = document.createElement('option');
+      opt.value = lp.slug;
+      opt.textContent = (lp.title || lp.slug) + ' – EUR ' + (lp.sale_price || 0) + (lp.negotiation_level ? ' [' + lp.negotiation_level + ']' : '');
+      sel.appendChild(opt);
+    });
+  } catch(e) { console.error('LP load error:', e); }
 }
 
 async function loadBusinessDiscounts() {
