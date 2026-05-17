@@ -685,19 +685,52 @@ async function toggleLP(articleId, currentState) {
 }
 
 async function saveLPBooking(articleId, updates) {
+  // Sofort lokalen State updaten für Live-Preis
+  if (sessionData && sessionData.articles) {
+    sessionData.articles.forEach(function(a) {
+      if (a.id === articleId) Object.assign(a, updates);
+    });
+  }
+  // Preis sofort neu berechnen
+  var price = calcPrice(sessionData.articles || []);
+  updatePriceDisplay(price);
   try {
     await fetch(API + '/api/vk/article/' + articleId + '/notes', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updates)
     });
-    // Lokalen State updaten
-    if (sessionData && sessionData.articles) {
-      sessionData.articles.forEach(function(a) {
-        if (a.id === articleId) Object.assign(a, updates);
-      });
-    }
   } catch(e) { console.error('LP speichern:', e.message); }
+}
+
+function updatePriceDisplay(price) {
+  // Preis in Zusammenfassung live updaten ohne volles Re-render
+  var articles = (sessionData && sessionData.articles) || [];
+  var priceCard = document.querySelector('.card:last-child');
+  if (!priceCard) return;
+  var cardTitle = priceCard.querySelector('.card-title');
+  if (!cardTitle) return;
+  // Alle Preis-Rows bis coupon-section neu aufbauen
+  var couponSection = document.getElementById('coupon-section');
+  if (!couponSection) return;
+  var node = cardTitle.nextSibling;
+  while (node && node !== couponSection) {
+    var next = node.nextSibling;
+    priceCard.removeChild(node);
+    node = next;
+  }
+  var frag = document.createRange().createContextualFragment(buildPriceRows(articles, price));
+  cardTitle.after(frag);
+  // Gesamt-Button updaten
+  var btnPay = document.getElementById('btn-pay');
+  if (btnPay && !btnPay.disabled) {
+    var displayPrice = getDisplayPrice(price);
+    if (businessDiscount && businessDiscount.percent >= 100) {
+      btnPay.textContent = '🎉 Kostenlos einlösen (Firmenrabatt)';
+    } else {
+      btnPay.textContent = '💳 Jetzt bezahlen  €' + displayPrice.toFixed(2);
+    }
+  }
 }
 
 function updateLPCost(articleId, days, hasBot) {
@@ -705,6 +738,13 @@ function updateLPCost(articleId, days, hasBot) {
   var cost = Math.round(days * rate * 100) / 100;
   var el = document.getElementById('lp-cost-' + articleId);
   if (el) el.textContent = '💰 Kosten: €' + cost.toFixed(2) + ' (' + days + ' Tage × €' + rate.toFixed(2) + '/Tag)';
+  // Sofort State updaten und Preis neu berechnen
+  if (sessionData && sessionData.articles) {
+    sessionData.articles.forEach(function(a) {
+      if (a.id === articleId) { a.lp_days = days; a.lp_has_bot = hasBot; }
+    });
+  }
+  updatePriceDisplay(calcPrice(sessionData.articles || []));
 }
 
 // ── HELPERS ───────────────────────────────────────────────────
