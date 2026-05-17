@@ -552,10 +552,10 @@ async function loadVerkaeufe() {
       html += '<td style="padding:10px;font-size:.75rem;color:var(--mu);">' + (dueAt ? dueAt.toLocaleDateString('de-AT') : '-') + '</td>';
       html += '<td style="padding:10px;">';
       if (v.payout_status === 'open') {
-        html += '<button onclick="setPayoutStatus('' + v.id + '', 'done')" style="padding:4px 8px;background:#15803d;color:#fff;border:none;border-radius:5px;font-size:.72rem;cursor:pointer;margin-right:4px;">Erledigt</button>';
-        html += '<button onclick="setPayoutStatus('' + v.id + '', 'suspended')" style="padding:4px 8px;background:#dc2626;color:#fff;border:none;border-radius:5px;font-size:.72rem;cursor:pointer;">Suspendieren</button>';
+        html += '<button data-lpid="' + v.id + '" data-status="done" data-action="payout" style="padding:4px 8px;background:#15803d;color:#fff;border:none;border-radius:5px;font-size:.72rem;cursor:pointer;margin-right:4px;">Erledigt</button>';
+        html += '<button data-lpid="' + v.id + '" data-status="suspended" data-action="payout" style="padding:4px 8px;background:#dc2626;color:#fff;border:none;border-radius:5px;font-size:.72rem;cursor:pointer;">Suspendieren</button>';
       } else if (v.payout_status !== 'done') {
-        html += '<button onclick="setPayoutStatus('' + v.id + '', 'open')" style="padding:4px 8px;background:var(--wa);color:#fff;border:none;border-radius:5px;font-size:.72rem;cursor:pointer;">Reaktivieren</button>';
+        html += '<button data-lpid="' + v.id + '" data-status="open" data-action="payout" style="padding:4px 8px;background:var(--wa);color:#fff;border:none;border-radius:5px;font-size:.72rem;cursor:pointer;">Reaktivieren</button>';
       }
       html += '</td>';
       html += '</tr>';
