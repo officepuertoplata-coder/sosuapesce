@@ -64,6 +64,7 @@ tr:hover td{background:#f9fafb;}
   <button class="tbtn" onclick="loadAll()">↺ Aktualisieren</button>
   <button class="tbtn active" onclick="showSection('orders')" id="btnOrders">📋 Aufträge</button>
   <button class="tbtn" onclick="showSection('verkaeufe')" id="btnVerkaeufe">💰 Verkäufe</button>
+  <button class="tbtn" onclick="showSection('botsandbox')" id="btnBotsandbox">🤖 Bot Sandbox</button>
   <button class="tbtn" onclick="showSection('coupons')" id="btnCoupons">🎟️ Gutscheine</button>
   <button class="tbtn" onclick="showSection('business')" id="btnBusiness">🏢 Business</button>
   <div class="nav-right"><button class="tbtn" onclick="doLogout()">Ausloggen</button></div>
@@ -134,6 +135,34 @@ tr:hover td{background:#f9fafb;}
     </div>
     <div id="verkaeufe-summary" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;"></div>
     <div id="verkaeufe-list"><div style="text-align:center;padding:40px;color:var(--mu);">Lade Verkaufe...</div></div>
+  </div>
+</div>
+
+<div id="section-botsandbox" style="display:none;">
+  <div class="card" style="margin:16px 0;">
+    <div class="card-title" style="font-size:1rem;font-weight:800;margin-bottom:16px;">🤖 Bot Sandbox – LP Verkauf testen</div>
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:200px;">
+        <label style="font-size:.72rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">LP SLUG</label>
+        <input id="sandbox-slug" placeholder="z.B. artikel-805-x54u0" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.85rem;font-family:inherit;">
+      </div>
+      <div style="flex:1;min-width:200px;">
+        <label style="font-size:.72rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">VERHANDLUNGS-LEVEL</label>
+        <select id="sandbox-level" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.85rem;font-family:inherit;">
+          <option value="friendly">😊 Freundlich – gibt leichter nach</option>
+          <option value="professional" selected>💼 Professionell – moderate Verhandlung</option>
+          <option value="hard">🔥 Hart – gibt kaum nach</option>
+        </select>
+      </div>
+    </div>
+    <div id="sandbox-chat" style="height:400px;overflow-y:auto;background:#f9fafb;border:1.5px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;display:flex;flex-direction:column;gap:10px;">
+      <div style="text-align:center;color:var(--mu);font-size:.82rem;padding:20px;">LP Slug eingeben und Nachricht senden um den Bot zu testen.</div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <input id="sandbox-input" placeholder="Schreibe eine Nachricht als Käufer..." style="flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:.9rem;font-family:inherit;" onkeydown="if(event.keyCode===13)sendSandboxMsg()">
+      <button onclick="sendSandboxMsg()" style="padding:10px 20px;background:var(--wa);color:#fff;border:none;border-radius:8px;font-weight:800;cursor:pointer;font-family:inherit;">Senden</button>
+      <button onclick="resetSandbox()" style="padding:10px 14px;background:var(--border);color:var(--txt);border:none;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit;">Reset</button>
+    </div>
   </div>
 </div>
 
@@ -419,10 +448,13 @@ function showSection(name) {
   document.getElementById('section-orders').style.display    = name === 'orders'    ? 'block' : 'none';
   var ve = document.getElementById('section-verkaeufe');
   if (ve) ve.style.display = name === 'verkaeufe' ? 'block' : 'none';
+  var bs = document.getElementById('section-botsandbox');
+  if (bs) bs.style.display = name === 'botsandbox' ? 'block' : 'none';
   document.querySelectorAll('.tbtn').forEach(b => b.classList.remove('active'));
   if (name === 'coupons') { document.getElementById('btnCoupons').classList.add('active'); loadCoupons(); }
   else if (name === 'business')  { document.getElementById('btnBusiness').classList.add('active');  loadBusinessDiscounts(); }
-  else if (name === 'verkaeufe') { document.getElementById('btnVerkaeufe').classList.add('active'); loadVerkaeufe(); }
+  else if (name === 'verkaeufe')   { document.getElementById('btnVerkaeufe').classList.add('active'); loadVerkaeufe(); }
+  else if (name === 'botsandbox') { document.getElementById('btnBotsandbox').classList.add('active'); }
   else { document.getElementById('btnOrders').classList.add('active'); loadOrders(); }
 }
 
@@ -590,6 +622,81 @@ async function setPayoutStatus(lpId, status) {
     });
     loadVerkaeufe();
   } catch(e) { alert('Fehler: ' + e.message); }
+}
+
+var sandboxMessages = [];
+var sandboxSlug = '';
+
+async function sendSandboxMsg() {
+  var input = document.getElementById('sandbox-input');
+  var slug = document.getElementById('sandbox-slug').value.trim();
+  var msg = input.value.trim();
+  if (!msg || !slug) { alert('Bitte LP Slug und Nachricht eingeben'); return; }
+
+  sandboxSlug = slug;
+  input.value = '';
+
+  // Käufer Nachricht anzeigen
+  appendSandboxMsg(msg, 'buyer');
+  sandboxMessages.push({ role: 'user', content: msg });
+
+  // Typing indicator
+  var typingId = 'typing-' + Date.now();
+  var chat = document.getElementById('sandbox-chat');
+  chat.innerHTML += '<div id="' + typingId + '" style="align-self:flex-start;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:8px 12px;font-size:.82rem;color:var(--mu);">⏳ Bot tippt...</div>';
+  chat.scrollTop = chat.scrollHeight;
+
+  try {
+    var r = await fetch(API + '/api/vk/admin/bot-sandbox', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        lp_slug: slug,
+        messages: sandboxMessages,
+        negotiation_level: document.getElementById('sandbox-level').value
+      })
+    });
+    var data = await r.json();
+    document.getElementById(typingId)?.remove();
+
+    if (!r.ok) { appendSandboxMsg('Fehler: ' + (data.error || 'Unbekannt'), 'error'); return; }
+
+    var reply = data.reply;
+    sandboxMessages.push({ role: 'assistant', content: reply });
+
+    // Payment Link erkannt?
+    if (data.payment_link) {
+      appendSandboxMsg(reply.replace(/ZAHLUNG_LINK:\d+(\.\d+)?/, ''), 'bot');
+      appendSandboxMsg('💳 EINIGUNG! Bot würde Payment Link für EUR ' + data.payment_link.amount.toFixed(2) + ' senden.', 'system');
+    } else {
+      appendSandboxMsg(reply, 'bot');
+    }
+
+    // Model anzeigen
+    var modelBadge = data.model && data.model.includes('opus') ? '🧠 Opus (Verhandlung)' : '⚡ Haiku (FAQ)';
+    chat.innerHTML += '<div style="text-align:center;font-size:.68rem;color:var(--mu);margin-top:-4px;">' + modelBadge + '</div>';
+  } catch(e) {
+    document.getElementById(typingId)?.remove();
+    appendSandboxMsg('Fehler: ' + e.message, 'error');
+  }
+}
+
+function appendSandboxMsg(text, type) {
+  var chat = document.getElementById('sandbox-chat');
+  var styles = {
+    buyer:  'align-self:flex-end;background:var(--wa);color:#fff;',
+    bot:    'align-self:flex-start;background:#fff;border:1.5px solid var(--border);color:var(--txt);',
+    system: 'align-self:center;background:#fef9c3;border:1px solid #fef08a;color:#a16207;font-size:.78rem;',
+    error:  'align-self:center;background:#fef2f2;border:1px solid #fecaca;color:#dc2626;font-size:.78rem;'
+  };
+  chat.innerHTML += '<div style="' + (styles[type]||styles.bot) + 'border-radius:10px;padding:9px 13px;font-size:.85rem;max-width:85%;white-space:pre-wrap;">' + esc(text) + '</div>';
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function resetSandbox() {
+  sandboxMessages = [];
+  var chat = document.getElementById('sandbox-chat');
+  chat.innerHTML = '<div style="text-align:center;color:var(--mu);font-size:.82rem;padding:20px;">Konversation zurückgesetzt.</div>';
 }
 
 async function loadBusinessDiscounts() {
