@@ -403,13 +403,16 @@ async function deleteSession(id, phone) {
 }
 
 function showSection(name) {
-  document.getElementById('section-coupons').style.display  = name === 'coupons'  ? 'block' : 'none';
-  document.getElementById('section-business').style.display = name === 'business' ? 'block' : 'none';
-  document.getElementById('section-orders').style.display   = name === 'orders'   ? 'block' : 'none';
+  document.getElementById('section-coupons').style.display   = name === 'coupons'   ? 'block' : 'none';
+  document.getElementById('section-business').style.display  = name === 'business'  ? 'block' : 'none';
+  document.getElementById('section-orders').style.display    = name === 'orders'    ? 'block' : 'none';
+  var ve = document.getElementById('section-verkaeufe');
+  if (ve) ve.style.display = name === 'verkaeufe' ? 'block' : 'none';
   document.querySelectorAll('.tbtn').forEach(b => b.classList.remove('active'));
   if (name === 'coupons') { document.getElementById('btnCoupons').classList.add('active'); loadCoupons(); }
-  else if (name === 'business') { document.getElementById('btnBusiness').classList.add('active'); loadBusinessDiscounts(); }
-  else { document.getElementById('btnOrders').classList.add('active'); }
+  else if (name === 'business')  { document.getElementById('btnBusiness').classList.add('active');  loadBusinessDiscounts(); }
+  else if (name === 'verkaeufe') { document.getElementById('btnVerkaeufe').classList.add('active'); loadVerkaeufe(); }
+  else { document.getElementById('btnOrders').classList.add('active'); loadOrders(); }
 }
 
 function toggleNewCoupon() {
