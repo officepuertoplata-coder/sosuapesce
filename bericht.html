@@ -284,7 +284,7 @@ function buildHTML(s, price) {
     '  <div class="card-title">Zusammenfassung</div>',
     buildPriceRows(articles, price),
     '  <div id="coupon-section">' + (businessDiscount && businessDiscount.has_discount ? '' : buildCouponSection()) + '</div>',
-    '  <button class="btn-pay" id="btn-pay" onclick="startPayment()">' + (businessDiscount && businessDiscount.percent >= 100 ? '🎉 Kostenlos einlösen (Firmenrabatt)' : '💳 Jetzt bezahlen &nbsp;€' + getDisplayPrice(price).toFixed(2)) + '</button>',
+    '  <button class="btn-pay" id="btn-pay" onclick="' + (businessDiscount && businessDiscount.percent >= 100 ? 'redeemBusinessFree()' : 'startPayment()') + '">' + (businessDiscount && businessDiscount.percent >= 100 ? '🎉 Kostenlos einlösen (Firmenrabatt)' : '💳 Jetzt bezahlen &nbsp;€' + getDisplayPrice(price).toFixed(2)) + '</button>',
     '</div>',
   ].join('\n');
 }
