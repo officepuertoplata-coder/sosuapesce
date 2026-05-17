@@ -292,7 +292,7 @@ function buildHTML(s, price) {
     '  <div class="card-title">Zusammenfassung</div>',
     buildPriceRows(articles, price),
     '  <div id="coupon-section">' + (businessDiscount && businessDiscount.has_discount ? '' : buildCouponSection()) + '</div>',
-    '  <bubuildPayButton(price),
+    buildPayButton(price),
     '</div>',
   ].join('\n');
 }
