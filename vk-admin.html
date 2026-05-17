@@ -505,6 +505,7 @@ async function loadVerkaeufe() {
   try {
     const r = await fetch(API + '/api/vk/admin/verkaeufe');
     const data = await r.json();
+    if (!Array.isArray(data)) throw new Error(data.error || 'Server Fehler');
 
     // Summary
     const totalOffen    = data.filter(v => v.payout_status === 'open').reduce((s,v) => s + (v.commission_amount||0), 0);
