@@ -249,6 +249,14 @@ function getBusinessBanner() {
     ' – wird automatisch angewendet</div>';
 }
 
+function buildPayButton(price) {
+  if (businessDiscount && businessDiscount.percent >= 100) {
+    return '<button class="btn-pay" id="btn-pay" onclick="redeemBusinessFree()">🎉 Kostenlos einlösen (Firmenrabatt)</button>';
+  }
+  var displayPrice = getDisplayPrice(price);
+  return '<button class="btn-pay" id="btn-pay" onclick="startPayment()">💳 Jetzt bezahlen  €' + displayPrice.toFixed(2) + '</button>';
+}
+
 function buildHTML(s, price) {
   const articles = s.articles || [];
   return [
@@ -284,7 +292,7 @@ function buildHTML(s, price) {
     '  <div class="card-title">Zusammenfassung</div>',
     buildPriceRows(articles, price),
     '  <div id="coupon-section">' + (businessDiscount && businessDiscount.has_discount ? '' : buildCouponSection()) + '</div>',
-    '  <button class="btn-pay" id="btn-pay" onclick="' + (businessDiscount && businessDiscount.percent >= 100 ? 'redeemBusinessFree()' : 'startPayment()') + '">' + (businessDiscount && businessDiscount.percent >= 100 ? '🎉 Kostenlos einlösen (Firmenrabatt)' : '💳 Jetzt bezahlen &nbsp;€' + getDisplayPrice(price).toFixed(2)) + '</button>',
+    '  <bubuildPayButton(price),
     '</div>',
   ].join('\n');
 }
