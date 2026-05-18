@@ -377,6 +377,8 @@ function render(data){
       // Tipps
       if(an.tips&&an.tips.length){html+='<div class="section"><div class="section-title">Verkaufstipps</div><div class="tip-list">';an.tips.forEach(function(t){html+='<div class="tip"><span>→</span><span>'+esc(t)+'</span></div>';});html+='</div></div>';}
     }
+    // ── Notizfeld + Neu analysieren
+    html+='<div class="section"><div class="section-title">📝 Zusatzinfos / Korrektur</div><textarea id="notes-'+a.id+'" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:.85rem;font-family:var(--font);resize:vertical;min-height:64px;" placeholder="z.B. Tissot Ballade 39mm, Neupreis Euro 1025, Kaufjahr 2022...">'+esc(a.notes||'')+'</textarea><button onclick="reanalyzeArticle(''+a.id+'')" id="reanalyze-btn-'+a.id+'" style="margin-top:8px;width:100%;padding:13px;background:#f0fdf4;border:1.5px solid var(--wa);border-radius:8px;color:#15803d;font-weight:800;font-size:.88rem;cursor:pointer;font-family:var(--font);">🔄 Neu analysieren mit diesen Infos</button><div style="font-size:.72rem;color:var(--mu);margin-top:6px;">Notizen eintragen → Neu analysieren → Ergebnis in ~30 Sek.</div></div>';
     // LP Button
     try{html+=buildLPButton(a);}catch(e){}
     html+='</div>';
@@ -414,6 +416,44 @@ async function deleteEmptyArticle(articleId){
     render(data);
     showToast("✅ Artikel gelöscht");
   }catch(e){showToast("❌ Fehler beim Löschen");}
+
+async function saveNotesResult(articleId, notes) {
+  try { await fetch(API+'/api/vk/article/'+articleId+'/notes', {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({notes:notes})}); } catch(e) {}
+}
+
+async function reanalyzeArticle(articleId) {
+  var notesEl = document.getElementById('notes-'+articleId);
+  if(notesEl) await saveNotesResult(articleId, notesEl.value);
+  var btn = document.getElementById('reanalyze-btn-'+articleId);
+  if(btn){ btn.disabled=true; btn.textContent='⏳ Analyse läuft... (~30 Sek.)'; }
+  try {
+    await fetch(API+'/api/vk/article/'+articleId+'/reanalyze', {method:'POST'});
+    var attempts=0;
+    var interval=setInterval(async function(){
+      attempts++;
+      try{
+        var r=await fetch(API+'/api/vk/results/'+TOKEN);
+        var data=await r.json();
+        var art=(data.articles||[]).find(function(a){return a.id===articleId;});
+        if(art && art.status==='analyzed'){
+          clearInterval(interval);
+          window._lastData=data;
+          render(data);
+          showToast('✅ Neu analysiert!');
+          return;
+        }
+      }catch(e){}
+      if(attempts>20){
+        clearInterval(interval);
+        if(btn){btn.disabled=false;btn.textContent='🔄 Neu analysieren mit diesen Infos';}
+        showToast('⏱ Dauert länger – Seite neu laden');
+      }
+    }, 3000);
+  } catch(e) {
+    if(btn){btn.disabled=false;btn.textContent='🔄 Neu analysieren mit diesen Infos';}
+    showToast('❌ Fehler: '+e.message);
+  }
+}
 }
 </script>
 </body>
