@@ -27,7 +27,6 @@
   /* ── ARTIKEL CARD ── */
   .article-card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; margin-bottom: 12px; }
 
-  /* Editierbarer Titel */
   .article-title-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
   .article-title-input {
     font-weight: 600; color: #1f2937; font-size: .95rem;
@@ -38,7 +37,6 @@
   .article-title-input:hover { border-color: #d1d5db; background: #f9fafb; }
   .article-title-input:focus { outline: none; border-color: #2d7a4f; background: #f0fdf4; }
 
-  /* Erklärungsbox */
   .hint-box {
     background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 8px;
     padding: 12px 14px; margin-bottom: 14px; font-size: .82rem; color: #15803d;
@@ -46,10 +44,29 @@
   }
   .hint-box strong { display: block; margin-bottom: 4px; font-size: .85rem; }
 
-  /* Fotos */
-  .photo-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
-  .photo-wrap { position: relative; width: 72px; height: 72px; }
-  .photo-thumb { width: 72px; height: 72px; border-radius: 8px; object-fit: cover; border: 1px solid #e5e7eb; display: block; }
+  /* ── Fotos & Drag & Drop ── */
+  .photo-row {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;
+    min-height: 80px; padding: 4px; border-radius: 10px;
+    transition: background .15s, box-shadow .15s;
+  }
+  .photo-row.drag-over {
+    background: #f0fdf4;
+    box-shadow: inset 0 0 0 2.5px #25D366;
+  }
+
+  .photo-wrap {
+    position: relative; width: 72px; height: 72px;
+    cursor: grab;
+    user-select: none; -webkit-user-select: none;
+    touch-action: none;
+    transition: opacity .15s, transform .15s;
+    border-radius: 8px;
+  }
+  .photo-wrap:active { cursor: grabbing; }
+  .photo-wrap.dragging { opacity: 0.25; transform: scale(0.9); }
+
+  .photo-thumb { width: 72px; height: 72px; border-radius: 8px; object-fit: cover; border: 1px solid #e5e7eb; display: block; pointer-events: none; -webkit-user-drag: none; }
   .photo-delete {
     position: absolute; top: -6px; right: -6px;
     width: 20px; height: 20px; border-radius: 50%;
@@ -58,8 +75,11 @@
     box-shadow: 0 1px 4px rgba(0,0,0,.2);
     display: flex; align-items: center; justify-content: center;
     transition: background .15s;
+    pointer-events: auto !important; /* fix: in draggable-Element */
+    z-index: 10;
   }
   .photo-delete:hover { background: #dc2626; }
+
   .photo-add {
     width: 72px; height: 72px; border-radius: 8px;
     border: 2px dashed #d1d5db;
@@ -70,13 +90,29 @@
   .photo-add:hover { border-color: #2d7a4f; color: #2d7a4f; }
   .photo-add span { font-size: 1.5rem; line-height: 1; }
 
-  /* Upload Fortschritt */
+  /* Touch-Drag Ghost */
+  #drag-ghost {
+    position: fixed; pointer-events: none; z-index: 9999;
+    width: 72px; height: 72px; border-radius: 10px; overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0,0,0,.35);
+    opacity: 0.85; display: none;
+    border: 2px solid #25D366;
+    transform: scale(1.1);
+  }
+  #drag-ghost img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  /* Drag-Hinweisbox (nur bei mehreren Artikeln) */
+  .drag-hint-bar {
+    background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 8px;
+    padding: 8px 12px; margin-bottom: 10px; font-size: .78rem; color: #15803d;
+    display: flex; align-items: center; gap: 8px;
+  }
+
   .upload-progress { margin-top: 8px; }
   .progress-bar-wrap { background: #f3f4f6; border-radius: 6px; height: 6px; overflow: hidden; margin-bottom: 4px; }
   .progress-bar { height: 6px; background: #2d7a4f; border-radius: 6px; transition: width .2s; }
   .progress-label { font-size: .75rem; color: #6b7280; }
 
-  /* Infofelder */
   .info-fields { margin-top: 10px; }
   .info-field-label { font-size: .75rem; font-weight: 600; color: #9ca3af; margin-bottom: 4px; }
   .info-field-textarea {
@@ -97,7 +133,6 @@
   }
   .btn-delete-article:hover { background: #fee2e2; }
 
-  /* Neue Position Button */
   .btn-add-position {
     display: flex; align-items: center; justify-content: center; gap: 8px;
     width: 100%; padding: 14px; border: 2px dashed #86efac;
@@ -108,7 +143,6 @@
   .btn-add-position:hover { background: #dcfce7; border-color: #2d7a4f; }
   .btn-add-position:disabled { opacity: .5; cursor: not-allowed; }
 
-  /* Preis & Zahlung */
   .price-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f3f4f6; font-size: .9rem; }
   .price-row:last-child { border-bottom: none; }
   .price-total { font-size: 1.2rem; font-weight: 700; color: #2d7a4f; }
@@ -129,7 +163,6 @@
   .btn-free { background: #059669; }
   .btn-free:hover { background: #047857; }
 
-  /* Landingpage Buchung */
   .lp-box{background:#fff;border:2px solid #25D366;border-radius:12px;padding:16px;margin-top:12px;}
   .lp-title{font-size:.85rem;font-weight:800;color:#15803d;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
   .lp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
@@ -147,6 +180,10 @@
   .error-box { background: #fee2e2; border-left: 4px solid #dc2626; border-radius: 8px; padding: 16px; color: #991b1b; }
   .info-row { display: flex; justify-content: space-between; font-size: .88rem; color: #4b5563; padding: 4px 0; }
   .info-label { color: #9ca3af; }
+
+  /* Toast */
+  #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:20px;font-size:.85rem;font-weight:700;transition:all .3s;opacity:0;z-index:9998;}
+  #toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
 </style>
 </head>
 <body>
@@ -163,15 +200,22 @@
   </div>
 </div>
 
+<div id="toast"></div>
+<!-- Touch-Drag Ghost -->
+<div id="drag-ghost"><img id="drag-ghost-img" src="" alt=""></div>
+
 <script>
 const API = 'https://converto-server-production.up.railway.app';
 let sessionToken = null;
 let sessionData  = null;
 let couponApplied = null;
 let businessDiscount = null;
-
-// Zwischenspeicher für Notizen (wird beim Tippen gespeichert)
 const notesCache = {};
+
+// ── Drag State ────────────────────────────────────────────────
+let _dragPhotoId = null, _dragSrcId = null;
+let _touchPhotoId = null, _touchSrcId = null;
+let _touchActive = false, _lastDropZone = null;
 
 (function init() {
   const params = new URLSearchParams(window.location.search);
@@ -180,6 +224,12 @@ const notesCache = {};
   loadSession();
 })();
 
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2500);
+}
+
 async function loadSession() {
   try {
     const res = await fetch(API + '/api/vk/session/' + sessionToken);
@@ -187,7 +237,6 @@ async function loadSession() {
     sessionData = await res.json();
     const params = new URLSearchParams(window.location.search);
     if (params.get('paid') === '1' && sessionData.status === 'open') { showAnalyzing(); pollStatus(); return; }
-    // Business-Rabatt laden
     try {
       const dr = await fetch(API + '/api/vk/session/' + sessionToken + '/discount');
       const dd = await dr.json();
@@ -228,25 +277,16 @@ function render() {
   const price = calcPrice(s.articles || []);
   document.getElementById('app').innerHTML = buildHTML(s, price);
   attachEvents();
+  setupDragDrop(); // ← Drag & Drop nach jedem render initialisieren
 }
 
 function getDisplayPrice(price) {
   if (businessDiscount && businessDiscount.has_discount) {
     var disc = Math.round(price * businessDiscount.percent / 100 * 100) / 100;
-    var result = price - disc;
-    if (businessDiscount.percent >= 100) return 0; // 100% = gratis
-    return Math.max(0.50, result);
+    if (businessDiscount.percent >= 100) return 0;
+    return Math.max(0.50, price - disc);
   }
   return price;
-}
-
-
-function getBusinessBanner() {
-  if (!businessDiscount || !businessDiscount.has_discount) return '';
-  return '<div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:12px 16px;margin-bottom:12px;font-size:.88rem;color:#15803d;font-weight:700;">' +
-    '🏢 Firmenrabatt aktiv: ' + businessDiscount.percent + '% Rabatt' +
-    (businessDiscount.company ? ' für ' + businessDiscount.company : '') +
-    ' – wird automatisch angewendet</div>';
 }
 
 function buildPayButton(price) {
@@ -254,13 +294,13 @@ function buildPayButton(price) {
     return '<button class="btn-pay" id="btn-pay" onclick="redeemBusinessFree()">🎉 Kostenlos einlösen (Firmenrabatt)</button>';
   }
   var displayPrice = getDisplayPrice(price);
-  return '<button class="btn-pay" id="btn-pay" onclick="startPayment()">💳 Jetzt bezahlen  €' + displayPrice.toFixed(2) + '</button>';
+  return '<button class="btn-pay" id="btn-pay" onclick="startPayment()">💳 Jetzt bezahlen  €' + displayPrice.toFixed(2) + '</button>';
 }
 
 function buildHTML(s, price) {
   const articles = s.articles || [];
+  const multiArticle = articles.length > 1;
   return [
-    // Business-Rabatt Banner
     businessDiscount && businessDiscount.has_discount ? '<div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;font-size:.88rem;color:#15803d;font-weight:700;">🏢 Firmenrabatt aktiv: <strong>' + businessDiscount.percent + '% Rabatt</strong>' + (businessDiscount.company ? ' für ' + businessDiscount.company : '') + ' – wird automatisch angewendet</div>' : '',
     '<div class="card">',
     '  <div class="card-title">Dein Auftrag</div>',
@@ -271,8 +311,6 @@ function buildHTML(s, price) {
 
     '<div class="card">',
     '  <div class="card-title">Artikel & Fotos</div>',
-
-    // Erklärungstext über dem ersten Artikel
     '  <div class="hint-box">',
     '    <strong>📸 So bekommst du das beste Ergebnis:</strong>',
     '    Fotografiere jeden Artikel aus verschiedenen Perspektiven: Vorderseite, Rückseite, Seiten, Details.',
@@ -280,9 +318,11 @@ function buildHTML(s, price) {
     '    Je mehr Infos die KI sieht, desto besser der Verkaufstext.',
     '  </div>',
 
-    articles.map(buildArticleHTML).join(''),
+    // Drag-Hinweis nur wenn mehrere Artikel
+    multiArticle ? '  <div class="drag-hint-bar">↔️ <span><strong>Foto verschieben:</strong> Foto auf anderen Artikel ziehen (Desktop) oder lange drücken und ziehen (Mobile)</span></div>' : '',
 
-    // Neue Position Button
+    articles.map(function(a, idx) { return buildArticleHTML(a, idx, multiArticle); }).join(''),
+
     '  <button class="btn-add-position" id="btn-add-pos" onclick="addPosition()">',
     '    <span style="font-size:1.3rem;">+</span> Neue Position hinzufügen',
     '  </button>',
@@ -297,14 +337,15 @@ function buildHTML(s, price) {
   ].join('\n');
 }
 
-function buildArticleHTML(a, idx) {
+function buildArticleHTML(a, idx, multiArticle) {
   const photos = a.vk_photos || [];
   const canAdd = photos.length < 4;
 
+  // Fotos: draggable mit data-pid und data-sid
   const photoHTML = photos.map(function(p) {
     return [
-      '<div class="photo-wrap">',
-      '  <img class="photo-thumb" src="' + p.public_url + '" alt="Foto">',
+      '<div class="photo-wrap" draggable="true" data-pid="' + p.id + '" data-sid="' + a.id + '">',
+      '  <img class="photo-thumb" src="' + p.public_url + '" alt="Foto" draggable="false">',
       '  <div class="photo-delete" onclick="deletePhoto(\'' + p.id + '\')" title="Foto löschen">✕</div>',
       '</div>'
     ].join('');
@@ -314,13 +355,10 @@ function buildArticleHTML(a, idx) {
     ? '<div class="photo-add" onclick="triggerUpload(\'' + a.id + '\', ' + photos.length + ')"><span>+</span>' + (photos.length === 0 ? 'Fotos' : 'Mehr') + '</div>'
     : '';
 
-  // Gespeicherte Notizen aus Cache oder aus DB
   const notes = notesCache[a.id] !== undefined ? notesCache[a.id] : (a.notes || '');
 
   return [
     '<div class="article-card" id="article-' + a.id + '">',
-
-    // Editierbarer Titel
     '  <div class="article-title-row">',
     '    <span style="font-size:.85rem;color:#9ca3af;font-weight:700;">#' + (idx + 1) + '</span>',
     '    <input class="article-title-input" type="text" value="' + escAttr(a.title || 'Artikel ' + (idx + 1)) + '"',
@@ -329,14 +367,13 @@ function buildArticleHTML(a, idx) {
     '      placeholder="Artikelbezeichnung..." />',
     '  </div>',
 
-    // Fotos
-    '  <div class="photo-row" id="photos-' + a.id + '">',
+    // photo-row mit data-zid für Drop-Zone
+    '  <div class="photo-row" id="photos-' + a.id + '" data-zid="' + a.id + '">',
     photoHTML,
     addBtn,
     '  </div>',
     '  <div id="progress-' + a.id + '"></div>',
 
-    // Infofelder
     '  <div class="info-fields">',
     '    <div class="info-field-label">ℹ️ Zusatzinfos für die KI (optional)</div>',
     '    <textarea class="info-field-textarea"',
@@ -346,17 +383,161 @@ function buildArticleHTML(a, idx) {
     '      oninput="notesCache[\'' + a.id + '\']=this.value">' + escHtml(notes) + '</textarea>',
     '  </div>',
 
-    // Footer
     '  <div class="article-footer">',
     '    <div class="article-meta">' + photos.length + ' von 4 Fotos · ' + (a.extended ? '7 Tage' : '3 Tage') + ' Aufbewahrung</div>',
     '    <button class="btn-delete-article" onclick="deleteArticle(\'' + a.id + '\')">🗑 Löschen</button>',
     '  </div>',
 
     buildLPToggle(a),
-
     '</div>',
   ].join('\n');
 }
+
+// ═══════════════════════════════════════════════════════════
+// DRAG & DROP – Desktop (HTML5) + Mobile (Touch)
+// ═══════════════════════════════════════════════════════════
+
+function setupDragDrop() {
+  var ghost = document.getElementById('drag-ghost');
+  var ghostImg = document.getElementById('drag-ghost-img');
+
+  // ── Desktop: HTML5 Drag & Drop ──────────────────────────
+  document.querySelectorAll('.photo-wrap').forEach(function(wrap) {
+    wrap.addEventListener('dragstart', function(e) {
+      _dragPhotoId = wrap.getAttribute('data-pid');
+      _dragSrcId   = wrap.getAttribute('data-sid');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', _dragPhotoId);
+      setTimeout(function(){ wrap.classList.add('dragging'); }, 0);
+    });
+    wrap.addEventListener('dragend', function() {
+      wrap.classList.remove('dragging');
+      document.querySelectorAll('.photo-row').forEach(function(z){ z.classList.remove('drag-over'); });
+      _dragPhotoId = null; _dragSrcId = null;
+    });
+  });
+
+  document.querySelectorAll('.photo-row').forEach(function(zone) {
+    zone.addEventListener('dragover', function(e) {
+      if (!_dragPhotoId) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      zone.classList.add('drag-over');
+    });
+    zone.addEventListener('dragleave', function(e) {
+      if (e.relatedTarget && zone.contains(e.relatedTarget)) return;
+      zone.classList.remove('drag-over');
+    });
+    zone.addEventListener('drop', function(e) {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      var targetId = zone.getAttribute('data-zid');
+      if (!_dragPhotoId || !targetId || targetId === _dragSrcId) return;
+      movePhoto(_dragPhotoId, targetId, _dragSrcId);
+    });
+  });
+
+  // ── Mobile: Touch Drag ───────────────────────────────────
+  document.querySelectorAll('.photo-wrap').forEach(function(wrap) {
+
+    wrap.addEventListener('touchstart', function(e) {
+      // Löschen-Button Tap = kein Drag
+      if (e.target.closest('.photo-delete')) return;
+      if (e.touches.length !== 1) return;
+      _touchPhotoId = wrap.getAttribute('data-pid');
+      _touchSrcId   = wrap.getAttribute('data-sid');
+      _touchActive  = false;
+      var img = wrap.querySelector('img');
+      if (img) ghostImg.src = img.src;
+      ghost.style.display = 'none';
+    }, { passive: true });
+
+    wrap.addEventListener('touchmove', function(e) {
+      if (!_touchPhotoId || wrap.getAttribute('data-pid') !== _touchPhotoId) return;
+      if (e.touches.length !== 1) return;
+      var touch = e.touches[0];
+
+      if (!_touchActive) {
+        _touchActive = true;
+        wrap.classList.add('dragging');
+        ghost.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+      }
+
+      e.preventDefault();
+
+      // Ghost unter Finger positionieren
+      ghost.style.left = (touch.clientX - 36) + 'px';
+      ghost.style.top  = (touch.clientY - 50) + 'px';
+
+      // Drop-Zone unter Finger finden
+      ghost.style.display = 'none';
+      var el = document.elementFromPoint(touch.clientX, touch.clientY);
+      ghost.style.display = 'block';
+      var zone = el ? el.closest('.photo-row') : null;
+
+      // Highlight aktualisieren
+      if (_lastDropZone && _lastDropZone !== zone) _lastDropZone.classList.remove('drag-over');
+      if (zone && zone.getAttribute('data-zid') !== _touchSrcId) {
+        zone.classList.add('drag-over');
+        _lastDropZone = zone;
+      } else {
+        _lastDropZone = null;
+      }
+    }, { passive: false });
+
+    wrap.addEventListener('touchend', function(e) {
+      if (!_touchPhotoId || wrap.getAttribute('data-pid') !== _touchPhotoId) return;
+
+      ghost.style.display = 'none';
+      wrap.classList.remove('dragging');
+      document.body.style.overflow = '';
+      if (_lastDropZone) _lastDropZone.classList.remove('drag-over');
+
+      if (!_touchActive) {
+        // Nur Tap – nichts tun
+        _touchPhotoId = null; _touchSrcId = null; _touchActive = false; _lastDropZone = null;
+        return;
+      }
+
+      var touch = e.changedTouches[0];
+      ghost.style.display = 'none';
+      var el = document.elementFromPoint(touch.clientX, touch.clientY);
+      var zone = el ? el.closest('.photo-row') : null;
+      var targetId = zone ? zone.getAttribute('data-zid') : null;
+
+      var pid = _touchPhotoId, sid = _touchSrcId;
+      _touchPhotoId = null; _touchSrcId = null; _touchActive = false; _lastDropZone = null;
+
+      if (targetId && targetId !== sid) {
+        movePhoto(pid, targetId, sid);
+      }
+    }, { passive: true });
+  });
+}
+
+// ── Foto verschieben ─────────────────────────────────────────
+async function movePhoto(photoId, targetArticleId, sourceArticleId) {
+  showToast('⏳ Wird verschoben...');
+  try {
+    var r = await fetch(API + '/api/vk/photo/' + photoId + '/move', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ article_id: targetArticleId })
+    });
+    if (!r.ok) throw new Error('Server Fehler ' + r.status);
+
+    // Session neu laden → re-render
+    var r2 = await fetch(API + '/api/vk/session/' + sessionToken);
+    sessionData = await r2.json();
+    render();
+    showToast('✅ Foto verschoben');
+  } catch(e) {
+    showToast('❌ Fehler: ' + e.message);
+  }
+}
+
+// ── Rest des bestehenden Codes ────────────────────────────────
 
 function buildPriceRows(articles, total) {
   const rows = ['<div class="price-row"><span>Grundpreis</span><span>€1.00</span></div>'];
@@ -370,7 +551,6 @@ function buildPriceRows(articles, total) {
       rows.push('<div class="price-row" style="color:#9ca3af;"><span>' + escHtml(a.title || 'Artikel') + ' – noch kein Foto</span><span>€0.00</span></div>');
     }
     if (a.extended) rows.push('<div class="price-row"><span>&nbsp;&nbsp;+ Verlängert (7 Tage)</span><span>€1.00</span></div>');
-    // LP Kosten anzeigen
     if (a.lp_booked && (a.lp_days || 0) > 0) {
       var lpRate = a.lp_has_bot ? 1.00 : 0.40;
       var lpCost = Math.round((a.lp_days || 7) * lpRate * 100) / 100;
@@ -403,15 +583,11 @@ function buildCouponSection() {
 }
 
 function calcPrice(articles) {
-  var total = 1.00; // Grundpreis
+  var total = 1.00;
   articles.forEach(function(a) {
     var photos = (a.vk_photos || []).length;
-    if (photos > 0) {
-      total += 1.00;
-      total += Math.max(0, photos-1) * 0.25;
-    }
+    if (photos > 0) { total += 1.00; total += Math.max(0, photos-1) * 0.25; }
     if (a.extended) total += 1.00;
-    // LP Kosten aus DB-Werten
     if (a.lp_booked && (a.lp_days || 0) > 0) {
       var lpRate = a.lp_has_bot ? 1.00 : 0.40;
       total += Math.round((a.lp_days || 7) * lpRate * 100) / 100;
@@ -432,75 +608,43 @@ function attachEvents() {
   }
 }
 
-// ── NEUE POSITION ─────────────────────────────────────────────
 async function addPosition() {
   var btn = document.getElementById('btn-add-pos');
   if (btn) { btn.disabled = true; btn.textContent = 'Wird angelegt...'; }
   try {
-    var res = await fetch(API + '/api/vk/article', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: sessionToken, title: 'Neuer Artikel' })
-    });
+    var res = await fetch(API + '/api/vk/article', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: sessionToken, title: 'Neuer Artikel' }) });
     var data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Fehler');
-    // Session neu laden
     var r2 = await fetch(API + '/api/vk/session/' + sessionToken);
     sessionData = await r2.json();
     render();
-    // Zum neuen Artikel scrollen
-    setTimeout(function() {
-      var el = document.getElementById('article-' + data.article.id);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 100);
-  } catch (err) {
-    alert('Fehler: ' + err.message);
-    if (btn) { btn.disabled = false; btn.innerHTML = '<span style="font-size:1.3rem;">+</span> Neue Position hinzufügen'; }
-  }
+    setTimeout(function() { var el = document.getElementById('article-' + data.article.id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+  } catch (err) { alert('Fehler: ' + err.message); if (btn) { btn.disabled = false; btn.innerHTML = '<span style="font-size:1.3rem;">+</span> Neue Position hinzufügen'; } }
 }
 
-// ── ARTIKEL TITEL SPEICHERN ───────────────────────────────────
 async function saveTitle(articleId, newTitle) {
-  var title = newTitle.trim();
-  if (!title) return;
+  var title = newTitle.trim(); if (!title) return;
   try {
-    await fetch(API + '/api/vk/article/' + articleId + '/notes', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: title })
-    });
-    // Lokalen State updaten ohne neu zu laden
-    if (sessionData && sessionData.articles) {
-      sessionData.articles.forEach(function(a) { if (a.id === articleId) a.title = title; });
-    }
+    await fetch(API + '/api/vk/article/' + articleId + '/notes', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: title }) });
+    if (sessionData && sessionData.articles) sessionData.articles.forEach(function(a) { if (a.id === articleId) a.title = title; });
   } catch(e) { console.error('Titel speichern:', e.message); }
 }
 
-// ── NOTIZEN SPEICHERN ─────────────────────────────────────────
 async function saveNotes(articleId, notes) {
   notesCache[articleId] = notes;
-  try {
-    await fetch(API + '/api/vk/article/' + articleId + '/notes', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ notes: notes })
-    });
-  } catch(e) { console.error('Notizen speichern:', e.message); }
+  try { await fetch(API + '/api/vk/article/' + articleId + '/notes', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ notes: notes }) }); } catch(e) { console.error('Notizen:', e.message); }
 }
 
-// ── ARTIKEL LÖSCHEN ───────────────────────────────────────────
 async function deleteArticle(articleId) {
   if (!confirm('Diese Position wirklich löschen?')) return;
   try {
     var res = await fetch(API + '/api/vk/article/' + articleId, { method: 'DELETE' });
     if (!res.ok) { var d = await res.json(); throw new Error(d.error || 'Fehler'); }
     var r2 = await fetch(API + '/api/vk/session/' + sessionToken);
-    sessionData = await r2.json();
-    render();
+    sessionData = await r2.json(); render();
   } catch (err) { alert('Fehler: ' + err.message); }
 }
 
-// ── MULTI FOTO UPLOAD ─────────────────────────────────────────
 function triggerUpload(articleId, currentCount) {
   var remaining = 4 - currentCount;
   if (remaining <= 0) { alert('Maximal 4 Fotos pro Artikel erreicht.'); return; }
@@ -509,7 +653,7 @@ function triggerUpload(articleId, currentCount) {
   inp.onchange = async function() {
     if (!inp.files || inp.files.length === 0) return;
     var files = Array.from(inp.files).slice(0, remaining);
-    if (inp.files.length > remaining) alert('Nur noch ' + remaining + ' Foto(s) möglich. Es werden die ersten ' + remaining + ' hochgeladen.');
+    if (inp.files.length > remaining) alert('Nur noch ' + remaining + ' Foto(s) möglich.');
     await uploadPhotos(articleId, files);
   };
   inp.click();
@@ -517,143 +661,88 @@ function triggerUpload(articleId, currentCount) {
 
 async function uploadPhotos(articleId, files) {
   var progressEl = document.getElementById('progress-' + articleId);
-  if (progressEl) {
-    progressEl.innerHTML = '<div class="upload-progress"><div class="progress-bar-wrap"><div class="progress-bar" id="pbar-' + articleId + '" style="width:0%"></div></div><div class="progress-label" id="plabel-' + articleId + '">0 / ' + files.length + ' hochgeladen</div></div>';
-  }
+  if (progressEl) progressEl.innerHTML = '<div class="upload-progress"><div class="progress-bar-wrap"><div class="progress-bar" id="pbar-' + articleId + '" style="width:0%"></div></div><div class="progress-label" id="plabel-' + articleId + '">0 / ' + files.length + ' hochgeladen</div></div>';
   var errors = 0;
   for (var i = 0; i < files.length; i++) {
     try {
-      var base64 = await new Promise(function(resolve, reject) {
-        var reader = new FileReader();
-        reader.onload = function() { resolve(reader.result.split(',')[1]); };
-        reader.onerror = reject;
-        reader.readAsDataURL(files[i]);
-      });
-      var res = await fetch(API + '/api/vk/photo', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ article_id: articleId, session_id: sessionData.id, image_base64: base64, content_type: files[i].type || 'image/jpeg' })
-      });
+      var base64 = await new Promise(function(resolve, reject) { var reader = new FileReader(); reader.onload = function() { resolve(reader.result.split(',')[1]); }; reader.onerror = reject; reader.readAsDataURL(files[i]); });
+      var res = await fetch(API + '/api/vk/photo', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ article_id: articleId, session_id: sessionData.id, image_base64: base64, content_type: files[i].type || 'image/jpeg' }) });
       var data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Upload fehlgeschlagen');
     } catch (err) { errors++; console.error('Upload Fehler:', err.message); }
     var pct = Math.round(((i + 1) / files.length) * 100);
-    var pbar = document.getElementById('pbar-' + articleId);
-    var plabel = document.getElementById('plabel-' + articleId);
+    var pbar = document.getElementById('pbar-' + articleId); var plabel = document.getElementById('plabel-' + articleId);
     if (pbar) pbar.style.width = pct + '%';
     if (plabel) plabel.textContent = (i + 1) + ' / ' + files.length + ' hochgeladen';
   }
   var r2 = await fetch(API + '/api/vk/session/' + sessionToken);
-  sessionData = await r2.json();
-  render();
+  sessionData = await r2.json(); render();
   if (errors > 0) alert(errors + ' Foto(s) konnten nicht hochgeladen werden.');
 }
 
-// ── FOTO LÖSCHEN ──────────────────────────────────────────────
 async function deletePhoto(photoId) {
   if (!confirm('Dieses Foto wirklich löschen?')) return;
   try {
     var res = await fetch(API + '/api/vk/photo/' + photoId, { method: 'DELETE' });
     if (!res.ok) { var d = await res.json(); throw new Error(d.error || 'Löschen fehlgeschlagen'); }
     var r2 = await fetch(API + '/api/vk/session/' + sessionToken);
-    sessionData = await r2.json();
-    render();
+    sessionData = await r2.json(); render();
   } catch (err) { alert('Fehler beim Löschen: ' + err.message); }
 }
 
-// ── COUPON ────────────────────────────────────────────────────
 async function validateCoupon() {
-  var input = document.getElementById('coupon-input');
-  var msg   = document.getElementById('coupon-msg');
-  var btn   = document.getElementById('btn-coupon');
+  var input = document.getElementById('coupon-input'); var msg = document.getElementById('coupon-msg'); var btn = document.getElementById('btn-coupon');
   if (!input || !msg) return;
-  var code = input.value.trim().toUpperCase();
-  if (!code) return;
+  var code = input.value.trim().toUpperCase(); if (!code) return;
   btn.disabled = true; btn.textContent = '...'; msg.textContent = '';
   try {
     var res = await fetch(API + '/api/vk/coupon/validate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: code, token: sessionToken }) });
     var data = await res.json();
     if (!res.ok || !data.coupon) { msg.className = 'coupon-msg coupon-err'; msg.textContent = data.error || 'Ungültiger Code'; btn.disabled = false; btn.textContent = 'Einlösen'; return; }
     couponApplied = { code: code, discount: data.coupon.discount, is_free: data.coupon.is_free };
-    msg.className = 'coupon-msg coupon-ok';
-    msg.textContent = '✓ Gutschein aktiv – Rabatt: €' + data.coupon.discount.toFixed(2);
+    msg.className = 'coupon-msg coupon-ok'; msg.textContent = '✓ Gutschein aktiv – Rabatt: €' + data.coupon.discount.toFixed(2);
     btn.disabled = false; btn.textContent = '✓';
     var price = calcPrice(sessionData.articles || []);
     var card = document.querySelector('.card:last-child');
-    if (card) {
-      var old = card.querySelector('.card-title');
-      if (old) {
-        var next = old.nextSibling;
-        while (next && next !== document.getElementById('coupon-section')) { var tmp = next.nextSibling; card.removeChild(next); next = tmp; }
-        var frag = document.createRange().createContextualFragment(buildPriceRows(sessionData.articles || [], price));
-        old.after(frag);
-      }
-    }
+    if (card) { var old = card.querySelector('.card-title'); if (old) { var next = old.nextSibling; while (next && next !== document.getElementById('coupon-section')) { var tmp = next.nextSibling; card.removeChild(next); next = tmp; } var frag = document.createRange().createContextualFragment(buildPriceRows(sessionData.articles || [], price)); old.after(frag); } }
     var btnPay = document.getElementById('btn-pay');
-    if (btnPay) {
-      var finalPrice = Math.max(0, price - (couponApplied.discount || 0));
-      if (finalPrice <= 0) { btnPay.className = 'btn-pay btn-free'; btnPay.textContent = '🎉 Kostenlos einlösen'; btnPay.onclick = redeemFree; }
-      else { btnPay.textContent = '💳 Jetzt bezahlen  €' + getDisplayPrice(finalPrice).toFixed(2); }
-    }
+    if (btnPay) { var finalPrice = Math.max(0, price - (couponApplied.discount || 0)); if (finalPrice <= 0) { btnPay.className = 'btn-pay btn-free'; btnPay.textContent = '🎉 Kostenlos einlösen'; btnPay.onclick = redeemFree; } else { btnPay.textContent = '💳 Jetzt bezahlen  €' + getDisplayPrice(finalPrice).toFixed(2); } }
   } catch (err) { msg.className = 'coupon-msg coupon-err'; msg.textContent = 'Fehler: ' + err.message; btn.disabled = false; btn.textContent = 'Einlösen'; }
 }
 
-// ── PAYMENT ───────────────────────────────────────────────────
 async function startPayment() {
-  var btn = document.getElementById('btn-pay');
-  if (btn) { btn.disabled = true; btn.textContent = 'Wird vorbereitet...'; }
+  var btn = document.getElementById('btn-pay'); if (btn) { btn.disabled = true; btn.textContent = 'Wird vorbereitet...'; }
   try {
-    var body = { token: sessionToken };
-    if (couponApplied) body.coupon_code = couponApplied.code;
+    var body = { token: sessionToken }; if (couponApplied) body.coupon_code = couponApplied.code;
     var res = await fetch(API + '/api/vk/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-    var data = await res.json();
-    if (!res.ok || !data.url) throw new Error(data.error || 'Checkout fehlgeschlagen');
+    var data = await res.json(); if (!res.ok || !data.url) throw new Error(data.error || 'Checkout fehlgeschlagen');
     window.location.href = data.url;
   } catch (err) { alert('Fehler: ' + err.message); if (btn) { btn.disabled = false; btn.textContent = '💳 Jetzt bezahlen'; } }
 }
 
 async function redeemBusinessFree() {
-  var btn = document.getElementById('btn-pay');
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Wird verarbeitet...'; }
+  var btn = document.getElementById('btn-pay'); if (btn) { btn.disabled = true; btn.textContent = '⏳ Wird verarbeitet...'; }
   try {
-    // Server informieren: Firmenrabatt 100% → direkt analysieren
-    var res = await fetch(API + '/api/vk/business-free', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: sessionToken })
-    });
-    var data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Fehler beim Einlösen');
+    var res = await fetch(API + '/api/vk/business-free', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: sessionToken }) });
+    var data = await res.json(); if (!res.ok) throw new Error(data.error || 'Fehler beim Einlösen');
     window.location.href = 'ergebnis.html?s=' + sessionToken;
-  } catch (err) {
-    alert('Fehler: ' + err.message);
-    if (btn) { btn.disabled = false; btn.textContent = '🎉 Kostenlos einlösen (Firmenrabatt)'; }
-  }
+  } catch (err) { alert('Fehler: ' + err.message); if (btn) { btn.disabled = false; btn.textContent = '🎉 Kostenlos einlösen (Firmenrabatt)'; } }
 }
 
 async function redeemFree() {
-  var btn = document.getElementById('btn-pay');
-  if (btn) { btn.disabled = true; btn.textContent = 'Wird eingelöst...'; }
+  var btn = document.getElementById('btn-pay'); if (btn) { btn.disabled = true; btn.textContent = 'Wird eingelöst...'; }
   try {
     var res = await fetch(API + '/api/vk/coupon/redeem', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: couponApplied.code, token: sessionToken }) });
-    var data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Einlösen fehlgeschlagen');
+    var data = await res.json(); if (!res.ok) throw new Error(data.error || 'Einlösen fehlgeschlagen');
     window.location.href = 'ergebnis.html?s=' + sessionToken;
   } catch (err) { alert('Fehler: ' + err.message); if (btn) { btn.disabled = false; btn.textContent = '🎉 Kostenlos einlösen'; } }
 }
 
-// ── LP TOGGLE ────────────────────────────────────────────────
 function buildLPToggle(a) {
-  // Nur für Business-Kunden (mit oder ohne landingpage_enabled Flag)
   if (!businessDiscount || !businessDiscount.has_discount) return '';
-  // Nur wenn Fotos vorhanden
   if (!(a.vk_photos || []).length) return '';
-
-  var booked = !!a.lp_booked;
-  var days   = a.lp_days || 7;
-  var hasBot = !!a.lp_has_bot;
-  var lpRate = hasBot ? 1.00 : 0.40;
-  var lpCost = Math.round(days * lpRate * 100) / 100;
-
+  var booked = !!a.lp_booked, days = a.lp_days || 7, hasBot = !!a.lp_has_bot;
+  var lpRate = hasBot ? 1.00 : 0.40, lpCost = Math.round(days * lpRate * 100) / 100;
   var toggleRow = '<div class="lp-toggle-row' + (booked ? '' : ' inactive') + '" onclick="toggleLP(\''+a.id+'\', '+booked+')">' +
     '<span class="lp-toggle-label' + (booked ? '' : ' inactive') + '">🌐 Landingpage mitbuchen</span>' +
     '<label class="lp-toggle-switch" onclick="event.stopPropagation()">' +
@@ -661,113 +750,60 @@ function buildLPToggle(a) {
       '<span class="lp-slider"></span>' +
     '</label>' +
   '</div>';
-
   if (!booked) return toggleRow;
-
   var details = '<div class="lp-details">' +
-    '<div class="lp-row">' +
-      '<div><label class="lp-label-sm">Laufzeit</label>' +
-        '<input class="lp-input-sm" type="number" min="1" max="30" value="' + days + '" ' +
-          'onchange="saveLPBooking(\''+a.id+'\', {lp_days: parseInt(this.value)||7}); updateLPCost(\''+a.id+'\', parseInt(this.value)||7, '+hasBot+')">' +
-        '&nbsp;Tage' +
-      '</div>' +
-    '</div>' +
-    '<label class="lp-bot-row">' +
-      '<input type="checkbox"' + (hasBot ? ' checked' : '') + ' style="accent-color:#6366f1;" ' +
-        'onchange="saveLPBooking(\''+a.id+'\', {lp_has_bot: this.checked}); updateLPCost(\''+a.id+'\', '+days+', this.checked)">' +
-      '<span style="font-size:.85rem;font-weight:700;color:#4f46e5;">🤖 Verkaufsbot (+€0.60/Tag)</span>' +
-    '</label>' +
+    '<div class="lp-row"><div><label class="lp-label-sm">Laufzeit</label>' +
+      '<input class="lp-input-sm" type="number" min="1" max="30" value="' + days + '" ' +
+        'onchange="saveLPBooking(\''+a.id+'\', {lp_days: parseInt(this.value)||7}); updateLPCost(\''+a.id+'\', parseInt(this.value)||7, '+hasBot+')">' +
+      '&nbsp;Tage</div></div>' +
+    '<label class="lp-bot-row"><input type="checkbox"' + (hasBot ? ' checked' : '') + ' style="accent-color:#6366f1;" ' +
+      'onchange="saveLPBooking(\''+a.id+'\', {lp_has_bot: this.checked}); updateLPCost(\''+a.id+'\', '+days+', this.checked)">' +
+      '<span style="font-size:.85rem;font-weight:700;color:#4f46e5;">🤖 Verkaufsbot (+€0.60/Tag)</span></label>' +
     '<div class="lp-cost" id="lp-cost-'+a.id+'">💰 Kosten: €' + lpCost.toFixed(2) + ' (' + days + ' Tage × €' + lpRate.toFixed(2) + '/Tag)</div>' +
   '</div>';
-
   return toggleRow + details;
 }
 
 async function toggleLP(articleId, currentState) {
-  var newState = !currentState;
-  await saveLPBooking(articleId, { lp_booked: newState });
-  // Session neu laden und rendern
+  await saveLPBooking(articleId, { lp_booked: !currentState });
   var r = await fetch(API + '/api/vk/session/' + sessionToken);
-  sessionData = await r.json();
-  render();
+  sessionData = await r.json(); render();
 }
 
 async function saveLPBooking(articleId, updates) {
-  // Sofort lokalen State updaten für Live-Preis
-  if (sessionData && sessionData.articles) {
-    sessionData.articles.forEach(function(a) {
-      if (a.id === articleId) Object.assign(a, updates);
-    });
-  }
-  // Preis sofort neu berechnen
-  var price = calcPrice(sessionData.articles || []);
-  updatePriceDisplay(price);
-  try {
-    await fetch(API + '/api/vk/article/' + articleId + '/notes', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updates)
-    });
-  } catch(e) { console.error('LP speichern:', e.message); }
+  if (sessionData && sessionData.articles) sessionData.articles.forEach(function(a) { if (a.id === articleId) Object.assign(a, updates); });
+  updatePriceDisplay(calcPrice(sessionData.articles || []));
+  try { await fetch(API + '/api/vk/article/' + articleId + '/notes', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updates) }); } catch(e) { console.error('LP speichern:', e.message); }
 }
 
 function updatePriceDisplay(price) {
-  // Preis in Zusammenfassung live updaten ohne volles Re-render
   var articles = (sessionData && sessionData.articles) || [];
-  var priceCard = document.querySelector('.card:last-child');
-  if (!priceCard) return;
-  var cardTitle = priceCard.querySelector('.card-title');
-  if (!cardTitle) return;
-  // Alle Preis-Rows bis coupon-section neu aufbauen
-  var couponSection = document.getElementById('coupon-section');
-  if (!couponSection) return;
+  var priceCard = document.querySelector('.card:last-child'); if (!priceCard) return;
+  var cardTitle = priceCard.querySelector('.card-title'); if (!cardTitle) return;
+  var couponSection = document.getElementById('coupon-section'); if (!couponSection) return;
   var node = cardTitle.nextSibling;
-  while (node && node !== couponSection) {
-    var next = node.nextSibling;
-    priceCard.removeChild(node);
-    node = next;
-  }
+  while (node && node !== couponSection) { var next = node.nextSibling; priceCard.removeChild(node); node = next; }
   var frag = document.createRange().createContextualFragment(buildPriceRows(articles, price));
   cardTitle.after(frag);
-  // Gesamt-Button updaten
   var btnPay = document.getElementById('btn-pay');
   if (btnPay && !btnPay.disabled) {
     var displayPrice = getDisplayPrice(price);
-    if (businessDiscount && businessDiscount.percent >= 100) {
-      btnPay.textContent = '🎉 Kostenlos einlösen (Firmenrabatt)';
-    } else {
-      btnPay.textContent = '💳 Jetzt bezahlen  €' + displayPrice.toFixed(2);
-    }
+    if (businessDiscount && businessDiscount.percent >= 100) { btnPay.textContent = '🎉 Kostenlos einlösen (Firmenrabatt)'; }
+    else { btnPay.textContent = '💳 Jetzt bezahlen  €' + displayPrice.toFixed(2); }
   }
 }
 
 function updateLPCost(articleId, days, hasBot) {
-  var rate = hasBot ? 1.00 : 0.40;
-  var cost = Math.round(days * rate * 100) / 100;
+  var rate = hasBot ? 1.00 : 0.40, cost = Math.round(days * rate * 100) / 100;
   var el = document.getElementById('lp-cost-' + articleId);
   if (el) el.textContent = '💰 Kosten: €' + cost.toFixed(2) + ' (' + days + ' Tage × €' + rate.toFixed(2) + '/Tag)';
-  // Sofort State updaten und Preis neu berechnen
-  if (sessionData && sessionData.articles) {
-    sessionData.articles.forEach(function(a) {
-      if (a.id === articleId) { a.lp_days = days; a.lp_has_bot = hasBot; }
-    });
-  }
+  if (sessionData && sessionData.articles) sessionData.articles.forEach(function(a) { if (a.id === articleId) { a.lp_days = days; a.lp_has_bot = hasBot; } });
   updatePriceDisplay(calcPrice(sessionData.articles || []));
 }
 
-// ── HELPERS ───────────────────────────────────────────────────
-function escHtml(str) {
-  if (!str) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function escAttr(str) {
-  if (!str) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-
-function showError(msg) {
-  document.getElementById('app').innerHTML = '<div class="card"><div class="error-box">⚠️ ' + msg + '</div></div>';
-}
+function escHtml(str) { if (!str) return ''; return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escAttr(str) { if (!str) return ''; return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function showError(msg) { document.getElementById('app').innerHTML = '<div class="card"><div class="error-box">⚠️ ' + msg + '</div></div>'; }
 </script>
 </body>
 </html>
