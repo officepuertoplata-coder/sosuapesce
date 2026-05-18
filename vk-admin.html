@@ -231,6 +231,12 @@ tr:hover td{background:#f9fafb;}
             <input type="checkbox" id="eb-lp-enabled" style="width:16px;height:16px;accent-color:var(--wa);">
             <label for="eb-lp-enabled" style="font-size:.82rem;font-weight:700;cursor:pointer;">🌐 Landingpage + Bot aktivieren</label>
           </div>
+          <div style="grid-column:span 2;"><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">UPLOAD MODUS</label>
+            <select id="eb-upload-mode" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;">
+              <option value="standard">⚡ Standard – Haiku (schnell, günstig)</option>
+              <option value="expert">🏆 Expert – Opus (maximale Genauigkeit ~€0.25/Upload)</option>
+            </select>
+          </div>
           <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">E-MAIL (Verkäufer)</label>
             <input id="eb-seller-email" type="email" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
           <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">STRASSE + NR</label>
@@ -278,6 +284,12 @@ tr:hover td{background:#f9fafb;}
           <div style="display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--wa);border-radius:7px;padding:10px;">
             <input type="checkbox" id="nb-lp-enabled" style="width:16px;height:16px;accent-color:var(--wa);">
             <label for="nb-lp-enabled" style="font-size:.82rem;font-weight:700;cursor:pointer;color:var(--wa);">🌐 Landingpage + Bot</label>
+          </div>
+          <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">UPLOAD MODUS</label>
+            <select id="nb-upload-mode" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;">
+              <option value="standard">⚡ Standard – Haiku</option>
+              <option value="expert">🏆 Expert – Opus</option>
+            </select>
           </div>
           <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">E-MAIL (Verkäufer)</label>
             <input id="nb-seller-email" type="email" placeholder="firma@beispiel.at" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;"></div>
@@ -824,7 +836,7 @@ async function createBusinessDiscount() {
   try {
     var r = await fetch(API + '/api/vk/admin/business-discounts', {
       method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ company_name: company, phone, discount_percent: discount, valid_until: until, max_uses: maxUses, notes, sales_commission_percent: commission, wise_email: wiseEmail, landingpage_enabled: lpEnabled, seller_email: sellerEmail, seller_address: sellerAddr, seller_zip: sellerZip, seller_city: sellerCity, seller_uid: sellerUid })
+      body: JSON.stringify({ company_name: company, phone, discount_percent: discount, valid_until: until, max_uses: maxUses, notes, sales_commission_percent: commission, wise_email: wiseEmail, landingpage_enabled: lpEnabled, seller_email: sellerEmail, seller_address: sellerAddr, seller_zip: sellerZip, seller_city: sellerCity, seller_uid: sellerUid, upload_mode: document.getElementById('nb-upload-mode').value || 'standard' })
     });
     var d = await r.json();
     if (!d.success) { document.getElementById('nb-err').textContent = d.error; return; }
@@ -863,6 +875,7 @@ function editBusinessDiscount(b) {
   document.getElementById('eb-commission').value    = b.sales_commission_percent || 0;
   document.getElementById('eb-wise').value           = b.wise_email || '';
   document.getElementById('eb-lp-enabled').checked   = !!b.landingpage_enabled;
+  document.getElementById('eb-upload-mode').value    = b.upload_mode || 'standard';
   document.getElementById('eb-seller-email').value   = b.seller_email || '';
   document.getElementById('eb-seller-address').value = b.seller_address || '';
   document.getElementById('eb-seller-zip').value     = b.seller_zip || '';
