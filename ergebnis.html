@@ -24,37 +24,9 @@ header{background:var(--wa);color:#fff;padding:16px 20px;}
 .article-title-input{font-size:.95rem;font-weight:800;flex:1;background:transparent;border:1.5px solid transparent;border-radius:6px;padding:2px 6px;color:#fff;font-family:inherit;cursor:pointer;min-width:0;}
 .article-title-input:hover{border-color:rgba(255,255,255,.4);}
 .article-title-input:focus{outline:none;border-color:rgba(255,255,255,.8);background:rgba(255,255,255,.1);}
-
-/* ── Drag & Drop ─────────────────────────── */
-.photos-strip{display:flex;gap:8px;padding:14px 16px;overflow-x:auto;min-height:120px;align-items:flex-start;flex-wrap:wrap;transition:background .15s,box-shadow .15s;}
-.photos-strip.drag-over{background:#ecfdf5;box-shadow:inset 0 0 0 2px var(--wa);}
-.photos-strip.empty-zone{align-items:center;justify-content:center;}
-.photo-wrap{position:relative;flex-shrink:0;cursor:grab;border-radius:8px;}
-.photo-wrap:active{cursor:grabbing;}
-.photo-wrap.dragging{opacity:0.25;}
-.photo-wrap img{height:90px;width:90px;object-fit:cover;border-radius:8px;display:block;
-  -webkit-user-drag:none;-moz-user-drag:none;user-select:none;pointer-events:none;}
-.drop-hint{display:none;font-size:.75rem;color:var(--mu);font-weight:700;
-  padding:10px 18px;border:1.5px dashed var(--border);border-radius:8px;pointer-events:none;}
-.drag-over .drop-hint,.empty-zone .drop-hint{display:block;}
-.move-btn{position:absolute;top:4px;right:4px;width:22px;height:22px;
-  background:rgba(0,0,0,.65);color:#fff;border:none;border-radius:4px;
-  font-size:.8rem;font-weight:900;cursor:pointer;opacity:0;transition:opacity .15s;
-  display:flex;align-items:center;justify-content:center;font-family:var(--font);}
-.photo-wrap:hover .move-btn{opacity:1;}
-/* Move-Modal */
-.move-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;
-  display:flex;align-items:flex-end;justify-content:center;}
-.move-modal{background:#fff;border-radius:16px 16px 0 0;padding:20px;
-  width:100%;max-width:500px;max-height:70vh;overflow-y:auto;}
-.move-modal h3{font-size:.95rem;font-weight:900;margin-bottom:14px;}
-.move-target{width:100%;padding:12px 14px;background:#f9fafb;
-  border:1.5px solid var(--border);border-radius:8px;text-align:left;
-  font-family:var(--font);font-size:.85rem;font-weight:700;cursor:pointer;
-  margin-bottom:8px;transition:all .15s;display:block;}
-.move-target:hover{border-color:var(--wa);background:#f0fdf4;color:#15803d;}
-/* ─────────────────────────────────────────── */
-
+.photos-strip{display:flex;gap:8px;padding:14px 16px;overflow-x:auto;min-height:100px;align-items:flex-start;flex-wrap:wrap;}
+.photo-wrap{position:relative;flex-shrink:0;}
+.photo-wrap img{height:90px;width:90px;object-fit:cover;border-radius:8px;display:block;}
 .section{padding:14px 16px;border-top:1px solid var(--border);}
 .section-title{font-size:.68rem;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;}
 .copy-field{background:#f9fafb;border:1.5px solid var(--border);border-radius:8px;padding:12px;font-size:.88rem;line-height:1.6;position:relative;margin-bottom:8px;cursor:pointer;transition:border-color .2s,background .2s;}
@@ -89,6 +61,19 @@ header{background:var(--wa);color:#fff;padding:16px 20px;}
 .market-stat-lbl{font-size:.68rem;color:var(--mu);margin-top:2px;}
 .market-assessment{font-size:.84rem;color:#15803d;margin-top:8px;font-weight:600;}
 .market-note{font-size:.82rem;color:var(--mu);font-style:italic;}
+
+/* ── Authentizitäts-Score ───────────────── */
+.auth-box{background:#f9fafb;border-radius:10px;padding:14px 16px;}
+.auth-score-ring{position:relative;width:60px;height:60px;flex-shrink:0;}
+.auth-score-ring svg{position:absolute;top:0;left:0;transform:rotate(-90deg);}
+.auth-score-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.auth-score-num{font-size:.95rem;font-weight:900;line-height:1;}
+.auth-score-den{font-size:.5rem;color:var(--mu);}
+.auth-flag{display:flex;align-items:flex-start;gap:6px;font-size:.82rem;margin-bottom:3px;}
+.auth-positive{color:#059669;}
+.auth-negative{color:#dc2626;}
+.auth-disclaimer{font-size:.72rem;color:var(--mu);margin-top:10px;padding-top:8px;border-top:1px solid var(--border);}
+
 .lp-btn{display:flex;align-items:center;gap:8px;width:100%;padding:13px 16px;background:#f0fdf4;border:1.5px solid #25D366;border-radius:10px;color:#15803d;font-weight:800;font-size:.9rem;cursor:pointer;font-family:var(--font);margin-top:10px;transition:all .2s;border:none;}
 .lp-btn:hover{background:#dcfce7;}
 .lp-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:flex-end;justify-content:center;}
@@ -97,7 +82,8 @@ header{background:var(--wa);color:#fff;padding:16px 20px;}
 .lp-modal-label{font-size:.72rem;font-weight:800;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px;margin-top:12px;}
 .lp-modal-input{width:100%;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:.95rem;font-family:var(--font);}
 .lp-modal-input:focus{outline:none;border-color:#25D366;}
-.lp-check-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f9fafb;border-radius:8px;margin-top:8px;}
+.lp-check-row{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:#f9fafb;border-radius:8px;margin-top:8px;}
+.lp-check-row input{flex-shrink:0;margin-top:2px;}
 .lp-modal-btn{display:block;width:100%;padding:15px;background:#25D366;color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:800;cursor:pointer;font-family:var(--font);margin-top:16px;}
 .lp-modal-btn:disabled{background:#9ca3af;cursor:not-allowed;}
 .pdf-section{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:20px;text-align:center;margin-top:20px;}
@@ -119,11 +105,11 @@ header{background:var(--wa);color:#fff;padding:16px 20px;}
   <div class="loading"><div class="spinner"></div>Lade Ergebnisse...</div>
 </div>
 <div id="toast"></div>
+
 <script>
 var API='https://converto-server-production.up.railway.app';
 var TOKEN=new URLSearchParams(location.search).get('s');
 var _store={},_storeIdx=0,_lpData={};
-var _dragPhotoId=null,_dragSrcId=null;
 
 function storeText(t){var id='c'+(++_storeIdx);_store[id]=t;return id;}
 function esc(s){if(!s&&s!==0)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -132,108 +118,87 @@ function showToast(msg){var t=document.getElementById('toast');t.textContent=msg
 if(!TOKEN){document.getElementById('content').innerHTML='<div class="loading">Kein gueltiger Link</div>';}
 else{loadResults();}
 
-// LP Event Delegation
 document.addEventListener('click',function(e){
   var el=e.target.closest('[data-action]');if(!el)return;
   var a=el.getAttribute('data-action');
   if(a==='open-lp-modal') openLPModal(el.getAttribute('data-aid'));
   else if(a==='copy-lp'){copyText(el.getAttribute('data-url'));el.textContent='Kopiert!';setTimeout(function(){el.textContent='Link kopieren';},2000);}
   else if(a==='deactivate-lp') deactivateLP(el.getAttribute('data-lpid'));
-  else if(a==='open-move') openMoveModal(el.getAttribute('data-pid'),el.getAttribute('data-sid'));
 });
 
-// ── setupDragDrop: wird nach jedem render() aufgerufen ──────
-function setupDragDrop(){
-  // Jedes Foto-Wrap bekommt eigene Listener
-  document.querySelectorAll('.photo-wrap').forEach(function(wrap){
-    wrap.addEventListener('dragstart',function(e){
-      _dragPhotoId=wrap.getAttribute('data-pid');
-      _dragSrcId=wrap.getAttribute('data-sid');
-      e.dataTransfer.effectAllowed='move';
-      // Firefox braucht setData
-      e.dataTransfer.setData('text/plain',_dragPhotoId);
-      // Klasse erst nach nächstem Frame (Ghost-Bild zeigt das Original)
-      setTimeout(function(){wrap.classList.add('dragging');},0);
-    });
-    wrap.addEventListener('dragend',function(){
-      wrap.classList.remove('dragging');
-      document.querySelectorAll('.photos-strip').forEach(function(z){z.classList.remove('drag-over');});
-      _dragPhotoId=null; _dragSrcId=null;
-    });
-  });
+// ── Authentizitäts-Score HTML ─────────────────────────────
+function buildAuthSection(an) {
+  var auth = an.authenticity;
+  if (!auth || auth.score === null || auth.score === undefined) return '';
 
-  // Jede Strip-Zone bekommt Drop-Listener
-  document.querySelectorAll('.photos-strip').forEach(function(zone){
-    zone.addEventListener('dragover',function(e){
-      if(!_dragPhotoId)return;
-      e.preventDefault(); // MUSS aufgerufen werden, sonst kein drop
-      e.dataTransfer.dropEffect='move';
-      zone.classList.add('drag-over');
-    });
-    zone.addEventListener('dragleave',function(e){
-      // Nur entfernen wenn Maus wirklich raus (nicht ins Kind-Element)
-      if(!zone.contains(e.relatedTarget)) zone.classList.remove('drag-over');
-    });
-    zone.addEventListener('drop',function(e){
-      e.preventDefault();
-      zone.classList.remove('drag-over');
-      var targetId=zone.getAttribute('data-zid');
-      if(!_dragPhotoId||!targetId||targetId===_dragSrcId)return;
-      movePhoto(_dragPhotoId,targetId,_dragSrcId);
-    });
-  });
+  var score = auth.score;
+  var scoreColor = score >= 80 ? '#059669' : score >= 60 ? '#d97706' : '#dc2626';
+  var scoreBg    = score >= 80 ? '#f0fdf4' : score >= 60 ? '#fefce8' : '#fef2f2';
+  var scoreBorder= score >= 80 ? '#86efac' : score >= 60 ? '#fde68a' : '#fecaca';
+  var scoreLabel = score >= 80 ? 'Gut' : score >= 60 ? 'Auffälligkeiten' : 'Verdächtig';
+  var verdictMap = {
+    'authentic':        '✅ Keine Fälschungsmerkmale erkannt',
+    'suspicious':       '⚠️ Verdächtige Merkmale gefunden',
+    'cannot_determine': '❓ Keine eindeutige Beurteilung möglich'
+  };
+  var verdictText = verdictMap[auth.verdict] || '';
+
+  // SVG Ring
+  var r = 24, circ = 2 * Math.PI * r;
+  var dash = (score / 100) * circ;
+  var ringHTML = '<svg width="60" height="60" viewBox="0 0 60 60">'
+    + '<circle cx="30" cy="30" r="'+r+'" fill="none" stroke="#e5e7eb" stroke-width="6"/>'
+    + '<circle cx="30" cy="30" r="'+r+'" fill="none" stroke="'+scoreColor+'" stroke-width="6"'
+    + ' stroke-dasharray="'+dash.toFixed(1)+' '+circ.toFixed(1)+'" stroke-linecap="round"/>'
+    + '</svg>';
+
+  var html = '<div class="section"><div class="section-title">🔍 Authentizitätsprüfung</div>';
+  html += '<div class="auth-box" style="border:1.5px solid '+scoreBorder+';background:'+scoreBg+';">';
+
+  // Score + Verdict
+  html += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;">';
+  html += '<div class="auth-score-ring">'+ringHTML;
+  html += '<div class="auth-score-inner"><span class="auth-score-num" style="color:'+scoreColor+';">'+score+'</span><span class="auth-score-den">/100</span></div></div>';
+  html += '<div><div style="font-weight:800;font-size:.9rem;color:'+scoreColor+';">'+esc(scoreLabel)+'</div>';
+  if (verdictText) html += '<div style="font-size:.82rem;color:#4b5563;margin-top:2px;">'+esc(verdictText)+'</div>';
+  html += '</div></div>';
+
+  // Score < 60 Hinweis
+  if (score < 60) {
+    html += '<div style="background:#fee2e2;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:.8rem;color:#991b1b;font-weight:700;">';
+    html += '⚠️ Dieser Artikel wird manuell geprüft. Bitte warte auf Freigabe.</div>';
+  }
+
+  // Flags (negativ)
+  if (auth.flags && auth.flags.length) {
+    html += '<div style="margin-bottom:8px;"><div style="font-size:.72rem;font-weight:800;color:var(--mu);margin-bottom:5px;">AUFFÄLLIGKEITEN</div>';
+    auth.flags.forEach(function(f){ html+='<div class="auth-flag auth-negative"><span>⚠</span><span>'+esc(f)+'</span></div>'; });
+    html += '</div>';
+  }
+
+  // Positive Indikatoren
+  if (auth.positive_indicators && auth.positive_indicators.length) {
+    html += '<div style="margin-bottom:8px;"><div style="font-size:.72rem;font-weight:800;color:var(--mu);margin-bottom:5px;">POSITIVE MERKMALE</div>';
+    auth.positive_indicators.forEach(function(p){ html+='<div class="auth-flag auth-positive"><span>✓</span><span>'+esc(p)+'</span></div>'; });
+    html += '</div>';
+  }
+
+  // Warnung
+  if (auth.warning) {
+    html += '<div style="background:#fef2f2;border-radius:6px;padding:8px 12px;margin-top:6px;font-size:.8rem;color:#dc2626;">'+esc(auth.warning)+'</div>';
+  }
+
+  // Geprüfte Merkmale
+  if (auth.checked_features && auth.checked_features.length) {
+    html += '<div style="font-size:.72rem;color:var(--mu);margin-top:8px;">Geprüfte Merkmale: '+auth.checked_features.map(esc).join(', ')+'</div>';
+  }
+
+  html += '<div class="auth-disclaimer">ℹ️ KI-Vorprüfung sichtbarer Merkmale auf Fotos. Keine physische Prüfung. Kein rechtlich verbindliches Echtheitszertifikat.</div>';
+  html += '</div></div>';
+  return html;
 }
 
-// ── Foto verschieben ─────────────────────────────────────────
-async function movePhoto(photoId,targetArticleId,sourceArticleId){
-  showToast('⏳ Wird verschoben...');
-  try{
-    var r=await fetch(API+'/api/vk/photo/'+photoId+'/move',{
-      method:'PUT',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({article_id:targetArticleId})
-    });
-    if(!r.ok) throw new Error('Server Fehler');
-    var data=window._lastData;
-    var src=data.articles.find(function(a){return String(a.id)===String(sourceArticleId);});
-    var tgt=data.articles.find(function(a){return String(a.id)===String(targetArticleId);});
-    if(!src||!tgt){loadResults();return;}
-    var idx=src.vk_photos.findIndex(function(p){return String(p.id)===String(photoId);});
-    if(idx===-1){loadResults();return;}
-    var photo=src.vk_photos.splice(idx,1)[0];
-    tgt.vk_photos.push(photo);
-    if(src.vk_photos.length===0){
-      try{await fetch(API+'/api/vk/article/'+sourceArticleId,{method:'DELETE'});}catch(e){}
-      data.articles=data.articles.filter(function(a){return String(a.id)!==String(sourceArticleId);});
-      showToast('✅ Foto verschoben – leerer Artikel aufgelöst');
-    }else{
-      showToast('✅ Foto verschoben');
-    }
-    render(data);
-  }catch(e){showToast('❌ Fehler: '+e.message);}
-}
-
-// ── Move Modal (Mobile) ──────────────────────────────────────
-function openMoveModal(photoId,sourceId){
-  var targets=(window._lastData.articles||[]).filter(function(a){return String(a.id)!==String(sourceId);});
-  if(!targets.length){showToast('Keine anderen Artikel vorhanden');return;}
-  var ov=document.createElement('div');ov.className='move-overlay';
-  var box=document.createElement('div');box.className='move-modal';
-  box.innerHTML='<h3>📦 Wohin verschieben?</h3>';
-  targets.forEach(function(a){
-    var btn=document.createElement('button');btn.className='move-target';
-    btn.textContent=(a.title||'Artikel')+' ('+(a.vk_photos||[]).length+' Fotos)';
-    btn.addEventListener('click',function(){ov.remove();movePhoto(photoId,a.id,sourceId);});
-    box.appendChild(btn);
-  });
-  var cancel=document.createElement('button');
-  cancel.style.cssText='width:100%;padding:12px;background:none;border:none;color:#9ca3af;cursor:pointer;font-size:.85rem;margin-top:4px;';
-  cancel.textContent='Abbrechen';
-  cancel.addEventListener('click',function(){ov.remove();});
-  box.appendChild(cancel);ov.appendChild(box);document.body.appendChild(ov);
-  ov.addEventListener('click',function(e){if(e.target===ov)ov.remove();});
-}
-
-// ── LP ───────────────────────────────────────────────────────
+// ── LP Button & Modal ────────────────────────────────────
 function buildLPButton(article){
   try{
     var lp=_lpData[article.id];var an=article.analysis||{};
@@ -245,8 +210,14 @@ function buildLPButton(article){
     }
     if(article.lp_booked){
       window._lpModalData=window._lpModalData||{};
-      window._lpModalData[article.id]={price:an.price_recommended||0,title:article.title||'',days:article.lp_days||7,hasBot:!!article.lp_has_bot};
-      return '<button class="lp-btn" data-action="open-lp-modal" data-aid="'+article.id+'">Landingpage jetzt aktivieren - Bereits bezahlt</button>';
+      window._lpModalData[article.id]={
+        price:an.price_recommended||0,
+        title:article.title||'',
+        days:article.lp_days||7,
+        hasBot:!!article.lp_has_bot,
+        authScore: an.authenticity && an.authenticity.score !== null ? an.authenticity.score : null
+      };
+      return '<button class="lp-btn" data-action="open-lp-modal" data-aid="'+article.id+'">🌐 Landingpage jetzt aktivieren – Bereits bezahlt</button>';
     }
     return '';
   }catch(e){return '';}
@@ -254,34 +225,77 @@ function buildLPButton(article){
 
 function openLPModal(articleId){
   var d=(window._lpModalData||{})[articleId]||{};
+  var authScore = d.authScore;
+  var hasGoodScore = authScore !== null && authScore !== undefined && authScore >= 60;
+
   var overlay=document.createElement('div');overlay.className='lp-modal-overlay';overlay.id='lp-modal';
   var box=document.createElement('div');box.className='lp-modal';
-  var h='<div class="lp-modal-title">Landingpage aktivieren</div>';
+  var h='<div class="lp-modal-title">🌐 Landingpage aktivieren</div>';
   h+='<div style="font-size:.85rem;color:#6b7280;margin-bottom:4px;">'+esc(d.title||'')+'</div>';
-  h+='<label class="lp-modal-label">Verkaufspreis *</label><input class="lp-modal-input" type="number" id="lp-price" min="0" step="0.01" value="'+(d.price||0)+'">';
-  h+='<label class="lp-modal-label">Mindestpreis (€)</label><input class="lp-modal-input" type="number" id="lp-minprice" min="0" step="0.01" placeholder="z.B. 2800">';
+
+  h+='<label class="lp-modal-label">Verkaufspreis *</label>';
+  h+='<input class="lp-modal-input" type="number" id="lp-price" min="0" step="0.01" value="'+(d.price||0)+'">';
+
+  h+='<label class="lp-modal-label">Mindestpreis (€) – für Preisverhandlung</label>';
+  h+='<input class="lp-modal-input" type="number" id="lp-minprice" min="0" step="0.01" placeholder="z.B. 280 (leer = kein Verhandeln)">';
+
+  // ── NEU: Stückzahl ──
+  h+='<label class="lp-modal-label">📦 Verfügbare Stückzahl (optional)</label>';
+  h+='<input class="lp-modal-input" type="number" id="lp-stock" min="1" step="1" placeholder="z.B. 1 (leer = unbegrenzt)">';
+  h+='<div style="font-size:.72rem;color:var(--mu);margin-top:4px;">Zeigt "Noch X verfügbar" auf der Produktseite. Bei 0 → Ausverkauft.</div>';
+
   h+='<label class="lp-modal-label">Lieferoptionen</label>';
   h+='<label class="lp-check-row"><input type="checkbox" id="lp-pickup" checked style="accent-color:#25D366;width:16px;height:16px;"> <span style="font-weight:700;">Selbstabholung</span></label>';
   h+='<div id="lp-pickup-loc" style="margin-top:6px;"><label class="lp-modal-label">Abholort</label><input class="lp-modal-input" type="text" id="lp-location" placeholder="z.B. Wien 1010"></div>';
-  h+='<label class="lp-check-row"><input type="checkbox" id="lp-shipping" style="accent-color:#25D366;width:16px;height:16px;"> <span style="font-weight:700;">Versand</span></label>';
+  h+='<label class="lp-check-row"><input type="checkbox" id="lp-shipping" style="accent-color:#25D366;width:16px;height:16px;"> <span style="font-weight:700;">Versand möglich</span></label>';
   h+='<div id="lp-shipping-cost" style="display:none;margin-top:6px;"><label class="lp-modal-label">Versandkosten</label><input class="lp-modal-input" type="number" id="lp-ship-cost" min="0" step="0.01" value="6.90"></div>';
+
+  // ── NEU: Score-Badge (nur wenn Score ≥ 60) ──
+  if (hasGoodScore) {
+    var scoreColor = authScore >= 80 ? '#059669' : '#d97706';
+    h+='<label class="lp-modal-label">🔍 Authentizitäts-Badge</label>';
+    h+='<label class="lp-check-row" style="background:#f0fdf4;border:1.5px solid #86efac;">';
+    h+='<input type="checkbox" id="lp-badge" style="accent-color:#25D366;width:16px;height:16px;">';
+    h+='<div>';
+    h+='<span style="font-weight:700;color:#15803d;">Score-Badge anzeigen ('+authScore+'/100)</span>';
+    h+='<div style="font-size:.72rem;color:#6b7280;margin-top:3px;">KI-generiert · Prüfung sichtbarer Merkmale · keine physische Prüfung</div>';
+    h+='<div style="font-size:.72rem;color:#6b7280;margin-top:2px;">Zeigt einen Vertrauens-Badge auf der Produktseite.</div>';
+    h+='</div></label>';
+  }
+
   h+='<button class="lp-modal-btn" id="lp-modal-btn">Landingpage erstellen</button>';
   h+='<button id="lp-cancel" style="width:100%;padding:12px;background:none;border:none;color:#9ca3af;cursor:pointer;font-size:.85rem;margin-top:6px;">Abbrechen</button>';
   box.innerHTML=h;overlay.appendChild(box);document.body.appendChild(overlay);
-  document.getElementById('lp-modal-btn').addEventListener('click',function(){activateLP(articleId);});
+
+  document.getElementById('lp-modal-btn').addEventListener('click',function(){activateLP(articleId, hasGoodScore);});
   document.getElementById('lp-cancel').addEventListener('click',function(){overlay.remove();});
   document.getElementById('lp-pickup').addEventListener('change',function(){document.getElementById('lp-pickup-loc').style.display=this.checked?'block':'none';});
   document.getElementById('lp-shipping').addEventListener('change',function(){document.getElementById('lp-shipping-cost').style.display=this.checked?'block':'none';});
 }
 
-async function activateLP(articleId){
+async function activateLP(articleId, hasGoodScore){
   var btn=document.getElementById('lp-modal-btn');
   var price=parseFloat(document.getElementById('lp-price').value);
   if(!price||price<=0){alert('Bitte Preis eingeben.');return;}
   btn.disabled=true;btn.textContent='Wird erstellt...';
   var article=(window._lastData&&window._lastData.articles)?window._lastData.articles.find(function(a){return a.id===articleId;}):null;
+  var stockVal = document.getElementById('lp-stock').value;
+  var badgeChecked = hasGoodScore && document.getElementById('lp-badge') && document.getElementById('lp-badge').checked;
   try{
-    var body={article_id:articleId,session_id:window._sessionId||null,days:article?(article.lp_days||7):7,has_bot:article?!!article.lp_has_bot:false,sale_price:price,delivery_pickup:document.getElementById('lp-pickup').checked,delivery_shipping:document.getElementById('lp-shipping').checked,pickup_location:document.getElementById('lp-location').value.trim(),shipping_cost:parseFloat(document.getElementById('lp-ship-cost').value)||0};
+    var body={
+      article_id:articleId,
+      session_id:window._sessionId||null,
+      days:article?(article.lp_days||7):7,
+      has_bot:article?!!article.lp_has_bot:false,
+      sale_price:price,
+      min_price:parseFloat(document.getElementById('lp-minprice').value)||null,
+      delivery_pickup:document.getElementById('lp-pickup').checked,
+      delivery_shipping:document.getElementById('lp-shipping').checked,
+      pickup_location:document.getElementById('lp-location').value.trim(),
+      shipping_cost:parseFloat(document.getElementById('lp-ship-cost').value)||0,
+      show_score_badge: badgeChecked,                          // ← NEU
+      stock_quantity: stockVal ? parseInt(stockVal) : null     // ← NEU
+    };
     var r=await fetch(API+'/api/vk/landingpage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     var result=await r.json();if(!r.ok)throw new Error(result.error||'Fehler');
     document.getElementById('lp-modal').remove();_lpData[articleId]=result.landingpage;
@@ -302,7 +316,7 @@ async function loadResults(){
   try{
     var r=await fetch(API+'/api/vk/results/'+TOKEN);var d=await r.json();
     if(!r.ok){
-      if(d.status==='analyzing'){document.getElementById('content').innerHTML='<div class="loading"><div class="spinner"></div><strong>Analyse laeuft...</strong><br><span>Diese Seite aktualisiert sich automatisch.</span></div>';setTimeout(loadResults,8000);return;}
+      if(d.status==='analyzing'){document.getElementById('content').innerHTML='<div class="loading"><div class="spinner"></div><strong>Analyse läuft...</strong><br><span>Diese Seite aktualisiert sich automatisch.</span></div>';setTimeout(loadResults,8000);return;}
       document.getElementById('content').innerHTML='<div class="loading">Fehler: '+esc(d.error||'Unbekannt')+'</div>';return;
     }
     window._lastData=d;window._sessionId=d.id;
@@ -318,14 +332,9 @@ function render(data){
   var deleteAt=data.delete_at?new Date(data.delete_at):null;
   var daysLeft=deleteAt?Math.ceil((deleteAt-Date.now())/(1000*60*60*24)):null;
   document.getElementById('headerSub').textContent=articles.length+' Artikel analysiert';
-  if(deleteAt) document.getElementById('deleteInfo').textContent='Loeschen in '+daysLeft+' Tagen ('+deleteAt.toLocaleDateString('de-AT')+')';
+  if(deleteAt) document.getElementById('deleteInfo').textContent='Löschen in '+daysLeft+' Tagen ('+deleteAt.toLocaleDateString('de-AT')+')';
   var html='';
-  if(daysLeft!==null&&daysLeft<=2) html+='<div class="delete-banner">Daten werden in <strong>'+daysLeft+' Tag(en)</strong> geloescht.</div>';
-
-  if(articles.length>1){
-    html+='<div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:.8rem;color:#15803d;display:flex;align-items:center;gap:8px;">';
-    html+='<span>↔️</span><span><strong>Fotos verschieben:</strong> Foto auf anderen Artikel ziehen (Desktop) oder ⊕ antippen (Mobile)</span></div>';
-  }
+  if(daysLeft!==null&&daysLeft<=2) html+='<div class="delete-banner">Daten werden in <strong>'+daysLeft+' Tag(en)</strong> gelöscht.</div>';
 
   articles.forEach(function(a,i){
     var photos=a.vk_photos||[];var an=a.analysis||{};
@@ -334,58 +343,56 @@ function render(data){
     html+='<input class="article-title-input" type="text" value="'+esc(a.title||'Artikel '+(i+1))+'" data-article-id="'+a.id+'" onblur="saveArticleTitle(this)" onkeydown="if(event.keyCode===13)this.blur()">';
     html+='</div>';
 
-    // Foto-Strip
-    html+='<div class="photos-strip'+(photos.length===0?' empty-zone':'')+'" data-zid="'+a.id+'">';
-    photos.forEach(function(p){
-      html+='<div class="photo-wrap" draggable="true" data-pid="'+p.id+'" data-sid="'+a.id+'">';
-      // draggable="false" verhindert den nativen Browser-Bild-Drag
-      html+='<img src="'+p.public_url+'" alt="Foto" draggable="false">';
-      if(articles.length>1){
-        html+='<button class="move-btn" data-action="open-move" data-pid="'+p.id+'" data-sid="'+a.id+'" title="Verschieben">⊕</button>';
-      }
-      html+='</div>';
-    });
-    html+='<div class="drop-hint">📥 hier ablegen</div>';
+    html+='<div class="photos-strip">';
+    photos.forEach(function(p){html+='<div class="photo-wrap"><img src="'+p.public_url+'" alt="Foto"></div>';});
     html+='</div>';
 
     if(!an||Object.keys(an).length===0||a.status!=='analyzed'){
       var cs=a.compliance_status||'pending_review';
       if(cs==='blocked'||cs==='needs_review'){
-        var cm=cs==='blocked'?'Dieser Artikel wurde gesperrt.':'Dieser Artikel wird geprüft.';
-        html+='<div class="section"><div style="background:#fef2f2;border:1.5px solid #fecaca;border-radius:8px;padding:14px;text-align:center;"><div style="font-size:1.1rem;margin-bottom:6px;">'+(cs==='blocked'?'🔒':'⚠️')+'</div><div style="font-weight:800;color:#dc2626;margin-bottom:4px;">'+(cs==='blocked'?'Artikel gesperrt':'Compliance-Prüfung')+'</div><div style="font-size:.82rem;color:#6b7280;">'+cm+'</div></div></div>';
+        var cm=cs==='blocked'?'Dieser Artikel wurde gesperrt.':'Dieser Artikel wird manuell geprüft.';
+        html+='<div class="section"><div style="background:#fef2f2;border:1.5px solid #fecaca;border-radius:8px;padding:14px;text-align:center;"><div style="font-size:1.1rem;margin-bottom:6px;">'+(cs==='blocked'?'🔒':'⚠️')+'</div><div style="font-weight:800;color:#dc2626;margin-bottom:4px;">'+(cs==='blocked'?'Artikel gesperrt':'Prüfung ausstehend')+'</div><div style="font-size:.82rem;color:#6b7280;">'+cm+'</div></div></div>';
       }else{
-        html+='<div class="section"><div class="loading" style="padding:20px;">Analyse noch ausstehend...</div></div>';
+        html+='<div class="section"><div class="loading" style="padding:20px;">Analyse ausstehend...</div></div>';
       }
     }else{
-      if(an.title_short||an.title_long||an.title_quick){html+='<div class="section"><div class="section-title">Titel-Varianten</div>';if(an.title_short)html+=copyField(an.title_short,'Kurztitel');if(an.title_long)html+=copyField(an.title_long,'Ausfuehrlicher Titel');if(an.title_quick)html+=copyField(an.title_quick,'Quick-Sale Titel');html+='</div>';}
-      if(an.price_min||an.price_recommended||an.price_max){var p1=storeText(String(an.price_min||0)),p2=storeText(String(an.price_recommended||0)),p3=storeText(String(an.price_max||0));html+='<div class="section"><div class="section-title">Preisvorschlag</div><div class="price-grid"><div class="price-card" data-cid="'+p1+'"><div class="price-val">'+esc(String(an.price_min||0))+'</div><div class="price-lbl">Mindestpreis</div><div class="price-range">Quick-Sale</div></div><div class="price-card" data-cid="'+p2+'"><div class="price-val" style="font-size:1.4rem;">'+esc(String(an.price_recommended||0))+'</div><div class="price-lbl">Empfohlen</div><div class="price-range">Bestes Verhaeltnis</div></div><div class="price-card" data-cid="'+p3+'"><div class="price-val">'+esc(String(an.price_max||0))+'</div><div class="price-lbl">Maximalpreis</div><div class="price-range">Geduld noetig</div></div></div>';if(an.price_reasoning)html+='<p style="font-size:.8rem;color:var(--mu);margin-top:8px;padding:0 4px;">'+esc(an.price_reasoning)+'</p>';html+='</div>';}
+      // Titel
+      if(an.title_short||an.title_long||an.title_quick){html+='<div class="section"><div class="section-title">Titel-Varianten</div>';if(an.title_short)html+=copyField(an.title_short,'Kurztitel');if(an.title_long)html+=copyField(an.title_long,'Ausführlicher Titel');if(an.title_quick)html+=copyField(an.title_quick,'Quick-Sale Titel');html+='</div>';}
+      // Preis
+      if(an.price_min||an.price_recommended||an.price_max){var p1=storeText(String(an.price_min||0)),p2=storeText(String(an.price_recommended||0)),p3=storeText(String(an.price_max||0));html+='<div class="section"><div class="section-title">Preisvorschlag</div><div class="price-grid"><div class="price-card" data-cid="'+p1+'"><div class="price-val">'+esc(String(an.price_min||0))+'</div><div class="price-lbl">Mindestpreis</div><div class="price-range">Quick-Sale</div></div><div class="price-card" data-cid="'+p2+'"><div class="price-val" style="font-size:1.4rem;">'+esc(String(an.price_recommended||0))+'</div><div class="price-lbl">Empfohlen</div><div class="price-range">Bestes Verhältnis</div></div><div class="price-card" data-cid="'+p3+'"><div class="price-val">'+esc(String(an.price_max||0))+'</div><div class="price-lbl">Maximalpreis</div><div class="price-range">Geduld nötig</div></div></div>';if(an.price_reasoning)html+='<p style="font-size:.8rem;color:var(--mu);margin-top:8px;padding:0 4px;">'+esc(an.price_reasoning)+'</p>';html+='</div>';}
+      // Kurzbeschreibung
       if(an.short_desc)html+='<div class="section"><div class="section-title">Kurzbeschreibung</div>'+copyField(an.short_desc)+'</div>';
-      if(an.long_desc)html+='<div class="section"><div class="section-title">Ausfuehrliche Beschreibung</div>'+copyField(an.long_desc)+'</div>';
+      // Ausführliche Beschreibung
+      if(an.long_desc)html+='<div class="section"><div class="section-title">Ausführliche Beschreibung</div>'+copyField(an.long_desc)+'</div>';
+      // Highlights
       if(an.bullet_points&&an.bullet_points.length){var bt=an.bullet_points.map(function(b){return'- '+b;}).join('\n');var allBid=storeText(bt);html+='<div class="section"><div class="section-title">Highlights <button class="copy-all-btn" data-cid="'+allBid+'">Alle kopieren</button></div><div class="bullet-list">';an.bullet_points.forEach(function(b){var bid=storeText(b);html+='<div class="bullet-item" data-cid="'+bid+'"><span class="bullet-dot">+</span><span class="bullet-text">'+esc(b)+'</span></div>';});html+='</div></div>';}
+      // Keywords
       if(an.keywords&&an.keywords.length){var allKwId=storeText(an.keywords.join(', '));html+='<div class="section"><div class="section-title">Keywords / Tags</div><div class="keywords">';an.keywords.forEach(function(k){var kid=storeText(k);html+='<span class="keyword" data-cid="'+kid+'">'+esc(k)+'</span>';});html+='</div><button class="copy-all-btn" data-cid="'+allKwId+'" style="margin-top:8px;">Alle Keywords kopieren</button></div>';}
-      if(an.market_comparison){var mc=an.market_comparison;html+='<div class="section"><div class="section-title">Marktvergleich'+(mc.platform?' - '+esc(mc.platform):'')+'</div>';if(mc.found&&mc.listings_count>0){html+='<div class="market-box"><div class="market-grid"><div class="market-stat"><div class="market-stat-val">'+esc(String(mc.price_range_min||0))+'</div><div class="market-stat-lbl">Niedrigster Preis</div></div><div class="market-stat"><div class="market-stat-val">'+esc(String(mc.price_avg||0))+'</div><div class="market-stat-lbl">Durchschnitt</div></div><div class="market-stat"><div class="market-stat-val">'+esc(String(mc.price_range_max||0))+'</div><div class="market-stat-lbl">Hoechster Preis</div></div></div><div style="font-size:.78rem;color:var(--mu);margin-top:6px;">'+mc.listings_count+' Angebote gefunden</div>';if(mc.assessment)html+='<div class="market-assessment">'+esc(mc.assessment)+'</div>';html+='</div>';}else{html+='<div class="market-box not-found"><div class="market-note">'+esc(mc.note||'Keine Angebote gefunden.')+'</div></div>';}html+='</div>';}
+      // Marktvergleich
+      if(an.market_comparison){var mc=an.market_comparison;html+='<div class="section"><div class="section-title">Marktvergleich'+(mc.platform?' – '+esc(mc.platform):'')+'</div>';if(mc.found&&mc.listings_count>0){html+='<div class="market-box"><div class="market-grid"><div class="market-stat"><div class="market-stat-val">'+esc(String(mc.price_range_min||0))+'</div><div class="market-stat-lbl">Niedrigster Preis</div></div><div class="market-stat"><div class="market-stat-val">'+esc(String(mc.price_avg||0))+'</div><div class="market-stat-lbl">Durchschnitt</div></div><div class="market-stat"><div class="market-stat-val">'+esc(String(mc.price_range_max||0))+'</div><div class="market-stat-lbl">Höchster Preis</div></div></div><div style="font-size:.78rem;color:var(--mu);margin-top:6px;">'+mc.listings_count+' Angebote gefunden</div>';if(mc.assessment)html+='<div class="market-assessment">'+esc(mc.assessment)+'</div>';html+='</div>';}else{html+='<div class="market-box not-found"><div class="market-note">'+esc(mc.note||'Keine Angebote gefunden.')+'</div></div>';}html+='</div>';}
+      // ── Authentizitäts-Score ──────────────────────────
+      html += buildAuthSection(an);
+      // Zustand
       if(an.condition)html+='<div class="section"><div class="section-title">Zustand</div>'+copyField(an.condition)+'</div>';
-      if(an.tips&&an.tips.length){html+='<div class="section"><div class="section-title">Verkaufstipps</div><div class="tip-list">';an.tips.forEach(function(t){html+='<div class="tip"><span>-</span><span>'+esc(t)+'</span></div>';});html+='</div></div>';}
+      // Tipps
+      if(an.tips&&an.tips.length){html+='<div class="section"><div class="section-title">Verkaufstipps</div><div class="tip-list">';an.tips.forEach(function(t){html+='<div class="tip"><span>→</span><span>'+esc(t)+'</span></div>';});html+='</div></div>';}
     }
+    // LP Button
     try{html+=buildLPButton(a);}catch(e){}
     html+='</div>';
   });
 
-  html+='<div class="pdf-section"><button class="pdf-btn" id="pdfBtn">PDF herunterladen</button>';
-  if(daysLeft) html+='<div class="pdf-note">Daten werden in '+daysLeft+' Tagen geloescht</div>';
+  html+='<div class="pdf-section"><button class="pdf-btn" id="pdfBtn">📄 PDF herunterladen</button>';
+  if(daysLeft) html+='<div class="pdf-note">Daten werden in '+daysLeft+' Tagen gelöscht</div>';
   html+='</div>';
 
   document.getElementById('content').innerHTML=html;
 
-  // Copy-Listener
   document.querySelectorAll('[data-cid]').forEach(function(el){
     el.addEventListener('click',function(e){e.stopPropagation();var text=_store[el.getAttribute('data-cid')];if(text!==undefined)doCopy(text,el);});
   });
   var pdfBtn=document.getElementById('pdfBtn');
   if(pdfBtn) pdfBtn.addEventListener('click',function(){window.open(API+'/api/vk/pdf/'+TOKEN,'_blank');});
-
-  // ✅ Drag & Drop NACH innerHTML initialisieren
-  setupDragDrop();
 
   var pending=(data.articles||[]).filter(function(a){return a.status!=='analyzed';});
   if(data.status==='analyzing'||pending.length>0) setTimeout(loadResults,6000);
