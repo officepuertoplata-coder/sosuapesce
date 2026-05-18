@@ -126,15 +126,15 @@ tr:hover td{background:#f9fafb;}
 
   </div>
 
-  <!-- GUTSCHEINE -->
+  <!-- VERKÄUFE -->
   <div id="section-verkaeufe" style="display:none;">
   <div class="card" style="margin:16px 0;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-      <div class="card-title" style="font-size:1rem;font-weight:800;">Verkaufe &amp; Provisionen</div>
+      <div class="card-title" style="font-size:1rem;font-weight:800;">Verkäufe &amp; Provisionen</div>
       <button onclick="loadVerkaeufe()" style="padding:6px 14px;background:var(--wa);color:#fff;border:none;border-radius:7px;font-size:.8rem;cursor:pointer;font-weight:700;">Aktualisieren</button>
     </div>
     <div id="verkaeufe-summary" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;"></div>
-    <div id="verkaeufe-list"><div style="text-align:center;padding:40px;color:var(--mu);">Lade Verkaufe...</div></div>
+    <div id="verkaeufe-list"><div style="text-align:center;padding:40px;color:var(--mu);">Lade Verkäufe...</div></div>
   </div>
 </div>
 
@@ -325,6 +325,9 @@ const KEY = 'converto_auth_v2';
 let sessions = [];
 let currentFilter = 'all';
 
+// ✅ FIX: Globale esc() Funktion – war vorher nur lokal definiert
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
 (function() {
   let auth = null;
   try { auth = JSON.parse(localStorage.getItem(KEY)||'null'); } catch(e){}
@@ -337,7 +340,6 @@ window.onload = loadAll;
 
 async function loadAll() {
   await Promise.all([loadStats(), loadSessions()]);
-  // Cleanup automatisch im Hintergrund ausführen
   runCleanup(true);
 }
 
@@ -355,7 +357,6 @@ async function runCleanup(silent) {
       var msg = '✅ ' + d.deleted + ' gelöscht, ' + d.fixed + ' repariert';
       if (status) status.textContent = msg;
       if (!silent) showToast(msg);
-      // Stats neu laden wenn was gelöscht wurde
       if (d.deleted > 0 || d.fixed > 0) {
         await Promise.all([loadStats(), loadSessions()]);
       }
@@ -370,7 +371,6 @@ async function loadStats() {
   try {
     const r = await fetch(API + '/api/vk/admin/stats');
     const d = await r.json();
-
     document.getElementById('s-valid').textContent   = d.valid ?? 0;
     document.getElementById('s-24h').textContent     = d.last_24h ?? 0;
     document.getElementById('s-rev-24h').textContent  = '€' + (d.revenue_24h  || 0).toFixed(2);
@@ -429,7 +429,7 @@ function renderSessions() {
         '<button class="btn btn-sm" style="background:#eff6ff;color:#1d4ed8;" onclick="extendSession(\''+s.id+'\')">+7d</button>' +
         '<button class="btn btn-sm btn-red" onclick="deleteSession(\''+s.id+'\',\''+s.phone+'\')">🗑️</button>' +
       '</td></tr>' +
-      // Compliance Sub-Rows für jeden Artikel
+      // ✅ FIX: Compliance Sub-Rows – Quotes korrekt escaped mit \'
       articles.filter(function(a) { return a.compliance_status === 'blocked' || a.compliance_status === 'needs_review'; }).map(function(a) {
         var compColor = a.compliance_status === 'blocked' ? '#fef2f2' : '#fefce8';
         var compIcon = a.compliance_status === 'blocked' ? '🔒' : '⚠️';
@@ -438,9 +438,9 @@ function renderSessions() {
         return '<tr style="background:' + compColor + ';border-top:1px solid #fecaca;">' +
           '<td colspan="3" style="padding:6px 16px;font-size:.78rem;">' + compIcon + ' <strong>' + esc(a.title || 'Unbekannt') + '</strong> – ' + compLabel + (a.compliance_blocked_reason ? ': ' + esc(a.compliance_blocked_reason) : '') + authBadge + '</td>' +
           '<td colspan="4" style="padding:6px 8px;">' +
-            '<button onclick="complianceAction('' + a.id + '', 'approve')" style="padding:3px 8px;background:#15803d;color:#fff;border:none;border-radius:5px;font-size:.72rem;cursor:pointer;margin-right:4px;">Freigeben</button>' +
-            '<button onclick="complianceReject('' + a.id + '')" style="padding:3px 8px;background:#dc2626;color:#fff;border:none;border-radius:5px;font-size:.72rem;cursor:pointer;margin-right:4px;">Ablehnen</button>' +
-            (a.authenticity_score >= 70 && !a.admin_verified ? '<button onclick="verifyAuth('' + a.id + '')" style="padding:3px 8px;background:#7c3aed;color:#fff;border:none;border-radius:5px;font-size:.72rem;cursor:pointer;">🏆 Verifizieren</button>' : '') +
+            '<button onclick="complianceAction(\'' + a.id + '\', \'approve\')" style="padding:3px 8px;background:#15803d;color:#fff;border:none;border-radius:5px;font-size:.72rem;cursor:pointer;margin-right:4px;">Freigeben</button>' +
+            '<button onclick="complianceReject(\'' + a.id + '\')" style="padding:3px 8px;background:#dc2626;color:#fff;border:none;border-radius:5px;font-size:.72rem;cursor:pointer;margin-right:4px;">Ablehnen</button>' +
+            (a.authenticity_score >= 70 && !a.admin_verified ? '<button onclick="verifyAuth(\'' + a.id + '\')" style="padding:3px 8px;background:#7c3aed;color:#fff;border:none;border-radius:5px;font-size:.72rem;cursor:pointer;">🏆 Verifizieren</button>' : '') +
           '</td></tr>';
       }).join('');
   }).join('');
@@ -510,11 +510,11 @@ function showSection(name) {
   var bs = document.getElementById('section-botsandbox');
   if (bs) bs.style.display = name === 'botsandbox' ? 'block' : 'none';
   document.querySelectorAll('.tbtn').forEach(b => b.classList.remove('active'));
-  if (name === 'coupons') { document.getElementById('btnCoupons').classList.add('active'); loadCoupons(); }
-  else if (name === 'business')  { document.getElementById('btnBusiness').classList.add('active');  loadBusinessDiscounts(); }
-  else if (name === 'verkaeufe')   { document.getElementById('btnVerkaeufe').classList.add('active'); loadVerkaeufe(); }
-  else if (name === 'botsandbox') { document.getElementById('btnBotsandbox').classList.add('active'); loadSandboxLPs(); }
-  else { document.getElementById('btnOrders').classList.add('active'); loadOrders(); }
+  if (name === 'coupons')     { document.getElementById('btnCoupons').classList.add('active');    loadCoupons(); }
+  else if (name === 'business')    { document.getElementById('btnBusiness').classList.add('active');   loadBusinessDiscounts(); }
+  else if (name === 'verkaeufe')   { document.getElementById('btnVerkaeufe').classList.add('active');  loadVerkaeufe(); }
+  else if (name === 'botsandbox')  { document.getElementById('btnBotsandbox').classList.add('active'); loadSandboxLPs(); }
+  else { document.getElementById('btnOrders').classList.add('active'); loadAll(); }
 }
 
 function toggleNewCoupon() {
@@ -535,7 +535,7 @@ async function loadCoupons() {
       var isFull = c.max_uses && c.used_count >= c.max_uses;
       var isActive = c.active && !isExpired && !isFull;
       return '<tr>' +
-        '<td><strong style="font-family:monospace;">' + c.code + '</strong>' + (c.description ? '<br><small style="color:var(--mu)">' + c.description + '</small>' : '') + '</td>' +
+        '<td><strong style="font-family:monospace;">' + esc(c.code) + '</strong>' + (c.description ? '<br><small style="color:var(--mu)">' + esc(c.description) + '</small>' : '') + '</td>' +
         '<td>' + typeLabel + '</td>' +
         '<td>' + (c.type==='free'?'—':c.type==='percent'?c.value+'%':c.value+'€') + '</td>' +
         '<td style="text-align:center;">' + (c.used_count||0) + '</td>' +
@@ -544,7 +544,7 @@ async function loadCoupons() {
         '<td><span class="badge ' + (isActive?'s-open':'s-expired') + '">' + (isActive?'Aktiv':'Inaktiv') + '</span></td>' +
         '<td style="white-space:nowrap;">' +
           '<button class="btn btn-sm ' + (c.active?'':'btn-g') + '" onclick="toggleCoupon(\'' + c.id + '\',' + c.active + ')">' + (c.active?'⏸':'▶') + '</button> ' +
-          '<button class="btn btn-sm btn-red" onclick="deleteCoupon(\'' + c.id + '\',\'' + c.code + '\')">🗑️</button>' +
+          '<button class="btn btn-sm btn-red" onclick="deleteCoupon(\'' + c.id + '\',\'' + esc(c.code) + '\')">🗑️</button>' +
         '</td></tr>';
     }).join('');
   } catch(e) { console.error(e); }
@@ -594,12 +594,10 @@ function toggleNewBusiness() {
 
 async function loadVerkaeufe() {
   try {
-    function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
     const r = await fetch(API + '/api/vk/admin/verkaeufe');
     const data = await r.json();
     if (!Array.isArray(data)) throw new Error(data.error || 'Server Fehler');
 
-    // Summary
     const totalOffen    = data.filter(v => v.payout_status === 'open').reduce((s,v) => s + (v.commission_amount||0), 0);
     const totalErledigt = data.filter(v => v.payout_status === 'done').reduce((s,v) => s + (v.commission_amount||0), 0);
     const totalSusp     = data.filter(v => v.payout_status === 'suspended').reduce((s,v) => s + (v.commission_amount||0), 0);
@@ -633,7 +631,6 @@ async function loadVerkaeufe() {
       const commAmt   = parseFloat(v.commission_amount || 0);
       const payoutAmt = saleAmt - commAmt;
       const dueAt     = v.payout_due_at ? new Date(v.payout_due_at) : null;
-      const soldAt    = v.sold_at ? new Date(v.sold_at) : null;
       const isOverdue = dueAt && dueAt < now && v.payout_status === 'open';
       const daysDue   = dueAt ? Math.ceil((now - dueAt) / (1000*60*60*24)) : 0;
 
@@ -667,6 +664,12 @@ async function loadVerkaeufe() {
 
     html += '</tbody></table></div>';
     document.getElementById('verkaeufe-list').innerHTML = html;
+
+    // Event delegation für Payout-Buttons
+    document.getElementById('verkaeufe-list').addEventListener('click', function(e) {
+      var btn = e.target.closest('[data-action="payout"]');
+      if (btn) setPayoutStatus(btn.dataset.lpid, btn.dataset.status);
+    });
   } catch(e) {
     document.getElementById('verkaeufe-list').innerHTML = '<div style="color:red;">Fehler: ' + e.message + '</div>';
   }
@@ -695,11 +698,9 @@ async function sendSandboxMsg() {
   sandboxSlug = slug;
   input.value = '';
 
-  // Käufer Nachricht anzeigen
   appendSandboxMsg(msg, 'buyer');
   sandboxMessages.push({ role: 'user', content: msg });
 
-  // Typing indicator
   var typingId = 'typing-' + Date.now();
   var chat = document.getElementById('sandbox-chat');
   chat.innerHTML += '<div id="' + typingId + '" style="align-self:flex-start;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:8px 12px;font-size:.82rem;color:var(--mu);">⏳ Bot tippt...</div>';
@@ -723,19 +724,16 @@ async function sendSandboxMsg() {
     var reply = data.reply;
     sandboxMessages.push({ role: 'assistant', content: reply });
 
-    // Natürliche Tipp-Verzögerung: ~50ms pro Zeichen, min 1s max 4s
     var typingDelay = Math.min(4000, Math.max(1000, reply.length * 40));
     await new Promise(function(r) { setTimeout(r, typingDelay); });
 
-    // Payment Link erkannt?
     if (data.payment_link) {
       appendSandboxMsg(reply.replace(/ZAHLUNG_LINK:\d+(\.\d+)?/, '').trim(), 'bot');
-      appendSandboxMsg('EINIGUNG - Bot wuerde Payment Link senden: EUR ' + data.payment_link.amount.toFixed(2), 'system');
+      appendSandboxMsg('EINIGUNG - Bot würde Payment Link senden: EUR ' + data.payment_link.amount.toFixed(2), 'system');
     } else {
       appendSandboxMsg(reply, 'bot');
     }
 
-    // Model anzeigen
     var modelBadge = data.model && data.model.includes('opus') ? 'Opus (Preisverhandlung)' : 'Haiku (Produktfrage)';
     chat.innerHTML += '<div style="text-align:center;font-size:.68rem;color:var(--mu);margin-top:-4px;">' + modelBadge + '</div>';
   } catch(e) {
@@ -745,7 +743,6 @@ async function sendSandboxMsg() {
 }
 
 function appendSandboxMsg(text, type) {
-  function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   var chat = document.getElementById('sandbox-chat');
   var styles = {
     buyer:  'align-self:flex-end;background:var(--wa);color:#fff;',
@@ -793,8 +790,8 @@ async function loadBusinessDiscounts() {
       var isActive = b.active && !isExpired && !isFull;
       var tr = document.createElement('tr');
       tr.innerHTML =
-        '<td><strong>' + b.company_name + '</strong>' + (b.notes ? '<br><small style="color:var(--mu)">' + b.notes + '</small>' : '') + (b.wise_email ? '<br><small style="color:var(--mu)">💳 ' + b.wise_email + '</small>' : '') + '</td>' +
-        '<td><span class="phone">' + b.phone + '</span></td>' +
+        '<td><strong>' + esc(b.company_name) + '</strong>' + (b.notes ? '<br><small style="color:var(--mu)">' + esc(b.notes) + '</small>' : '') + (b.wise_email ? '<br><small style="color:var(--mu)">💳 ' + esc(b.wise_email) + '</small>' : '') + '</td>' +
+        '<td><span class="phone">' + esc(b.phone) + '</span></td>' +
         '<td style="font-weight:800;color:#059669;">' + b.discount_percent + '%</td>' +
         '<td style="text-align:center;">' + (b.sales_commission_percent||0) + '%</td>' +
         '<td style="text-align:center;">' + (b.landingpage_enabled ? '✅' : '—') + '</td>' +
@@ -806,7 +803,6 @@ async function loadBusinessDiscounts() {
           '<button class="btn btn-sm" style="margin-right:4px;">' + (b.active?'⏸':'▶') + '</button>' +
           '<button class="btn btn-sm btn-red">🗑️</button>' +
         '</td>';
-      // Add event listeners via JS (keine onclick-Strings nötig)
       var btns = tr.querySelectorAll('button');
       btns[0].addEventListener('click', function() { editBusinessDiscount(b); });
       btns[1].addEventListener('click', function() { toggleBusinessDiscount(b.id, b.active); });
