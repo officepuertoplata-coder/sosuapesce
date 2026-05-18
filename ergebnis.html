@@ -353,7 +353,7 @@ function render(data){
         var cm=cs==='blocked'?'Dieser Artikel wurde gesperrt.':'Dieser Artikel wird manuell geprüft.';
         html+='<div class="section"><div style="background:#fef2f2;border:1.5px solid #fecaca;border-radius:8px;padding:14px;text-align:center;"><div style="font-size:1.1rem;margin-bottom:6px;">'+(cs==='blocked'?'🔒':'⚠️')+'</div><div style="font-weight:800;color:#dc2626;margin-bottom:4px;">'+(cs==='blocked'?'Artikel gesperrt':'Prüfung ausstehend')+'</div><div style="font-size:.82rem;color:#6b7280;">'+cm+'</div></div></div>';
       }else{
-        html+='<div class="section"><div class="loading" style="padding:20px;">Analyse ausstehend...</div></div>';
+        html+='<div class="section"><div style="padding:20px;text-align:center;"><div style="color:var(--mu);margin-bottom:12px;">Analyse ausstehend...</div><button onclick="deleteEmptyArticle(\''+a.id+'\')" style="background:none;border:1px solid #fecaca;color:#ef4444;border-radius:6px;padding:6px 14px;font-size:.78rem;cursor:pointer;font-family:var(--font);">🗑 Leeren Artikel löschen</button></div></div>';
       }
     }else{
       // Titel
@@ -404,6 +404,17 @@ function doCopy(text,el){if(navigator.clipboard&&navigator.clipboard.writeText){
 function fallbackCopy(text,el){var ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;top:0;left:0;opacity:0;pointer-events:none;';document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand('copy');flash(el);showToast('Kopiert!');}catch(e){}document.body.removeChild(ta);}
 function flash(el){if(!el)return;el.classList.add('copied');setTimeout(function(){el.classList.remove('copied');},1500);}
 async function saveArticleTitle(input){var id=input.getAttribute('data-article-id'),t=input.value.trim();if(!t||!id)return;try{await fetch(API+'/api/vk/article/'+id+'/notes',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:t})});showToast('Titel gespeichert');}catch(e){}}
+
+async function deleteEmptyArticle(articleId){
+  if(!confirm("Diesen leeren Artikel löschen?"))return;
+  try{
+    await fetch(API+"/api/vk/article/"+articleId,{method:"DELETE"});
+    var data=window._lastData;
+    data.articles=data.articles.filter(function(a){return a.id!==articleId;});
+    render(data);
+    showToast("✅ Artikel gelöscht");
+  }catch(e){showToast("❌ Fehler beim Löschen");}
+}
 </script>
 </body>
 </html>
