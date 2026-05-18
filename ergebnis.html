@@ -378,7 +378,7 @@ function render(data){
       if(an.tips&&an.tips.length){html+='<div class="section"><div class="section-title">Verkaufstipps</div><div class="tip-list">';an.tips.forEach(function(t){html+='<div class="tip"><span>→</span><span>'+esc(t)+'</span></div>';});html+='</div></div>';}
     }
     // ── Notizfeld + Neu analysieren
-    html+='<div class="section"><div class="section-title">📝 Zusatzinfos / Korrektur</div><textarea id="notes-'+a.id+'" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:.85rem;font-family:var(--font);resize:vertical;min-height:64px;" placeholder="z.B. Tissot Ballade 39mm, Neupreis Euro 1025, Kaufjahr 2022...">'+esc(a.notes||'')+'</textarea><button onclick="reanalyzeArticle(this.getAttribute(\"data-aid\"))" data-aid="'+a.id+'" id="reanalyze-btn-'+a.id+'" style="margin-top:8px;width:100%;padding:13px;background:#f0fdf4;border:1.5px solid var(--wa);border-radius:8px;color:#15803d;font-weight:800;font-size:.88rem;cursor:pointer;font-family:var(--font);">🔄 Neu analysieren mit diesen Infos</button><div style="font-size:.72rem;color:var(--mu);margin-top:6px;">Notizen eintragen → Neu analysieren → Ergebnis in ~30 Sek.</div></div>';
+    html+='<div class="section"><div class="section-title">📝 Zusatzinfos / Korrektur</div><textarea id="notes-'+a.id+'" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:.85rem;font-family:var(--font);resize:vertical;min-height:64px;" placeholder="z.B. Tissot Ballade 39mm, Neupreis Euro 1025, Kaufjahr 2022...">'+esc(a.notes||'')+'</textarea><button class="reanalyze-btn" data-article-id="'+a.id+'" style="margin-top:8px;width:100%;padding:13px;background:#f0fdf4;border:1.5px solid var(--wa);border-radius:8px;color:#15803d;font-weight:800;font-size:.88rem;cursor:pointer;font-family:var(--font);">🔄 Neu analysieren mit diesen Infos</button><div style="font-size:.72rem;color:var(--mu);margin-top:6px;">Notizen eintragen → Neu analysieren → Ergebnis in ~30 Sek.</div></div>';
     // LP Button
     try{html+=buildLPButton(a);}catch(e){}
     html+='</div>';
@@ -395,6 +395,13 @@ function render(data){
   });
   var pdfBtn=document.getElementById('pdfBtn');
   if(pdfBtn) pdfBtn.addEventListener('click',function(){window.open(API+'/api/vk/pdf/'+TOKEN,'_blank');});
+
+  // Reanalyse-Buttons
+  document.querySelectorAll('.reanalyze-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      reanalyzeArticle(this.getAttribute('data-article-id'));
+    });
+  });
 
   var pending=(data.articles||[]).filter(function(a){return a.status!=='analyzed';});
   if(data.status==='analyzing'||pending.length>0) setTimeout(loadResults,6000);
