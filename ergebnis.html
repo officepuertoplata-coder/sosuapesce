@@ -416,6 +416,7 @@ async function deleteEmptyArticle(articleId){
     render(data);
     showToast("✅ Artikel gelöscht");
   }catch(e){showToast("❌ Fehler beim Löschen");}
+}
 
 async function saveNotesResult(articleId, notes) {
   try { await fetch(API+'/api/vk/article/'+articleId+'/notes', {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({notes:notes})}); } catch(e) {}
