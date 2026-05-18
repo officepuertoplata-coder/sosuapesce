@@ -245,7 +245,19 @@ function render(data) {
     if (photos.length) { html += '<div class="photos-strip">'; photos.forEach(function(p){html+='<img src="'+p.public_url+'" alt="Foto">';}); html += '</div>'; }
 
     if (!an || Object.keys(an).length===0 || a.status!=='analyzed') {
-      html += '<div class="section"><div class="loading" style="padding:20px;">Analyse noch ausstehend...</div></div>';
+      var compStatus = a.compliance_status || 'pending_review';
+      if (compStatus === 'blocked' || compStatus === 'needs_review') {
+        var compMsg = compStatus === 'blocked'
+          ? 'Dieser Artikel wurde gesperrt. Unser Team prüft ihn.'
+          : 'Dieser Artikel wird vom Converdino Team geprüft.';
+        html += '<div class="section"><div style="background:#fef2f2;border:1.5px solid #fecaca;border-radius:8px;padding:14px;text-align:center;">' +
+          '<div style="font-size:1.1rem;margin-bottom:6px;">' + (compStatus === 'blocked' ? '🔒' : '⚠️') + '</div>' +
+          '<div style="font-weight:800;color:#dc2626;margin-bottom:4px;">' + (compStatus === 'blocked' ? 'Artikel gesperrt' : 'Compliance-Prüfung') + '</div>' +
+          '<div style="font-size:.82rem;color:#6b7280;">' + compMsg + '</div>' +
+          '</div></div>';
+      } else {
+        html += '<div class="section"><div class="loading" style="padding:20px;">Analyse noch ausstehend...</div></div>';
+      }
     } else {
       if (an.title_short||an.title_long||an.title_quick) {
         html += '<div class="section"><div class="section-title">Titel-Varianten</div>';
