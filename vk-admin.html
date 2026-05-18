@@ -416,8 +416,53 @@ function renderSessions() {
         (['open','paid','error','done'].includes(s.status) ? '<button class="btn btn-sm btn-gold" onclick="analyzeSession(\''+s.id+'\')">🔍 Analysieren</button>' : '') +
         '<button class="btn btn-sm" style="background:#eff6ff;color:#1d4ed8;" onclick="extendSession(\''+s.id+'\')">+7d</button>' +
         '<button class="btn btn-sm btn-red" onclick="deleteSession(\''+s.id+'\',\''+s.phone+'\')">🗑️</button>' +
-      '</td></tr>';
+      '</td></tr>' +
+      // Compliance Sub-Rows für jeden Artikel
+      articles.filter(function(a) { return a.compliance_status === 'blocked' || a.compliance_status === 'needs_review'; }).map(function(a) {
+        var compColor = a.compliance_status === 'blocked' ? '#fef2f2' : '#fefce8';
+        var compIcon = a.compliance_status === 'blocked' ? '🔒' : '⚠️';
+        var compLabel = a.compliance_status === 'blocked' ? 'GESPERRT' : 'PRÜFUNG';
+        var authBadge = a.authenticity_score ? ' | Auth: ' + a.authenticity_score + '/100' : '';
+        return '<tr style="background:' + compColor + ';border-top:1px solid #fecaca;">' +
+          '<td colspan="3" style="padding:6px 16px;font-size:.78rem;">' + compIcon + ' <strong>' + esc(a.title || 'Unbekannt') + '</strong> – ' + compLabel + (a.compliance_blocked_reason ? ': ' + esc(a.compliance_blocked_reason) : '') + authBadge + '</td>' +
+          '<td colspan="4" style="padding:6px 8px;">' +
+            '<button onclick="complianceAction('' + a.id + '', 'approve')" style="padding:3px 8px;background:#15803d;color:#fff;border:none;border-radius:5px;font-size:.72rem;cursor:pointer;margin-right:4px;">Freigeben</button>' +
+            '<button onclick="complianceReject('' + a.id + '')" style="padding:3px 8px;background:#dc2626;color:#fff;border:none;border-radius:5px;font-size:.72rem;cursor:pointer;margin-right:4px;">Ablehnen</button>' +
+            (a.authenticity_score >= 70 && !a.admin_verified ? '<button onclick="verifyAuth('' + a.id + '')" style="padding:3px 8px;background:#7c3aed;color:#fff;border:none;border-radius:5px;font-size:.72rem;cursor:pointer;">🏆 Verifizieren</button>' : '') +
+          '</td></tr>';
+      }).join('');
   }).join('');
+}
+
+async function complianceAction(articleId, action) {
+  try {
+    await fetch(API + '/api/vk/admin/compliance/' + articleId, {
+      method: 'PUT', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ action })
+    });
+    showToast(action === 'approve' ? '✅ Freigegeben' : '❌ Abgelehnt');
+    loadSessions();
+  } catch(e) { alert('Fehler: ' + e.message); }
+}
+
+function complianceReject(articleId) {
+  var reason = prompt('Begründung für Ablehnung (wird an Verkäufer gesendet):');
+  if (!reason) return;
+  fetch(API + '/api/vk/admin/compliance/' + articleId, {
+    method: 'PUT', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ action: 'reject', reason })
+  }).then(function() {
+    showToast('❌ Abgelehnt – Verkäufer wird informiert');
+    loadSessions();
+  }).catch(function(e) { alert('Fehler: ' + e.message); });
+}
+
+async function verifyAuth(articleId) {
+  try {
+    await fetch(API + '/api/vk/admin/verify/' + articleId, { method: 'PUT' });
+    showToast('🏆 Authentizität verifiziert');
+    loadSessions();
+  } catch(e) { alert('Fehler: ' + e.message); }
 }
 
 async function analyzeSession(id) {
