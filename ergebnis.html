@@ -437,6 +437,7 @@ async function reanalyzeArticle(articleId) {
   try {
     await fetch(API+'/api/vk/article/'+articleId+'/reanalyze', {method:'POST'});
     var attempts=0;
+    await new Promise(function(r){setTimeout(r,4000);}); // warten bis status=pending
     var interval=setInterval(async function(){
       attempts++;
       try{
