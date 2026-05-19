@@ -248,6 +248,10 @@ async function activateLP(articleId, hasGoodScore){
 function openUpdateLP(lpId, articleId){
   var lp=_lpData[articleId];
   if(!lp)return;
+  var article=(window._lastData&&window._lastData.articles)?window._lastData.articles.find(function(a){return a.id===articleId;}):null;
+  var an=(article&&article.analysis)||{};
+  var authScore=an.authenticity&&an.authenticity.score!==null&&an.authenticity.score!==undefined?an.authenticity.score:null;
+  var hasGoodScore=authScore!==null&&authScore>=60;
   var overlay=document.createElement('div');overlay.className='lp-modal-overlay';overlay.id='lp-update-modal';
   var box=document.createElement('div');box.className='lp-modal';
   var h='<div class="lp-modal-title">✏️ Landingpage aktualisieren</div>';
@@ -263,16 +267,20 @@ function openUpdateLP(lpId, articleId){
   h+='<div id="upd-pickup-loc" style="margin-top:6px;'+(lp.delivery_pickup?'':'display:none;')+'"><label class="lp-modal-label">Abholort</label><input class="lp-modal-input" type="text" id="upd-location" value="'+esc(lp.pickup_location||'')+'"></div>';
   h+='<label class="lp-check-row"><input type="checkbox" id="upd-shipping" '+(lp.delivery_shipping?'checked':'')+' style="accent-color:#25D366;width:16px;height:16px;"> <span style="font-weight:700;">Versand möglich</span></label>';
   h+='<div id="upd-shipping-cost" style="margin-top:6px;'+(lp.delivery_shipping?'':'display:none;')+'"><label class="lp-modal-label">Versandkosten</label><input class="lp-modal-input" type="number" id="upd-ship-cost" min="0" step="0.01" value="'+(lp.shipping_cost||6.90)+'"></div>';
+  if(hasGoodScore){
+    h+='<label class="lp-modal-label">🔍 Authentizitäts-Badge</label>';
+    h+='<label class="lp-check-row" style="background:#f0fdf4;border:1.5px solid #86efac;"><input type="checkbox" id="upd-badge" '+(lp.show_score_badge?'checked':'')+' style="accent-color:#25D366;width:16px;height:16px;"><div><span style="font-weight:700;color:#15803d;">Score-Badge anzeigen ('+authScore+'/100)</span><div style="font-size:.72rem;color:#6b7280;margin-top:3px;">KI-generiert · Prüfung sichtbarer Merkmale · keine physische Prüfung</div></div></label>';
+  }
   h+='<button class="lp-modal-btn" id="upd-modal-btn">Aktualisieren</button>';
   h+='<button id="upd-cancel" style="width:100%;padding:12px;background:none;border:none;color:#9ca3af;cursor:pointer;font-size:.85rem;margin-top:6px;">Abbrechen</button>';
   box.innerHTML=h;overlay.appendChild(box);document.body.appendChild(overlay);
   document.getElementById('upd-pickup').addEventListener('change',function(){document.getElementById('upd-pickup-loc').style.display=this.checked?'block':'none';});
   document.getElementById('upd-shipping').addEventListener('change',function(){document.getElementById('upd-shipping-cost').style.display=this.checked?'block':'none';});
-  document.getElementById('upd-modal-btn').addEventListener('click',function(){updateLP(lpId,articleId);});
+  document.getElementById('upd-modal-btn').addEventListener('click',function(){updateLP(lpId,articleId,hasGoodScore);});
   document.getElementById('upd-cancel').addEventListener('click',function(){overlay.remove();});
 }
 
-async function updateLP(lpId, articleId){
+async function updateLP(lpId, articleId, hasGoodScore){
   var btn=document.getElementById('upd-modal-btn');
   var price=parseFloat(document.getElementById('upd-price').value);
   if(!price||price<=0){alert('Bitte Preis eingeben.');return;}
@@ -285,7 +293,8 @@ async function updateLP(lpId, articleId){
       delivery_pickup:document.getElementById('upd-pickup').checked,
       delivery_shipping:document.getElementById('upd-shipping').checked,
       pickup_location:document.getElementById('upd-location').value.trim(),
-      shipping_cost:parseFloat(document.getElementById('upd-ship-cost').value)||0
+      shipping_cost:parseFloat(document.getElementById('upd-ship-cost').value)||0,
+      show_score_badge:hasGoodScore&&document.getElementById('upd-badge')&&document.getElementById('upd-badge').checked
     };
     var r=await fetch(API+'/api/vk/landingpage/'+lpId,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     var result=await r.json();if(!r.ok)throw new Error(result.error||'Fehler');
