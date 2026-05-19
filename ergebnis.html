@@ -129,7 +129,6 @@ document.addEventListener('click',function(e){
   }
 });
 
-// ── Authentizitäts-Score HTML ─────────────────────────────
 function buildAuthSection(an) {
   var auth = an.authenticity;
   if (!auth || auth.score === null || auth.score === undefined) return '';
@@ -160,21 +159,39 @@ function buildAuthSection(an) {
   return html;
 }
 
-// ── LP Button & Modal ────────────────────────────────────
+// ── LP Button & Modal ─────────────────────────────────────
+// ÄNDERUNG: Business-Sessions sehen LP-Button auch ohne lp_booked
 function buildLPButton(article){
   try{
-    var lp=_lpData[article.id];var an=article.analysis||{};
+    var lp=_lpData[article.id];
+    var an=article.analysis||{};
+    var isBusiness=!!(window._lastData&&window._lastData.business_discount_id);
+    var isAnalyzed=article.status==='analyzed'&&Object.keys(an).length>2;
+
+    // LP bereits aktiv → QR Code + Links anzeigen
     if(lp&&lp.status==='active'){
       var url='https://p.converdino.com/p/'+lp.slug;
       var qrUrl='https://api.qrserver.com/v1/create-qr-code/?size=160x160&data='+encodeURIComponent(url)+'&color=1b4332&bgcolor=ffffff&margin=10';
       var labelUrl=API+'/api/vk/lp/label/'+lp.slug;
       return '<div style="margin-top:10px;padding:16px;background:#dcfce7;border:1.5px solid #25D366;border-radius:12px;"><div style="font-size:.8rem;font-weight:800;color:#15803d;margin-bottom:10px;">Landingpage aktiv</div><div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;"><div style="flex-shrink:0;text-align:center;"><img src="'+qrUrl+'" style="width:120px;height:120px;border-radius:8px;border:2px solid #86efac;display:block;" alt="QR Code"><div style="font-size:.68rem;color:#15803d;font-weight:700;margin-top:4px;">Scan &rarr; Produktseite</div></div><div style="flex:1;min-width:180px;"><a href="'+url+'" target="_blank" style="font-size:.82rem;color:#15803d;word-break:break-all;display:block;margin-bottom:10px;">'+url+'</a><div style="display:flex;flex-direction:column;gap:6px;"><button data-action="copy-lp" data-url="'+url+'" style="padding:8px 12px;background:#25D366;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:.8rem;text-align:left;">Link kopieren</button><a href="'+labelUrl+'" target="_blank" style="padding:8px 12px;background:#1b4332;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:.8rem;text-decoration:none;display:block;">Produktetikett drucken</a><button data-action="deactivate-lp" data-lpid="'+lp.id+'" style="padding:6px 12px;background:none;border:1px solid #fecaca;color:#ef4444;border-radius:8px;font-size:.75rem;cursor:pointer;text-align:left;">Deaktivieren</button></div></div></div></div>';
     }
-    if(article.lp_booked){
+
+    // LP Button: lp_booked (bezahlt) ODER Business-Session mit analysiertem Artikel
+    if(article.lp_booked||(isBusiness&&isAnalyzed)){
       window._lpModalData=window._lpModalData||{};
-      window._lpModalData[article.id]={price:an.price_recommended||0,title:article.title||'',days:article.lp_days||7,hasBot:!!article.lp_has_bot,authScore:an.authenticity&&an.authenticity.score!==null?an.authenticity.score:null};
-      return '<button class="lp-btn" data-action="open-lp-modal" data-aid="'+article.id+'">🌐 Landingpage jetzt aktivieren – Bereits bezahlt</button>';
+      window._lpModalData[article.id]={
+        price:an.price_recommended||0,
+        title:article.title||'',
+        days:article.lp_days||7,
+        hasBot:!!article.lp_has_bot,
+        authScore:an.authenticity&&an.authenticity.score!==null?an.authenticity.score:null
+      };
+      var btnText=article.lp_booked
+        ?'🌐 Landingpage jetzt aktivieren – Bereits bezahlt'
+        :'🌐 Landingpage erstellen';
+      return '<button class="lp-btn" data-action="open-lp-modal" data-aid="'+article.id+'">'+btnText+'</button>';
     }
+
     return '';
   }catch(e){return '';}
 }
@@ -237,86 +254,41 @@ async function loadLPData(articles){
   for(var i=0;i<articles.length;i++){try{var r=await fetch(API+'/api/vk/landingpage/article/'+articles[i].id);if(r.ok){var d=await r.json();if(d)_lpData[articles[i].id]=d;}}catch(e){}}
 }
 
-// ═══════════════════════════════════════════════════════
-// loadResults – ALLE Status korrekt behandelt
-// ═══════════════════════════════════════════════════════
 async function loadResults(){
   try{
     var r=await fetch(API+'/api/vk/results/'+TOKEN);
     var d=await r.json();
-
     if(!r.ok){
       var status=d.status;
-
-      // ── Session offen: noch keine Fotos / Zahlung ──
       if(status==='open'){
-        document.getElementById('content').innerHTML=
-          '<div class="loading">' +
-          '<div style="font-size:2.5rem;margin-bottom:12px;">📋</div>' +
-          '<strong style="font-size:1.1rem;">Auftrag noch nicht abgeschlossen</strong><br>' +
-          '<span style="color:var(--mu);font-size:.85rem;display:block;margin:8px 0 20px;">Bitte Fotos hochladen und Analyse starten.</span>' +
-          '<a href="bericht.html?s='+TOKEN+'" style="display:inline-block;padding:13px 28px;background:var(--wa);color:#fff;border-radius:10px;text-decoration:none;font-weight:800;font-size:.95rem;">→ Zum Auftrag</a>' +
-          '</div>';
+        document.getElementById('content').innerHTML='<div class="loading"><div style="font-size:2.5rem;margin-bottom:12px;">📋</div><strong style="font-size:1.1rem;">Auftrag noch nicht abgeschlossen</strong><br><span style="color:var(--mu);font-size:.85rem;display:block;margin:8px 0 20px;">Bitte Fotos hochladen und Analyse starten.</span><a href="bericht.html?s='+TOKEN+'" style="display:inline-block;padding:13px 28px;background:var(--wa);color:#fff;border-radius:10px;text-decoration:none;font-weight:800;font-size:.95rem;">→ Zum Auftrag</a></div>';
         return;
       }
-
-      // ── Bezahlt oder Analyse läuft ──
       if(status==='analyzing'||status==='paid'){
-        document.getElementById('content').innerHTML=
-          '<div class="loading"><div class="spinner"></div>' +
-          '<strong>Analyse läuft...</strong><br>' +
-          '<span>Diese Seite aktualisiert sich automatisch.</span></div>';
-        setTimeout(loadResults,5000);
-        return;
+        document.getElementById('content').innerHTML='<div class="loading"><div class="spinner"></div><strong>Analyse läuft...</strong><br><span>Diese Seite aktualisiert sich automatisch.</span></div>';
+        setTimeout(loadResults,5000);return;
       }
-
-      // ── Fehler bei der Analyse ──
       if(status==='error'){
-        document.getElementById('content').innerHTML=
-          '<div class="loading">' +
-          '<div style="font-size:2rem;margin-bottom:12px;">❌</div>' +
-          '<strong>Analyse fehlgeschlagen</strong><br>' +
-          '<span style="font-size:.82rem;color:var(--mu);">Bitte wende dich an den Support: office@ynhald.com</span>' +
-          '</div>';
+        document.getElementById('content').innerHTML='<div class="loading"><div style="font-size:2rem;margin-bottom:12px;">❌</div><strong>Analyse fehlgeschlagen</strong><br><span style="font-size:.82rem;color:var(--mu);">Bitte wende dich an den Support: office@ynhald.com</span></div>';
         return;
       }
-
-      // ── Session abgelaufen ──
       if(status==='expired'){
-        document.getElementById('content').innerHTML=
-          '<div class="loading">' +
-          '<div style="font-size:2rem;margin-bottom:12px;">⏰</div>' +
-          '<strong>Session abgelaufen</strong><br>' +
-          '<span style="font-size:.82rem;color:var(--mu);">Dieser Link ist nicht mehr gültig.</span>' +
-          '</div>';
+        document.getElementById('content').innerHTML='<div class="loading"><div style="font-size:2rem;margin-bottom:12px;">⏰</div><strong>Session abgelaufen</strong><br><span style="font-size:.82rem;color:var(--mu);">Dieser Link ist nicht mehr gültig.</span></div>';
         return;
       }
-
-      // ── Gelöscht ──
       if(status==='deleted'){
-        document.getElementById('content').innerHTML=
-          '<div class="loading">' +
-          '<div style="font-size:2rem;margin-bottom:12px;">🗑</div>' +
-          '<strong>Auftrag gelöscht</strong><br>' +
-          '<span style="font-size:.82rem;color:var(--mu);">Dieser Auftrag wurde bereits gelöscht.</span>' +
-          '</div>';
+        document.getElementById('content').innerHTML='<div class="loading"><div style="font-size:2rem;margin-bottom:12px;">🗑</div><strong>Auftrag gelöscht</strong><br><span style="font-size:.82rem;color:var(--mu);">Dieser Auftrag wurde bereits gelöscht.</span></div>';
         return;
       }
-
-      // ── Fallback für unbekannte Status ──
-      document.getElementById('content').innerHTML=
-        '<div class="loading">Fehler: '+esc(d.error||'Unbekannt')+'</div>';
+      document.getElementById('content').innerHTML='<div class="loading">Fehler: '+esc(d.error||'Unbekannt')+'</div>';
       return;
     }
-
-    // ── Erfolg: Daten laden und rendern ──
     window._lastData=d;
     window._sessionId=d.id;
     try{await loadLPData(d.articles||[]);}catch(e){}
     render(d);
   }catch(e){
-    document.getElementById('content').innerHTML=
-      '<div class="loading">Verbindungsfehler: '+esc(e.message)+'</div>';
+    document.getElementById('content').innerHTML='<div class="loading">Verbindungsfehler: '+esc(e.message)+'</div>';
   }
 }
 
@@ -403,16 +375,13 @@ function doCopy(text,el){if(navigator.clipboard&&navigator.clipboard.writeText){
 function fallbackCopy(text,el){var ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;top:0;left:0;opacity:0;pointer-events:none;';document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand('copy');flash(el);showToast('Kopiert!');}catch(e){}document.body.removeChild(ta);}
 function flash(el){if(!el)return;el.classList.add('copied');setTimeout(function(){el.classList.remove('copied');},1500);}
 async function saveArticleTitle(input){var id=input.getAttribute('data-article-id'),t=input.value.trim();if(!t||!id)return;try{await fetch(API+'/api/vk/article/'+id+'/notes',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:t})});showToast('Titel gespeichert');}catch(e){}}
-
 async function deleteEmptyArticle(articleId){
   if(!confirm("Diesen leeren Artikel löschen?"))return;
   try{await fetch(API+"/api/vk/article/"+articleId,{method:"DELETE"});var data=window._lastData;data.articles=data.articles.filter(function(a){return a.id!==articleId;});render(data);showToast("✅ Artikel gelöscht");}catch(e){showToast("❌ Fehler beim Löschen");}
 }
-
 async function saveNotesResult(articleId, notes) {
   try{await fetch(API+'/api/vk/article/'+articleId+'/notes',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({notes:notes})});}catch(e){}
 }
-
 async function reanalyzeArticle(articleId) {
   var notesEl = document.getElementById('notes-'+articleId);
   if(notesEl) await saveNotesResult(articleId, notesEl.value);
