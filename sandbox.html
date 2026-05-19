@@ -448,57 +448,54 @@ async function runReport(){
   // 2 Sek warten damit DB-Writes sicher committed sind
   await new Promise(function(r){setTimeout(r,2000);});
 
-  // Step 3: Artikel-IDs holen und per reanalyze triggern
-  // (reanalyze nutzt unseren Fallback der Fotos direkt aus DB holt)
+  // Step 3: admin/analyze triggert – setzt Session auf 'analyzing' dann 'done'
   setStep(3,'run','Analyse starten...');
   try{
-    var rSess2=await fetch(API+'/api/vk/session/'+currentToken);
-    var dSess2=await rSess2.json();
-    var articleIds=(dSess2.articles||[]).map(function(a){return a.id;});
-
-    if(articleIds.length===0) throw new Error('Keine Artikel gefunden');
-
-    for(var j=0;j<articleIds.length;j++){
-      var rRe=await fetch(API+'/api/vk/article/'+articleIds[j]+'/reanalyze',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'}
-      });
-      // Bei Fehler (z.B. kein Business) → admin/analyze als Fallback
-      if(!rRe.ok){
-        await fetch(API+'/api/vk/admin/analyze/'+sessionId,{method:'POST',headers:{'Content-Type':'application/json'}});
-        break;
-      }
-    }
+    var ran=await fetch(API+'/api/vk/admin/analyze/'+sessionId,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'}
+    });
+    var dan=await ran.json();
+    if(!ran.ok) throw new Error(dan.error||'Analyse-Start fehlgeschlagen');
     setStep(3,'done','Analyse läuft... (~30 Sek.) ✓');
   }catch(e){
     setStep(3,'err','Fehler: '+e.message);
-    showRError('Analyse-Start: '+e.message);
+    showRError('Analyse konnte nicht gestartet werden: '+e.message);
+    btn.disabled=false;btn.textContent='🚀 Jetzt analysieren';
+    return;
   }
 
-  // Step 4: Polling alle 3 Sek bis status done
+  // Step 4: Polling alle 3 Sek – wartet auf status='done' + analysierte Artikel
   setStep(4,'run','Warte auf Ergebnis...');
   var attempts=0;
   var pollInterval=setInterval(async function(){
     attempts++;
     try{
-      var rp2=await fetch(API+'/api/vk/results/'+currentToken);
-      var dp2=await rp2.json();
-      // Prüfe ob mindestens 1 Artikel analysiert ist
-      var analyzed=(dp2.articles||[]).filter(function(a){
-        return a.status==='analyzed'&&a.analysis&&Object.keys(a.analysis).length>2;
-      });
-      if(analyzed.length>0||(dp2.status==='done'&&attempts>5)){
-        clearInterval(pollInterval);
-        setStep(4,'done','Analyse fertig ✓');
-        setTimeout(function(){window.location.href='ergebnis.html?s='+currentToken;},600);
-        return;
+      var rp=await fetch(API+'/api/vk/results/'+currentToken);
+      var dp=await rp.json();
+      if(rp.ok){
+        // Prüfe ob Artikel wirklich Inhalt haben
+        var done=(dp.articles||[]).some(function(a){
+          return a.status==='analyzed'&&a.analysis&&Object.keys(a.analysis).length>2;
+        });
+        if(done){
+          clearInterval(pollInterval);
+          setStep(4,'done','Analyse fertig ✓');
+          setTimeout(function(){window.location.href='ergebnis.html?s='+currentToken;},600);
+          return;
+        }
+        // Session done aber Analyse leer → trotzdem öffnen
+        if(dp.status==='done'&&attempts>8){
+          clearInterval(pollInterval);
+          setStep(4,'done','Öffne Ergebnis...');
+          setTimeout(function(){window.location.href='ergebnis.html?s='+currentToken;},600);
+          return;
+        }
       }
       setStep(4,'run','Analyse läuft... ('+attempts*3+' Sek.)');
     }catch(e){}
-    if(attempts>25){
+    if(attempts>30){
       clearInterval(pollInterval);
-      setStep(4,'err','Timeout');
-      btn.disabled=false;btn.textContent='🚀 Jetzt analysieren';
       window.location.href='ergebnis.html?s='+currentToken;
     }
   },3000);
