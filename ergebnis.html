@@ -384,12 +384,7 @@ function render(data){
       if(an.tips&&an.tips.length){html+='<div class="section"><div class="section-title">Verkaufstipps</div><div class="tip-list">';an.tips.forEach(function(t){html+='<div class="tip"><span>→</span><span>'+esc(t)+'</span></div>';});html+='</div></div>';}
     }
     // ── Notizfeld + Neu analysieren
-    html+='<div class="section"><div class="section-title">📝 Zusatzinfos / Korrektur</div><textarea id="notes-'+a.id+'" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:.85rem;font-family:var(--font);resize:vertical;min-height:64px;" placeholder="z.B. Tissot Ballade 39mm, Neupreis Euro 1025...">'+esc(a.notes||'')+'</textarea>(function(){
-      var isBiz=!!(data.business_discount_id);
-      if(!isBiz)return '';
-      var cnt=a.analysis_count||1;var maxed=cnt>=3;
-      return '<div style="font-size:.75rem;color:var(--mu);margin-bottom:6px;font-weight:700;">Analysen: '+cnt+' / 3</div>'+(maxed?'<button disabled id="reanalyze-btn-'+a.id+'" style="margin-top:8px;width:100%;padding:13px;background:#f3f4f6;border:1.5px solid #e5e7eb;border-radius:8px;color:#9ca3af;font-weight:800;font-size:.88rem;cursor:not-allowed;font-family:var(--font);">🔄 Maximum erreicht (3/3)</button>':'<button data-action="reanalyze" data-aid="'+a.id+'" id="reanalyze-btn-'+a.id+'" style="margin-top:8px;width:100%;padding:13px;background:#f0fdf4;border:1.5px solid var(--wa);border-radius:8px;color:#15803d;font-weight:800;font-size:.88rem;cursor:pointer;font-family:var(--font);">🔄 Neu analysieren mit diesen Infos</button><div style="font-size:.72rem;color:var(--mu);margin-top:6px;">Notizen eintragen → Neu analysieren → Ergebnis in ~30 Sek.</div>')+'</div>';
-    })()+';
+    html+='<div class="section"><div class="section-title">📝 Zusatzinfos / Korrektur</div><textarea id="notes-'+a.id+'" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:.85rem;font-family:var(--font);resize:vertical;min-height:64px;" placeholder="z.B. Tissot Ballade 39mm, Neupreis Euro 1025...">'+esc(a.notes||'')+'</textarea><button data-action="reanalyze" data-aid="'+a.id+'" id="reanalyze-btn-'+a.id+'" style="margin-top:8px;width:100%;padding:13px;background:#f0fdf4;border:1.5px solid var(--wa);border-radius:8px;color:#15803d;font-weight:800;font-size:.88rem;cursor:pointer;font-family:var(--font);">🔄 Neu analysieren mit diesen Infos</button><div style="font-size:.72rem;color:var(--mu);margin-top:6px;">Notizen eintragen → Neu analysieren → Ergebnis in ~30 Sek.</div></div>';
     // LP Button
     try{html+=buildLPButton(a);}catch(e){}
     html+='</div>';
@@ -400,6 +395,46 @@ function render(data){
   html+='</div>';
 
   document.getElementById('content').innerHTML=html;
+  // Business-Check: Neu-Analyse nur fuer Business-Kunden, max 3x
+  if(!data.business_discount_id){
+    document.querySelectorAll('[data-action="reanalyze"]').forEach(function(btn){
+      var section=btn.closest('.section');if(section)section.style.display='none';
+    });
+  } else {
+    (data.articles||[]).forEach(function(a){
+      var cnt=a.analysis_count||1;
+      var btn=document.getElementById('reanalyze-btn-'+a.id);
+      if(!btn)return;
+      if(cnt>=3){
+        btn.disabled=true;btn.style.background='#f3f4f6';
+        btn.style.color='#9ca3af';btn.style.cursor='not-allowed';
+        btn.removeAttribute('data-action');btn.removeAttribute('data-aid');
+        btn.textContent='🔄 Maximum erreicht (3/3)';
+      } else {
+        btn.textContent='🔄 Neu analysieren ('+cnt+'/3)';
+      }
+    });
+  }
+  // Business-Check: Neu-Analyse nur fuer Business-Kunden
+  if(!data.business_discount_id){
+    document.querySelectorAll('[data-action="reanalyze"]').forEach(function(btn){
+      var wrap=btn.closest('.section');if(wrap)wrap.style.display='none';
+    });
+  } else {
+    // Zähler anzeigen + deaktivieren bei 3
+    (data.articles||[]).forEach(function(a){
+      var cnt=a.analysis_count||1;
+      var btn=document.getElementById('reanalyze-btn-'+a.id);
+      if(!btn)return;
+      if(cnt>=3){
+        btn.disabled=true;btn.style.background='#f3f4f6';btn.style.color='#9ca3af';
+        btn.style.cursor='not-allowed';btn.textContent='🔄 Maximum erreicht (3/3)';
+        btn.removeAttribute('data-action');
+      } else {
+        btn.textContent='🔄 Neu analysieren ('+cnt+'/3)';
+      }
+    });
+  }
 
   document.querySelectorAll('[data-cid]').forEach(function(el){
     el.addEventListener('click',function(e){e.stopPropagation();var text=_store[el.getAttribute('data-cid')];if(text!==undefined)doCopy(text,el);});
