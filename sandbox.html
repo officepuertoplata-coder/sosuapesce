@@ -13,21 +13,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 label{display:block;font-size:.75rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
 input{width:100%;padding:12px 14px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:.95rem;font-family:inherit;margin-bottom:14px;transition:border-color .2s;}
 input:focus{outline:none;border-color:#2d7a4f;}
-.pw-row{display:flex;gap:8px;align-items:flex-start;}
-.pw-row input{flex:1;}
-.pw-toggle{padding:12px;background:#f3f4f6;border:1.5px solid #e5e7eb;border-radius:10px;cursor:pointer;font-size:.8rem;color:#6b7280;white-space:nowrap;height:46px;}
-.pw-toggle:hover{background:#e5e7eb;}
-.saved-badge{font-size:.72rem;color:#25D366;font-weight:700;margin-top:-10px;margin-bottom:10px;}
+input.has-saved{border-color:#86efac !important;background:#f0fdf4;}
+.toggle-row{display:flex;gap:8px;align-items:flex-start;}
+.toggle-row input{flex:1;}
+.toggle-btn{padding:12px;background:#f3f4f6;border:1.5px solid #e5e7eb;border-radius:10px;cursor:pointer;font-size:.8rem;color:#6b7280;white-space:nowrap;height:46px;font-family:inherit;}
+.toggle-btn:hover{background:#e5e7eb;}
+.saved-badge{font-size:.72rem;color:#25D366;font-weight:700;margin-top:-10px;margin-bottom:10px;display:none;}
+.saved-badge.active{display:block;}
 .btn{display:block;width:100%;padding:14px;background:#2d7a4f;color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;transition:background .2s;}
 .btn:hover{background:#245f3d;}
 .btn:disabled{background:#9ca3af;cursor:not-allowed;}
-.error{background:#fee2e2;border-left:3px solid #dc2626;border-radius:6px;padding:10px 14px;font-size:.85rem;color:#991b1b;margin-top:12px;}
+.error{background:#fee2e2;border-left:3px solid #dc2626;border-radius:6px;padding:10px 14px;font-size:.85rem;color:#991b1b;margin-top:12px;display:none;}
 .hint{font-size:.78rem;color:#9ca3af;margin-top:14px;text-align:center;line-height:1.5;}
 .divider{border:none;border-top:1px solid #f3f4f6;margin:16px 0;}
 .biz-section{background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:14px;margin-bottom:14px;}
 .biz-label{font-size:.75rem;font-weight:700;color:#15803d;margin-bottom:8px;display:block;}
 .biz-section input{margin-bottom:0;border-color:#86efac;}
 .biz-section input:focus{border-color:#25D366;}
+.biz-section input.has-saved{background:#dcfce7 !important;border-color:#25D366 !important;}
+.biz-section .toggle-btn{background:#dcfce7;border-color:#86efac;color:#15803d;}
+.biz-section .toggle-btn:hover{background:#bbf7d0;}
+.biz-section .saved-badge{margin-top:8px;margin-bottom:0;}
 .biz-hint{font-size:.72rem;color:#6b7280;margin-top:6px;}
 </style>
 </head>
@@ -36,78 +42,137 @@ input:focus{outline:none;border-color:#2d7a4f;}
   <div class="logo">🔧 Converdino Sandbox</div>
   <div class="subtitle">Test-Session erstellen (ohne WhatsApp)</div>
 
+  <!-- PASSWORT -->
   <label>Admin-Passwort</label>
-  <div class="pw-row">
-    <input type="password" id="pw" placeholder="••••••••" autocomplete="current-password">
-    <button class="pw-toggle" onclick="toggleSave()" id="save-btn">💾 Merken</button>
+  <div class="toggle-row">
+    <input type="password" id="pw" placeholder="••••••••"
+           autocomplete="off" data-1p-ignore="true" data-lpignore="true">
+    <button class="toggle-btn" onclick="toggleSavePw()" id="pw-save-btn">💾 Merken</button>
   </div>
-  <div id="saved-badge" class="saved-badge" style="display:none">✅ Passwort gespeichert</div>
+  <div id="pw-saved-badge" class="saved-badge">✅ Passwort gespeichert</div>
 
   <hr class="divider">
 
+  <!-- TEST-TELEFON -->
   <label>Test-Telefonnummer (optional)</label>
-  <input type="tel" id="phone" placeholder="z.B. 4367712345678" oninput="localStorage.setItem('cvd_phone',this.value)">
+  <input type="tel" id="phone" placeholder="z.B. 4367712345678"
+         autocomplete="off" data-1p-ignore="true" data-lpignore="true"
+         oninput="localStorage.setItem('cvd_phone', this.value)">
 
+  <!-- BUSINESS -->
   <div class="biz-section">
     <span class="biz-label">🏢 Als Business-Kunde testen</span>
-    <input type="tel" id="biz-phone" placeholder="Business-Telefon (muss in vk_business_discounts stehen)" oninput="localStorage.setItem('cvd_biz_phone',this.value)">
+    <div class="toggle-row">
+      <input type="tel" id="biz-phone" placeholder="Business-Telefon"
+             autocomplete="off" data-1p-ignore="true" data-lpignore="true">
+      <button class="toggle-btn" onclick="toggleSaveBiz()" id="biz-save-btn">💾 Merken</button>
+    </div>
+    <div id="biz-saved-badge" class="saved-badge">✅ Business-Nummer gespeichert</div>
     <div class="biz-hint">Wenn ausgefüllt wird die Session automatisch als Business-Session angelegt</div>
   </div>
 
   <button class="btn" id="btn" onclick="createSession()">Session erstellen → bericht.html öffnen</button>
-  <div id="error" style="display:none"></div>
+  <div id="error" class="error"></div>
 
   <div class="hint">Erstellt eine leere Verkaufsreport-Session<br>und öffnet direkt bericht.html zum Testen.</div>
 </div>
 
 <script>
-var API = 'https://converto-server-production.up.railway.app';
-var PW_KEY = 'cvd_sandbox_pw';
+var API     = 'https://converto-server-production.up.railway.app';
+var PW_KEY  = 'cvd_sandbox_pw';
+var PH_KEY  = 'cvd_phone';
+var BIZ_KEY = 'cvd_biz_phone';
 
-// Passwort laden wenn gespeichert
-window.onload = function() {
-  var saved = localStorage.getItem(PW_KEY);
-  if(saved) {
-    document.getElementById('pw').value = saved;
-    document.getElementById('saved-badge').style.display = 'block';
-    document.getElementById('save-btn').textContent = '🗑 Vergessen';
+/* ── Hilfsfunktion: Gespeichert-Style setzen ──────────── */
+function setSavedStyle(inputId, badgeId, btnId, isSaved) {
+  var input = document.getElementById(inputId);
+  var badge = document.getElementById(badgeId);
+  var btn   = document.getElementById(btnId);
+  if (input) {
+    if (isSaved) input.classList.add('has-saved');
+    else         input.classList.remove('has-saved');
   }
-  var savedPhone = localStorage.getItem('cvd_phone');
-  if(savedPhone) document.getElementById('phone').value = savedPhone;
-  var savedBiz = localStorage.getItem('cvd_biz_phone');
-  if(savedBiz) document.getElementById('biz-phone').value = savedBiz;
-};
+  if (badge) {
+    if (isSaved) badge.classList.add('active');
+    else         badge.classList.remove('active');
+  }
+  if (btn) btn.textContent = isSaved ? '🗑 Vergessen' : '💾 Merken';
+}
 
-function toggleSave() {
-  var pw = document.getElementById('pw').value.trim();
+/* ── Werte aus localStorage laden ────────────────────── */
+function loadSavedValues() {
+  // Passwort
+  var pw = localStorage.getItem(PW_KEY);
+  var pwEl = document.getElementById('pw');
+  if (pw && pwEl && pwEl.value !== pw) pwEl.value = pw;
+  setSavedStyle('pw', 'pw-saved-badge', 'pw-save-btn', !!pw);
+
+  // Test-Telefon (nur laden, kein Merken-Button)
+  var ph = localStorage.getItem(PH_KEY);
+  var phEl = document.getElementById('phone');
+  if (ph && phEl && phEl.value !== ph) phEl.value = ph;
+
+  // Business-Telefon
+  var biz = localStorage.getItem(BIZ_KEY);
+  var bizEl = document.getElementById('biz-phone');
+  if (biz && bizEl && bizEl.value !== biz) bizEl.value = biz;
+  setSavedStyle('biz-phone', 'biz-saved-badge', 'biz-save-btn', !!biz);
+}
+
+// Mehrfach laden – schützt gegen Chrome/iOS Autofill der nach window.load kommt
+document.addEventListener('DOMContentLoaded', loadSavedValues);
+window.addEventListener('load', loadSavedValues);
+setTimeout(loadSavedValues, 200);
+setTimeout(loadSavedValues, 800);
+
+/* ── Passwort: Merken / Vergessen ─────────────────────── */
+function toggleSavePw() {
   var saved = localStorage.getItem(PW_KEY);
-  if(saved) {
+  if (saved) {
     localStorage.removeItem(PW_KEY);
-    document.getElementById('saved-badge').style.display = 'none';
-    document.getElementById('save-btn').textContent = '💾 Merken';
+    setSavedStyle('pw', 'pw-saved-badge', 'pw-save-btn', false);
   } else {
-    if(!pw) { alert('Bitte erst Passwort eingeben'); return; }
+    var pw = document.getElementById('pw').value.trim();
+    if (!pw) { alert('Bitte erst Passwort eingeben'); return; }
     localStorage.setItem(PW_KEY, pw);
-    document.getElementById('saved-badge').style.display = 'block';
-    document.getElementById('save-btn').textContent = '🗑 Vergessen';
+    setSavedStyle('pw', 'pw-saved-badge', 'pw-save-btn', true);
   }
 }
 
-async function createSession() {
-  var btn = document.getElementById('btn');
-  var pw = document.getElementById('pw').value.trim();
-  var phone = document.getElementById('phone').value.trim();
-  var bizPhone = document.getElementById('biz-phone').value.trim();
-  var errEl = document.getElementById('error');
-
-  if(!pw) { showError('Bitte Passwort eingeben.'); return; }
-
-  // Passwort automatisch speichern wenn noch nicht gespeichert
-  if(!localStorage.getItem(PW_KEY)) {
-    localStorage.setItem(PW_KEY, pw);
-    document.getElementById('saved-badge').style.display = 'block';
-    document.getElementById('save-btn').textContent = '🗑 Vergessen';
+/* ── Business-Nummer: Merken / Vergessen ──────────────── */
+function toggleSaveBiz() {
+  var saved = localStorage.getItem(BIZ_KEY);
+  if (saved) {
+    // Vergessen: aus Storage löschen, Feld leeren
+    localStorage.removeItem(BIZ_KEY);
+    document.getElementById('biz-phone').value = '';
+    setSavedStyle('biz-phone', 'biz-saved-badge', 'biz-save-btn', false);
+  } else {
+    var biz = document.getElementById('biz-phone').value.trim();
+    if (!biz) { alert('Bitte erst Business-Telefon eingeben'); return; }
+    localStorage.setItem(BIZ_KEY, biz);
+    setSavedStyle('biz-phone', 'biz-saved-badge', 'biz-save-btn', true);
   }
+}
+
+/* ── Session erstellen ────────────────────────────────── */
+async function createSession() {
+  var btn      = document.getElementById('btn');
+  var pw       = document.getElementById('pw').value.trim();
+  var phone    = document.getElementById('phone').value.trim();
+  var bizPhone = document.getElementById('biz-phone').value.trim();
+  var errEl    = document.getElementById('error');
+
+  if (!pw) { showError('Bitte Passwort eingeben.'); return; }
+
+  // Passwort auto-speichern beim ersten Absenden
+  if (!localStorage.getItem(PW_KEY) && pw) {
+    localStorage.setItem(PW_KEY, pw);
+    setSavedStyle('pw', 'pw-saved-badge', 'pw-save-btn', true);
+  }
+
+  // Test-Telefon auto-speichern (kein Toggle-Button nötig)
+  if (phone) localStorage.setItem(PH_KEY, phone);
 
   btn.disabled = true;
   btn.textContent = 'Wird erstellt...';
@@ -118,15 +183,15 @@ async function createSession() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        password: pw,
-        phone: bizPhone || phone || undefined,
+        password:      pw,
+        phone:         bizPhone || phone || undefined,
         business_phone: bizPhone || undefined
       })
     });
     var data = await res.json();
-    if(!res.ok) throw new Error(data.error || 'Fehler');
+    if (!res.ok) throw new Error(data.error || 'Fehler');
     window.location.href = 'bericht.html?s=' + data.token;
-  } catch(e) {
+  } catch (e) {
     showError(e.message);
     btn.disabled = false;
     btn.textContent = 'Session erstellen → bericht.html öffnen';
@@ -140,7 +205,7 @@ function showError(msg) {
 }
 
 document.addEventListener('keydown', function(e) {
-  if(e.key === 'Enter') createSession();
+  if (e.key === 'Enter') createSession();
 });
 </script>
 </body>
