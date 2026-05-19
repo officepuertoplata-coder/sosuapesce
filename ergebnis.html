@@ -173,7 +173,7 @@ function buildLPButton(article){
       var url='https://p.converdino.com/p/'+lp.slug;
       var qrUrl='https://api.qrserver.com/v1/create-qr-code/?size=160x160&data='+encodeURIComponent(url)+'&color=1b4332&bgcolor=ffffff&margin=10';
       var labelUrl=API+'/api/vk/lp/label/'+lp.slug;
-      return '<div style="margin-top:10px;padding:16px;background:#dcfce7;border:1.5px solid #25D366;border-radius:12px;"><div style="font-size:.8rem;font-weight:800;color:#15803d;margin-bottom:10px;">Landingpage aktiv</div><div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;"><div style="flex-shrink:0;text-align:center;"><img src="'+qrUrl+'" style="width:120px;height:120px;border-radius:8px;border:2px solid #86efac;display:block;" alt="QR Code"><div style="font-size:.68rem;color:#15803d;font-weight:700;margin-top:4px;">Scan &rarr; Produktseite</div></div><div style="flex:1;min-width:180px;"><a href="'+url+'" target="_blank" style="font-size:.82rem;color:#15803d;word-break:break-all;display:block;margin-bottom:10px;">'+url+'</a><div style="display:flex;flex-direction:column;gap:6px;"><button data-action="copy-lp" data-url="'+url+'" style="padding:8px 12px;background:#25D366;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:.8rem;text-align:left;">Link kopieren</button><a href="'+labelUrl+'" target="_blank" style="padding:8px 12px;background:#1b4332;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:.8rem;text-decoration:none;display:block;">Produktetikett drucken</a><button data-action="deactivate-lp" data-lpid="'+lp.id+'" style="padding:6px 12px;background:none;border:1px solid #fecaca;color:#ef4444;border-radius:8px;font-size:.75rem;cursor:pointer;text-align:left;">Deaktivieren</button><button onclick="openUpdateLP(\''+lp.id+'\',\''+article.id+'\')" style="padding:6px 12px;background:#f0fdf4;border:1px solid #25D366;color:#15803d;border-radius:8px;font-size:.75rem;cursor:pointer;text-align:left;">✏️ Aktualisieren</button></div></div></div></div>
+      return '<div style="margin-top:10px;padding:16px;background:#dcfce7;border:1.5px solid #25D366;border-radius:12px;"><div style="font-size:.8rem;font-weight:800;color:#15803d;margin-bottom:10px;">Landingpage aktiv</div><div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;"><div style="flex-shrink:0;text-align:center;"><img src="'+qrUrl+'" style="width:120px;height:120px;border-radius:8px;border:2px solid #86efac;display:block;" alt="QR Code"><div style="font-size:.68rem;color:#15803d;font-weight:700;margin-top:4px;">Scan &rarr; Produktseite</div></div><div style="flex:1;min-width:180px;"><a href="'+url+'" target="_blank" style="font-size:.82rem;color:#15803d;word-break:break-all;display:block;margin-bottom:10px;">'+url+'</a><div style="display:flex;flex-direction:column;gap:6px;"><button data-action="copy-lp" data-url="'+url+'" style="padding:8px 12px;background:#25D366;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:.8rem;text-align:left;">Link kopieren</button><a href="'+labelUrl+'" target="_blank" style="padding:8px 12px;background:#1b4332;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:.8rem;text-decoration:none;display:block;">Produktetikett drucken</a><button onclick="openUpdateLP(\''+lp.id+'\',\''+article.id+'\')" style="padding:6px 12px;background:#f0fdf4;border:1px solid #25D366;color:#15803d;border-radius:8px;font-size:.75rem;cursor:pointer;text-align:left;">✏️ Preis & Einstellungen aktualisieren</button><button data-action="deactivate-lp" data-lpid="'+lp.id+'" style="padding:6px 12px;background:none;border:1px solid #fecaca;color:#ef4444;border-radius:8px;font-size:.75rem;cursor:pointer;text-align:left;">Deaktivieren</button></div></div></div></div>';
     }
 
     // LP Button: lp_booked (bezahlt) ODER Business-Session mit analysiertem Artikel
@@ -243,6 +243,56 @@ async function activateLP(articleId, hasGoodScore){
     document.getElementById('lp-modal').remove();_lpData[articleId]=result.landingpage;
     showToast('Landingpage ist live!');render(window._lastData);
   }catch(e){btn.disabled=false;btn.textContent='Landingpage erstellen';alert('Fehler: '+e.message);}
+}
+
+function openUpdateLP(lpId, articleId){
+  var lp=_lpData[articleId];
+  if(!lp)return;
+  var overlay=document.createElement('div');overlay.className='lp-modal-overlay';overlay.id='lp-update-modal';
+  var box=document.createElement('div');box.className='lp-modal';
+  var h='<div class="lp-modal-title">✏️ Landingpage aktualisieren</div>';
+  h+='<div style="font-size:.82rem;color:#6b7280;margin-bottom:12px;">URL und QR Code bleiben unverändert.</div>';
+  h+='<label class="lp-modal-label">Verkaufspreis *</label>';
+  h+='<input class="lp-modal-input" type="number" id="upd-price" min="0" step="0.01" value="'+(lp.sale_price||0)+'">';
+  h+='<label class="lp-modal-label">Mindestpreis (€) – leer = kein Verhandeln</label>';
+  h+='<input class="lp-modal-input" type="number" id="upd-minprice" min="0" step="0.01" value="'+(lp.min_price||'')+'">';
+  h+='<label class="lp-modal-label">📦 Verfügbare Stückzahl (leer = unbegrenzt)</label>';
+  h+='<input class="lp-modal-input" type="number" id="upd-stock" min="1" step="1" value="'+(lp.stock_quantity||'')+'">';
+  h+='<label class="lp-modal-label">Lieferoptionen</label>';
+  h+='<label class="lp-check-row"><input type="checkbox" id="upd-pickup" '+(lp.delivery_pickup?'checked':'')+' style="accent-color:#25D366;width:16px;height:16px;"> <span style="font-weight:700;">Selbstabholung</span></label>';
+  h+='<div id="upd-pickup-loc" style="margin-top:6px;'+(lp.delivery_pickup?'':'display:none;')+'"><label class="lp-modal-label">Abholort</label><input class="lp-modal-input" type="text" id="upd-location" value="'+esc(lp.pickup_location||'')+'"></div>';
+  h+='<label class="lp-check-row"><input type="checkbox" id="upd-shipping" '+(lp.delivery_shipping?'checked':'')+' style="accent-color:#25D366;width:16px;height:16px;"> <span style="font-weight:700;">Versand möglich</span></label>';
+  h+='<div id="upd-shipping-cost" style="margin-top:6px;'+(lp.delivery_shipping?'':'display:none;')+'"><label class="lp-modal-label">Versandkosten</label><input class="lp-modal-input" type="number" id="upd-ship-cost" min="0" step="0.01" value="'+(lp.shipping_cost||6.90)+'"></div>';
+  h+='<button class="lp-modal-btn" id="upd-modal-btn">Aktualisieren</button>';
+  h+='<button id="upd-cancel" style="width:100%;padding:12px;background:none;border:none;color:#9ca3af;cursor:pointer;font-size:.85rem;margin-top:6px;">Abbrechen</button>';
+  box.innerHTML=h;overlay.appendChild(box);document.body.appendChild(overlay);
+  document.getElementById('upd-pickup').addEventListener('change',function(){document.getElementById('upd-pickup-loc').style.display=this.checked?'block':'none';});
+  document.getElementById('upd-shipping').addEventListener('change',function(){document.getElementById('upd-shipping-cost').style.display=this.checked?'block':'none';});
+  document.getElementById('upd-modal-btn').addEventListener('click',function(){updateLP(lpId,articleId);});
+  document.getElementById('upd-cancel').addEventListener('click',function(){overlay.remove();});
+}
+
+async function updateLP(lpId, articleId){
+  var btn=document.getElementById('upd-modal-btn');
+  var price=parseFloat(document.getElementById('upd-price').value);
+  if(!price||price<=0){alert('Bitte Preis eingeben.');return;}
+  btn.disabled=true;btn.textContent='Wird aktualisiert...';
+  try{
+    var body={
+      sale_price:price,
+      min_price:parseFloat(document.getElementById('upd-minprice').value)||null,
+      stock_quantity:document.getElementById('upd-stock').value?parseInt(document.getElementById('upd-stock').value):null,
+      delivery_pickup:document.getElementById('upd-pickup').checked,
+      delivery_shipping:document.getElementById('upd-shipping').checked,
+      pickup_location:document.getElementById('upd-location').value.trim(),
+      shipping_cost:parseFloat(document.getElementById('upd-ship-cost').value)||0
+    };
+    var r=await fetch(API+'/api/vk/landingpage/'+lpId,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    var result=await r.json();if(!r.ok)throw new Error(result.error||'Fehler');
+    document.getElementById('lp-update-modal').remove();
+    _lpData[articleId]=result.landingpage;
+    showToast('✅ Landingpage aktualisiert!');render(window._lastData);
+  }catch(e){btn.disabled=false;btn.textContent='Aktualisieren';alert('Fehler: '+e.message);}
 }
 
 async function deactivateLP(lpId){
