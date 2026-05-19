@@ -46,11 +46,11 @@ input:focus{outline:none;border-color:#2d7a4f;}
   <hr class="divider">
 
   <label>Test-Telefonnummer (optional)</label>
-  <input type="tel" id="phone" placeholder="z.B. 4367712345678">
+  <input type="tel" id="phone" placeholder="z.B. 4367712345678" oninput="localStorage.setItem('cvd_phone',this.value)">
 
   <div class="biz-section">
     <span class="biz-label">🏢 Als Business-Kunde testen</span>
-    <input type="tel" id="biz-phone" placeholder="Business-Telefon (muss in vk_business_discounts stehen)">
+    <input type="tel" id="biz-phone" placeholder="Business-Telefon (muss in vk_business_discounts stehen)" oninput="localStorage.setItem('cvd_biz_phone',this.value)">
     <div class="biz-hint">Wenn ausgefüllt wird die Session automatisch als Business-Session angelegt</div>
   </div>
 
@@ -72,6 +72,10 @@ window.onload = function() {
     document.getElementById('saved-badge').style.display = 'block';
     document.getElementById('save-btn').textContent = '🗑 Vergessen';
   }
+  var savedPhone = localStorage.getItem('cvd_phone');
+  if(savedPhone) document.getElementById('phone').value = savedPhone;
+  var savedBiz = localStorage.getItem('cvd_biz_phone');
+  if(savedBiz) document.getElementById('biz-phone').value = savedBiz;
 };
 
 function toggleSave() {
