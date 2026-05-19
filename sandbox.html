@@ -445,28 +445,44 @@ async function runReport(){
   if(ok===0){setStep(2,'err','Alle Fotos fehlgeschlagen!');showRError('Kein Foto hochladbar.');btn.disabled=false;btn.textContent='🚀 Jetzt analysieren';return;}
   setStep(2,'done',ok+' Foto'+(ok!==1?'s':'')+' hochgeladen'+(fail>0?' ('+fail+' Fehler)':'')+' ✓');
 
-  // Step 3: Rabatt prüfen + Analyse
-  setStep(3,'run','Analyse starten...');
-  var free=false;
-  try{var rd=await fetch(API+'/api/vk/session/'+currentToken+'/discount');var dd=await rd.json();if(dd.has_discount&&dd.percent>=100)free=true;}catch(e){}
+  // Kurz warten damit DB-Writes committed sind bevor Analyse startet
+  await new Promise(function(r){setTimeout(r,1500);});
 
-  if(free){
-    try{
-      var rf=await fetch(API+'/api/vk/business-free',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})});
-      var df=await rf.json();if(!rf.ok)throw new Error(df.error);
-      setStep(3,'done','Analyse gestartet (gratis) ✓');
-    }catch(e){setStep(3,'err','Fehler: '+e.message);showRError(e.message);}
-  }else{
-    setStep(3,'done','Kein 100%-Rabatt → Stripe via bericht.html');
-    setStep(4,'run','Öffne bericht.html...');
-    setTimeout(function(){window.location.href='bericht.html?s='+currentToken;},800);
-    btn.disabled=false;btn.textContent='🚀 Jetzt analysieren';
-    return;
+  // Step 3: Admin-Analyze (direkt, kein business-free Timing-Problem)
+  setStep(3,'run','Analyse starten...');
+  try{
+    var ran=await fetch(API+'/api/vk/admin/analyze/'+sessionId,{method:'POST',headers:{'Content-Type':'application/json'}});
+    var dan=await ran.json();
+    if(!ran.ok)throw new Error(dan.error||'Analyse-Start fehlgeschlagen');
+    setStep(3,'done','Analyse läuft... (~30 Sek.) ✓');
+  }catch(e){
+    setStep(3,'err','Fehler: '+e.message);
+    showRError(e.message+' → Trotzdem zu ergebnis.html öffnen');
   }
 
-  // Step 4: ergebnis.html
-  setStep(4,'run','Öffne Ergebnis...');
-  setTimeout(function(){setStep(4,'done','Geöffnet ✓');window.location.href='ergebnis.html?s='+currentToken;},1500);
+  // Step 4: Polling bis done, dann ergebnis.html
+  setStep(4,'run','Warte auf Ergebnis...');
+  var attempts=0;
+  var pollInterval=setInterval(async function(){
+    attempts++;
+    try{
+      var rp2=await fetch(API+'/api/vk/session/'+currentToken);
+      var dp2=await rp2.json();
+      if(dp2.status==='done'||dp2.status==='error'){
+        clearInterval(pollInterval);
+        setStep(4,'done','Analyse fertig – öffne Ergebnis ✓');
+        setTimeout(function(){window.location.href='ergebnis.html?s='+currentToken;},600);
+      }else{
+        setStep(4,'run','Analyse läuft... ('+attempts*3+' Sek.)');
+      }
+    }catch(e){}
+    if(attempts>20){
+      clearInterval(pollInterval);
+      setStep(4,'err','Timeout – manuell öffnen');
+      btn.disabled=false;btn.textContent='🚀 Jetzt analysieren';
+      window.open('ergebnis.html?s='+currentToken,'_blank');
+    }
+  },3000);
 }
 
 /* ═══════════════════════════════════════════════════════
