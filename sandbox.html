@@ -6,206 +6,423 @@
 <title>Converdino Sandbox</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f5;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
-.card{background:#fff;border-radius:16px;padding:32px 28px;width:100%;max-width:420px;box-shadow:0 2px 12px rgba(0,0,0,.1);}
-.logo{font-size:1.4rem;font-weight:900;color:#2d7a4f;margin-bottom:4px;}
-.subtitle{font-size:.85rem;color:#9ca3af;margin-bottom:24px;}
-label{display:block;font-size:.75rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
-input{width:100%;padding:12px 14px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:.95rem;font-family:inherit;margin-bottom:14px;transition:border-color .2s;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f5;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;}
+.card{background:#fff;border-radius:16px;padding:28px 24px;width:100%;max-width:480px;box-shadow:0 2px 12px rgba(0,0,0,.1);}
+.logo{font-size:1.3rem;font-weight:900;color:#2d7a4f;margin-bottom:2px;}
+.subtitle{font-size:.82rem;color:#9ca3af;margin-bottom:20px;}
+.section-label{font-size:.7rem;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;display:block;}
+input[type=password],input[type=tel]{width:100%;padding:11px 13px;border:1.5px solid #e5e7eb;border-radius:9px;font-size:.92rem;font-family:inherit;transition:border-color .2s;}
 input:focus{outline:none;border-color:#2d7a4f;}
 input.has-saved{border-color:#86efac !important;background:#f0fdf4;}
-.toggle-row{display:flex;gap:8px;align-items:flex-start;}
-.toggle-row input{flex:1;}
-.toggle-btn{padding:12px;background:#f3f4f6;border:1.5px solid #e5e7eb;border-radius:10px;cursor:pointer;font-size:.8rem;color:#6b7280;white-space:nowrap;height:46px;font-family:inherit;}
+.toggle-row{display:flex;gap:7px;align-items:flex-start;margin-bottom:4px;}
+.toggle-row input{flex:1;margin-bottom:0;}
+.toggle-btn{padding:11px 12px;background:#f3f4f6;border:1.5px solid #e5e7eb;border-radius:9px;cursor:pointer;font-size:.75rem;color:#6b7280;white-space:nowrap;height:44px;font-family:inherit;}
 .toggle-btn:hover{background:#e5e7eb;}
-.saved-badge{font-size:.72rem;color:#25D366;font-weight:700;margin-top:-10px;margin-bottom:10px;display:none;}
+.saved-badge{font-size:.7rem;color:#25D366;font-weight:700;margin-bottom:10px;display:none;}
 .saved-badge.active{display:block;}
-.btn{display:block;width:100%;padding:14px;background:#2d7a4f;color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;transition:background .2s;}
-.btn:hover{background:#245f3d;}
-.btn:disabled{background:#9ca3af;cursor:not-allowed;}
-.error{background:#fee2e2;border-left:3px solid #dc2626;border-radius:6px;padding:10px 14px;font-size:.85rem;color:#991b1b;margin-top:12px;display:none;}
-.hint{font-size:.78rem;color:#9ca3af;margin-top:14px;text-align:center;line-height:1.5;}
-.divider{border:none;border-top:1px solid #f3f4f6;margin:16px 0;}
-.biz-section{background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:14px;margin-bottom:14px;}
-.biz-label{font-size:.75rem;font-weight:700;color:#15803d;margin-bottom:8px;display:block;}
-.biz-section input{margin-bottom:0;border-color:#86efac;}
-.biz-section input:focus{border-color:#25D366;}
+.divider{border:none;border-top:1px solid #f0f0f0;margin:16px 0;}
+
+/* BUSINESS */
+.biz-section{background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:13px;margin-bottom:14px;}
+.biz-label{font-size:.72rem;font-weight:800;color:#15803d;margin-bottom:7px;display:block;}
+.biz-section input{background:#fff;border-color:#86efac;margin-bottom:0;}
 .biz-section input.has-saved{background:#dcfce7 !important;border-color:#25D366 !important;}
 .biz-section .toggle-btn{background:#dcfce7;border-color:#86efac;color:#15803d;}
-.biz-section .toggle-btn:hover{background:#bbf7d0;}
-.biz-section .saved-badge{margin-top:8px;margin-bottom:0;}
-.biz-hint{font-size:.72rem;color:#6b7280;margin-top:6px;}
+.biz-section .saved-badge{margin-top:6px;margin-bottom:0;}
+.biz-hint{font-size:.7rem;color:#6b7280;margin-top:5px;}
+
+/* FOTO UPLOAD */
+.upload-section{background:#f9fafb;border:2px dashed #d1d5db;border-radius:10px;padding:16px;margin-bottom:14px;transition:border-color .2s;}
+.upload-section.drag-over{border-color:#25D366;background:#f0fdf4;}
+.upload-label{font-size:.72rem;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;display:block;}
+.upload-hint{font-size:.8rem;color:#9ca3af;text-align:center;margin-bottom:10px;}
+.upload-btn-row{display:flex;gap:8px;justify-content:center;}
+.upload-pick-btn{padding:8px 16px;background:#fff;border:1.5px solid #d1d5db;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit;color:#374151;}
+.upload-pick-btn:hover{border-color:#25D366;color:#15803d;}
+.photo-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.photo-thumb{position:relative;width:72px;height:72px;}
+.photo-thumb img{width:72px;height:72px;object-fit:cover;border-radius:7px;border:1.5px solid #e5e7eb;display:block;}
+.photo-remove{position:absolute;top:-6px;right:-6px;width:18px;height:18px;background:#ef4444;color:#fff;border:none;border-radius:50%;font-size:.65rem;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+.photo-count{font-size:.75rem;color:#25D366;font-weight:700;margin-top:6px;text-align:center;}
+
+/* PROGRESS */
+.progress-box{background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:14px;margin-bottom:14px;display:none;}
+.progress-step{display:flex;align-items:center;gap:9px;font-size:.85rem;padding:4px 0;}
+.step-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0;}
+.step-wait{background:#e5e7eb;color:#9ca3af;}
+.step-active{background:#fef3c7;color:#d97706;animation:pulse .8s ease-in-out infinite;}
+.step-done{background:#dcfce7;color:#15803d;}
+.step-error{background:#fee2e2;color:#dc2626;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+
+/* BUTTONS */
+.btn-primary{display:block;width:100%;padding:14px;background:#2d7a4f;color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:800;cursor:pointer;font-family:inherit;transition:background .2s;margin-bottom:8px;}
+.btn-primary:hover{background:#245f3d;}
+.btn-primary:disabled{background:#9ca3af;cursor:not-allowed;}
+.btn-secondary{display:block;width:100%;padding:11px;background:#fff;border:1.5px solid #e5e7eb;color:#374151;border-radius:10px;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;text-align:center;text-decoration:none;}
+.btn-secondary:hover{border-color:#2d7a4f;color:#2d7a4f;}
+.error-box{background:#fee2e2;border-left:3px solid #dc2626;border-radius:6px;padding:10px 13px;font-size:.83rem;color:#991b1b;margin-top:10px;display:none;}
+.hint{font-size:.76rem;color:#9ca3af;margin-top:12px;text-align:center;line-height:1.5;}
+input[type=file]{display:none;}
 </style>
 </head>
 <body>
 <div class="card">
   <div class="logo">🔧 Converdino Sandbox</div>
-  <div class="subtitle">Test-Session erstellen (ohne WhatsApp)</div>
+  <div class="subtitle">Vollständiger Test ohne WhatsApp</div>
 
   <!-- PASSWORT -->
-  <label>Admin-Passwort</label>
+  <span class="section-label">Admin-Passwort</span>
   <div class="toggle-row">
-    <input type="password" id="pw" placeholder="••••••••"
-           autocomplete="off" data-1p-ignore="true" data-lpignore="true">
+    <input type="password" id="pw" placeholder="••••••••" autocomplete="off" data-lpignore="true">
     <button class="toggle-btn" onclick="toggleSavePw()" id="pw-save-btn">💾 Merken</button>
   </div>
-  <div id="pw-saved-badge" class="saved-badge">✅ Passwort gespeichert</div>
+  <div id="pw-saved-badge" class="saved-badge">✅ Gespeichert</div>
 
-  <hr class="divider">
+  <div class="divider"></div>
 
   <!-- TEST-TELEFON -->
-  <label>Test-Telefonnummer (optional)</label>
-  <input type="tel" id="phone" placeholder="z.B. 4367712345678"
-         autocomplete="off" data-1p-ignore="true" data-lpignore="true"
-         oninput="localStorage.setItem('cvd_phone', this.value)">
+  <span class="section-label">Test-Telefonnummer (optional)</span>
+  <input type="tel" id="phone" placeholder="z.B. 4367712345678" autocomplete="off"
+         oninput="localStorage.setItem('cvd_phone',this.value)" style="margin-bottom:14px;">
 
   <!-- BUSINESS -->
   <div class="biz-section">
-    <span class="biz-label">🏢 Als Business-Kunde testen</span>
+    <span class="biz-label">🏢 Business-Kunde testen</span>
     <div class="toggle-row">
-      <input type="tel" id="biz-phone" placeholder="Business-Telefon"
-             autocomplete="off" data-1p-ignore="true" data-lpignore="true">
+      <input type="tel" id="biz-phone" placeholder="Business-Telefon" autocomplete="off">
       <button class="toggle-btn" onclick="toggleSaveBiz()" id="biz-save-btn">💾 Merken</button>
     </div>
     <div id="biz-saved-badge" class="saved-badge">✅ Business-Nummer gespeichert</div>
-    <div class="biz-hint">Wenn ausgefüllt wird die Session automatisch als Business-Session angelegt</div>
+    <div class="biz-hint">Mit 100% Rabatt → Analyse gratis & ohne Stripe</div>
   </div>
 
-  <button class="btn" id="btn" onclick="createSession()">Session erstellen → bericht.html öffnen</button>
-  <div id="error" class="error"></div>
+  <!-- FOTOS -->
+  <div class="upload-section" id="drop-zone">
+    <span class="upload-label">📷 Fotos hochladen</span>
+    <div class="upload-hint">Fotos direkt hier hochladen – kein WhatsApp nötig</div>
+    <div class="upload-btn-row">
+      <button class="upload-pick-btn" onclick="document.getElementById('file-input').click()">📁 Fotos wählen</button>
+      <button class="upload-pick-btn" onclick="document.getElementById('cam-input').click()">📷 Kamera</button>
+    </div>
+    <input type="file" id="file-input" accept="image/*" multiple onchange="addFiles(this.files)">
+    <input type="file" id="cam-input" accept="image/*" capture="environment" onchange="addFiles(this.files)">
+    <div class="photo-grid" id="photo-grid"></div>
+    <div class="photo-count" id="photo-count" style="display:none"></div>
+  </div>
 
-  <div class="hint">Erstellt eine leere Verkaufsreport-Session<br>und öffnet direkt bericht.html zum Testen.</div>
+  <!-- PROGRESS -->
+  <div class="progress-box" id="progress-box">
+    <div class="progress-step" id="step-session">
+      <div class="step-icon step-wait" id="icon-session">1</div>
+      <span id="text-session">Session erstellen</span>
+    </div>
+    <div class="progress-step" id="step-photos">
+      <div class="step-icon step-wait" id="icon-photos">2</div>
+      <span id="text-photos">Fotos hochladen</span>
+    </div>
+    <div class="progress-step" id="step-analyze">
+      <div class="step-icon step-wait" id="icon-analyze">3</div>
+      <span id="text-analyze">Analyse starten</span>
+    </div>
+    <div class="progress-step" id="step-result">
+      <div class="step-icon step-wait" id="icon-result">4</div>
+      <span id="text-result">Zum Ergebnis</span>
+    </div>
+  </div>
+
+  <!-- BUTTONS -->
+  <button class="btn-primary" id="btn-analyze" onclick="runFullFlow()">
+    🚀 Session erstellen + analysieren
+  </button>
+  <a id="btn-bericht" class="btn-secondary" style="display:none" href="#">
+    📋 Nur Session erstellen → bericht.html
+  </a>
+
+  <div id="error-box" class="error-box"></div>
+  <div class="hint" id="hint-text">Fotos hochladen → Analysieren klicken → Ergebnis öffnet automatisch</div>
 </div>
 
 <script>
-var API     = 'https://converto-server-production.up.railway.app';
+var API = 'https://converto-server-production.up.railway.app';
 var PW_KEY  = 'cvd_sandbox_pw';
 var PH_KEY  = 'cvd_phone';
 var BIZ_KEY = 'cvd_biz_phone';
 
-/* ── Hilfsfunktion: Gespeichert-Style setzen ──────────── */
+var selectedFiles = [];
+var currentToken  = null;
+
+/* ── localStorage Helpers ─────────────────────────────── */
 function setSavedStyle(inputId, badgeId, btnId, isSaved) {
   var input = document.getElementById(inputId);
   var badge = document.getElementById(badgeId);
   var btn   = document.getElementById(btnId);
-  if (input) {
-    if (isSaved) input.classList.add('has-saved');
-    else         input.classList.remove('has-saved');
-  }
-  if (badge) {
-    if (isSaved) badge.classList.add('active');
-    else         badge.classList.remove('active');
-  }
-  if (btn) btn.textContent = isSaved ? '🗑 Vergessen' : '💾 Merken';
+  if (input) { if (isSaved) input.classList.add('has-saved'); else input.classList.remove('has-saved'); }
+  if (badge) { if (isSaved) badge.classList.add('active');    else badge.classList.remove('active'); }
+  if (btn)   btn.textContent = isSaved ? '🗑 Vergessen' : '💾 Merken';
 }
 
-/* ── Werte aus localStorage laden ────────────────────── */
 function loadSavedValues() {
-  // Passwort
   var pw = localStorage.getItem(PW_KEY);
-  var pwEl = document.getElementById('pw');
-  if (pw && pwEl && pwEl.value !== pw) pwEl.value = pw;
+  if (pw) { var el = document.getElementById('pw'); if(el && el.value !== pw) el.value = pw; }
   setSavedStyle('pw', 'pw-saved-badge', 'pw-save-btn', !!pw);
 
-  // Test-Telefon (nur laden, kein Merken-Button)
   var ph = localStorage.getItem(PH_KEY);
-  var phEl = document.getElementById('phone');
-  if (ph && phEl && phEl.value !== ph) phEl.value = ph;
+  if (ph) { var el2 = document.getElementById('phone'); if(el2 && el2.value !== ph) el2.value = ph; }
 
-  // Business-Telefon
   var biz = localStorage.getItem(BIZ_KEY);
-  var bizEl = document.getElementById('biz-phone');
-  if (biz && bizEl && bizEl.value !== biz) bizEl.value = biz;
+  if (biz) { var el3 = document.getElementById('biz-phone'); if(el3 && el3.value !== biz) el3.value = biz; }
   setSavedStyle('biz-phone', 'biz-saved-badge', 'biz-save-btn', !!biz);
 }
 
-// Mehrfach laden – schützt gegen Chrome/iOS Autofill der nach window.load kommt
 document.addEventListener('DOMContentLoaded', loadSavedValues);
 window.addEventListener('load', loadSavedValues);
-setTimeout(loadSavedValues, 200);
-setTimeout(loadSavedValues, 800);
+setTimeout(loadSavedValues, 300);
+setTimeout(loadSavedValues, 900);
 
-/* ── Passwort: Merken / Vergessen ─────────────────────── */
 function toggleSavePw() {
   var saved = localStorage.getItem(PW_KEY);
-  if (saved) {
-    localStorage.removeItem(PW_KEY);
-    setSavedStyle('pw', 'pw-saved-badge', 'pw-save-btn', false);
-  } else {
-    var pw = document.getElementById('pw').value.trim();
-    if (!pw) { alert('Bitte erst Passwort eingeben'); return; }
-    localStorage.setItem(PW_KEY, pw);
-    setSavedStyle('pw', 'pw-saved-badge', 'pw-save-btn', true);
-  }
+  if (saved) { localStorage.removeItem(PW_KEY); setSavedStyle('pw', 'pw-saved-badge', 'pw-save-btn', false); }
+  else { var v = document.getElementById('pw').value.trim(); if (!v) { alert('Bitte Passwort eingeben'); return; } localStorage.setItem(PW_KEY, v); setSavedStyle('pw', 'pw-saved-badge', 'pw-save-btn', true); }
 }
 
-/* ── Business-Nummer: Merken / Vergessen ──────────────── */
 function toggleSaveBiz() {
   var saved = localStorage.getItem(BIZ_KEY);
-  if (saved) {
-    // Vergessen: aus Storage löschen, Feld leeren
-    localStorage.removeItem(BIZ_KEY);
-    document.getElementById('biz-phone').value = '';
-    setSavedStyle('biz-phone', 'biz-saved-badge', 'biz-save-btn', false);
+  if (saved) { localStorage.removeItem(BIZ_KEY); document.getElementById('biz-phone').value = ''; setSavedStyle('biz-phone', 'biz-saved-badge', 'biz-save-btn', false); }
+  else { var v = document.getElementById('biz-phone').value.trim(); if (!v) { alert('Bitte Business-Nummer eingeben'); return; } localStorage.setItem(BIZ_KEY, v); setSavedStyle('biz-phone', 'biz-saved-badge', 'biz-save-btn', true); }
+}
+
+/* ── Foto Upload ──────────────────────────────────────── */
+var dropZone = document.getElementById('drop-zone');
+dropZone.addEventListener('dragover', function(e) { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', function() { dropZone.classList.remove('drag-over'); });
+dropZone.addEventListener('drop', function(e) { e.preventDefault(); dropZone.classList.remove('drag-over'); addFiles(e.dataTransfer.files); });
+
+function addFiles(files) {
+  for (var i = 0; i < files.length; i++) {
+    if (files[i].type.startsWith('image/') && selectedFiles.length < 15) {
+      selectedFiles.push(files[i]);
+    }
+  }
+  renderPhotos();
+}
+
+function removePhoto(idx) {
+  selectedFiles.splice(idx, 1);
+  renderPhotos();
+}
+
+function renderPhotos() {
+  var grid = document.getElementById('photo-grid');
+  var count = document.getElementById('photo-count');
+  grid.innerHTML = '';
+  selectedFiles.forEach(function(f, i) {
+    var url = URL.createObjectURL(f);
+    var wrap = document.createElement('div');
+    wrap.className = 'photo-thumb';
+    wrap.innerHTML = '<img src="'+url+'" alt="Foto '+(i+1)+'"><button class="photo-remove" onclick="removePhoto('+i+')">✕</button>';
+    grid.appendChild(wrap);
+  });
+  if (selectedFiles.length > 0) {
+    count.style.display = 'block';
+    count.textContent = selectedFiles.length + ' Foto' + (selectedFiles.length !== 1 ? 's' : '') + ' bereit';
   } else {
-    var biz = document.getElementById('biz-phone').value.trim();
-    if (!biz) { alert('Bitte erst Business-Telefon eingeben'); return; }
-    localStorage.setItem(BIZ_KEY, biz);
-    setSavedStyle('biz-phone', 'biz-saved-badge', 'biz-save-btn', true);
+    count.style.display = 'none';
   }
 }
 
-/* ── Session erstellen ────────────────────────────────── */
-async function createSession() {
-  var btn      = document.getElementById('btn');
-  var pw       = document.getElementById('pw').value.trim();
-  var phone    = document.getElementById('phone').value.trim();
-  var bizPhone = document.getElementById('biz-phone').value.trim();
-  var errEl    = document.getElementById('error');
-
-  if (!pw) { showError('Bitte Passwort eingeben.'); return; }
-
-  // Passwort auto-speichern beim ersten Absenden
-  if (!localStorage.getItem(PW_KEY) && pw) {
-    localStorage.setItem(PW_KEY, pw);
-    setSavedStyle('pw', 'pw-saved-badge', 'pw-save-btn', true);
-  }
-
-  // Test-Telefon auto-speichern (kein Toggle-Button nötig)
-  if (phone) localStorage.setItem(PH_KEY, phone);
-
-  btn.disabled = true;
-  btn.textContent = 'Wird erstellt...';
-  errEl.style.display = 'none';
-
-  try {
-    var res = await fetch(API + '/api/vk/admin/new-session', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        password:      pw,
-        phone:         bizPhone || phone || undefined,
-        business_phone: bizPhone || undefined
-      })
-    });
-    var data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Fehler');
-    window.location.href = 'bericht.html?s=' + data.token;
-  } catch (e) {
-    showError(e.message);
-    btn.disabled = false;
-    btn.textContent = 'Session erstellen → bericht.html öffnen';
-  }
+/* ── Progress Steps ───────────────────────────────────── */
+function setStep(step, state, text) {
+  var icon = document.getElementById('icon-' + step);
+  var textEl = document.getElementById('text-' + step);
+  icon.className = 'step-icon step-' + state;
+  icon.textContent = state === 'done' ? '✓' : state === 'error' ? '✕' : (step === 'session' ? '1' : step === 'photos' ? '2' : step === 'analyze' ? '3' : '4');
+  if (text) textEl.textContent = text;
 }
 
+function showProgress() {
+  document.getElementById('progress-box').style.display = 'block';
+}
+
+/* ── Fehler ───────────────────────────────────────────── */
 function showError(msg) {
-  var el = document.getElementById('error');
+  var el = document.getElementById('error-box');
   el.textContent = '⚠️ ' + msg;
   el.style.display = 'block';
 }
+function clearError() {
+  document.getElementById('error-box').style.display = 'none';
+}
+
+/* ── Bild → Base64 ────────────────────────────────────── */
+function fileToBase64(file) {
+  return new Promise(function(resolve, reject) {
+    var reader = new FileReader();
+    reader.onload = function(e) { resolve(e.target.result.split(',')[1]); };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ── Haupt-Flow ───────────────────────────────────────── */
+async function runFullFlow() {
+  var pw       = document.getElementById('pw').value.trim();
+  var phone    = document.getElementById('phone').value.trim();
+  var bizPhone = document.getElementById('biz-phone').value.trim();
+
+  clearError();
+
+  if (!pw) { showError('Bitte Passwort eingeben.'); return; }
+
+  // Passwort auto-speichern
+  if (!localStorage.getItem(PW_KEY)) {
+    localStorage.setItem(PW_KEY, pw);
+    setSavedStyle('pw', 'pw-saved-badge', 'pw-save-btn', true);
+  }
+  if (phone) localStorage.setItem(PH_KEY, phone);
+
+  var btn = document.getElementById('btn-analyze');
+  btn.disabled = true;
+  btn.textContent = '⏳ Läuft...';
+  showProgress();
+
+  // ── SCHRITT 1: Session erstellen ──────────────────────
+  setStep('session', 'active', 'Session erstellen...');
+  try {
+    var r1 = await fetch(API + '/api/vk/admin/new-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw, phone: bizPhone || phone || undefined, business_phone: bizPhone || undefined })
+    });
+    var d1 = await r1.json();
+    if (!r1.ok) throw new Error(d1.error || 'Session Fehler');
+    currentToken = d1.token;
+    setStep('session', 'done', 'Session erstellt ✓');
+  } catch(e) {
+    setStep('session', 'error', 'Session Fehler: ' + e.message);
+    showError(e.message);
+    btn.disabled = false; btn.textContent = '🚀 Session erstellen + analysieren';
+    return;
+  }
+
+  // ── Wenn keine Fotos: direkt zu bericht.html ──────────
+  if (selectedFiles.length === 0) {
+    setStep('photos', 'done', 'Keine Fotos – manuell via bericht.html');
+    setStep('analyze', 'wait', 'Analyse über bericht.html starten');
+    setStep('result', 'active', 'Öffne bericht.html...');
+    setTimeout(function() { window.location.href = 'bericht.html?s=' + currentToken; }, 800);
+    return;
+  }
+
+  // ── SCHRITT 2: Fotos hochladen ────────────────────────
+  setStep('photos', 'active', 'Fotos hochladen (0/' + selectedFiles.length + ')...');
+
+  // Session-ID aus DB holen
+  var sessionId = null;
+  var articleId = null;
+  try {
+    var rSess = await fetch(API + '/api/vk/session/' + currentToken);
+    var dSess = await rSess.json();
+    sessionId = dSess.id;
+    // Artikel anlegen
+    var rArt = await fetch(API + '/api/vk/article', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: currentToken, title: 'Artikel 1' })
+    });
+    var dArt = await rArt.json();
+    if (!rArt.ok) throw new Error(dArt.error || 'Artikel Fehler');
+    articleId = dArt.article.id;
+  } catch(e) {
+    setStep('photos', 'error', 'Setup Fehler: ' + e.message);
+    showError(e.message);
+    btn.disabled = false; btn.textContent = '🚀 Session erstellen + analysieren';
+    return;
+  }
+
+  var uploaded = 0;
+  var failed = 0;
+  for (var i = 0; i < selectedFiles.length; i++) {
+    setStep('photos', 'active', 'Fotos hochladen (' + (i+1) + '/' + selectedFiles.length + ')...');
+    try {
+      var b64 = await fileToBase64(selectedFiles[i]);
+      var ct  = selectedFiles[i].type || 'image/jpeg';
+      var rp = await fetch(API + '/api/vk/photo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ article_id: articleId, session_id: sessionId, image_base64: b64, content_type: ct })
+      });
+      var dp = await rp.json();
+      if (!rp.ok) { failed++; console.warn('Photo upload failed:', dp.error); }
+      else uploaded++;
+    } catch(e) { failed++; console.warn('Photo error:', e.message); }
+  }
+
+  if (uploaded === 0) {
+    setStep('photos', 'error', 'Alle Fotos fehlgeschlagen!');
+    showError('Kein Foto konnte hochgeladen werden.');
+    btn.disabled = false; btn.textContent = '🚀 Session erstellen + analysieren';
+    return;
+  }
+
+  setStep('photos', 'done', uploaded + ' Foto' + (uploaded !== 1 ? 's' : '') + ' hochgeladen' + (failed > 0 ? ' (' + failed + ' Fehler)' : '') + ' ✓');
+
+  // ── SCHRITT 3: Analyse starten ────────────────────────
+  setStep('analyze', 'active', 'Analyse starten...');
+
+  // Prüfen ob Business-Rabatt 100%
+  var hasFreeDiscount = false;
+  try {
+    var rDisc = await fetch(API + '/api/vk/session/' + currentToken + '/discount');
+    var dDisc = await rDisc.json();
+    if (dDisc.has_discount && dDisc.percent >= 100) hasFreeDiscount = true;
+  } catch(e) {}
+
+  if (hasFreeDiscount) {
+    try {
+      var rFree = await fetch(API + '/api/vk/business-free', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: currentToken })
+      });
+      var dFree = await rFree.json();
+      if (!rFree.ok) throw new Error(dFree.error || 'Analyse Fehler');
+      setStep('analyze', 'done', 'Analyse läuft (gratis) ✓');
+    } catch(e) {
+      setStep('analyze', 'error', 'Analyse Fehler: ' + e.message);
+      showError(e.message + ' → Trotzdem zu ergebnis.html');
+    }
+  } else {
+    // Kein 100% Rabatt → zu bericht.html für Zahlung
+    setStep('analyze', 'done', 'Kein 100% Rabatt → Zahlung über bericht.html');
+    setStep('result', 'active', 'Öffne bericht.html...');
+    setTimeout(function() { window.location.href = 'bericht.html?s=' + currentToken; }, 800);
+    return;
+  }
+
+  // ── SCHRITT 4: Ergebnis öffnen ────────────────────────
+  setStep('result', 'active', 'Öffne Ergebnis...');
+  setTimeout(function() {
+    setStep('result', 'done', 'Ergebnis geöffnet ✓');
+    window.location.href = 'ergebnis.html?s=' + currentToken;
+  }, 1200);
+}
+
+/* ── Nur Session erstellen (kein Analyze) ─────────────── */
+document.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('btn-bericht');
+  btn.style.display = 'block';
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    var pw = document.getElementById('pw').value.trim();
+    if (!pw) { showError('Bitte Passwort eingeben'); return; }
+    // Just use the analyze flow but it redirects if no photos
+    runFullFlow();
+  });
+});
 
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') createSession();
+  if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') runFullFlow();
 });
 </script>
 </body>
