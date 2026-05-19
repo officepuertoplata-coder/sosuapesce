@@ -322,7 +322,12 @@ async function loadResults(){
   try{
     var r=await fetch(API+'/api/vk/results/'+TOKEN);var d=await r.json();
     if(!r.ok){
-      if(d.status==='analyzing'){document.getElementById('content').innerHTML='<div class="loading"><div class="spinner"></div><strong>Analyse läuft...</strong><br><span>Diese Seite aktualisiert sich automatisch.</span></div>';setTimeout(loadResults,8000);return;}
+      var waitStatuses=['analyzing','paid','open'];
+      if(waitStatuses.includes(d.status)){
+        var msg=d.status==='analyzing'?'Analyse läuft...':'Auftrag wird vorbereitet...';
+        document.getElementById('content').innerHTML='<div class="loading"><div class="spinner"></div><strong>'+msg+'</strong><br><span>Diese Seite aktualisiert sich automatisch.</span></div>';
+        setTimeout(loadResults,5000);return;
+      }
       document.getElementById('content').innerHTML='<div class="loading">Fehler: '+esc(d.error||'Unbekannt')+'</div>';return;
     }
     window._lastData=d;window._sessionId=d.id;
