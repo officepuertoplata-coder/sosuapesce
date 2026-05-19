@@ -61,8 +61,6 @@ header{background:var(--wa);color:#fff;padding:16px 20px;}
 .market-stat-lbl{font-size:.68rem;color:var(--mu);margin-top:2px;}
 .market-assessment{font-size:.84rem;color:#15803d;margin-top:8px;font-weight:600;}
 .market-note{font-size:.82rem;color:var(--mu);font-style:italic;}
-
-/* ── Authentizitäts-Score ───────────────── */
 .auth-box{background:#f9fafb;border-radius:10px;padding:14px 16px;}
 .auth-score-ring{position:relative;width:60px;height:60px;flex-shrink:0;}
 .auth-score-ring svg{position:absolute;top:0;left:0;transform:rotate(-90deg);}
@@ -73,7 +71,6 @@ header{background:var(--wa);color:#fff;padding:16px 20px;}
 .auth-positive{color:#059669;}
 .auth-negative{color:#dc2626;}
 .auth-disclaimer{font-size:.72rem;color:var(--mu);margin-top:10px;padding-top:8px;border-top:1px solid var(--border);}
-
 .lp-btn{display:flex;align-items:center;gap:8px;width:100%;padding:13px 16px;background:#f0fdf4;border:1.5px solid #25D366;border-radius:10px;color:#15803d;font-weight:800;font-size:.9rem;cursor:pointer;font-family:var(--font);margin-top:10px;transition:all .2s;border:none;}
 .lp-btn:hover{background:#dcfce7;}
 .lp-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:flex-end;justify-content:center;}
@@ -136,69 +133,28 @@ document.addEventListener('click',function(e){
 function buildAuthSection(an) {
   var auth = an.authenticity;
   if (!auth || auth.score === null || auth.score === undefined) return '';
-
   var score = auth.score;
   var scoreColor = score >= 80 ? '#059669' : score >= 60 ? '#d97706' : '#dc2626';
   var scoreBg    = score >= 80 ? '#f0fdf4' : score >= 60 ? '#fefce8' : '#fef2f2';
   var scoreBorder= score >= 80 ? '#86efac' : score >= 60 ? '#fde68a' : '#fecaca';
   var scoreLabel = score >= 80 ? 'Gut' : score >= 60 ? 'Auffälligkeiten' : 'Verdächtig';
-  var verdictMap = {
-    'authentic':        '✅ Keine Fälschungsmerkmale erkannt',
-    'suspicious':       '⚠️ Verdächtige Merkmale gefunden',
-    'cannot_determine': '❓ Keine eindeutige Beurteilung möglich'
-  };
+  var verdictMap = {'authentic':'✅ Keine Fälschungsmerkmale erkannt','suspicious':'⚠️ Verdächtige Merkmale gefunden','cannot_determine':'❓ Keine eindeutige Beurteilung möglich'};
   var verdictText = verdictMap[auth.verdict] || '';
-
-  // SVG Ring
   var r = 24, circ = 2 * Math.PI * r;
   var dash = (score / 100) * circ;
-  var ringHTML = '<svg width="60" height="60" viewBox="0 0 60 60">'
-    + '<circle cx="30" cy="30" r="'+r+'" fill="none" stroke="#e5e7eb" stroke-width="6"/>'
-    + '<circle cx="30" cy="30" r="'+r+'" fill="none" stroke="'+scoreColor+'" stroke-width="6"'
-    + ' stroke-dasharray="'+dash.toFixed(1)+' '+circ.toFixed(1)+'" stroke-linecap="round"/>'
-    + '</svg>';
-
+  var ringHTML = '<svg width="60" height="60" viewBox="0 0 60 60"><circle cx="30" cy="30" r="'+r+'" fill="none" stroke="#e5e7eb" stroke-width="6"/><circle cx="30" cy="30" r="'+r+'" fill="none" stroke="'+scoreColor+'" stroke-width="6" stroke-dasharray="'+dash.toFixed(1)+' '+circ.toFixed(1)+'" stroke-linecap="round"/></svg>';
   var html = '<div class="section"><div class="section-title">🔍 Authentizitätsprüfung</div>';
   html += '<div class="auth-box" style="border:1.5px solid '+scoreBorder+';background:'+scoreBg+';">';
-
-  // Score + Verdict
   html += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;">';
   html += '<div class="auth-score-ring">'+ringHTML;
   html += '<div class="auth-score-inner"><span class="auth-score-num" style="color:'+scoreColor+';">'+score+'</span><span class="auth-score-den">/100</span></div></div>';
   html += '<div><div style="font-weight:800;font-size:.9rem;color:'+scoreColor+';">'+esc(scoreLabel)+'</div>';
   if (verdictText) html += '<div style="font-size:.82rem;color:#4b5563;margin-top:2px;">'+esc(verdictText)+'</div>';
   html += '</div></div>';
-
-  // Score < 60 Hinweis
-  if (score < 60) {
-    html += '<div style="background:#fee2e2;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:.8rem;color:#991b1b;font-weight:700;">';
-    html += '⚠️ Dieser Artikel wird manuell geprüft. Bitte warte auf Freigabe.</div>';
-  }
-
-  // Flags (negativ)
-  if (auth.flags && auth.flags.length) {
-    html += '<div style="margin-bottom:8px;"><div style="font-size:.72rem;font-weight:800;color:var(--mu);margin-bottom:5px;">AUFFÄLLIGKEITEN</div>';
-    auth.flags.forEach(function(f){ html+='<div class="auth-flag auth-negative"><span>⚠</span><span>'+esc(f)+'</span></div>'; });
-    html += '</div>';
-  }
-
-  // Positive Indikatoren
-  if (auth.positive_indicators && auth.positive_indicators.length) {
-    html += '<div style="margin-bottom:8px;"><div style="font-size:.72rem;font-weight:800;color:var(--mu);margin-bottom:5px;">POSITIVE MERKMALE</div>';
-    auth.positive_indicators.forEach(function(p){ html+='<div class="auth-flag auth-positive"><span>✓</span><span>'+esc(p)+'</span></div>'; });
-    html += '</div>';
-  }
-
-  // Warnung
-  if (auth.warning) {
-    html += '<div style="background:#fef2f2;border-radius:6px;padding:8px 12px;margin-top:6px;font-size:.8rem;color:#dc2626;">'+esc(auth.warning)+'</div>';
-  }
-
-  // Geprüfte Merkmale
-  if (auth.checked_features && auth.checked_features.length) {
-    html += '<div style="font-size:.72rem;color:var(--mu);margin-top:8px;">Geprüfte Merkmale: '+auth.checked_features.map(esc).join(', ')+'</div>';
-  }
-
+  if (score < 60) html += '<div style="background:#fee2e2;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:.8rem;color:#991b1b;font-weight:700;">⚠️ Dieser Artikel wird manuell geprüft. Bitte warte auf Freigabe.</div>';
+  if (auth.flags && auth.flags.length) { html += '<div style="margin-bottom:8px;"><div style="font-size:.72rem;font-weight:800;color:var(--mu);margin-bottom:5px;">AUFFÄLLIGKEITEN</div>'; auth.flags.forEach(function(f){ html+='<div class="auth-flag auth-negative"><span>⚠</span><span>'+esc(f)+'</span></div>'; }); html += '</div>'; }
+  if (auth.positive_indicators && auth.positive_indicators.length) { html += '<div style="margin-bottom:8px;"><div style="font-size:.72rem;font-weight:800;color:var(--mu);margin-bottom:5px;">POSITIVE MERKMALE</div>'; auth.positive_indicators.forEach(function(p){ html+='<div class="auth-flag auth-positive"><span>✓</span><span>'+esc(p)+'</span></div>'; }); html += '</div>'; }
+  if (auth.warning) html += '<div style="background:#fef2f2;border-radius:6px;padding:8px 12px;margin-top:6px;font-size:.8rem;color:#dc2626;">'+esc(auth.warning)+'</div>';
   html += '<div class="auth-disclaimer">ℹ️ KI-Vorprüfung sichtbarer Merkmale auf Fotos. Keine physische Prüfung. Kein rechtlich verbindliches Echtheitszertifikat.</div>';
   html += '</div></div>';
   return html;
@@ -216,13 +172,7 @@ function buildLPButton(article){
     }
     if(article.lp_booked){
       window._lpModalData=window._lpModalData||{};
-      window._lpModalData[article.id]={
-        price:an.price_recommended||0,
-        title:article.title||'',
-        days:article.lp_days||7,
-        hasBot:!!article.lp_has_bot,
-        authScore: an.authenticity && an.authenticity.score !== null ? an.authenticity.score : null
-      };
+      window._lpModalData[article.id]={price:an.price_recommended||0,title:article.title||'',days:article.lp_days||7,hasBot:!!article.lp_has_bot,authScore:an.authenticity&&an.authenticity.score!==null?an.authenticity.score:null};
       return '<button class="lp-btn" data-action="open-lp-modal" data-aid="'+article.id+'">🌐 Landingpage jetzt aktivieren – Bereits bezahlt</button>';
     }
     return '';
@@ -233,46 +183,28 @@ function openLPModal(articleId){
   var d=(window._lpModalData||{})[articleId]||{};
   var authScore = d.authScore;
   var hasGoodScore = authScore !== null && authScore !== undefined && authScore >= 60;
-
   var overlay=document.createElement('div');overlay.className='lp-modal-overlay';overlay.id='lp-modal';
   var box=document.createElement('div');box.className='lp-modal';
   var h='<div class="lp-modal-title">🌐 Landingpage aktivieren</div>';
   h+='<div style="font-size:.85rem;color:#6b7280;margin-bottom:4px;">'+esc(d.title||'')+'</div>';
-
   h+='<label class="lp-modal-label">Verkaufspreis *</label>';
   h+='<input class="lp-modal-input" type="number" id="lp-price" min="0" step="0.01" value="'+(d.price||0)+'">';
-
   h+='<label class="lp-modal-label">Mindestpreis (€) – für Preisverhandlung</label>';
   h+='<input class="lp-modal-input" type="number" id="lp-minprice" min="0" step="0.01" placeholder="z.B. 280 (leer = kein Verhandeln)">';
-
-  // ── NEU: Stückzahl ──
   h+='<label class="lp-modal-label">📦 Verfügbare Stückzahl (optional)</label>';
   h+='<input class="lp-modal-input" type="number" id="lp-stock" min="1" step="1" placeholder="z.B. 1 (leer = unbegrenzt)">';
-  h+='<div style="font-size:.72rem;color:var(--mu);margin-top:4px;">Zeigt "Noch X verfügbar" auf der Produktseite. Bei 0 → Ausverkauft.</div>';
-
   h+='<label class="lp-modal-label">Lieferoptionen</label>';
   h+='<label class="lp-check-row"><input type="checkbox" id="lp-pickup" checked style="accent-color:#25D366;width:16px;height:16px;"> <span style="font-weight:700;">Selbstabholung</span></label>';
   h+='<div id="lp-pickup-loc" style="margin-top:6px;"><label class="lp-modal-label">Abholort</label><input class="lp-modal-input" type="text" id="lp-location" placeholder="z.B. Wien 1010"></div>';
   h+='<label class="lp-check-row"><input type="checkbox" id="lp-shipping" style="accent-color:#25D366;width:16px;height:16px;"> <span style="font-weight:700;">Versand möglich</span></label>';
   h+='<div id="lp-shipping-cost" style="display:none;margin-top:6px;"><label class="lp-modal-label">Versandkosten</label><input class="lp-modal-input" type="number" id="lp-ship-cost" min="0" step="0.01" value="6.90"></div>';
-
-  // ── NEU: Score-Badge (nur wenn Score ≥ 60) ──
   if (hasGoodScore) {
-    var scoreColor = authScore >= 80 ? '#059669' : '#d97706';
     h+='<label class="lp-modal-label">🔍 Authentizitäts-Badge</label>';
-    h+='<label class="lp-check-row" style="background:#f0fdf4;border:1.5px solid #86efac;">';
-    h+='<input type="checkbox" id="lp-badge" style="accent-color:#25D366;width:16px;height:16px;">';
-    h+='<div>';
-    h+='<span style="font-weight:700;color:#15803d;">Score-Badge anzeigen ('+authScore+'/100)</span>';
-    h+='<div style="font-size:.72rem;color:#6b7280;margin-top:3px;">KI-generiert · Prüfung sichtbarer Merkmale · keine physische Prüfung</div>';
-    h+='<div style="font-size:.72rem;color:#6b7280;margin-top:2px;">Zeigt einen Vertrauens-Badge auf der Produktseite.</div>';
-    h+='</div></label>';
+    h+='<label class="lp-check-row" style="background:#f0fdf4;border:1.5px solid #86efac;"><input type="checkbox" id="lp-badge" style="accent-color:#25D366;width:16px;height:16px;"><div><span style="font-weight:700;color:#15803d;">Score-Badge anzeigen ('+authScore+'/100)</span><div style="font-size:.72rem;color:#6b7280;margin-top:3px;">KI-generiert · Prüfung sichtbarer Merkmale · keine physische Prüfung</div></div></label>';
   }
-
   h+='<button class="lp-modal-btn" id="lp-modal-btn">Landingpage erstellen</button>';
   h+='<button id="lp-cancel" style="width:100%;padding:12px;background:none;border:none;color:#9ca3af;cursor:pointer;font-size:.85rem;margin-top:6px;">Abbrechen</button>';
   box.innerHTML=h;overlay.appendChild(box);document.body.appendChild(overlay);
-
   document.getElementById('lp-modal-btn').addEventListener('click',function(){activateLP(articleId, hasGoodScore);});
   document.getElementById('lp-cancel').addEventListener('click',function(){overlay.remove();});
   document.getElementById('lp-pickup').addEventListener('change',function(){document.getElementById('lp-pickup-loc').style.display=this.checked?'block':'none';});
@@ -288,20 +220,7 @@ async function activateLP(articleId, hasGoodScore){
   var stockVal = document.getElementById('lp-stock').value;
   var badgeChecked = hasGoodScore && document.getElementById('lp-badge') && document.getElementById('lp-badge').checked;
   try{
-    var body={
-      article_id:articleId,
-      session_id:window._sessionId||null,
-      days:article?(article.lp_days||7):7,
-      has_bot:article?!!article.lp_has_bot:false,
-      sale_price:price,
-      min_price:parseFloat(document.getElementById('lp-minprice').value)||null,
-      delivery_pickup:document.getElementById('lp-pickup').checked,
-      delivery_shipping:document.getElementById('lp-shipping').checked,
-      pickup_location:document.getElementById('lp-location').value.trim(),
-      shipping_cost:parseFloat(document.getElementById('lp-ship-cost').value)||0,
-      show_score_badge: badgeChecked,                          // ← NEU
-      stock_quantity: stockVal ? parseInt(stockVal) : null     // ← NEU
-    };
+    var body={article_id:articleId,session_id:window._sessionId||null,days:article?(article.lp_days||7):7,has_bot:article?!!article.lp_has_bot:false,sale_price:price,min_price:parseFloat(document.getElementById('lp-minprice').value)||null,delivery_pickup:document.getElementById('lp-pickup').checked,delivery_shipping:document.getElementById('lp-shipping').checked,pickup_location:document.getElementById('lp-location').value.trim(),shipping_cost:parseFloat(document.getElementById('lp-ship-cost').value)||0,show_score_badge:badgeChecked,stock_quantity:stockVal?parseInt(stockVal):null};
     var r=await fetch(API+'/api/vk/landingpage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     var result=await r.json();if(!r.ok)throw new Error(result.error||'Fehler');
     document.getElementById('lp-modal').remove();_lpData[articleId]=result.landingpage;
@@ -318,22 +237,87 @@ async function loadLPData(articles){
   for(var i=0;i<articles.length;i++){try{var r=await fetch(API+'/api/vk/landingpage/article/'+articles[i].id);if(r.ok){var d=await r.json();if(d)_lpData[articles[i].id]=d;}}catch(e){}}
 }
 
+// ═══════════════════════════════════════════════════════
+// loadResults – ALLE Status korrekt behandelt
+// ═══════════════════════════════════════════════════════
 async function loadResults(){
   try{
-    var r=await fetch(API+'/api/vk/results/'+TOKEN);var d=await r.json();
+    var r=await fetch(API+'/api/vk/results/'+TOKEN);
+    var d=await r.json();
+
     if(!r.ok){
-      var waitStatuses=['analyzing','paid','open'];
-      if(waitStatuses.includes(d.status)){
-        var msg=d.status==='analyzing'?'Analyse läuft...':'Auftrag wird vorbereitet...';
-        document.getElementById('content').innerHTML='<div class="loading"><div class="spinner"></div><strong>'+msg+'</strong><br><span>Diese Seite aktualisiert sich automatisch.</span></div>';
-        setTimeout(loadResults,5000);return;
+      var status=d.status;
+
+      // ── Session offen: noch keine Fotos / Zahlung ──
+      if(status==='open'){
+        document.getElementById('content').innerHTML=
+          '<div class="loading">' +
+          '<div style="font-size:2.5rem;margin-bottom:12px;">📋</div>' +
+          '<strong style="font-size:1.1rem;">Auftrag noch nicht abgeschlossen</strong><br>' +
+          '<span style="color:var(--mu);font-size:.85rem;display:block;margin:8px 0 20px;">Bitte Fotos hochladen und Analyse starten.</span>' +
+          '<a href="bericht.html?s='+TOKEN+'" style="display:inline-block;padding:13px 28px;background:var(--wa);color:#fff;border-radius:10px;text-decoration:none;font-weight:800;font-size:.95rem;">→ Zum Auftrag</a>' +
+          '</div>';
+        return;
       }
-      document.getElementById('content').innerHTML='<div class="loading">Fehler: '+esc(d.error||'Unbekannt')+'</div>';return;
+
+      // ── Bezahlt oder Analyse läuft ──
+      if(status==='analyzing'||status==='paid'){
+        document.getElementById('content').innerHTML=
+          '<div class="loading"><div class="spinner"></div>' +
+          '<strong>Analyse läuft...</strong><br>' +
+          '<span>Diese Seite aktualisiert sich automatisch.</span></div>';
+        setTimeout(loadResults,5000);
+        return;
+      }
+
+      // ── Fehler bei der Analyse ──
+      if(status==='error'){
+        document.getElementById('content').innerHTML=
+          '<div class="loading">' +
+          '<div style="font-size:2rem;margin-bottom:12px;">❌</div>' +
+          '<strong>Analyse fehlgeschlagen</strong><br>' +
+          '<span style="font-size:.82rem;color:var(--mu);">Bitte wende dich an den Support: office@ynhald.com</span>' +
+          '</div>';
+        return;
+      }
+
+      // ── Session abgelaufen ──
+      if(status==='expired'){
+        document.getElementById('content').innerHTML=
+          '<div class="loading">' +
+          '<div style="font-size:2rem;margin-bottom:12px;">⏰</div>' +
+          '<strong>Session abgelaufen</strong><br>' +
+          '<span style="font-size:.82rem;color:var(--mu);">Dieser Link ist nicht mehr gültig.</span>' +
+          '</div>';
+        return;
+      }
+
+      // ── Gelöscht ──
+      if(status==='deleted'){
+        document.getElementById('content').innerHTML=
+          '<div class="loading">' +
+          '<div style="font-size:2rem;margin-bottom:12px;">🗑</div>' +
+          '<strong>Auftrag gelöscht</strong><br>' +
+          '<span style="font-size:.82rem;color:var(--mu);">Dieser Auftrag wurde bereits gelöscht.</span>' +
+          '</div>';
+        return;
+      }
+
+      // ── Fallback für unbekannte Status ──
+      document.getElementById('content').innerHTML=
+        '<div class="loading">Fehler: '+esc(d.error||'Unbekannt')+'</div>';
+      return;
     }
-    window._lastData=d;window._sessionId=d.id;
+
+    // ── Erfolg: Daten laden und rendern ──
+    window._lastData=d;
+    window._sessionId=d.id;
     try{await loadLPData(d.articles||[]);}catch(e){}
     render(d);
-  }catch(e){document.getElementById('content').innerHTML='<div class="loading">Verbindungsfehler: '+e.message+'</div>';}
+  }catch(e){
+    document.getElementById('content').innerHTML=
+      '<div class="loading">Verbindungsfehler: '+esc(e.message)+'</div>';
+  }
 }
 
 function render(data){
@@ -353,7 +337,6 @@ function render(data){
     html+='<div class="article-header"><div class="article-num">'+(i+1)+'</div>';
     html+='<input class="article-title-input" type="text" value="'+esc(a.title||'Artikel '+(i+1))+'" data-article-id="'+a.id+'" onblur="saveArticleTitle(this)" onkeydown="if(event.keyCode===13)this.blur()">';
     html+='</div>';
-
     html+='<div class="photos-strip">';
     photos.forEach(function(p){html+='<div class="photo-wrap"><img src="'+p.public_url+'" alt="Foto"></div>';});
     html+='</div>';
@@ -367,30 +350,19 @@ function render(data){
         html+='<div class="section"><div style="padding:20px;text-align:center;"><div style="color:var(--mu);margin-bottom:12px;">Analyse ausstehend...</div><button onclick="deleteEmptyArticle(\''+a.id+'\')" style="background:none;border:1px solid #fecaca;color:#ef4444;border-radius:6px;padding:6px 14px;font-size:.78rem;cursor:pointer;font-family:var(--font);">🗑 Leeren Artikel löschen</button></div></div>';
       }
     }else{
-      // Titel
       if(an.title_short||an.title_long||an.title_quick){html+='<div class="section"><div class="section-title">Titel-Varianten</div>';if(an.title_short)html+=copyField(an.title_short,'Kurztitel');if(an.title_long)html+=copyField(an.title_long,'Ausführlicher Titel');if(an.title_quick)html+=copyField(an.title_quick,'Quick-Sale Titel');html+='</div>';}
-      // Preis
       if(an.price_min||an.price_recommended||an.price_max){var p1=storeText(String(an.price_min||0)),p2=storeText(String(an.price_recommended||0)),p3=storeText(String(an.price_max||0));html+='<div class="section"><div class="section-title">Preisvorschlag</div><div class="price-grid"><div class="price-card" data-cid="'+p1+'"><div class="price-val">'+esc(String(an.price_min||0))+'</div><div class="price-lbl">Mindestpreis</div><div class="price-range">Quick-Sale</div></div><div class="price-card" data-cid="'+p2+'"><div class="price-val" style="font-size:1.4rem;">'+esc(String(an.price_recommended||0))+'</div><div class="price-lbl">Empfohlen</div><div class="price-range">Bestes Verhältnis</div></div><div class="price-card" data-cid="'+p3+'"><div class="price-val">'+esc(String(an.price_max||0))+'</div><div class="price-lbl">Maximalpreis</div><div class="price-range">Geduld nötig</div></div></div>';if(an.price_reasoning)html+='<p style="font-size:.8rem;color:var(--mu);margin-top:8px;padding:0 4px;">'+esc(an.price_reasoning)+'</p>';html+='</div>';}
-      // Kurzbeschreibung
       if(an.short_desc)html+='<div class="section"><div class="section-title">Kurzbeschreibung</div>'+copyField(an.short_desc)+'</div>';
-      // Ausführliche Beschreibung
       if(an.long_desc)html+='<div class="section"><div class="section-title">Ausführliche Beschreibung</div>'+copyField(an.long_desc)+'</div>';
-      // Highlights
       if(an.bullet_points&&an.bullet_points.length){var bt=an.bullet_points.map(function(b){return'- '+b;}).join('\n');var allBid=storeText(bt);html+='<div class="section"><div class="section-title">Highlights <button class="copy-all-btn" data-cid="'+allBid+'">Alle kopieren</button></div><div class="bullet-list">';an.bullet_points.forEach(function(b){var bid=storeText(b);html+='<div class="bullet-item" data-cid="'+bid+'"><span class="bullet-dot">+</span><span class="bullet-text">'+esc(b)+'</span></div>';});html+='</div></div>';}
-      // Keywords
       if(an.keywords&&an.keywords.length){var allKwId=storeText(an.keywords.join(', '));html+='<div class="section"><div class="section-title">Keywords / Tags</div><div class="keywords">';an.keywords.forEach(function(k){var kid=storeText(k);html+='<span class="keyword" data-cid="'+kid+'">'+esc(k)+'</span>';});html+='</div><button class="copy-all-btn" data-cid="'+allKwId+'" style="margin-top:8px;">Alle Keywords kopieren</button></div>';}
-      // Marktvergleich
       if(an.market_comparison){var mc=an.market_comparison;html+='<div class="section"><div class="section-title">Marktvergleich'+(mc.platform?' – '+esc(mc.platform):'')+'</div>';if(mc.found&&mc.listings_count>0){html+='<div class="market-box"><div class="market-grid"><div class="market-stat"><div class="market-stat-val">'+esc(String(mc.price_range_min||0))+'</div><div class="market-stat-lbl">Niedrigster Preis</div></div><div class="market-stat"><div class="market-stat-val">'+esc(String(mc.price_avg||0))+'</div><div class="market-stat-lbl">Durchschnitt</div></div><div class="market-stat"><div class="market-stat-val">'+esc(String(mc.price_range_max||0))+'</div><div class="market-stat-lbl">Höchster Preis</div></div></div><div style="font-size:.78rem;color:var(--mu);margin-top:6px;">'+mc.listings_count+' Angebote gefunden</div>';if(mc.assessment)html+='<div class="market-assessment">'+esc(mc.assessment)+'</div>';html+='</div>';}else{html+='<div class="market-box not-found"><div class="market-note">'+esc(mc.note||'Keine Angebote gefunden.')+'</div></div>';}html+='</div>';}
-      // ── Authentizitäts-Score ──────────────────────────
       html += buildAuthSection(an);
-      // Zustand
       if(an.condition)html+='<div class="section"><div class="section-title">Zustand</div>'+copyField(an.condition)+'</div>';
-      // Tipps
       if(an.tips&&an.tips.length){html+='<div class="section"><div class="section-title">Verkaufstipps</div><div class="tip-list">';an.tips.forEach(function(t){html+='<div class="tip"><span>→</span><span>'+esc(t)+'</span></div>';});html+='</div></div>';}
     }
-    // ── Notizfeld + Neu analysieren
+
     html+='<div class="section"><div class="section-title">📝 Zusatzinfos / Korrektur</div><textarea id="notes-'+a.id+'" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:.85rem;font-family:var(--font);resize:vertical;min-height:64px;" placeholder="z.B. Tissot Ballade 39mm, Neupreis Euro 1025...">'+esc(a.notes||'')+'</textarea><button data-action="reanalyze" data-aid="'+a.id+'" id="reanalyze-btn-'+a.id+'" style="margin-top:8px;width:100%;padding:13px;background:#f0fdf4;border:1.5px solid var(--wa);border-radius:8px;color:#15803d;font-weight:800;font-size:.88rem;cursor:pointer;font-family:var(--font);">🔄 Neu analysieren mit diesen Infos</button><div style="font-size:.72rem;color:var(--mu);margin-top:6px;">Notizen eintragen → Neu analysieren → Ergebnis in ~30 Sek.</div></div>';
-    // LP Button
     try{html+=buildLPButton(a);}catch(e){}
     html+='</div>';
   });
@@ -400,44 +372,18 @@ function render(data){
   html+='</div>';
 
   document.getElementById('content').innerHTML=html;
-  // Business-Check: Neu-Analyse nur fuer Business-Kunden, max 3x
+
   if(!data.business_discount_id){
     document.querySelectorAll('[data-action="reanalyze"]').forEach(function(btn){
       var section=btn.closest('.section');if(section)section.style.display='none';
     });
-  } else {
+  }else{
     (data.articles||[]).forEach(function(a){
       var cnt=a.analysis_count||1;
       var btn=document.getElementById('reanalyze-btn-'+a.id);
       if(!btn)return;
-      if(cnt>=3){
-        btn.disabled=true;btn.style.background='#f3f4f6';
-        btn.style.color='#9ca3af';btn.style.cursor='not-allowed';
-        btn.removeAttribute('data-action');btn.removeAttribute('data-aid');
-        btn.textContent='🔄 Maximum erreicht (3/3)';
-      } else {
-        btn.textContent='🔄 Neu analysieren ('+cnt+'/3)';
-      }
-    });
-  }
-  // Business-Check: Neu-Analyse nur fuer Business-Kunden
-  if(!data.business_discount_id){
-    document.querySelectorAll('[data-action="reanalyze"]').forEach(function(btn){
-      var wrap=btn.closest('.section');if(wrap)wrap.style.display='none';
-    });
-  } else {
-    // Zähler anzeigen + deaktivieren bei 3
-    (data.articles||[]).forEach(function(a){
-      var cnt=a.analysis_count||1;
-      var btn=document.getElementById('reanalyze-btn-'+a.id);
-      if(!btn)return;
-      if(cnt>=3){
-        btn.disabled=true;btn.style.background='#f3f4f6';btn.style.color='#9ca3af';
-        btn.style.cursor='not-allowed';btn.textContent='🔄 Maximum erreicht (3/3)';
-        btn.removeAttribute('data-action');
-      } else {
-        btn.textContent='🔄 Neu analysieren ('+cnt+'/3)';
-      }
+      if(cnt>=3){btn.disabled=true;btn.style.background='#f3f4f6';btn.style.color='#9ca3af';btn.style.cursor='not-allowed';btn.removeAttribute('data-action');btn.removeAttribute('data-aid');btn.textContent='🔄 Maximum erreicht (3/3)';}
+      else{btn.textContent='🔄 Neu analysieren ('+cnt+'/3)';}
     });
   }
 
@@ -446,7 +392,6 @@ function render(data){
   });
   var pdfBtn=document.getElementById('pdfBtn');
   if(pdfBtn) pdfBtn.addEventListener('click',function(){window.open(API+'/api/vk/pdf/'+TOKEN,'_blank');});
-
 
   var pending=(data.articles||[]).filter(function(a){return a.status!=='analyzed';});
   if(data.status==='analyzing'||pending.length>0) setTimeout(loadResults,6000);
@@ -461,52 +406,28 @@ async function saveArticleTitle(input){var id=input.getAttribute('data-article-i
 
 async function deleteEmptyArticle(articleId){
   if(!confirm("Diesen leeren Artikel löschen?"))return;
-  try{
-    await fetch(API+"/api/vk/article/"+articleId,{method:"DELETE"});
-    var data=window._lastData;
-    data.articles=data.articles.filter(function(a){return a.id!==articleId;});
-    render(data);
-    showToast("✅ Artikel gelöscht");
-  }catch(e){showToast("❌ Fehler beim Löschen");}
+  try{await fetch(API+"/api/vk/article/"+articleId,{method:"DELETE"});var data=window._lastData;data.articles=data.articles.filter(function(a){return a.id!==articleId;});render(data);showToast("✅ Artikel gelöscht");}catch(e){showToast("❌ Fehler beim Löschen");}
 }
 
 async function saveNotesResult(articleId, notes) {
-  try { await fetch(API+'/api/vk/article/'+articleId+'/notes', {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({notes:notes})}); } catch(e) {}
+  try{await fetch(API+'/api/vk/article/'+articleId+'/notes',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({notes:notes})});}catch(e){}
 }
 
 async function reanalyzeArticle(articleId) {
   var notesEl = document.getElementById('notes-'+articleId);
   if(notesEl) await saveNotesResult(articleId, notesEl.value);
   var btn = document.getElementById('reanalyze-btn-'+articleId);
-  if(btn){ btn.disabled=true; btn.textContent='⏳ Analyse läuft... (~30 Sek.)'; }
-  try {
-    await fetch(API+'/api/vk/article/'+articleId+'/reanalyze', {method:'POST'});
+  if(btn){btn.disabled=true;btn.textContent='⏳ Analyse läuft... (~30 Sek.)';}
+  try{
+    await fetch(API+'/api/vk/article/'+articleId+'/reanalyze',{method:'POST'});
     var attempts=0;
-    await new Promise(function(r){setTimeout(r,4000);}); // warten bis status=pending
+    await new Promise(function(r){setTimeout(r,4000);});
     var interval=setInterval(async function(){
       attempts++;
-      try{
-        var r=await fetch(API+'/api/vk/results/'+TOKEN);
-        var data=await r.json();
-        var art=(data.articles||[]).find(function(a){return a.id===articleId;});
-        if(art && art.status==='analyzed'){
-          clearInterval(interval);
-          window._lastData=data;
-          render(data);
-          showToast('✅ Neu analysiert!');
-          return;
-        }
-      }catch(e){}
-      if(attempts>20){
-        clearInterval(interval);
-        if(btn){btn.disabled=false;btn.textContent='🔄 Neu analysieren mit diesen Infos';}
-        showToast('⏱ Dauert länger – Seite neu laden');
-      }
-    }, 3000);
-  } catch(e) {
-    if(btn){btn.disabled=false;btn.textContent='🔄 Neu analysieren mit diesen Infos';}
-    showToast('❌ Fehler: '+e.message);
-  }
+      try{var r=await fetch(API+'/api/vk/results/'+TOKEN);var data=await r.json();var art=(data.articles||[]).find(function(a){return a.id===articleId;});if(art&&art.status==='analyzed'){clearInterval(interval);window._lastData=data;render(data);showToast('✅ Neu analysiert!');return;}}catch(e){}
+      if(attempts>20){clearInterval(interval);if(btn){btn.disabled=false;btn.textContent='🔄 Neu analysieren mit diesen Infos';}showToast('⏱ Dauert länger – Seite neu laden');}
+    },3000);
+  }catch(e){if(btn){btn.disabled=false;btn.textContent='🔄 Neu analysieren mit diesen Infos';}showToast('❌ Fehler: '+e.message);}
 }
 </script>
 </body>
