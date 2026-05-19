@@ -3,144 +3,286 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Converdino Sandbox</title>
+<title>Converdino Dev Sandbox</title>
 <style>
+:root{--wa:#25D366;--dark:#1b4332;--bg:#f5f5f5;--card:#fff;--border:#e5e7eb;--mu:#6b7280;--r:12px;}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f5;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;}
-.card{background:#fff;border-radius:16px;padding:28px 24px;width:100%;max-width:480px;box-shadow:0 2px 12px rgba(0,0,0,.1);}
-.logo{font-size:1.3rem;font-weight:900;color:#2d7a4f;margin-bottom:2px;}
-.subtitle{font-size:.82rem;color:#9ca3af;margin-bottom:20px;}
-.section-label{font-size:.7rem;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;display:block;}
-input[type=password],input[type=tel]{width:100%;padding:11px 13px;border:1.5px solid #e5e7eb;border-radius:9px;font-size:.92rem;font-family:inherit;transition:border-color .2s;}
-input:focus{outline:none;border-color:#2d7a4f;}
-input.has-saved{border-color:#86efac !important;background:#f0fdf4;}
-.toggle-row{display:flex;gap:7px;align-items:flex-start;margin-bottom:4px;}
-.toggle-row input{flex:1;margin-bottom:0;}
-.toggle-btn{padding:11px 12px;background:#f3f4f6;border:1.5px solid #e5e7eb;border-radius:9px;cursor:pointer;font-size:.75rem;color:#6b7280;white-space:nowrap;height:44px;font-family:inherit;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);min-height:100vh;padding:20px 16px 40px;}
+h1{color:var(--dark);font-size:1.15rem;font-weight:900;margin-bottom:2px;}
+.subtitle{font-size:.8rem;color:var(--mu);margin-bottom:20px;}
+
+/* TABS */
+.tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
+.tab{padding:8px 16px;background:#fff;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:.82rem;font-weight:700;color:var(--mu);transition:all .2s;}
+.tab.active{background:var(--dark);border-color:var(--dark);color:#fff;}
+.tab:hover:not(.active){border-color:var(--dark);color:var(--dark);}
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* CARDS */
+.card{background:var(--card);border-radius:var(--r);border:1.5px solid var(--border);padding:18px;margin-bottom:14px;}
+.card-title{font-size:.72rem;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px;}
+
+/* FORM */
+label{display:block;font-size:.72rem;font-weight:700;color:var(--mu);margin-bottom:4px;margin-top:10px;}
+label:first-child{margin-top:0;}
+input,select,textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.88rem;font-family:inherit;background:#fff;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--wa);}
+input.has-saved{border-color:#86efac;background:#f0fdf4;}
+.row{display:flex;gap:8px;}
+.row input,.row select{flex:1;}
+.toggle-btn{padding:10px 12px;background:#f3f4f6;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:.75rem;color:var(--mu);white-space:nowrap;font-family:inherit;}
 .toggle-btn:hover{background:#e5e7eb;}
-.saved-badge{font-size:.7rem;color:#25D366;font-weight:700;margin-bottom:10px;display:none;}
+.saved-badge{font-size:.7rem;color:var(--wa);font-weight:700;margin-top:4px;display:none;}
 .saved-badge.active{display:block;}
-.divider{border:none;border-top:1px solid #f0f0f0;margin:16px 0;}
-
-/* BUSINESS */
-.biz-section{background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:13px;margin-bottom:14px;}
-.biz-label{font-size:.72rem;font-weight:800;color:#15803d;margin-bottom:7px;display:block;}
-.biz-section input{background:#fff;border-color:#86efac;margin-bottom:0;}
-.biz-section input.has-saved{background:#dcfce7 !important;border-color:#25D366 !important;}
-.biz-section .toggle-btn{background:#dcfce7;border-color:#86efac;color:#15803d;}
-.biz-section .saved-badge{margin-top:6px;margin-bottom:0;}
-.biz-hint{font-size:.7rem;color:#6b7280;margin-top:5px;}
-
-/* FOTO UPLOAD */
-.upload-section{background:#f9fafb;border:2px dashed #d1d5db;border-radius:10px;padding:16px;margin-bottom:14px;transition:border-color .2s;}
-.upload-section.drag-over{border-color:#25D366;background:#f0fdf4;}
-.upload-label{font-size:.72rem;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;display:block;}
-.upload-hint{font-size:.8rem;color:#9ca3af;text-align:center;margin-bottom:10px;}
-.upload-btn-row{display:flex;gap:8px;justify-content:center;}
-.upload-pick-btn{padding:8px 16px;background:#fff;border:1.5px solid #d1d5db;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit;color:#374151;}
-.upload-pick-btn:hover{border-color:#25D366;color:#15803d;}
-.photo-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
-.photo-thumb{position:relative;width:72px;height:72px;}
-.photo-thumb img{width:72px;height:72px;object-fit:cover;border-radius:7px;border:1.5px solid #e5e7eb;display:block;}
-.photo-remove{position:absolute;top:-6px;right:-6px;width:18px;height:18px;background:#ef4444;color:#fff;border:none;border-radius:50%;font-size:.65rem;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
-.photo-count{font-size:.75rem;color:#25D366;font-weight:700;margin-top:6px;text-align:center;}
-
-/* PROGRESS */
-.progress-box{background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:14px;margin-bottom:14px;display:none;}
-.progress-step{display:flex;align-items:center;gap:9px;font-size:.85rem;padding:4px 0;}
-.step-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0;}
-.step-wait{background:#e5e7eb;color:#9ca3af;}
-.step-active{background:#fef3c7;color:#d97706;animation:pulse .8s ease-in-out infinite;}
-.step-done{background:#dcfce7;color:#15803d;}
-.step-error{background:#fee2e2;color:#dc2626;}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
 
 /* BUTTONS */
-.btn-primary{display:block;width:100%;padding:14px;background:#2d7a4f;color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:800;cursor:pointer;font-family:inherit;transition:background .2s;margin-bottom:8px;}
-.btn-primary:hover{background:#245f3d;}
-.btn-primary:disabled{background:#9ca3af;cursor:not-allowed;}
-.btn-secondary{display:block;width:100%;padding:11px;background:#fff;border:1.5px solid #e5e7eb;color:#374151;border-radius:10px;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;text-align:center;text-decoration:none;}
-.btn-secondary:hover{border-color:#2d7a4f;color:#2d7a4f;}
-.error-box{background:#fee2e2;border-left:3px solid #dc2626;border-radius:6px;padding:10px 13px;font-size:.83rem;color:#991b1b;margin-top:10px;display:none;}
-.hint{font-size:.76rem;color:#9ca3af;margin-top:12px;text-align:center;line-height:1.5;}
+.btn{display:inline-block;padding:11px 20px;background:var(--dark);color:#fff;border:none;border-radius:9px;font-size:.88rem;font-weight:800;cursor:pointer;font-family:inherit;transition:background .2s;}
+.btn:hover{background:#245f3d;}
+.btn:disabled{background:#9ca3af;cursor:not-allowed;}
+.btn-full{display:block;width:100%;text-align:center;}
+.btn-wa{background:var(--wa);}
+.btn-wa:hover{background:#1da851;}
+.btn-sm{padding:7px 14px;font-size:.78rem;}
+.btn-outline{background:#fff;border:1.5px solid var(--dark);color:var(--dark);}
+.btn-outline:hover{background:#f0fdf4;}
+
+/* PHOTO UPLOAD */
+.drop-zone{border:2px dashed var(--border);border-radius:10px;padding:14px;text-align:center;transition:all .2s;cursor:pointer;}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--wa);background:#f0fdf4;}
+.drop-hint{font-size:.82rem;color:var(--mu);margin-bottom:8px;}
+.photo-grid{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px;}
+.thumb{position:relative;width:68px;height:68px;}
+.thumb img{width:100%;height:100%;object-fit:cover;border-radius:7px;border:1.5px solid var(--border);}
+.thumb-rm{position:absolute;top:-5px;right:-5px;width:17px;height:17px;background:#ef4444;color:#fff;border:none;border-radius:50%;font-size:.6rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 input[type=file]{display:none;}
+
+/* PROGRESS */
+.progress{background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:14px;margin:12px 0;display:none;}
+.p-step{display:flex;align-items:center;gap:8px;font-size:.83rem;padding:3px 0;}
+.p-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:800;flex-shrink:0;}
+.p-wait{background:#e5e7eb;color:#9ca3af;}
+.p-run{background:#fef3c7;color:#d97706;}
+.p-done{background:#dcfce7;color:#15803d;}
+.p-err{background:#fee2e2;color:#dc2626;}
+
+/* CHAT */
+.chat-wrap{border:1.5px solid var(--border);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;height:340px;}
+.chat-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:#f9fafb;}
+.msg{max-width:80%;padding:9px 12px;border-radius:10px;font-size:.85rem;line-height:1.5;}
+.msg-user{background:var(--wa);color:#fff;align-self:flex-end;border-radius:10px 10px 2px 10px;}
+.msg-bot{background:#fff;border:1.5px solid var(--border);align-self:flex-start;border-radius:10px 10px 10px 2px;}
+.msg-info{background:#fef3c7;font-size:.75rem;align-self:center;text-align:center;color:#92400e;padding:5px 10px;}
+.chat-input-row{display:flex;gap:8px;padding:10px;border-top:1px solid var(--border);background:#fff;}
+.chat-input{flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.85rem;font-family:inherit;}
+.chat-input:focus{outline:none;border-color:var(--wa);}
+.chat-send{padding:9px 16px;background:var(--wa);color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:.82rem;font-family:inherit;}
+.typing{color:var(--mu);font-size:.75rem;font-style:italic;padding:4px 12px;}
+
+/* OUTPUT */
+.output{background:#f9fafb;border:1px solid var(--border);border-radius:8px;padding:12px;font-size:.82rem;line-height:1.6;white-space:pre-wrap;max-height:300px;overflow-y:auto;margin-top:10px;}
+.output.success{background:#f0fdf4;border-color:#86efac;}
+.output.error{background:#fef2f2;border-color:#fecaca;color:#991b1b;}
+
+/* STATUS BADGES */
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:.7rem;font-weight:700;}
+.badge-green{background:#dcfce7;color:#15803d;}
+.badge-red{background:#fee2e2;color:#dc2626;}
+.badge-yellow{background:#fef3c7;color:#92400e;}
+
+/* LP LINKS */
+.lp-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.lp-row:last-child{border-bottom:none;}
+.lp-title{flex:1;font-size:.85rem;font-weight:700;min-width:120px;}
+.lp-url{font-size:.75rem;color:var(--mu);}
+
+.divider{border:none;border-top:1px solid var(--border);margin:14px 0;}
+.hint{font-size:.75rem;color:var(--mu);margin-top:8px;line-height:1.5;}
+.error-box{background:#fee2e2;border-left:3px solid #dc2626;border-radius:6px;padding:9px 12px;font-size:.82rem;color:#991b1b;margin-top:10px;display:none;}
 </style>
 </head>
 <body>
-<div class="card">
-  <div class="logo">🔧 Converdino Sandbox</div>
-  <div class="subtitle">Vollständiger Test ohne WhatsApp</div>
 
-  <!-- PASSWORT -->
-  <span class="section-label">Admin-Passwort</span>
-  <div class="toggle-row">
-    <input type="password" id="pw" placeholder="••••••••" autocomplete="off" data-lpignore="true">
-    <button class="toggle-btn" onclick="toggleSavePw()" id="pw-save-btn">💾 Merken</button>
-  </div>
-  <div id="pw-saved-badge" class="saved-badge">✅ Gespeichert</div>
+<h1>🔧 Converdino Dev Sandbox</h1>
+<div class="subtitle">Vollständiger Test ohne WhatsApp</div>
 
-  <div class="divider"></div>
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('report')">📊 Verkaufsreport</div>
+  <div class="tab" onclick="switchTab('bot')">🤖 LP Bot</div>
+  <div class="tab" onclick="switchTab('lp')">🌐 Landingpages</div>
+  <div class="tab" onclick="switchTab('prompt')">🧪 Prompt Test</div>
+  <div class="tab" onclick="switchTab('settings')">⚙️ Zugangsdaten</div>
+</div>
 
-  <!-- TEST-TELEFON -->
-  <span class="section-label">Test-Telefonnummer (optional)</span>
-  <input type="tel" id="phone" placeholder="z.B. 4367712345678" autocomplete="off"
-         oninput="localStorage.setItem('cvd_phone',this.value)" style="margin-bottom:14px;">
+<!-- ═══════════════════════════════════════════════════
+     TAB 1: VERKAUFSREPORT
+════════════════════════════════════════════════════ -->
+<div id="panel-report" class="panel active">
 
-  <!-- BUSINESS -->
-  <div class="biz-section">
-    <span class="biz-label">🏢 Business-Kunde testen</span>
-    <div class="toggle-row">
-      <input type="tel" id="biz-phone" placeholder="Business-Telefon" autocomplete="off">
-      <button class="toggle-btn" onclick="toggleSaveBiz()" id="biz-save-btn">💾 Merken</button>
+  <div class="card">
+    <div class="card-title">Session & Fotos</div>
+
+    <label>Business-Telefon <span style="color:var(--wa);font-size:.7rem;">→ 100% Rabatt = gratis analysieren</span></label>
+    <div class="row">
+      <input type="tel" id="r-biz" placeholder="z.B. 4367684949610" autocomplete="off">
+      <button class="toggle-btn" onclick="toggleBizReport()">💾 Merken</button>
     </div>
-    <div id="biz-saved-badge" class="saved-badge">✅ Business-Nummer gespeichert</div>
-    <div class="biz-hint">Mit 100% Rabatt → Analyse gratis & ohne Stripe</div>
-  </div>
+    <div id="r-biz-badge" class="saved-badge">✅ Gespeichert</div>
 
-  <!-- FOTOS -->
-  <div class="upload-section" id="drop-zone">
-    <span class="upload-label">📷 Fotos hochladen</span>
-    <div class="upload-hint">Fotos direkt hier hochladen – kein WhatsApp nötig</div>
-    <div class="upload-btn-row">
-      <button class="upload-pick-btn" onclick="document.getElementById('file-input').click()">📁 Fotos wählen</button>
-      <button class="upload-pick-btn" onclick="document.getElementById('cam-input').click()">📷 Kamera</button>
+    <label>Test-Telefon (optional, falls kein Business)</label>
+    <input type="tel" id="r-phone" placeholder="z.B. 4367712345678" autocomplete="off"
+           oninput="localStorage.setItem('cvd_phone',this.value)" style="margin-bottom:10px;">
+
+    <div class="divider"></div>
+
+    <label>📷 Produktfotos</label>
+    <div class="drop-zone" id="r-drop" onclick="document.getElementById('r-files').click()">
+      <div class="drop-hint">Fotos hierher ziehen oder klicken zum Auswählen (max. 15)</div>
+      <button class="btn btn-sm btn-outline" onclick="event.stopPropagation();document.getElementById('r-cam').click()" style="margin-top:6px;">📷 Kamera</button>
     </div>
-    <input type="file" id="file-input" accept="image/*" multiple onchange="addFiles(this.files)">
-    <input type="file" id="cam-input" accept="image/*" capture="environment" onchange="addFiles(this.files)">
-    <div class="photo-grid" id="photo-grid"></div>
-    <div class="photo-count" id="photo-count" style="display:none"></div>
+    <input type="file" id="r-files" accept="image/*" multiple onchange="addReportFiles(this.files)">
+    <input type="file" id="r-cam" accept="image/*" capture="environment" onchange="addReportFiles(this.files)">
+    <div class="photo-grid" id="r-grid"></div>
+    <div id="r-count" style="font-size:.75rem;color:var(--wa);font-weight:700;margin-top:6px;display:none;"></div>
   </div>
 
   <!-- PROGRESS -->
-  <div class="progress-box" id="progress-box">
-    <div class="progress-step" id="step-session">
-      <div class="step-icon step-wait" id="icon-session">1</div>
-      <span id="text-session">Session erstellen</span>
-    </div>
-    <div class="progress-step" id="step-photos">
-      <div class="step-icon step-wait" id="icon-photos">2</div>
-      <span id="text-photos">Fotos hochladen</span>
-    </div>
-    <div class="progress-step" id="step-analyze">
-      <div class="step-icon step-wait" id="icon-analyze">3</div>
-      <span id="text-analyze">Analyse starten</span>
-    </div>
-    <div class="progress-step" id="step-result">
-      <div class="step-icon step-wait" id="icon-result">4</div>
-      <span id="text-result">Zum Ergebnis</span>
+  <div class="progress" id="r-progress">
+    <div class="p-step"><div class="p-icon p-wait" id="pi-1">1</div><span id="pt-1">Session erstellen</span></div>
+    <div class="p-step"><div class="p-icon p-wait" id="pi-2">2</div><span id="pt-2">Fotos hochladen</span></div>
+    <div class="p-step"><div class="p-icon p-wait" id="pi-3">3</div><span id="pt-3">Analyse starten</span></div>
+    <div class="p-step"><div class="p-icon p-wait" id="pi-4">4</div><span id="pt-4">Ergebnis öffnen</span></div>
+  </div>
+
+  <button class="btn btn-full" id="r-btn" onclick="runReport()">🚀 Jetzt analysieren</button>
+  <div id="r-error" class="error-box"></div>
+  <div class="hint">Kein WhatsApp nötig. Business-Nummer mit 100% Rabatt = komplett gratis.</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     TAB 2: LP BOT TESTEN
+════════════════════════════════════════════════════ -->
+<div id="panel-bot" class="panel">
+  <div class="card">
+    <div class="card-title">Verhandlungs-Bot testen</div>
+
+    <label>Landingpage auswählen</label>
+    <select id="b-lp-select" onchange="lpSelected()">
+      <option value="">– LP laden...</option>
+    </select>
+    <div id="b-lp-info" style="font-size:.78rem;color:var(--mu);margin-top:5px;display:none;"></div>
+
+    <label style="margin-top:12px;">Oder: LP Slug direkt eingeben</label>
+    <div class="row">
+      <input type="text" id="b-slug" placeholder="z.B. adidas-samba-sneaker-abc12">
+      <button class="btn btn-sm" onclick="loadBotLP()">Laden</button>
     </div>
   </div>
 
-  <!-- BUTTONS -->
-  <button class="btn-primary" id="btn-analyze" onclick="runFullFlow()">
-    🚀 Session erstellen + analysieren
-  </button>
-  <a id="btn-bericht" class="btn-secondary" style="display:none" href="#">
-    📋 Nur Session erstellen → bericht.html
-  </a>
+  <div class="card" id="b-chat-card" style="display:none;padding:0;overflow:hidden;">
+    <div style="padding:12px 14px;background:var(--dark);color:#fff;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-weight:800;font-size:.9rem;" id="b-title">Bot</div>
+        <div style="font-size:.72rem;opacity:.7;" id="b-price-info"></div>
+      </div>
+      <button onclick="resetBot()" style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:6px;padding:5px 10px;font-size:.75rem;cursor:pointer;">Reset</button>
+    </div>
+    <div class="chat-wrap" style="border:none;border-radius:0;height:300px;">
+      <div class="chat-msgs" id="b-msgs">
+        <div class="msg msg-info">Schreib eine Nachricht um den Bot zu testen</div>
+      </div>
+      <div id="b-typing" class="typing" style="display:none;">Bot tippt...</div>
+      <div class="chat-input-row">
+        <input class="chat-input" id="b-input" placeholder="z.B. Würdest du für 200€ verkaufen?" onkeydown="if(event.key==='Enter')sendBotMsg()">
+        <button class="chat-send" onclick="sendBotMsg()">Senden</button>
+      </div>
+    </div>
+  </div>
+  <div class="hint">Testet den Verhandlungs-Bot direkt – ohne WhatsApp. Exakt wie ein echtes Kundengespräch.</div>
+</div>
 
-  <div id="error-box" class="error-box"></div>
-  <div class="hint" id="hint-text">Fotos hochladen → Analysieren klicken → Ergebnis öffnet automatisch</div>
+<!-- ═══════════════════════════════════════════════════
+     TAB 3: LANDINGPAGES
+════════════════════════════════════════════════════ -->
+<div id="panel-lp" class="panel">
+  <div class="card">
+    <div class="card-title">Aktive Landingpages</div>
+    <button class="btn btn-sm btn-outline" onclick="loadActiveLPs()" style="margin-bottom:12px;">🔄 Aktualisieren</button>
+    <div id="lp-list"><div style="color:var(--mu);font-size:.85rem;">Lade...</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">LP direkt öffnen / testen</div>
+    <label>Slug eingeben</label>
+    <div class="row">
+      <input type="text" id="lp-slug-input" placeholder="z.B. adidas-samba-abc12">
+      <button class="btn btn-sm" onclick="openLP()">Öffnen</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+      <button class="btn btn-sm btn-outline" onclick="openLPPage()">🌐 Produktseite</button>
+      <button class="btn btn-sm btn-outline" onclick="openLPLabel()">🏷 Etikett</button>
+      <button class="btn btn-sm btn-outline" onclick="openLPBuy()">💳 Checkout testen</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     TAB 4: PROMPT TEST
+════════════════════════════════════════════════════ -->
+<div id="panel-prompt" class="panel">
+  <div class="card">
+    <div class="card-title">Claude Vision – Artikel analysieren</div>
+    <label>Foto hochladen</label>
+    <div class="drop-zone" id="p-drop" onclick="document.getElementById('p-file').click()">
+      <div class="drop-hint">Foto klicken oder hierher ziehen</div>
+    </div>
+    <input type="file" id="p-file" accept="image/*" onchange="promptFileSelected(this.files[0])">
+    <div id="p-preview" style="margin-top:8px;display:none;">
+      <img id="p-img" style="height:120px;object-fit:cover;border-radius:8px;border:1.5px solid var(--border);">
+    </div>
+    <label style="margin-top:12px;">Zusatzinfos (optional)</label>
+    <textarea id="p-notes" rows="2" placeholder="z.B. Nike Air Max 90, Neupreis 120€, kaum getragen"></textarea>
+    <button class="btn btn-full" style="margin-top:10px;" id="p-btn" onclick="runPromptTest()">🧪 Analyse starten</button>
+  </div>
+
+  <div id="p-result-card" class="card" style="display:none;">
+    <div class="card-title">Analyse-Ergebnis</div>
+    <div id="p-result" class="output"></div>
+  </div>
+  <div class="hint">Testet den Claude Vision Prompt direkt – siehst du was der Analyse-Bot aus einem Foto macht.</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     TAB 5: EINSTELLUNGEN
+════════════════════════════════════════════════════ -->
+<div id="panel-settings" class="panel">
+  <div class="card">
+    <div class="card-title">Zugangsdaten (lokal gespeichert)</div>
+
+    <label>Admin-Passwort</label>
+    <div class="row">
+      <input type="password" id="s-pw" placeholder="••••••••" autocomplete="off">
+      <button class="toggle-btn" onclick="toggleSavePw()" id="s-pw-btn">💾 Merken</button>
+    </div>
+    <div id="s-pw-badge" class="saved-badge">✅ Passwort gespeichert</div>
+
+    <label style="margin-top:14px;">Business-Telefon</label>
+    <div class="row">
+      <input type="tel" id="s-biz" placeholder="z.B. 4367684949610" autocomplete="off">
+      <button class="toggle-btn" onclick="toggleSaveBiz()" id="s-biz-btn">💾 Merken</button>
+    </div>
+    <div id="s-biz-badge" class="saved-badge">✅ Business-Nummer gespeichert</div>
+
+    <div class="divider"></div>
+    <button class="btn btn-sm btn-outline" onclick="clearAll()">🗑 Alle gespeicherten Daten löschen</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">API Status</div>
+    <button class="btn btn-sm btn-outline" onclick="checkHealth()" style="margin-bottom:10px;">🔄 Server prüfen</button>
+    <div id="health-result" style="font-size:.83rem;color:var(--mu);">–</div>
+  </div>
 </div>
 
 <script>
@@ -149,281 +291,417 @@ var PW_KEY  = 'cvd_sandbox_pw';
 var PH_KEY  = 'cvd_phone';
 var BIZ_KEY = 'cvd_biz_phone';
 
-var selectedFiles = [];
-var currentToken  = null;
+var reportFiles = [];
+var botMsgs     = [];
+var botLP       = null;
+var promptFile  = null;
+var currentToken = null;
 
-/* ── localStorage Helpers ─────────────────────────────── */
-function setSavedStyle(inputId, badgeId, btnId, isSaved) {
-  var input = document.getElementById(inputId);
-  var badge = document.getElementById(badgeId);
-  var btn   = document.getElementById(btnId);
-  if (input) { if (isSaved) input.classList.add('has-saved'); else input.classList.remove('has-saved'); }
-  if (badge) { if (isSaved) badge.classList.add('active');    else badge.classList.remove('active'); }
-  if (btn)   btn.textContent = isSaved ? '🗑 Vergessen' : '💾 Merken';
+/* ═══════════════════════════════════════════════════════
+   TABS
+════════════════════════════════════════════════════════ */
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelector('[onclick="switchTab(\''+name+'\')"]').classList.add('active');
+  document.getElementById('panel-'+name).classList.add('active');
+  if (name === 'lp') loadActiveLPs();
+  if (name === 'bot') loadBotLPs();
 }
 
-function loadSavedValues() {
-  var pw = localStorage.getItem(PW_KEY);
-  if (pw) { var el = document.getElementById('pw'); if(el && el.value !== pw) el.value = pw; }
-  setSavedStyle('pw', 'pw-saved-badge', 'pw-save-btn', !!pw);
+/* ═══════════════════════════════════════════════════════
+   SAVED VALUES
+════════════════════════════════════════════════════════ */
+function setSaved(inputId, badgeId, btnId, isSaved) {
+  var el = document.getElementById(inputId);
+  var bd = document.getElementById(badgeId);
+  var bt = document.getElementById(btnId);
+  if (el) { if (isSaved) el.classList.add('has-saved'); else el.classList.remove('has-saved'); }
+  if (bd) { if (isSaved) bd.classList.add('active'); else bd.classList.remove('active'); }
+  if (bt) bt.textContent = isSaved ? '🗑 Vergessen' : '💾 Merken';
+}
 
-  var ph = localStorage.getItem(PH_KEY);
-  if (ph) { var el2 = document.getElementById('phone'); if(el2 && el2.value !== ph) el2.value = ph; }
-
+function loadAll() {
+  var pw  = localStorage.getItem(PW_KEY);
+  var ph  = localStorage.getItem(PH_KEY);
   var biz = localStorage.getItem(BIZ_KEY);
-  if (biz) { var el3 = document.getElementById('biz-phone'); if(el3 && el3.value !== biz) el3.value = biz; }
-  setSavedStyle('biz-phone', 'biz-saved-badge', 'biz-save-btn', !!biz);
+  ['s-pw','pw'].forEach(function(id){ var el=document.getElementById(id); if(el&&pw&&el.value!==pw) el.value=pw; });
+  ['s-biz','r-biz'].forEach(function(id){ var el=document.getElementById(id); if(el&&biz&&el.value!==biz) el.value=biz; });
+  var ph2=document.getElementById('r-phone'); if(ph2&&ph&&ph2.value!==ph) ph2.value=ph;
+  setSaved('s-pw','s-pw-badge','s-pw-btn',!!pw);
+  setSaved('s-biz','s-biz-badge','s-biz-btn',!!biz);
+  setSaved('r-biz','r-biz-badge',null,!!biz);
 }
+document.addEventListener('DOMContentLoaded',loadAll);
+window.addEventListener('load',loadAll);
+setTimeout(loadAll,300);setTimeout(loadAll,900);
 
-document.addEventListener('DOMContentLoaded', loadSavedValues);
-window.addEventListener('load', loadSavedValues);
-setTimeout(loadSavedValues, 300);
-setTimeout(loadSavedValues, 900);
-
-function toggleSavePw() {
-  var saved = localStorage.getItem(PW_KEY);
-  if (saved) { localStorage.removeItem(PW_KEY); setSavedStyle('pw', 'pw-saved-badge', 'pw-save-btn', false); }
-  else { var v = document.getElementById('pw').value.trim(); if (!v) { alert('Bitte Passwort eingeben'); return; } localStorage.setItem(PW_KEY, v); setSavedStyle('pw', 'pw-saved-badge', 'pw-save-btn', true); }
+function toggleSavePw(){
+  var s=localStorage.getItem(PW_KEY);
+  if(s){localStorage.removeItem(PW_KEY);setSaved('s-pw','s-pw-badge','s-pw-btn',false);}
+  else{var v=document.getElementById('s-pw').value.trim();if(!v){alert('Bitte Passwort eingeben');return;}localStorage.setItem(PW_KEY,v);setSaved('s-pw','s-pw-badge','s-pw-btn',true);}
 }
-
-function toggleSaveBiz() {
-  var saved = localStorage.getItem(BIZ_KEY);
-  if (saved) { localStorage.removeItem(BIZ_KEY); document.getElementById('biz-phone').value = ''; setSavedStyle('biz-phone', 'biz-saved-badge', 'biz-save-btn', false); }
-  else { var v = document.getElementById('biz-phone').value.trim(); if (!v) { alert('Bitte Business-Nummer eingeben'); return; } localStorage.setItem(BIZ_KEY, v); setSavedStyle('biz-phone', 'biz-saved-badge', 'biz-save-btn', true); }
+function toggleSaveBiz(){
+  var s=localStorage.getItem(BIZ_KEY);
+  if(s){localStorage.removeItem(BIZ_KEY);document.getElementById('s-biz').value='';setSaved('s-biz','s-biz-badge','s-biz-btn',false);}
+  else{var v=document.getElementById('s-biz').value.trim();if(!v){alert('Bitte Business-Nummer eingeben');return;}localStorage.setItem(BIZ_KEY,v);setSaved('s-biz','s-biz-badge','s-biz-btn',true);}
 }
-
-/* ── Foto Upload ──────────────────────────────────────── */
-var dropZone = document.getElementById('drop-zone');
-dropZone.addEventListener('dragover', function(e) { e.preventDefault(); dropZone.classList.add('drag-over'); });
-dropZone.addEventListener('dragleave', function() { dropZone.classList.remove('drag-over'); });
-dropZone.addEventListener('drop', function(e) { e.preventDefault(); dropZone.classList.remove('drag-over'); addFiles(e.dataTransfer.files); });
-
-function addFiles(files) {
-  for (var i = 0; i < files.length; i++) {
-    if (files[i].type.startsWith('image/') && selectedFiles.length < 15) {
-      selectedFiles.push(files[i]);
-    }
-  }
-  renderPhotos();
+function toggleBizReport(){
+  var s=localStorage.getItem(BIZ_KEY);
+  if(s){localStorage.removeItem(BIZ_KEY);document.getElementById('r-biz').value='';setSaved('r-biz','r-biz-badge',null,false);}
+  else{var v=document.getElementById('r-biz').value.trim();if(!v){alert('Bitte Business-Nummer eingeben');return;}localStorage.setItem(BIZ_KEY,v);setSaved('r-biz','r-biz-badge',null,true);}
 }
+function clearAll(){if(!confirm('Alle gespeicherten Daten löschen?'))return;localStorage.removeItem(PW_KEY);localStorage.removeItem(PH_KEY);localStorage.removeItem(BIZ_KEY);loadAll();alert('✅ Gelöscht');}
 
-function removePhoto(idx) {
-  selectedFiles.splice(idx, 1);
-  renderPhotos();
+/* ═══════════════════════════════════════════════════════
+   TAB 1: VERKAUFSREPORT
+════════════════════════════════════════════════════════ */
+var rDrop=null;
+document.addEventListener('DOMContentLoaded',function(){
+  rDrop=document.getElementById('r-drop');
+  rDrop.addEventListener('dragover',function(e){e.preventDefault();rDrop.classList.add('drag-over');});
+  rDrop.addEventListener('dragleave',function(){rDrop.classList.remove('drag-over');});
+  rDrop.addEventListener('drop',function(e){e.preventDefault();rDrop.classList.remove('drag-over');addReportFiles(e.dataTransfer.files);});
+});
+function addReportFiles(files){
+  for(var i=0;i<files.length;i++){if(files[i].type.startsWith('image/')&&reportFiles.length<15)reportFiles.push(files[i]);}
+  renderReportGrid();
 }
-
-function renderPhotos() {
-  var grid = document.getElementById('photo-grid');
-  var count = document.getElementById('photo-count');
-  grid.innerHTML = '';
-  selectedFiles.forEach(function(f, i) {
-    var url = URL.createObjectURL(f);
-    var wrap = document.createElement('div');
-    wrap.className = 'photo-thumb';
-    wrap.innerHTML = '<img src="'+url+'" alt="Foto '+(i+1)+'"><button class="photo-remove" onclick="removePhoto('+i+')">✕</button>';
-    grid.appendChild(wrap);
+function removeReportPhoto(i){reportFiles.splice(i,1);renderReportGrid();}
+function renderReportGrid(){
+  var g=document.getElementById('r-grid'),c=document.getElementById('r-count');
+  g.innerHTML='';
+  reportFiles.forEach(function(f,i){
+    var url=URL.createObjectURL(f);
+    var d=document.createElement('div');d.className='thumb';
+    d.innerHTML='<img src="'+url+'"><button class="thumb-rm" onclick="removeReportPhoto('+i+')">✕</button>';
+    g.appendChild(d);
   });
-  if (selectedFiles.length > 0) {
-    count.style.display = 'block';
-    count.textContent = selectedFiles.length + ' Foto' + (selectedFiles.length !== 1 ? 's' : '') + ' bereit';
-  } else {
-    count.style.display = 'none';
+  if(reportFiles.length>0){c.style.display='block';c.textContent=reportFiles.length+' Foto'+(reportFiles.length!==1?'s':'')+' bereit';}
+  else c.style.display='none';
+}
+function setStep(n,state,text){
+  var ic=document.getElementById('pi-'+n),tx=document.getElementById('pt-'+n);
+  ic.className='p-icon p-'+state;
+  ic.textContent=state==='done'?'✓':state==='err'?'✕':String(n);
+  if(text)tx.textContent=text;
+}
+function getPw(){return (localStorage.getItem(PW_KEY)||document.getElementById('s-pw').value||'').trim();}
+function showRError(msg){var el=document.getElementById('r-error');el.textContent='⚠️ '+msg;el.style.display='block';}
+function clearRError(){document.getElementById('r-error').style.display='none';}
+function fileToB64(file){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(e){res(e.target.result.split(',')[1]);};r.onerror=rej;r.readAsDataURL(file);});}
+
+async function runReport(){
+  var pw=getPw();
+  var biz=document.getElementById('r-biz').value.trim();
+  var phone=document.getElementById('r-phone').value.trim();
+  clearRError();
+  if(!pw){showRError('Bitte Passwort in ⚙️ Zugangsdaten eingeben.');return;}
+  if(!biz&&!phone){showRError('Business-Telefon oder Test-Telefon eingeben.');return;}
+
+  var btn=document.getElementById('r-btn');
+  btn.disabled=true;btn.textContent='⏳ Läuft...';
+  document.getElementById('r-progress').style.display='block';
+  if(phone)localStorage.setItem(PH_KEY,phone);
+
+  // Step 1: Session
+  setStep(1,'run','Session erstellen...');
+  try{
+    var r1=await fetch(API+'/api/vk/admin/new-session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pw,phone:biz||phone||undefined,business_phone:biz||undefined})});
+    var d1=await r1.json();if(!r1.ok)throw new Error(d1.error||'Session Fehler');
+    currentToken=d1.token;
+    setStep(1,'done','Session erstellt ✓');
+  }catch(e){setStep(1,'err',e.message);showRError(e.message);btn.disabled=false;btn.textContent='🚀 Jetzt analysieren';return;}
+
+  // Kein Foto → bericht.html
+  if(reportFiles.length===0){
+    setStep(2,'done','Keine Fotos – weiter via bericht.html');
+    setStep(3,'done','Manuell über bericht.html starten');
+    setStep(4,'run','Öffne bericht.html...');
+    setTimeout(function(){window.location.href='bericht.html?s='+currentToken;},800);
+    return;
   }
-}
 
-/* ── Progress Steps ───────────────────────────────────── */
-function setStep(step, state, text) {
-  var icon = document.getElementById('icon-' + step);
-  var textEl = document.getElementById('text-' + step);
-  icon.className = 'step-icon step-' + state;
-  icon.textContent = state === 'done' ? '✓' : state === 'error' ? '✕' : (step === 'session' ? '1' : step === 'photos' ? '2' : step === 'analyze' ? '3' : '4');
-  if (text) textEl.textContent = text;
-}
+  // Step 2: Session-ID + Artikel holen
+  setStep(2,'run','Setup...');
+  var sessionId=null,articleId=null;
+  try{
+    var rs=await fetch(API+'/api/vk/session/'+currentToken);
+    var ds=await rs.json();sessionId=ds.id;
+    var ra=await fetch(API+'/api/vk/article',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken,title:'Artikel 1'})});
+    var da=await ra.json();if(!ra.ok)throw new Error(da.error);articleId=da.article.id;
+  }catch(e){setStep(2,'err',e.message);showRError(e.message);btn.disabled=false;btn.textContent='🚀 Jetzt analysieren';return;}
 
-function showProgress() {
-  document.getElementById('progress-box').style.display = 'block';
-}
-
-/* ── Fehler ───────────────────────────────────────────── */
-function showError(msg) {
-  var el = document.getElementById('error-box');
-  el.textContent = '⚠️ ' + msg;
-  el.style.display = 'block';
-}
-function clearError() {
-  document.getElementById('error-box').style.display = 'none';
-}
-
-/* ── Bild → Base64 ────────────────────────────────────── */
-function fileToBase64(file) {
-  return new Promise(function(resolve, reject) {
-    var reader = new FileReader();
-    reader.onload = function(e) { resolve(e.target.result.split(',')[1]); };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-/* ── Haupt-Flow ───────────────────────────────────────── */
-async function runFullFlow() {
-  var pw       = document.getElementById('pw').value.trim();
-  var phone    = document.getElementById('phone').value.trim();
-  var bizPhone = document.getElementById('biz-phone').value.trim();
-
-  clearError();
-
-  if (!pw) { showError('Bitte Passwort eingeben.'); return; }
-
-  // Passwort auto-speichern
-  if (!localStorage.getItem(PW_KEY)) {
-    localStorage.setItem(PW_KEY, pw);
-    setSavedStyle('pw', 'pw-saved-badge', 'pw-save-btn', true);
+  // Fotos hochladen
+  var ok=0,fail=0;
+  for(var i=0;i<reportFiles.length;i++){
+    setStep(2,'run','Fotos hochladen ('+(i+1)+'/'+reportFiles.length+')...');
+    try{
+      var b64=await fileToB64(reportFiles[i]);
+      var rp=await fetch(API+'/api/vk/photo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({article_id:articleId,session_id:sessionId,image_base64:b64,content_type:reportFiles[i].type||'image/jpeg'})});
+      var dp=await rp.json();if(!rp.ok)fail++;else ok++;
+    }catch(e){fail++;}
   }
-  if (phone) localStorage.setItem(PH_KEY, phone);
+  if(ok===0){setStep(2,'err','Alle Fotos fehlgeschlagen!');showRError('Kein Foto hochladbar.');btn.disabled=false;btn.textContent='🚀 Jetzt analysieren';return;}
+  setStep(2,'done',ok+' Foto'+(ok!==1?'s':'')+' hochgeladen'+(fail>0?' ('+fail+' Fehler)':'')+' ✓');
 
-  var btn = document.getElementById('btn-analyze');
-  btn.disabled = true;
-  btn.textContent = '⏳ Läuft...';
-  showProgress();
+  // Step 3: Rabatt prüfen + Analyse
+  setStep(3,'run','Analyse starten...');
+  var free=false;
+  try{var rd=await fetch(API+'/api/vk/session/'+currentToken+'/discount');var dd=await rd.json();if(dd.has_discount&&dd.percent>=100)free=true;}catch(e){}
 
-  // ── SCHRITT 1: Session erstellen ──────────────────────
-  setStep('session', 'active', 'Session erstellen...');
-  try {
-    var r1 = await fetch(API + '/api/vk/admin/new-session', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: pw, phone: bizPhone || phone || undefined, business_phone: bizPhone || undefined })
+  if(free){
+    try{
+      var rf=await fetch(API+'/api/vk/business-free',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})});
+      var df=await rf.json();if(!rf.ok)throw new Error(df.error);
+      setStep(3,'done','Analyse gestartet (gratis) ✓');
+    }catch(e){setStep(3,'err','Fehler: '+e.message);showRError(e.message);}
+  }else{
+    setStep(3,'done','Kein 100%-Rabatt → Stripe via bericht.html');
+    setStep(4,'run','Öffne bericht.html...');
+    setTimeout(function(){window.location.href='bericht.html?s='+currentToken;},800);
+    btn.disabled=false;btn.textContent='🚀 Jetzt analysieren';
+    return;
+  }
+
+  // Step 4: ergebnis.html
+  setStep(4,'run','Öffne Ergebnis...');
+  setTimeout(function(){setStep(4,'done','Geöffnet ✓');window.location.href='ergebnis.html?s='+currentToken;},1500);
+}
+
+/* ═══════════════════════════════════════════════════════
+   TAB 2: LP BOT
+════════════════════════════════════════════════════════ */
+async function loadBotLPs(){
+  var sel=document.getElementById('b-lp-select');
+  try{
+    var r=await fetch(API+'/api/vk/admin/active-lps');
+    var data=await r.json();
+    sel.innerHTML='<option value="">– LP auswählen –</option>';
+    (data||[]).forEach(function(lp){
+      var opt=document.createElement('option');
+      opt.value=lp.slug;
+      opt.textContent=lp.title+' (€'+lp.sale_price+')';
+      opt.setAttribute('data-price',lp.sale_price);
+      opt.setAttribute('data-min',lp.min_price||'');
+      sel.appendChild(opt);
     });
-    var d1 = await r1.json();
-    if (!r1.ok) throw new Error(d1.error || 'Session Fehler');
-    currentToken = d1.token;
-    setStep('session', 'done', 'Session erstellt ✓');
-  } catch(e) {
-    setStep('session', 'error', 'Session Fehler: ' + e.message);
-    showError(e.message);
-    btn.disabled = false; btn.textContent = '🚀 Session erstellen + analysieren';
-    return;
-  }
-
-  // ── Wenn keine Fotos: direkt zu bericht.html ──────────
-  if (selectedFiles.length === 0) {
-    setStep('photos', 'done', 'Keine Fotos – manuell via bericht.html');
-    setStep('analyze', 'wait', 'Analyse über bericht.html starten');
-    setStep('result', 'active', 'Öffne bericht.html...');
-    setTimeout(function() { window.location.href = 'bericht.html?s=' + currentToken; }, 800);
-    return;
-  }
-
-  // ── SCHRITT 2: Fotos hochladen ────────────────────────
-  setStep('photos', 'active', 'Fotos hochladen (0/' + selectedFiles.length + ')...');
-
-  // Session-ID aus DB holen
-  var sessionId = null;
-  var articleId = null;
-  try {
-    var rSess = await fetch(API + '/api/vk/session/' + currentToken);
-    var dSess = await rSess.json();
-    sessionId = dSess.id;
-    // Artikel anlegen
-    var rArt = await fetch(API + '/api/vk/article', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: currentToken, title: 'Artikel 1' })
-    });
-    var dArt = await rArt.json();
-    if (!rArt.ok) throw new Error(dArt.error || 'Artikel Fehler');
-    articleId = dArt.article.id;
-  } catch(e) {
-    setStep('photos', 'error', 'Setup Fehler: ' + e.message);
-    showError(e.message);
-    btn.disabled = false; btn.textContent = '🚀 Session erstellen + analysieren';
-    return;
-  }
-
-  var uploaded = 0;
-  var failed = 0;
-  for (var i = 0; i < selectedFiles.length; i++) {
-    setStep('photos', 'active', 'Fotos hochladen (' + (i+1) + '/' + selectedFiles.length + ')...');
-    try {
-      var b64 = await fileToBase64(selectedFiles[i]);
-      var ct  = selectedFiles[i].type || 'image/jpeg';
-      var rp = await fetch(API + '/api/vk/photo', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ article_id: articleId, session_id: sessionId, image_base64: b64, content_type: ct })
-      });
-      var dp = await rp.json();
-      if (!rp.ok) { failed++; console.warn('Photo upload failed:', dp.error); }
-      else uploaded++;
-    } catch(e) { failed++; console.warn('Photo error:', e.message); }
-  }
-
-  if (uploaded === 0) {
-    setStep('photos', 'error', 'Alle Fotos fehlgeschlagen!');
-    showError('Kein Foto konnte hochgeladen werden.');
-    btn.disabled = false; btn.textContent = '🚀 Session erstellen + analysieren';
-    return;
-  }
-
-  setStep('photos', 'done', uploaded + ' Foto' + (uploaded !== 1 ? 's' : '') + ' hochgeladen' + (failed > 0 ? ' (' + failed + ' Fehler)' : '') + ' ✓');
-
-  // ── SCHRITT 3: Analyse starten ────────────────────────
-  setStep('analyze', 'active', 'Analyse starten...');
-
-  // Prüfen ob Business-Rabatt 100%
-  var hasFreeDiscount = false;
-  try {
-    var rDisc = await fetch(API + '/api/vk/session/' + currentToken + '/discount');
-    var dDisc = await rDisc.json();
-    if (dDisc.has_discount && dDisc.percent >= 100) hasFreeDiscount = true;
-  } catch(e) {}
-
-  if (hasFreeDiscount) {
-    try {
-      var rFree = await fetch(API + '/api/vk/business-free', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: currentToken })
-      });
-      var dFree = await rFree.json();
-      if (!rFree.ok) throw new Error(dFree.error || 'Analyse Fehler');
-      setStep('analyze', 'done', 'Analyse läuft (gratis) ✓');
-    } catch(e) {
-      setStep('analyze', 'error', 'Analyse Fehler: ' + e.message);
-      showError(e.message + ' → Trotzdem zu ergebnis.html');
-    }
-  } else {
-    // Kein 100% Rabatt → zu bericht.html für Zahlung
-    setStep('analyze', 'done', 'Kein 100% Rabatt → Zahlung über bericht.html');
-    setStep('result', 'active', 'Öffne bericht.html...');
-    setTimeout(function() { window.location.href = 'bericht.html?s=' + currentToken; }, 800);
-    return;
-  }
-
-  // ── SCHRITT 4: Ergebnis öffnen ────────────────────────
-  setStep('result', 'active', 'Öffne Ergebnis...');
-  setTimeout(function() {
-    setStep('result', 'done', 'Ergebnis geöffnet ✓');
-    window.location.href = 'ergebnis.html?s=' + currentToken;
-  }, 1200);
+  }catch(e){sel.innerHTML='<option>Fehler beim Laden</option>';}
 }
 
-/* ── Nur Session erstellen (kein Analyze) ─────────────── */
-document.addEventListener('DOMContentLoaded', function() {
-  var btn = document.getElementById('btn-bericht');
-  btn.style.display = 'block';
-  btn.addEventListener('click', function(e) {
-    e.preventDefault();
-    var pw = document.getElementById('pw').value.trim();
-    if (!pw) { showError('Bitte Passwort eingeben'); return; }
-    // Just use the analyze flow but it redirects if no photos
-    runFullFlow();
-  });
+function lpSelected(){
+  var sel=document.getElementById('b-lp-select');
+  var slug=sel.value;
+  if(!slug)return;
+  document.getElementById('b-slug').value=slug;
+  loadBotLP();
+}
+
+async function loadBotLP(){
+  var slug=document.getElementById('b-slug').value.trim();
+  if(!slug)return;
+  try{
+    var r=await fetch(API+'/api/vk/admin/active-lps');
+    var lps=await r.json();
+    botLP=lps.find(function(l){return l.slug===slug;})||{slug:slug,title:slug,sale_price:0,min_price:null,negotiation_level:'professional'};
+    document.getElementById('b-title').textContent=botLP.title||slug;
+    document.getElementById('b-price-info').textContent='Preis: €'+(botLP.sale_price||'?')+(botLP.min_price?' | Min: €'+botLP.min_price:'');
+    document.getElementById('b-chat-card').style.display='block';
+    resetBot();
+  }catch(e){alert('LP nicht gefunden');}
+}
+
+function resetBot(){
+  botMsgs=[];
+  var msgs=document.getElementById('b-msgs');
+  msgs.innerHTML='<div class="msg msg-info">Schreib eine Nachricht um den Bot zu testen</div>';
+  document.getElementById('b-input').value='';
+}
+
+async function sendBotMsg(){
+  if(!botLP){alert('Bitte zuerst eine LP laden');return;}
+  var inp=document.getElementById('b-input');
+  var text=inp.value.trim();
+  if(!text)return;
+  inp.value='';
+
+  // User msg anzeigen
+  addMsg(text,'user');
+  botMsgs.push({role:'user',content:text});
+
+  document.getElementById('b-typing').style.display='block';
+  try{
+    var r=await fetch(API+'/api/vk/admin/bot-sandbox',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lp_slug:botLP.slug,messages:botMsgs})});
+    var d=await r.json();
+    document.getElementById('b-typing').style.display='none';
+    var reply=d.reply||'(keine Antwort)';
+
+    // Payment Link erkennen
+    if(d.payment_link){
+      reply=reply.replace(/ZAHLUNG_LINK:\d+(\.\d+)?/g,'');
+      addMsg(reply.trim(),'bot');
+      addMsg('💳 Zahlungslink würde für €'+d.payment_link.amount+' generiert werden','info');
+    }else{
+      addMsg(reply,'bot');
+    }
+    botMsgs.push({role:'assistant',content:d.reply});
+  }catch(e){
+    document.getElementById('b-typing').style.display='none';
+    addMsg('Fehler: '+e.message,'info');
+  }
+}
+
+function addMsg(text,type){
+  var msgs=document.getElementById('b-msgs');
+  var div=document.createElement('div');
+  div.className='msg msg-'+(type==='user'?'user':type==='bot'?'bot':'info');
+  div.textContent=text;
+  msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('b-input').addEventListener('keydown',function(e){if(e.key==='Enter')sendBotMsg();});
 });
 
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') runFullFlow();
+/* ═══════════════════════════════════════════════════════
+   TAB 3: LANDINGPAGES
+════════════════════════════════════════════════════════ */
+async function loadActiveLPs(){
+  var list=document.getElementById('lp-list');
+  list.innerHTML='<div style="color:var(--mu);font-size:.85rem;">Lade...</div>';
+  try{
+    var r=await fetch(API+'/api/vk/admin/active-lps');
+    var data=await r.json();
+    if(!data||!data.length){list.innerHTML='<div style="color:var(--mu);font-size:.85rem;">Keine aktiven LPs</div>';return;}
+    list.innerHTML='';
+    data.forEach(function(lp){
+      var url='https://p.converdino.com/p/'+lp.slug;
+      var div=document.createElement('div');
+      div.className='lp-row';
+      div.innerHTML='<div class="lp-title">'+esc(lp.title)+'<br><span class="lp-url">'+lp.slug+'</span></div>'+
+        '<span style="font-weight:800;color:var(--wa);">€'+lp.sale_price+'</span>'+
+        '<a href="'+url+'" target="_blank" class="btn btn-sm btn-outline" style="text-decoration:none;">🌐 Öffnen</a>';
+      list.appendChild(div);
+    });
+  }catch(e){list.innerHTML='<div class="error-box" style="display:block;">Fehler: '+e.message+'</div>';}
+}
+
+function openLPPage(){var s=document.getElementById('lp-slug-input').value.trim();if(!s)return;window.open('https://p.converdino.com/p/'+s,'_blank');}
+function openLPLabel(){var s=document.getElementById('lp-slug-input').value.trim();if(!s)return;window.open(API+'/api/vk/lp/label/'+s,'_blank');}
+function openLPBuy(){var s=document.getElementById('lp-slug-input').value.trim();if(!s)return;window.open('https://p.converdino.com/p/'+s+'/buy','_blank');}
+function openLP(){openLPPage();}
+
+/* ═══════════════════════════════════════════════════════
+   TAB 4: PROMPT TEST
+════════════════════════════════════════════════════════ */
+var pDrop=null;
+document.addEventListener('DOMContentLoaded',function(){
+  pDrop=document.getElementById('p-drop');
+  pDrop.addEventListener('dragover',function(e){e.preventDefault();pDrop.classList.add('drag-over');});
+  pDrop.addEventListener('dragleave',function(){pDrop.classList.remove('drag-over');});
+  pDrop.addEventListener('drop',function(e){e.preventDefault();pDrop.classList.remove('drag-over');promptFileSelected(e.dataTransfer.files[0]);});
 });
+
+function promptFileSelected(file){
+  if(!file||!file.type.startsWith('image/'))return;
+  promptFile=file;
+  var img=document.getElementById('p-img');
+  img.src=URL.createObjectURL(file);
+  document.getElementById('p-preview').style.display='block';
+  pDrop.style.border='2px solid var(--wa)';
+}
+
+async function runPromptTest(){
+  if(!promptFile){alert('Bitte erst ein Foto auswählen');return;}
+  var btn=document.getElementById('p-btn');
+  btn.disabled=true;btn.textContent='⏳ Analysiere...';
+  var notes=document.getElementById('p-notes').value.trim();
+  var rc=document.getElementById('p-result-card');
+  var ro=document.getElementById('p-result');
+  rc.style.display='none';ro.className='output';ro.textContent='';
+
+  try{
+    // Bild als base64
+    var b64=await fileToB64(promptFile);
+    var ct=promptFile.type||'image/jpeg';
+
+    // Direkt Anthropic API via Server-Proxy (oder eigenen Endpoint bauen)
+    // Wir nutzen den photo-upload + analyze Flow via Admin-Analyze
+    var pw=getPw();
+    if(!pw){alert('Bitte Passwort in ⚙️ Zugangsdaten eingeben');btn.disabled=false;btn.textContent='🧪 Analyse starten';return;}
+
+    // Temp-Session erstellen
+    var rs=await fetch(API+'/api/vk/admin/new-session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pw,phone:'test'+Date.now()})});
+    var ds=await rs.json();if(!rs.ok)throw new Error(ds.error);
+    var token=ds.token;
+
+    // Session-ID holen + Artikel
+    var rss=await fetch(API+'/api/vk/session/'+token);
+    var dss=await rss.json();
+    var ra=await fetch(API+'/api/vk/article',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:token,title:'Prompt Test'})});
+    var da=await ra.json();
+
+    // Notizen speichern
+    if(notes&&da.article){
+      await fetch(API+'/api/vk/article/'+da.article.id+'/notes',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({notes:notes})});
+    }
+
+    // Foto hochladen
+    var rp=await fetch(API+'/api/vk/photo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({article_id:da.article.id,session_id:dss.id,image_base64:b64,content_type:ct})});
+    var dp=await rp.json();if(!rp.ok)throw new Error(dp.error);
+
+    // Analyse triggern
+    var ran=await fetch(API+'/api/vk/admin/analyze/'+dss.id,{method:'POST',headers:{'Content-Type':'application/json'}});
+    if(!ran.ok)throw new Error('Analyse-Start fehlgeschlagen');
+
+    // Polling bis done
+    rc.style.display='block';ro.textContent='Analysiere... (bis zu 30 Sek.)';
+    var attempts=0;
+    var interval=setInterval(async function(){
+      attempts++;
+      try{
+        var rr=await fetch(API+'/api/vk/results/'+token);
+        var dr=await rr.json();
+        if(dr.status==='done'&&dr.articles&&dr.articles[0]&&dr.articles[0].analysis){
+          clearInterval(interval);
+          var an=dr.articles[0].analysis;
+          var out='TITEL: '+esc2(an.title_short||'–')+'\n';
+          out+='PREIS: €'+an.price_recommended+' (€'+an.price_min+' – €'+an.price_max+')\n';
+          out+='ZUSTAND: '+esc2(an.condition||'–')+'\n\n';
+          out+='KURZBESCHREIBUNG:\n'+esc2(an.short_desc||'–')+'\n\n';
+          out+='HIGHLIGHTS:\n'+(an.bullet_points||[]).map(function(b){return'• '+b;}).join('\n')+'\n\n';
+          out+='PREISBEGRÜNDUNG:\n'+esc2(an.price_reasoning||'–')+'\n\n';
+          out+='KEYWORDS: '+(an.keywords||[]).join(', ')+'\n\n';
+          if(an.authenticity&&an.authenticity.score!==null)out+='AUTHENTIZITÄT: '+an.authenticity.score+'/100 ('+an.authenticity.verdict+')\n\n';
+          out+='RAW JSON:\n'+JSON.stringify(an,null,2);
+          ro.className='output success';ro.textContent=out;
+          btn.disabled=false;btn.textContent='🧪 Analyse starten';
+        }
+      }catch(e){}
+      if(attempts>20){clearInterval(interval);ro.className='output error';ro.textContent='Timeout – bitte nochmal versuchen';btn.disabled=false;btn.textContent='🧪 Analyse starten';}
+    },3000);
+  }catch(e){
+    rc.style.display='block';ro.className='output error';ro.textContent='Fehler: '+e.message;
+    btn.disabled=false;btn.textContent='🧪 Analyse starten';
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   EINSTELLUNGEN
+════════════════════════════════════════════════════════ */
+async function checkHealth(){
+  var el=document.getElementById('health-result');
+  el.textContent='Prüfe...';
+  try{
+    var r=await fetch(API+'/api/health');
+    var d=await r.json();
+    el.innerHTML='<span class="badge badge-green">✅ Online</span> '+d.version;
+  }catch(e){el.innerHTML='<span class="badge badge-red">❌ Offline</span> '+e.message;}
+}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function esc2(s){return String(s||'');}
 </script>
 </body>
 </html>
