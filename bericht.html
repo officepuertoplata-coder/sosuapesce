@@ -334,7 +334,7 @@ function buildLPToggle(a) {
   var lpRate = hasBot ? 1.00 : 0.40, lpCost = Math.round(days * lpRate * 100) / 100;
   var html = '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid #f3f4f6;margin-top:10px;cursor:pointer;" onclick="toggleLP(\'' + a.id + '\',' + booked + ')">';
   html += '<span style="font-size:.85rem;font-weight:700;color:' + (booked?'#15803d':'#6b7280') + ';">&#127760; Landingpage mitbuchen</span>';
-  html += '<input type="checkbox"' + (booked?' checked':'') + ' onclick="event.stopPropagation();toggleLP(\'' + a.id + '\',!' + booked + ')" style="width:16px;height:16px;accent-color:#25D366;">';
+  html += '<input type="checkbox"' + (booked?' checked':'') + ' onclick="event.stopPropagation();toggleLP(\'' + a.id + '\',' + booked + ')" style="width:16px;height:16px;accent-color:#25D366;">';
   html += '</div>';
   if (booked) {
     html += '<div style="background:#f0fdf4;border-radius:8px;padding:10px 12px;font-size:.82rem;">';
