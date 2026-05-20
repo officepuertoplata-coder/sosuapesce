@@ -127,7 +127,18 @@ function setArticleMode(id, mode) {
 }
 function getModeMultiplier() { return MODES[selectedMode] ? MODES[selectedMode].mult : 1; }
 function isMassUploadMode() { return selectedMode === 'abteilungsleiter' || selectedMode === 'experte'; }
-function setMode(mode) { selectedMode = mode; render(); }
+function setMode(mode) {
+  selectedMode = mode;
+  if (sessionData && sessionData.articles) {
+    var conflicts = sessionData.articles.filter(function(a) {
+      return articleModes[a.id] && articleModes[a.id] !== mode;
+    });
+    if (conflicts.length > 0) {
+      showToast('ℹ️ ' + conflicts.length + ' Position' + (conflicts.length > 1 ? 'en haben' : ' hat') + ' einen eigenen Modus — wird nicht geändert.');
+    }
+  }
+  render();
+}
 function getArticleDays(id) { return daysCache[id] || 3; }
 function setDays(id, days) { daysCache[id] = days; render(); }
 
@@ -177,22 +188,30 @@ function render() {
 }
 
 // ── Preisberechnung (pro Artikel) ────────────────────────────
-function calcArticleBase(a) {
+// Fixkosten pro Artikel (NICHT multipliziert)
+function calcArticleFixed(a) {
+  return (a.vk_photos || []).length > 0 ? 1.00 : 0;
+}
+// Variable Kosten (werden mit KI-Modus multipliziert)
+function calcArticleVariable(a) {
   var photos = (a.vk_photos || []).length;
   if (!photos) return 0;
-  var base = 1.00 + Math.max(0, photos - 1) * 0.25;
-  // Verfügbarkeit nur ohne LP berechnen — mit LP gratis inklusive
+  var v = Math.max(0, photos - 1) * 0.25;
   if (!a.lp_booked) {
     var days = getArticleDays(a.id);
-    base += Math.max(0, days - 3) / 7 * 1.00;
+    if (days > 3) v += Math.floor(days / 7) * 1.00;
   }
   if (a.lp_booked && (a.lp_days || 0) > 0) {
     var lpRate = a.lp_has_bot ? 1.00 : 0.40;
-    base += Math.round((a.lp_days || 7) * lpRate * 100) / 100;
+    v += Math.round((a.lp_days || 7) * lpRate * 100) / 100;
   }
-  return Math.round(base * 100) / 100;
+  return Math.round(v * 100) / 100;
 }
-function calcArticlePrice(a) { return Math.round(calcArticleBase(a) * getArticleModeMult(a.id) * 100) / 100; }
+// Gesamt pro Artikel: €1 fix + variable × KI-Modus
+function calcArticleBase(a) { return calcArticleFixed(a) + calcArticleVariable(a); }
+function calcArticlePrice(a) {
+  return Math.round((calcArticleFixed(a) + calcArticleVariable(a) * getArticleModeMult(a.id)) * 100) / 100;
+}
 function calcPrice(articles) {
   var total = 1.00;
   articles.forEach(function(a) { total += calcArticlePrice(a); });
@@ -286,7 +305,12 @@ function buildArticleModeSelector(a) {
     var active = current === d.key;
     html += '<button class="art-mode-chip' + (active ? ' ' + d.cls : '') + '" onclick="setArticleMode(\'' + a.id + '\',\'' + d.key + '\')">' + d.label + (active ? ' &#10003;' : '') + '</button>';
   });
-  html += '<span style="margin-left:auto;font-size:.7rem;color:#9ca3af;font-weight:700;">&times;' + mult + '</span>';
+  var aPrice = calcArticlePrice(a);
+  if (aPrice > 0) {
+    html += '<span style="margin-left:auto;font-size:.78rem;color:#2d7a4f;font-weight:800;">€' + aPrice.toFixed(2) + '</span>';
+  } else {
+    html += '<span style="margin-left:auto;font-size:.7rem;color:#9ca3af;font-weight:700;">&times;' + mult + '</span>';
+  }
   html += '</div>';
   return html;
 }
@@ -328,7 +352,7 @@ function buildDaySelector(a) {
   var current = getArticleDays(a.id);
   var html = '<div><div class="article-meta">Bericht verf&uuml;gbar:</div><div class="day-selector">';
   [3,7,14,21].forEach(function(d) {
-    var cost = d === 3 ? '3 Tage inkl.' : '+&euro;' + Math.round((d-3)/7) + '.00';
+    var cost = d === 3 ? '3 Tage inkl.' : '+&euro;' + Math.floor(d / 7) + '.00';
     html += '<button class="day-btn' + (current===d?' active':'') + '" onclick="setDays(\'' + a.id + '\',' + d + ')">' + d + ' Tage<span class="day-cost">' + cost + '</span></button>';
   });
   html += '</div></div>';
@@ -419,8 +443,17 @@ function buildPriceRows(articles, total) {
     if (photos > 0) {
       var aBase = calcArticleBase(a);
       var aPrice = calcArticlePrice(a);
+      var aFixed = calcArticleFixed(a);
+      var aVar = calcArticleVariable(a);
       html += '<div class="price-row" style="color:#9ca3af;font-size:.78rem;"><span>' + escHtml(a.title||'Artikel') + modeTag + '</span><span></span></div>';
-      if (aMult > 1) html += '<div class="price-row" style="color:#9ca3af;font-size:.75rem;"><span>&nbsp;&nbsp;Basis €' + aBase.toFixed(2) + ' &times; ' + aMult + '</span><span></span></div>';
+      html += '<div class="price-row" style="color:#9ca3af;font-size:.75rem;"><span>&nbsp;&nbsp;Artikelgeb&uuml;hr (fix)</span><span>€' + aFixed.toFixed(2) + '</span></div>';
+      if (aVar > 0) {
+        if (aMult > 1) {
+          html += '<div class="price-row" style="color:#9ca3af;font-size:.75rem;"><span>&nbsp;&nbsp;Analyseleistung €' + aVar.toFixed(2) + ' &times; ' + aMult + '</span><span>€' + (aVar * aMult).toFixed(2) + '</span></div>';
+        } else {
+          html += '<div class="price-row" style="color:#9ca3af;font-size:.75rem;"><span>&nbsp;&nbsp;Analyseleistung</span><span>€' + aVar.toFixed(2) + '</span></div>';
+        }
+      }
       html += '<div class="price-row"><span style="font-weight:700;">Gesamt f&uuml;r &bdquo;' + escHtml(a.title||'Artikel') + '&ldquo;</span><span style="font-weight:700;">€' + aPrice.toFixed(2) + '</span></div>';
     } else {
       html += '<div class="price-row" style="color:#9ca3af;"><span>' + escHtml(a.title||'Artikel') + ' – noch kein Foto</span><span>€0.00</span></div>';
