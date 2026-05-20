@@ -283,24 +283,6 @@ function buildArt(a,idx){
   if(pics.length>0)h+='<div style="font-size:.72rem;color:#9ca3af;margin-bottom:4px;">&#8596; Ziehen zum Sortieren &nbsp;|&nbsp; &#128065;/&#128683; LP ein/aus</div>';
     if(pics.length>0)h+='<div style="font-size:.72rem;color:#9ca3af;margin-bottom:4px;">&#8596; Ziehen zum Sortieren &nbsp;|&nbsp; &#128065;/&#128683; LP ein/aus</div>';
     h+='<div class="photo-row" id="pr-'+a.id+'" data-zid="'+a.id+'">'+photoHTML+addBtn+'</div>';
-  /* photo controls */
-  if(pics.length>0){
-    h+='<div class="photo-controls">';
-    pics.forEach((p,pi)=>{
-      var onLP=p.show_on_lp!==false;
-      h+='<div class="photo-ctrl">';
-      h+='<div class="photo-ord-row">';
-      if(pi>0)h+='<button class="ord-btn" onclick="movePhotoOrd(\''+a.id+'\','+pi+','+(pi-1)+')">&#8592;</button>';
-      else h+='<span style="width:20px"></span>';
-      h+='<span class="ord-num">'+(pi+1)+'</span>';
-      if(pi<pics.length-1)h+='<button class="ord-btn" onclick="movePhotoOrd(\''+a.id+'\','+pi+','+(pi+1)+')">&#8594;</button>';
-      h+='</div>';
-      h+='<button class="lp-vis-btn '+(onLP?'lp-vis-on':'lp-vis-off')+'" onclick="togPhotoLP(\''+p.id+'\','+onLP+')">'+(onLP?'&#128065; LP':'&#128683; LP')+'</button>';
-      h+='</div>';
-    });
-    h+='</div>';
-  }
-  /* notes */
   h+='<div style="font-size:.75rem;font-weight:600;color:#9ca3af;margin-bottom:4px;">&#8505;&#65039; Zusatzinfos f&uuml;r die KI (optional)</div>';
   h+='<textarea class="notes-ta" id="nt-'+a.id+'" placeholder="z.B. Gr&ouml;&szlig;e M, Baujahr 2019..." onblur="saveNotes(\''+a.id+'\',this.value)" oninput="notesCache[\''+a.id+'\']=this.value">'+esc(notes)+'</textarea>';
   /* footer */
@@ -450,8 +432,13 @@ function setupDrag(){
       if(tid===_dragSid){
         // Reorder within same article
         var wraps=Array.from(z.querySelectorAll('.photo-wrap'));
-        var dropX=e.clientX,ti=wraps.length;
-        for(var i=0;i<wraps.length;i++){var r=wraps[i].getBoundingClientRect();if(dropX<r.left+r.width/2){ti=i;break;}}
+        var dropX=e.clientX,dropY=e.clientY,ti=wraps.length;
+        for(var i=0;i<wraps.length;i++){
+          var r=wraps[i].getBoundingClientRect();
+          var sameRow=dropY>=r.top&&dropY<=r.bottom;
+          var aboveRow=dropY<r.top;
+          if(aboveRow||(sameRow&&dropX<r.left+r.width/2)){ti=i;break;}
+        }
         var ids=wraps.map(w=>w.dataset.pid);
         var fi=ids.indexOf(_dragPid);
         if(fi===-1||fi===ti)return;
