@@ -1151,33 +1151,44 @@ async function rtAnalyze() {
 }
 
 
-// ── LANDINGPAGES LIST ────────────────────────────────────────
-async async function loadLPsList() {
+
+// ── LANDINGPAGES LIST ──────────────────────────────────────
+async function loadLPsList() {
   var container = document.getElementById('lps-list-content');
   if (!container) return;
   container.innerHTML = '<div style="text-align:center;color:var(--mu);padding:20px;">Lade...</div>';
   try {
     var r = await fetch(API + '/api/vk/admin/active-lps');
     var lps = await r.json();
-    if (!lps || !lps.length) { container.innerHTML = '<div style="text-align:center;color:var(--mu);padding:30px;">Keine aktiven Landingpages</div>'; return; }
+    if (!lps || !lps.length) {
+      container.innerHTML = '<div style="text-align:center;color:var(--mu);padding:30px;">Keine aktiven Landingpages</div>';
+      return;
+    }
     var html = '<div style="display:grid;gap:12px;">';
     lps.forEach(function(lp) {
-      var url = 'https://p.converdino.com/p/' + lp.slug;
+      var slug = lp.slug || '';
+      var title = lp.title || slug;
+      var url = 'https://p.converdino.com/p/' + slug;
       var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=' + encodeURIComponent(url) + '&color=1b4332&bgcolor=ffffff&margin=6';
+      var priceTag = lp.sale_price ? ' &bull; <strong style="color:#15803d">&euro;' + parseFloat(lp.sale_price).toFixed(2) + '</strong>' : '';
+      var botTag = lp.has_bot ? ' &bull; &#129302; Bot' : '';
       html += '<div style="display:flex;align-items:center;gap:14px;background:#f9fafb;border:1.5px solid var(--border);border-radius:10px;padding:14px;">';
       html += '<img src="' + qrUrl + '" style="width:64px;height:64px;border-radius:6px;border:1px solid var(--border);flex-shrink:0;" alt="QR">';
       html += '<div style="flex:1;min-width:0;">';
-      html += '<div style="font-weight:800;font-size:.88rem;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(lp.title || lp.slug) + '</div>';
-      html += '<div style="font-size:.75rem;color:var(--mu);margin-bottom:6px;">' + esc(lp.slug) + (lp.sale_price ? ' &bull; <strong style=color:#15803d>&euro;' + parseFloat(lp.sale_price).toFixed(2) + '</strong>' : '') + (lp.has_bot ? ' &bull; &#129302; Bot' : '') + '</div>';
+      html += '<div style="font-weight:800;font-size:.88rem;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(title) + '</div>';
+      html += '<div style="font-size:.75rem;color:var(--mu);margin-bottom:6px;">' + esc(slug) + priceTag + botTag + '</div>';
       html += '<div style="display:flex;gap:6px;flex-wrap:wrap;">';
       html += '<a href="' + url + '" target="_blank" style="padding:4px 10px;background:var(--wa);color:#fff;border-radius:6px;font-size:.72rem;font-weight:700;text-decoration:none;">&#128279; &Ouml;ffnen</a>';
-      html += '<button onclick="navigator.clipboard&&navigator.clipboard.writeText('' + url + '').then(function(){showToast('&#10003; Kopiert!');})" style="padding:4px 10px;background:#f0fdf4;border:1px solid #86efac;color:#15803d;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:inherit;">Kopieren</button>';
-      if (lp.slug) html += '<button onclick="document.getElementById('sandbox-slug').value='' + esc(lp.slug) + '';switchSandboxTab('bot');resetSandbox();" style="padding:4px 10px;background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:inherit;">&#129302; Bot testen</button>';
+      var escapedSlug = slug.replace(/'/g, "\'");
+      html += '<button onclick="navigator.clipboard.writeText(\'' + url + '\').then(function(){showToast(\'&#10003; Kopiert!\');})" style="padding:4px 10px;background:#f0fdf4;border:1px solid #86efac;color:#15803d;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:inherit;">Kopieren</button>';
+      html += '<button onclick="document.getElementById(\'sandbox-slug\').value=\'' + escapedSlug + '\';switchSandboxTab(\'bot\');resetSandbox();" style="padding:4px 10px;background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:inherit;">&#129302; Bot testen</button>';
       html += '</div></div></div>';
     });
     html += '</div>';
     container.innerHTML = html;
-  } catch(e) { container.innerHTML = '<div style="color:var(--red);padding:16px;">Fehler: ' + e.message + '</div>'; }
+  } catch(e) {
+    container.innerHTML = '<div style="color:var(--red);padding:16px;">Fehler: ' + e.message + '</div>';
+  }
 }
 
 function showToast(msg) {
