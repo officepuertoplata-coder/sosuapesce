@@ -13,6 +13,7 @@ header{background:var(--wa);color:#fff;padding:16px 20px;}
 .header-inner{max-width:720px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
 .logo{font-weight:900;font-size:1.1rem;}
 .logo span{opacity:.8;font-size:.75rem;display:block;font-weight:600;}
+.role-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.2);border-radius:20px;padding:3px 10px;font-size:.72rem;font-weight:800;white-space:nowrap;}
 .main{max-width:720px;margin:0 auto;padding:16px;}
 .loading{text-align:center;padding:60px;color:var(--mu);}
 .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--wa);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px;}
@@ -71,6 +72,17 @@ header{background:var(--wa);color:#fff;padding:16px 20px;}
 .auth-positive{color:#059669;}
 .auth-negative{color:#dc2626;}
 .auth-disclaimer{font-size:.72rem;color:var(--mu);margin-top:10px;padding-top:8px;border-top:1px solid var(--border);}
+
+/* ── EXPERTE SEKTIONEN ── */
+.platform-list{display:flex;flex-direction:column;gap:8px;}
+.platform-item{display:flex;align-items:flex-start;gap:10px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:8px;padding:10px 12px;}
+.platform-icon{font-size:1.2rem;flex-shrink:0;}
+.platform-name{font-weight:800;font-size:.85rem;color:#15803d;}
+.platform-reason{font-size:.78rem;color:#374151;margin-top:2px;}
+.persona-box{background:#faf5ff;border:1.5px solid #e9d5ff;border-radius:10px;padding:14px 16px;font-size:.85rem;line-height:1.6;color:#374151;}
+.strategy-box{background:#fff7ed;border:1.5px solid #fed7aa;border-radius:10px;padding:14px 16px;font-size:.85rem;line-height:1.6;color:#374151;}
+.experte-badge{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border-radius:20px;padding:2px 10px;font-size:.68rem;font-weight:800;margin-left:6px;vertical-align:middle;}
+
 .lp-btn{display:flex;align-items:center;gap:8px;width:100%;padding:13px 16px;background:#f0fdf4;border:1.5px solid #25D366;border-radius:10px;color:#15803d;font-weight:800;font-size:.9rem;cursor:pointer;font-family:var(--font);margin-top:10px;transition:all .2s;border:none;}
 .lp-btn:hover{background:#dcfce7;}
 .lp-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:flex-end;justify-content:center;}
@@ -95,7 +107,10 @@ header{background:var(--wa);color:#fff;padding:16px 20px;}
 <header>
   <div class="header-inner">
     <div class="logo">Dein Verkaufsreport<span id="headerSub">Lade...</span></div>
-    <div id="deleteInfo" style="font-size:.78rem;opacity:.85;text-align:right;"></div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <div id="roleBadge" style="display:none;" class="role-badge"></div>
+      <div id="deleteInfo" style="font-size:.78rem;opacity:.85;text-align:right;"></div>
+    </div>
   </div>
 </header>
 <div class="main" id="content">
@@ -107,6 +122,17 @@ header{background:var(--wa);color:#fff;padding:16px 20px;}
 var API='https://converto-server-production.up.railway.app';
 var TOKEN=new URLSearchParams(location.search).get('s');
 var _store={},_storeIdx=0,_lpData={};
+
+// Rollen-Definitionen
+var ROLE_LABELS = {
+  sachbearbeiter:   { icon: '👤', label: 'Sachbearbeiter',   color: '#059669' },
+  abteilungsleiter: { icon: '📊', label: 'Abteilungsleiter', color: '#1d4ed8' },
+  experte:          { icon: '🎯', label: 'Experte',           color: '#7c3aed' }
+};
+
+function getAiMode() { return (window._lastData && window._lastData.ai_mode) || 'sachbearbeiter'; }
+function isExperte()  { return getAiMode() === 'experte'; }
+function hasLPAccess(){ return getAiMode() !== 'sachbearbeiter'; }
 
 function storeText(t){var id='c'+(++_storeIdx);_store[id]=t;return id;}
 function esc(s){if(!s&&s!==0)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -159,8 +185,44 @@ function buildAuthSection(an) {
   return html;
 }
 
-// ── LP Button & Modal ─────────────────────────────────────
-// ÄNDERUNG: Business-Sessions sehen LP-Button auch ohne lp_booked
+// ── EXPERTE: Plattformempfehlungen ────────────────────────────
+function buildPlatformsSection(an) {
+  if (!an.platforms || !an.platforms.length) return '';
+  var html = '<div class="section"><div class="section-title">🏪 Wo verkaufen <span class="experte-badge">🎯 Experte</span></div>';
+  html += '<div class="platform-list">';
+  an.platforms.forEach(function(p) {
+    var name = typeof p === 'string' ? p : (p.name || p.platform || '');
+    var reason = typeof p === 'object' ? (p.reason || p.why || '') : '';
+    var icon = {'ebay':'🛒','willhaben':'🏷️','chrono24':'⌚','ricardo':'🇨🇭','vinted':'👗','facebook':'📘','instagram':'📸','amazon':'📦'}[name.toLowerCase()] || '🏪';
+    html += '<div class="platform-item">';
+    html += '<div class="platform-icon">'+icon+'</div>';
+    html += '<div><div class="platform-name">'+esc(name)+'</div>';
+    if (reason) html += '<div class="platform-reason">'+esc(reason)+'</div>';
+    html += '</div></div>';
+  });
+  html += '</div></div>';
+  return html;
+}
+
+// ── EXPERTE: Käufer-Persona ───────────────────────────────────
+function buildPersonaSection(an) {
+  if (!an.buyer_persona) return '';
+  return '<div class="section"><div class="section-title">👥 Zielkäufer <span class="experte-badge">🎯 Experte</span></div>' +
+    '<div class="persona-box">'+esc(an.buyer_persona)+'</div></div>';
+}
+
+// ── EXPERTE: Verkaufsstrategie ────────────────────────────────
+function buildStrategySection(an) {
+  if (!an.sales_strategy) return '';
+  var id = storeText(an.sales_strategy);
+  return '<div class="section"><div class="section-title">📈 Verkaufsstrategie <span class="experte-badge">🎯 Experte</span></div>' +
+    '<div class="strategy-box" data-cid="'+id+'" style="cursor:pointer;">' +
+    esc(an.sales_strategy) +
+    '<button class="copy-btn" style="pointer-events:none;">Kopieren</button>' +
+    '</div></div>';
+}
+
+// ── LP Button (nur für Abteilungsleiter + Experte) ────────────
 function buildLPButton(article){
   try{
     var lp=_lpData[article.id];
@@ -168,7 +230,7 @@ function buildLPButton(article){
     var isBusiness=!!(window._lastData&&window._lastData.business_discount_id);
     var isAnalyzed=article.status==='analyzed'&&Object.keys(an).length>2;
 
-    // LP bereits aktiv → QR Code + Links anzeigen
+    // LP bereits aktiv → QR Code + Links anzeigen (immer, unabhängig von Rolle)
     if(lp&&lp.status==='active'){
       var url='https://p.converdino.com/p/'+lp.slug;
       var qrUrl='https://api.qrserver.com/v1/create-qr-code/?size=160x160&data='+encodeURIComponent(url)+'&color=1b4332&bgcolor=ffffff&margin=10';
@@ -176,7 +238,10 @@ function buildLPButton(article){
       return '<div style="margin-top:10px;padding:16px;background:#dcfce7;border:1.5px solid #25D366;border-radius:12px;"><div style="font-size:.8rem;font-weight:800;color:#15803d;margin-bottom:10px;">Landingpage aktiv</div><div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;"><div style="flex-shrink:0;text-align:center;"><img src="'+qrUrl+'" style="width:120px;height:120px;border-radius:8px;border:2px solid #86efac;display:block;" alt="QR Code"><div style="font-size:.68rem;color:#15803d;font-weight:700;margin-top:4px;">Scan &rarr; Produktseite</div></div><div style="flex:1;min-width:180px;"><a href="'+url+'" target="_blank" style="font-size:.82rem;color:#15803d;word-break:break-all;display:block;margin-bottom:10px;">'+url+'</a><div style="display:flex;flex-direction:column;gap:6px;"><button data-action="copy-lp" data-url="'+url+'" style="padding:8px 12px;background:#25D366;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:.8rem;text-align:left;">Link kopieren</button><a href="'+labelUrl+'" target="_blank" style="padding:8px 12px;background:#1b4332;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:.8rem;text-decoration:none;display:block;">Produktetikett drucken</a><button onclick="openUpdateLP(\''+lp.id+'\',\''+article.id+'\')" style="padding:6px 12px;background:#f0fdf4;border:1px solid #25D366;color:#15803d;border-radius:8px;font-size:.75rem;cursor:pointer;text-align:left;">✏️ Preis & Einstellungen aktualisieren</button><button data-action="deactivate-lp" data-lpid="'+lp.id+'" style="padding:6px 12px;background:none;border:1px solid #fecaca;color:#ef4444;border-radius:8px;font-size:.75rem;cursor:pointer;text-align:left;">Deaktivieren</button></div></div></div></div>';
     }
 
-    // LP Button: lp_booked (bezahlt) ODER Business-Session mit analysiertem Artikel
+    // ── LP-Button nur für Abt/Experte ─────────────────────────
+    if (!hasLPAccess()) return '';
+
+    // LP Button anzeigen wenn: lp_booked (bezahlt) ODER Business-Session + analysiert
     if(article.lp_booked||(isBusiness&&isAnalyzed)){
       window._lpModalData=window._lpModalData||{};
       window._lpModalData[article.id]={
@@ -267,10 +332,7 @@ function openUpdateLP(lpId, articleId){
   h+='<div id="upd-pickup-loc" style="margin-top:6px;'+(lp.delivery_pickup?'':'display:none;')+'"><label class="lp-modal-label">Abholort</label><input class="lp-modal-input" type="text" id="upd-location" value="'+esc(lp.pickup_location||'')+'"></div>';
   h+='<label class="lp-check-row"><input type="checkbox" id="upd-shipping" '+(lp.delivery_shipping?'checked':'')+' style="accent-color:#25D366;width:16px;height:16px;"> <span style="font-weight:700;">Versand möglich</span></label>';
   h+='<div id="upd-shipping-cost" style="margin-top:6px;'+(lp.delivery_shipping?'':'display:none;')+'"><label class="lp-modal-label">Versandkosten</label><input class="lp-modal-input" type="number" id="upd-ship-cost" min="0" step="0.01" value="'+(lp.shipping_cost||6.90)+'"></div>';
-  if(hasGoodScore){
-    h+='<label class="lp-modal-label">🔍 Authentizitäts-Badge</label>';
-    h+='<label class="lp-check-row" style="background:#f0fdf4;border:1.5px solid #86efac;"><input type="checkbox" id="upd-badge" '+(lp.show_score_badge?'checked':'')+' style="accent-color:#25D366;width:16px;height:16px;"><div><span style="font-weight:700;color:#15803d;">Score-Badge anzeigen ('+authScore+'/100)</span><div style="font-size:.72rem;color:#6b7280;margin-top:3px;">KI-generiert · Prüfung sichtbarer Merkmale · keine physische Prüfung</div></div></label>';
-  }
+  if(hasGoodScore){h+='<label class="lp-modal-label">🔍 Authentizitäts-Badge</label><label class="lp-check-row" style="background:#f0fdf4;border:1.5px solid #86efac;"><input type="checkbox" id="upd-badge" '+(lp.show_score_badge?'checked':'')+' style="accent-color:#25D366;width:16px;height:16px;"><div><span style="font-weight:700;color:#15803d;">Score-Badge anzeigen ('+authScore+'/100)</span><div style="font-size:.72rem;color:#6b7280;margin-top:3px;">KI-generiert · keine physische Prüfung</div></div></label>';}
   h+='<button class="lp-modal-btn" id="upd-modal-btn">Aktualisieren</button>';
   h+='<button id="upd-cancel" style="width:100%;padding:12px;background:none;border:none;color:#9ca3af;cursor:pointer;font-size:.85rem;margin-top:6px;">Abbrechen</button>';
   box.innerHTML=h;overlay.appendChild(box);document.body.appendChild(overlay);
@@ -286,20 +348,10 @@ async function updateLP(lpId, articleId, hasGoodScore){
   if(!price||price<=0){alert('Bitte Preis eingeben.');return;}
   btn.disabled=true;btn.textContent='Wird aktualisiert...';
   try{
-    var body={
-      sale_price:price,
-      min_price:parseFloat(document.getElementById('upd-minprice').value)||null,
-      stock_quantity:document.getElementById('upd-stock').value?parseInt(document.getElementById('upd-stock').value):null,
-      delivery_pickup:document.getElementById('upd-pickup').checked,
-      delivery_shipping:document.getElementById('upd-shipping').checked,
-      pickup_location:document.getElementById('upd-location').value.trim(),
-      shipping_cost:parseFloat(document.getElementById('upd-ship-cost').value)||0,
-      show_score_badge:hasGoodScore&&document.getElementById('upd-badge')&&document.getElementById('upd-badge').checked
-    };
+    var body={sale_price:price,min_price:parseFloat(document.getElementById('upd-minprice').value)||null,stock_quantity:document.getElementById('upd-stock').value?parseInt(document.getElementById('upd-stock').value):null,delivery_pickup:document.getElementById('upd-pickup').checked,delivery_shipping:document.getElementById('upd-shipping').checked,pickup_location:document.getElementById('upd-location').value.trim(),shipping_cost:parseFloat(document.getElementById('upd-ship-cost').value)||0,show_score_badge:hasGoodScore&&document.getElementById('upd-badge')&&document.getElementById('upd-badge').checked};
     var r=await fetch(API+'/api/vk/landingpage/'+lpId,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     var result=await r.json();if(!r.ok)throw new Error(result.error||'Fehler');
-    document.getElementById('lp-update-modal').remove();
-    _lpData[articleId]=result.landingpage;
+    document.getElementById('lp-update-modal').remove();_lpData[articleId]=result.landingpage;
     showToast('✅ Landingpage aktualisiert!');render(window._lastData);
   }catch(e){btn.disabled=false;btn.textContent='Aktualisieren';alert('Fehler: '+e.message);}
 }
@@ -319,46 +371,38 @@ async function loadResults(){
     var d=await r.json();
     if(!r.ok){
       var status=d.status;
-      if(status==='open'){
-        document.getElementById('content').innerHTML='<div class="loading"><div style="font-size:2.5rem;margin-bottom:12px;">📋</div><strong style="font-size:1.1rem;">Auftrag noch nicht abgeschlossen</strong><br><span style="color:var(--mu);font-size:.85rem;display:block;margin:8px 0 20px;">Bitte Fotos hochladen und Analyse starten.</span><a href="bericht.html?s='+TOKEN+'" style="display:inline-block;padding:13px 28px;background:var(--wa);color:#fff;border-radius:10px;text-decoration:none;font-weight:800;font-size:.95rem;">→ Zum Auftrag</a></div>';
-        return;
-      }
-      if(status==='analyzing'||status==='paid'){
-        document.getElementById('content').innerHTML='<div class="loading"><div class="spinner"></div><strong>Analyse läuft...</strong><br><span>Diese Seite aktualisiert sich automatisch.</span></div>';
-        setTimeout(loadResults,5000);return;
-      }
-      if(status==='error'){
-        document.getElementById('content').innerHTML='<div class="loading"><div style="font-size:2rem;margin-bottom:12px;">❌</div><strong>Analyse fehlgeschlagen</strong><br><span style="font-size:.82rem;color:var(--mu);">Bitte wende dich an den Support: office@ynhald.com</span></div>';
-        return;
-      }
-      if(status==='expired'){
-        document.getElementById('content').innerHTML='<div class="loading"><div style="font-size:2rem;margin-bottom:12px;">⏰</div><strong>Session abgelaufen</strong><br><span style="font-size:.82rem;color:var(--mu);">Dieser Link ist nicht mehr gültig.</span></div>';
-        return;
-      }
-      if(status==='deleted'){
-        document.getElementById('content').innerHTML='<div class="loading"><div style="font-size:2rem;margin-bottom:12px;">🗑</div><strong>Auftrag gelöscht</strong><br><span style="font-size:.82rem;color:var(--mu);">Dieser Auftrag wurde bereits gelöscht.</span></div>';
-        return;
-      }
-      document.getElementById('content').innerHTML='<div class="loading">Fehler: '+esc(d.error||'Unbekannt')+'</div>';
-      return;
+      if(status==='open'){document.getElementById('content').innerHTML='<div class="loading"><div style="font-size:2.5rem;margin-bottom:12px;">📋</div><strong style="font-size:1.1rem;">Auftrag noch nicht abgeschlossen</strong><br><span style="color:var(--mu);font-size:.85rem;display:block;margin:8px 0 20px;">Bitte Fotos hochladen und Analyse starten.</span><a href="bericht.html?s='+TOKEN+'" style="display:inline-block;padding:13px 28px;background:var(--wa);color:#fff;border-radius:10px;text-decoration:none;font-weight:800;font-size:.95rem;">→ Zum Auftrag</a></div>';return;}
+      if(status==='analyzing'||status==='paid'){document.getElementById('content').innerHTML='<div class="loading"><div class="spinner"></div><strong>Analyse läuft...</strong><br><span>Diese Seite aktualisiert sich automatisch.</span></div>';setTimeout(loadResults,5000);return;}
+      if(status==='error'){document.getElementById('content').innerHTML='<div class="loading"><div style="font-size:2rem;margin-bottom:12px;">❌</div><strong>Analyse fehlgeschlagen</strong><br><span style="font-size:.82rem;color:var(--mu);">Bitte wende dich an den Support: office@ynhald.com</span></div>';return;}
+      if(status==='expired'){document.getElementById('content').innerHTML='<div class="loading"><div style="font-size:2rem;margin-bottom:12px;">⏰</div><strong>Session abgelaufen</strong><br><span style="font-size:.82rem;color:var(--mu);">Dieser Link ist nicht mehr gültig.</span></div>';return;}
+      if(status==='deleted'){document.getElementById('content').innerHTML='<div class="loading"><div style="font-size:2rem;margin-bottom:12px;">🗑</div><strong>Auftrag gelöscht</strong><br><span style="font-size:.82rem;color:var(--mu);">Dieser Auftrag wurde bereits gelöscht.</span></div>';return;}
+      document.getElementById('content').innerHTML='<div class="loading">Fehler: '+esc(d.error||'Unbekannt')+'</div>';return;
     }
-    window._lastData=d;
-    window._sessionId=d.id;
+    window._lastData=d;window._sessionId=d.id;
     try{await loadLPData(d.articles||[]);}catch(e){}
     render(d);
-  }catch(e){
-    document.getElementById('content').innerHTML='<div class="loading">Verbindungsfehler: '+esc(e.message)+'</div>';
-  }
+  }catch(e){document.getElementById('content').innerHTML='<div class="loading">Verbindungsfehler: '+esc(e.message)+'</div>';}
 }
 
 function render(data){
   if(!data)return;
   window._lastData=data;
   var articles=data.articles||[];
+  var aiMode=data.ai_mode||'sachbearbeiter';
+  var roleInfo=ROLE_LABELS[aiMode]||ROLE_LABELS.sachbearbeiter;
   var deleteAt=data.delete_at?new Date(data.delete_at):null;
   var daysLeft=deleteAt?Math.ceil((deleteAt-Date.now())/(1000*60*60*24)):null;
+
+  // Header
   document.getElementById('headerSub').textContent=articles.length+' Artikel analysiert';
+  var roleBadge=document.getElementById('roleBadge');
+  if(roleBadge){
+    roleBadge.style.display='flex';
+    roleBadge.textContent=roleInfo.icon+' '+roleInfo.label;
+    roleBadge.style.background='rgba(255,255,255,.2)';
+  }
   if(deleteAt) document.getElementById('deleteInfo').textContent='Löschen in '+daysLeft+' Tagen ('+deleteAt.toLocaleDateString('de-AT')+')';
+
   var html='';
   if(daysLeft!==null&&daysLeft<=2) html+='<div class="delete-banner">Daten werden in <strong>'+daysLeft+' Tag(en)</strong> gelöscht.</div>';
 
@@ -381,19 +425,36 @@ function render(data){
         html+='<div class="section"><div style="padding:20px;text-align:center;"><div style="color:var(--mu);margin-bottom:12px;">Analyse ausstehend...</div><button onclick="deleteEmptyArticle(\''+a.id+'\')" style="background:none;border:1px solid #fecaca;color:#ef4444;border-radius:6px;padding:6px 14px;font-size:.78rem;cursor:pointer;font-family:var(--font);">🗑 Leeren Artikel löschen</button></div></div>';
       }
     }else{
+      // Titel-Varianten
       if(an.title_short||an.title_long||an.title_quick){html+='<div class="section"><div class="section-title">Titel-Varianten</div>';if(an.title_short)html+=copyField(an.title_short,'Kurztitel');if(an.title_long)html+=copyField(an.title_long,'Ausführlicher Titel');if(an.title_quick)html+=copyField(an.title_quick,'Quick-Sale Titel');html+='</div>';}
+      // Preis
       if(an.price_min||an.price_recommended||an.price_max){var p1=storeText(String(an.price_min||0)),p2=storeText(String(an.price_recommended||0)),p3=storeText(String(an.price_max||0));html+='<div class="section"><div class="section-title">Preisvorschlag</div><div class="price-grid"><div class="price-card" data-cid="'+p1+'"><div class="price-val">'+esc(String(an.price_min||0))+'</div><div class="price-lbl">Mindestpreis</div><div class="price-range">Quick-Sale</div></div><div class="price-card" data-cid="'+p2+'"><div class="price-val" style="font-size:1.4rem;">'+esc(String(an.price_recommended||0))+'</div><div class="price-lbl">Empfohlen</div><div class="price-range">Bestes Verhältnis</div></div><div class="price-card" data-cid="'+p3+'"><div class="price-val">'+esc(String(an.price_max||0))+'</div><div class="price-lbl">Maximalpreis</div><div class="price-range">Geduld nötig</div></div></div>';if(an.price_reasoning)html+='<p style="font-size:.8rem;color:var(--mu);margin-top:8px;padding:0 4px;">'+esc(an.price_reasoning)+'</p>';html+='</div>';}
+      // Beschreibungen
       if(an.short_desc)html+='<div class="section"><div class="section-title">Kurzbeschreibung</div>'+copyField(an.short_desc)+'</div>';
       if(an.long_desc)html+='<div class="section"><div class="section-title">Ausführliche Beschreibung</div>'+copyField(an.long_desc)+'</div>';
+      // Highlights
       if(an.bullet_points&&an.bullet_points.length){var bt=an.bullet_points.map(function(b){return'- '+b;}).join('\n');var allBid=storeText(bt);html+='<div class="section"><div class="section-title">Highlights <button class="copy-all-btn" data-cid="'+allBid+'">Alle kopieren</button></div><div class="bullet-list">';an.bullet_points.forEach(function(b){var bid=storeText(b);html+='<div class="bullet-item" data-cid="'+bid+'"><span class="bullet-dot">+</span><span class="bullet-text">'+esc(b)+'</span></div>';});html+='</div></div>';}
+      // Keywords
       if(an.keywords&&an.keywords.length){var allKwId=storeText(an.keywords.join(', '));html+='<div class="section"><div class="section-title">Keywords / Tags</div><div class="keywords">';an.keywords.forEach(function(k){var kid=storeText(k);html+='<span class="keyword" data-cid="'+kid+'">'+esc(k)+'</span>';});html+='</div><button class="copy-all-btn" data-cid="'+allKwId+'" style="margin-top:8px;">Alle Keywords kopieren</button></div>';}
+      // Marktvergleich
       if(an.market_comparison){var mc=an.market_comparison;html+='<div class="section"><div class="section-title">Marktvergleich'+(mc.platform?' – '+esc(mc.platform):'')+'</div>';if(mc.found&&mc.listings_count>0){html+='<div class="market-box"><div class="market-grid"><div class="market-stat"><div class="market-stat-val">'+esc(String(mc.price_range_min||0))+'</div><div class="market-stat-lbl">Niedrigster Preis</div></div><div class="market-stat"><div class="market-stat-val">'+esc(String(mc.price_avg||0))+'</div><div class="market-stat-lbl">Durchschnitt</div></div><div class="market-stat"><div class="market-stat-val">'+esc(String(mc.price_range_max||0))+'</div><div class="market-stat-lbl">Höchster Preis</div></div></div><div style="font-size:.78rem;color:var(--mu);margin-top:6px;">'+mc.listings_count+' Angebote gefunden</div>';if(mc.assessment)html+='<div class="market-assessment">'+esc(mc.assessment)+'</div>';html+='</div>';}else{html+='<div class="market-box not-found"><div class="market-note">'+esc(mc.note||'Keine Angebote gefunden.')+'</div></div>';}html+='</div>';}
+      // Authentizität
       html += buildAuthSection(an);
+      // Zustand
       if(an.condition)html+='<div class="section"><div class="section-title">Zustand</div>'+copyField(an.condition)+'</div>';
+      // Tipps
       if(an.tips&&an.tips.length){html+='<div class="section"><div class="section-title">Verkaufstipps</div><div class="tip-list">';an.tips.forEach(function(t){html+='<div class="tip"><span>→</span><span>'+esc(t)+'</span></div>';});html+='</div></div>';}
+
+      // ── EXPERTE Sektionen (erscheinen automatisch wenn Felder da sind) ──
+      html += buildPlatformsSection(an);
+      html += buildPersonaSection(an);
+      html += buildStrategySection(an);
     }
 
+    // Notizen + Neu analysieren
     html+='<div class="section"><div class="section-title">📝 Zusatzinfos / Korrektur</div><textarea id="notes-'+a.id+'" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:.85rem;font-family:var(--font);resize:vertical;min-height:64px;" placeholder="z.B. Tissot Ballade 39mm, Neupreis Euro 1025...">'+esc(a.notes||'')+'</textarea><button data-action="reanalyze" data-aid="'+a.id+'" id="reanalyze-btn-'+a.id+'" style="margin-top:8px;width:100%;padding:13px;background:#f0fdf4;border:1.5px solid var(--wa);border-radius:8px;color:#15803d;font-weight:800;font-size:.88rem;cursor:pointer;font-family:var(--font);">🔄 Neu analysieren mit diesen Infos</button><div style="font-size:.72rem;color:var(--mu);margin-top:6px;">Notizen eintragen → Neu analysieren → Ergebnis in ~30 Sek.</div></div>';
+
+    // LP Button (nur Abt/Experte)
     try{html+=buildLPButton(a);}catch(e){}
     html+='</div>';
   });
@@ -404,6 +465,7 @@ function render(data){
 
   document.getElementById('content').innerHTML=html;
 
+  // Reanalyze Buttons (nur für Business)
   if(!data.business_discount_id){
     document.querySelectorAll('[data-action="reanalyze"]').forEach(function(btn){
       var section=btn.closest('.section');if(section)section.style.display='none';
