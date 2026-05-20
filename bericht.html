@@ -188,8 +188,8 @@ function render() {
 }
 
 // ── Preisberechnung (pro Artikel) ────────────────────────────
-// Variable Kosten (werden mit KI-Modus multipliziert)
-function calcArticleVariable(a) {
+// Analysekosten (werden mit KI-Modus multipliziert - nur Analyse, nicht LP!)
+function calcAnalysisVar(a) {
   var photos = (a.vk_photos || []).length;
   if (!photos) return 0;
   var v = Math.max(0, photos - 1) * 0.25;
@@ -197,16 +197,19 @@ function calcArticleVariable(a) {
     var days = getArticleDays(a.id);
     if (days > 3) v += Math.floor(days / 7) * 1.00;
   }
-  if (a.lp_booked && (a.lp_days || 0) > 0) {
-    var lpRate = a.lp_has_bot ? 1.00 : 0.40;
-    v += Math.round((a.lp_days || 7) * lpRate * 100) / 100;
-  }
   return Math.round(v * 100) / 100;
 }
-// Gesamt pro Artikel: variable × KI-Modus (Auftragsgebühr gilt für den ganzen Auftrag)
-function calcArticleBase(a) { return calcArticleVariable(a); }
+// LP-Kosten (NICHT multipliziert - eigener Dienst)
+function calcLPCost(a) {
+  if (!a.lp_booked || !(a.lp_days || 0)) return 0;
+  var lpRate = a.lp_has_bot ? 1.00 : 0.40;
+  return Math.round((a.lp_days || 7) * lpRate * 100) / 100;
+}
+function calcArticleVariable(a) { return calcAnalysisVar(a); }
+function calcArticleBase(a) { return calcAnalysisVar(a) + calcLPCost(a); }
 function calcArticlePrice(a) {
-  return Math.round(calcArticleVariable(a) * getArticleModeMult(a.id) * 100) / 100;
+  if (!(a.vk_photos || []).length) return 0;
+  return Math.round(calcAnalysisVar(a) * getArticleModeMult(a.id) * 100) / 100 + calcLPCost(a);
 }
 function calcPrice(articles) {
   var total = 1.00;
@@ -316,16 +319,18 @@ function buildArticleHTML(a, idx) {
   html += '<div class="article-title-row">';
   html += '<span style="font-size:.85rem;color:#9ca3af;font-weight:700;">#' + (idx + 1) + '</span>';
   html += '<input class="article-title-input" type="text" value="' + escAttr(a.title || 'Artikel ' + (idx + 1)) + '" onblur="saveTitle(\'' + a.id + '\', this.value)" onkeydown="if(event.key===\'Enter\')this.blur()">';
-  if (photos.length > 0) html += '<span style="background:#f0fdf4;border:1px solid #86efac;color:#15803d;font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:10px;">' + photos.length + ' Foto' + (photos.length !== 1 ? 's' : '') + '</span>';
+  if (photos.length > 0) {
+    html += '<span style="background:#f0fdf4;border:1px solid #86efac;color:#15803d;font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:10px;">' + photos.length + ' Foto' + (photos.length !== 1 ? 's' : '') + '</span>';
+    var artTitlePrice = calcArticlePrice(a);
+    if (artTitlePrice > 0) html += '<span style="font-size:.9rem;font-weight:800;color:#2d7a4f;margin-left:4px;">&euro;' + artTitlePrice.toFixed(2) + '</span>';
+  }
   html += '</div>';
   html += buildArticleModeSelector(a);
   html += '<div class="photo-row" id="photos-' + a.id + '" data-zid="' + a.id + '">' + photoHTML + addBtn + '</div>';
   html += '<div id="progress-' + a.id + '"></div>';
   html += '<div class="info-fields"><div class="info-field-label">&#8505;&#65039; Zusatzinfos f&uuml;r die KI (optional)</div>';
   html += '<textarea class="info-field-textarea" id="notes-' + a.id + '" placeholder="z.B. Gr&ouml;&szlig;e M, Baujahr 2019..." onblur="saveNotes(\'' + a.id + '\', this.value)" oninput="notesCache[\'' + a.id + '\']=this.value">' + escHtml(notes) + '</textarea></div>';
-    var artPrice = calcArticlePrice(a);
-  var priceLabel = (a.vk_photos||[]).length > 0 ? '<div style="font-size:.95rem;font-weight:800;color:#2d7a4f;text-align:right;">&euro;' + artPrice.toFixed(2) + '</div>' : '';
-  html += '<div class="article-footer">' + buildDaySelector(a) + '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">' + priceLabel + '<button class="btn-delete-article" onclick="deleteArticle(\\\'' + a.id + '\\\')">&#128465; L&ouml;schen</button></div></div>';
+      html += '<div class="article-footer">' + buildDaySelector(a) + '<button class="btn-delete-article" onclick="deleteArticle(\\\'' + a.id + '\\\')">&#128465; L&ouml;schen</button></div>';
   html += buildLPToggle(a);
   html += '</div>';
   return html;
@@ -422,7 +427,7 @@ function buildLPToggle(a) {
 
 function buildPriceRows(articles, total) {
   var html = '';
-  html += '<div class="price-row"><span>Auftragsgebühr</span><span>€1.00</span></div>';
+  html += '<div class="price-row"><span style="font-weight:700;">Auftragsgebühr</span><span style="font-weight:700;">€1.00</span></div>';
   articles.forEach(function(a) {
     var photos = (a.vk_photos || []).length;
     var aMode = getArticleMode(a.id);
@@ -432,10 +437,16 @@ function buildPriceRows(articles, total) {
     if (photos > 0) {
       var aBase = calcArticleBase(a);
       var aPrice = calcArticlePrice(a);
-      var aVar = calcArticleVariable(a);
+      var aAn = calcAnalysisVar(a);
+      var aLP = calcLPCost(a);
       html += '<div class="price-row" style="color:#9ca3af;font-size:.78rem;"><span>' + escHtml(a.title||'Artikel') + modeTag + '</span><span></span></div>';
-      if (aVar > 0 && aMult > 1) {
-        html += '<div class="price-row" style="color:#9ca3af;font-size:.75rem;"><span>&nbsp;&nbsp;€' + aVar.toFixed(2) + ' &times; ' + aMult + '</span><span>€' + (Math.round(aVar * aMult * 100)/100).toFixed(2) + '</span></div>';
+      if (aAn > 0 && aMult > 1) {
+        html += '<div class="price-row" style="color:#9ca3af;font-size:.75rem;"><span>&nbsp;&nbsp;Analyse €' + aAn.toFixed(2) + ' &times; ' + aMult + '</span><span>€' + (Math.round(aAn * aMult * 100)/100).toFixed(2) + '</span></div>';
+      } else if (aAn > 0) {
+        html += '<div class="price-row" style="color:#9ca3af;font-size:.75rem;"><span>&nbsp;&nbsp;Analyse</span><span>€' + aAn.toFixed(2) + '</span></div>';
+      }
+      if (aLP > 0) {
+        html += '<div class="price-row" style="color:#9ca3af;font-size:.75rem;"><span>&nbsp;&nbsp;Landingpage</span><span>€' + aLP.toFixed(2) + '</span></div>';
       }
       html += '<div class="price-row"><span style="font-weight:700;">Gesamt f&uuml;r &bdquo;' + escHtml(a.title||'Artikel') + '&ldquo;</span><span style="font-weight:700;">€' + aPrice.toFixed(2) + '</span></div>';
     } else {
