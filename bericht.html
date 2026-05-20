@@ -33,6 +33,20 @@
   .hint-box { background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; font-size: .82rem; color: #15803d; line-height: 1.5; }
   .hint-box strong { display: block; margin-bottom: 4px; font-size: .85rem; }
 
+  /* ── BULK UPLOAD ZONE ── */
+  .bulk-zone { border: 2.5px dashed #86efac; border-radius: 12px; background: #f0fdf4; padding: 28px 20px; text-align: center; cursor: pointer; margin-bottom: 14px; transition: all .2s; }
+  .bulk-zone:hover, .bulk-zone.drag-over { border-color: #2d7a4f; background: #dcfce7; transform: scale(1.01); }
+  .bulk-zone-icon { font-size: 2.2rem; margin-bottom: 8px; }
+  .bulk-zone-title { font-weight: 800; font-size: .95rem; color: #15803d; margin-bottom: 4px; }
+  .bulk-zone-sub { font-size: .78rem; color: #6b7280; }
+  .bulk-progress { margin-top: 10px; background: #e5e7eb; border-radius: 6px; height: 6px; overflow: hidden; }
+  .bulk-progress-bar { height: 6px; background: #2d7a4f; border-radius: 6px; transition: width .3s; }
+
+  /* ── AUTO GROUP BUTTON ── */
+  .btn-autogroup { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px; border: 2px solid #7c3aed; border-radius: 10px; background: #faf5ff; color: #7c3aed; font-size: .88rem; font-weight: 800; cursor: pointer; font-family: inherit; transition: all .2s; margin-bottom: 12px; }
+  .btn-autogroup:hover { background: #ede9fe; border-color: #6d28d9; }
+  .btn-autogroup:disabled { opacity: .5; cursor: not-allowed; }
+
   .photo-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; min-height: 80px; padding: 4px; border-radius: 10px; transition: background .15s, box-shadow .15s; }
   .photo-row.drag-over { background: #f0fdf4; box-shadow: inset 0 0 0 2.5px #25D366; }
   .photo-wrap { position: relative; width: 72px; height: 72px; cursor: grab; user-select: none; -webkit-user-select: none; touch-action: none; transition: opacity .15s, transform .15s; border-radius: 8px; }
@@ -44,6 +58,9 @@
   .photo-add { width: 72px; height: 72px; border-radius: 8px; border: 2px dashed #d1d5db; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; color: #9ca3af; font-size: .7rem; text-align: center; background: #f9fafb; transition: border-color .2s; user-select: none; }
   .photo-add:hover { border-color: #2d7a4f; color: #2d7a4f; }
   .photo-add span { font-size: 1.5rem; line-height: 1; }
+
+  /* Photo count badge */
+  .photo-count-badge { display: inline-block; background: #f0fdf4; border: 1px solid #86efac; color: #15803d; font-size: .7rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: 6px; }
 
   #drag-ghost { position: fixed; pointer-events: none; z-index: 9999; width: 72px; height: 72px; border-radius: 10px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,.35); opacity: 0.85; display: none; border: 2px solid #25D366; transform: scale(1.1); }
   #drag-ghost img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -66,7 +83,6 @@
   .btn-delete-article { background: none; border: 1px solid #fecaca; color: #ef4444; border-radius: 6px; padding: 4px 10px; font-size: .75rem; cursor: pointer; font-family: inherit; transition: all .15s; flex-shrink: 0; margin-top: 4px; }
   .btn-delete-article:hover { background: #fee2e2; }
 
-  /* ── DAY SELECTOR ── */
   .day-selector { display: flex; gap: 5px; flex-wrap: wrap; }
   .day-btn { padding: 6px 10px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: .75rem; font-weight: 700; cursor: pointer; font-family: inherit; background: #f9fafb; color: #6b7280; transition: all .2s; text-align: center; line-height: 1.3; }
   .day-btn.active { border-color: #2d7a4f; background: #f0fdf4; color: #15803d; }
@@ -74,7 +90,6 @@
   .day-btn .day-cost { font-size: .62rem; font-weight: 600; display: block; color: #9ca3af; }
   .day-btn.active .day-cost { color: #059669; }
 
-  /* ── MODE SELECTOR ── */
   .mode-selector { display: flex; gap: 8px; margin-bottom: 16px; }
   .mode-btn { flex: 1; padding: 11px 6px; border: 2px solid #e5e7eb; border-radius: 10px; background: #f9fafb; cursor: pointer; text-align: center; font-family: inherit; transition: all .2s; }
   .mode-btn:hover { border-color: #86efac; background: #f0fdf4; }
@@ -84,6 +99,8 @@
   .mode-btn.active .mode-name { color: #15803d; }
   .mode-btn .mode-mult { font-size: .68rem; color: #9ca3af; display: block; margin-top: 2px; }
   .mode-btn.active .mode-mult { color: #059669; font-weight: 700; }
+  .mode-btn .mode-features { font-size: .62rem; color: #9ca3af; display: block; margin-top: 3px; line-height: 1.4; }
+  .mode-btn.active .mode-features { color: #059669; }
 
   .btn-add-position { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; border: 2px dashed #86efac; border-radius: 10px; background: #f0fdf4; color: #15803d; font-size: .92rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: all .2s; margin-bottom: 4px; }
   .btn-add-position:hover { background: #dcfce7; border-color: #2d7a4f; }
@@ -158,28 +175,23 @@ let sessionData    = null;
 let couponApplied  = null;
 let businessDiscount = null;
 const notesCache   = {};
-const daysCache    = {}; // Aufbewahrungstage pro Artikel (3–7)
-let selectedMode   = 'sachbearbeiter'; // Analysemodus
+const daysCache    = {};
+let selectedMode   = 'sachbearbeiter';
 
 // ── Modi ─────────────────────────────────────────────────────
 const MODES = {
-  sachbearbeiter:   { icon: '👤', label: 'Sachbearbeiter',   mult: 1, desc: 'Basis ×1' },
-  abteilungsleiter: { icon: '📊', label: 'Abteilungsleiter', mult: 2, desc: 'Standard ×2' },
-  experte:          { icon: '🎯', label: 'Experte',           mult: 4, desc: 'Premium ×4' }
+  sachbearbeiter:   { icon: '👤', label: 'Sachbearbeiter',   mult: 1, desc: 'Basis ×1',    features: 'Einzelfoto-Upload' },
+  abteilungsleiter: { icon: '📊', label: 'Abteilungsleiter', mult: 2, desc: 'Standard ×2', features: 'Massen-Upload + LP' },
+  experte:          { icon: '🎯', label: 'Experte',           mult: 4, desc: 'Premium ×4',  features: 'Massen-Upload + LP + Vollgutachten' }
 };
 
+function isMassUploadMode() { return selectedMode === 'abteilungsleiter' || selectedMode === 'experte'; }
 function getModeMultiplier() { return MODES[selectedMode]?.mult || 1; }
 function setMode(mode) { selectedMode = mode; render(); }
 
 // ── Tage ─────────────────────────────────────────────────────
 function getArticleDays(articleId) { return daysCache[articleId] || 3; }
-function setDays(articleId, days) {
-  daysCache[articleId] = days;
-  var price = calcPrice(sessionData.articles || []);
-  // Re-render only price area + day buttons for performance
-  // Simple: full render (session still in memory)
-  render();
-}
+function setDays(articleId, days) { daysCache[articleId] = days; render(); }
 
 // ── Drag State ────────────────────────────────────────────────
 let _dragPhotoId = null, _dragSrcId = null;
@@ -211,7 +223,6 @@ async function loadSession() {
       const dd = await dr.json();
       if (dd.has_discount) { businessDiscount = dd; }
     } catch(e) {}
-    // Modus aus Session laden falls gesetzt
     if (sessionData.ai_mode && MODES[sessionData.ai_mode]) {
       selectedMode = sessionData.ai_mode;
     }
@@ -251,6 +262,7 @@ function render() {
   document.getElementById('app').innerHTML = buildHTML(s, price);
   attachEvents();
   setupDragDrop();
+  setupBulkZone();
 }
 
 function getDisplayPrice(price) {
@@ -280,14 +292,38 @@ function buildModeSelector() {
         '<span class="mode-icon">' + m.icon + '</span>' +
         '<span class="mode-name">' + m.label + '</span>' +
         '<span class="mode-mult">' + m.desc + '</span>' +
+        '<span class="mode-features">' + m.features + '</span>' +
         '</button>';
     }).join('') +
     '</div>';
 }
 
+// ── Bulk Upload Zone (nur für Abt/Experte) ───────────────────
+function buildBulkZone(totalPhotos) {
+  if (!isMassUploadMode()) return '';
+  return [
+    '<div class="bulk-zone" id="bulk-zone" onclick="triggerBulkUpload()" ',
+    '  ondragover="event.preventDefault();document.getElementById(\'bulk-zone\').classList.add(\'drag-over\')" ',
+    '  ondragleave="document.getElementById(\'bulk-zone\').classList.remove(\'drag-over\')" ',
+    '  ondrop="handleBulkDrop(event)">',
+    '  <div class="bulk-zone-icon">📸</div>',
+    '  <div class="bulk-zone-title">Alle Fotos hier ablegen oder antippen</div>',
+    '  <div class="bulk-zone-sub">Beliebig viele Fotos auf einmal — KI gruppiert automatisch in Artikel</div>',
+    totalPhotos > 0 ? '<div style="margin-top:8px;font-size:.78rem;font-weight:700;color:#15803d;">✅ ' + totalPhotos + ' Foto(s) bereits hochgeladen</div>' : '',
+    '  <div id="bulk-progress-wrap" style="display:none;margin-top:10px;">',
+    '    <div class="bulk-progress"><div class="bulk-progress-bar" id="bulk-progress-bar" style="width:0%"></div></div>',
+    '    <div id="bulk-progress-label" style="font-size:.75rem;color:#6b7280;margin-top:4px;text-align:center;"></div>',
+    '  </div>',
+    '</div>',
+    totalPhotos > 0 ? '<button class="btn-autogroup" id="btn-autogroup" onclick="autoGroupPhotos()">🤖 Fotos automatisch gruppieren</button>' : ''
+  ].join('');
+}
+
 function buildHTML(s, price) {
   const articles = s.articles || [];
   const multiArticle = articles.length > 1;
+  const totalPhotos = articles.reduce(function(sum, a) { return sum + (a.vk_photos || []).length; }, 0);
+
   return [
     businessDiscount && businessDiscount.has_discount ? '<div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;font-size:.88rem;color:#15803d;font-weight:700;">🏢 Firmenrabatt aktiv: <strong>' + businessDiscount.percent + '% Rabatt</strong>' + (businessDiscount.company ? ' für ' + businessDiscount.company : '') + ' – wird automatisch angewendet</div>' : '',
 
@@ -301,11 +337,11 @@ function buildHTML(s, price) {
     '<div class="card">',
     '  <div class="card-title">Artikel & Fotos</div>',
     '  <div class="hint-box">',
-    '    <strong>📸 So bekommst du das beste Ergebnis:</strong>',
-    '    Fotografiere jeden Artikel aus verschiedenen Perspektiven: Vorderseite, Rückseite, Seiten, Details.',
-    '    Zeige Typenschilder, Beschriftungen, Seriennummern und Altersangaben.',
-    '    Je mehr Infos die KI sieht, desto besser der Verkaufstext.',
+    isMassUploadMode()
+      ? '<strong>📸 Massen-Upload aktiv:</strong>Lade alle Fotos auf einmal hoch. Die KI gruppiert sie automatisch in Artikelpositionen. Je mehr Fotos, desto bessere Analyse.'
+      : '<strong>📸 So bekommst du das beste Ergebnis:</strong>Fotografiere jeden Artikel aus verschiedenen Perspektiven: Vorderseite, Rückseite, Seiten, Details. Zeige Typenschilder und Seriennummern.',
     '  </div>',
+    buildBulkZone(totalPhotos),
     multiArticle ? '  <div class="drag-hint-bar">↔️ <span><strong>Foto verschieben:</strong> Foto auf anderen Artikel ziehen</span></div>' : '',
     articles.map(function(a, idx) { return buildArticleHTML(a, idx, multiArticle); }).join(''),
     '  <button class="btn-add-position" id="btn-add-pos" onclick="addPosition()">',
@@ -339,7 +375,8 @@ function buildDaySelector(articleId) {
 
 function buildArticleHTML(a, idx, multiArticle) {
   const photos = a.vk_photos || [];
-  const canAdd = photos.length < 4;
+  // ── Kein Fotolimit mehr ──────────────────────────────────────
+  const canAdd = true;
 
   const photoHTML = photos.map(function(p) {
     return [
@@ -351,7 +388,12 @@ function buildArticleHTML(a, idx, multiArticle) {
   }).join('');
 
   const addBtn = canAdd
-    ? '<div class="photo-add" onclick="triggerUpload(\'' + a.id + '\', ' + photos.length + ')"><span>+</span>' + (photos.length === 0 ? 'Fotos' : 'Mehr') + '</div>'
+    ? '<div class="photo-add" onclick="triggerUpload(\'' + a.id + '\')">' +
+      '<span>+</span>' + (photos.length === 0 ? 'Fotos' : 'Mehr') + '</div>'
+    : '';
+
+  const photoCountBadge = photos.length > 0
+    ? '<span class="photo-count-badge">' + photos.length + ' Foto' + (photos.length !== 1 ? 's' : '') + '</span>'
     : '';
 
   const notes = notesCache[a.id] !== undefined ? notesCache[a.id] : (a.notes || '');
@@ -364,6 +406,7 @@ function buildArticleHTML(a, idx, multiArticle) {
     '      onblur="saveTitle(\'' + a.id + '\', this.value)"',
     '      onkeydown="if(event.key===\'Enter\')this.blur()"',
     '      placeholder="Artikelbezeichnung..." />',
+    photoCountBadge,
     '  </div>',
     '  <div class="photo-row" id="photos-' + a.id + '" data-zid="' + a.id + '">',
     photoHTML,
@@ -387,7 +430,117 @@ function buildArticleHTML(a, idx, multiArticle) {
   ].join('\n');
 }
 
-// ── Drag & Drop ───────────────────────────────────────────────
+// ── Bulk Upload ───────────────────────────────────────────────
+function setupBulkZone() {
+  // Already handled via inline ondrop/ondragover
+}
+
+function triggerBulkUpload() {
+  var inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'image/*';
+  inp.multiple = true;
+  inp.onchange = async function() {
+    if (!inp.files || inp.files.length === 0) return;
+    await handleBulkFiles(Array.from(inp.files));
+  };
+  inp.click();
+}
+
+function handleBulkDrop(event) {
+  event.preventDefault();
+  document.getElementById('bulk-zone').classList.remove('drag-over');
+  var files = Array.from(event.dataTransfer.files).filter(function(f) { return f.type.startsWith('image/'); });
+  if (!files.length) { showToast('❌ Nur Bilder erlaubt'); return; }
+  handleBulkFiles(files);
+}
+
+async function handleBulkFiles(files) {
+  showToast('⏳ ' + files.length + ' Fotos werden hochgeladen...');
+
+  var wrap = document.getElementById('bulk-progress-wrap');
+  var bar = document.getElementById('bulk-progress-bar');
+  var label = document.getElementById('bulk-progress-label');
+  if (wrap) wrap.style.display = 'block';
+
+  // Sicherstellen dass mindestens 1 Artikel existiert
+  var articles = sessionData.articles || [];
+  if (!articles.length) {
+    var btn = document.getElementById('btn-add-pos');
+    if (btn) { btn.disabled = true; }
+    try {
+      var res = await fetch(API + '/api/vk/article', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: sessionToken, title: 'Artikel 1' }) });
+      var r2 = await fetch(API + '/api/vk/session/' + sessionToken);
+      sessionData = await r2.json();
+      articles = sessionData.articles || [];
+    } catch(e) { showToast('❌ Fehler beim Erstellen: ' + e.message); return; }
+  }
+
+  var targetArticleId = articles[0].id;
+  var errors = 0;
+
+  for (var i = 0; i < files.length; i++) {
+    try {
+      var base64 = await new Promise(function(resolve, reject) {
+        var reader = new FileReader();
+        reader.onload = function() { resolve(reader.result.split(',')[1]); };
+        reader.onerror = reject;
+        reader.readAsDataURL(files[i]);
+      });
+      var uploadRes = await fetch(API + '/api/vk/photo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ article_id: targetArticleId, session_id: sessionData.id, image_base64: base64, content_type: files[i].type || 'image/jpeg' })
+      });
+      if (!uploadRes.ok) throw new Error('Upload fehlgeschlagen');
+    } catch(e) { errors++; }
+
+    var pct = Math.round(((i + 1) / files.length) * 100);
+    if (bar) bar.style.width = pct + '%';
+    if (label) label.textContent = (i + 1) + ' / ' + files.length + ' hochgeladen' + (errors > 0 ? ' (' + errors + ' Fehler)' : '');
+  }
+
+  var r3 = await fetch(API + '/api/vk/session/' + sessionToken);
+  sessionData = await r3.json();
+  render();
+
+  if (errors > 0) {
+    showToast('⚠️ ' + (files.length - errors) + '/' + files.length + ' Fotos hochgeladen');
+  } else {
+    showToast('✅ ' + files.length + ' Fotos hochgeladen! KI-Gruppierung starten?');
+  }
+}
+
+// ── Auto-Gruppierung ──────────────────────────────────────────
+async function autoGroupPhotos() {
+  var btn = document.getElementById('btn-autogroup');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ KI analysiert Fotos...'; }
+
+  try {
+    var res = await fetch(API + '/api/vk/auto-group', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: sessionToken, ai_mode: selectedMode })
+    });
+
+    if (res.ok) {
+      var data = await res.json();
+      showToast('✅ ' + (data.groups || 0) + ' Artikel erkannt!');
+      var r2 = await fetch(API + '/api/vk/session/' + sessionToken);
+      sessionData = await r2.json();
+      render();
+    } else {
+      // API noch nicht verfügbar
+      showToast('⚠️ Auto-Gruppierung folgt in Kürze');
+      if (btn) { btn.disabled = false; btn.textContent = '🤖 Fotos automatisch gruppieren'; }
+    }
+  } catch(e) {
+    showToast('⚠️ Auto-Gruppierung folgt in Kürze');
+    if (btn) { btn.disabled = false; btn.textContent = '🤖 Fotos automatisch gruppieren'; }
+  }
+}
+
+// ── Drag & Drop (zwischen Artikeln) ──────────────────────────
 function setupDragDrop() {
   var ghost = document.getElementById('drag-ghost');
   var ghostImg = document.getElementById('drag-ghost-img');
@@ -475,17 +628,15 @@ async function movePhoto(photoId, targetArticleId, sourceArticleId) {
 
 // ── Preisberechnung ───────────────────────────────────────────
 function calcSubtotal(articles) {
-  var sub = 1.00; // Auftragsgebühr
+  var sub = 1.00;
   articles.forEach(function(a) {
     var photos = (a.vk_photos || []).length;
     if (photos > 0) {
-      sub += 1.00; // Artikel + 1 Foto
-      sub += Math.max(0, photos - 1) * 0.25; // Weitere Fotos
+      sub += 1.00;
+      sub += Math.max(0, photos - 1) * 0.25;
     }
-    // Verlängerungstage (über 3 Tage hinaus)
     var days = getArticleDays(a.id);
     sub += Math.max(0, days - 3) * 1.00;
-    // LP + Bot
     if (a.lp_booked && (a.lp_days || 0) > 0) {
       var lpRate = a.lp_has_bot ? 1.00 : 0.40;
       sub += Math.round((a.lp_days || 7) * lpRate * 100) / 100;
@@ -519,7 +670,6 @@ function buildPriceRows(articles, total) {
     var days = getArticleDays(a.id);
     var extraDays = Math.max(0, days - 3);
     if (extraDays > 0) rows.push('<div class="price-row"><span>&nbsp;&nbsp;+ ' + extraDays + ' Zusatztag' + (extraDays>1?'e':'') + ' (' + days + ' Tage)</span><span>€' + (extraDays * 1.00).toFixed(2) + '</span></div>');
-
     if (a.lp_booked && (a.lp_days || 0) > 0) {
       var lpRate = a.lp_has_bot ? 1.00 : 0.40;
       var lpCost = Math.round((a.lp_days || 7) * lpRate * 100) / 100;
@@ -527,13 +677,11 @@ function buildPriceRows(articles, total) {
     }
   });
 
-  // Zwischensumme + Multiplikator
   if (mult > 1) {
     rows.push('<div class="price-row" style="border-top:2px solid #e5e7eb;margin-top:4px;padding-top:12px;"><span style="color:#6b7280;">Zwischensumme</span><span style="color:#6b7280;">€' + sub.toFixed(2) + '</span></div>');
     rows.push('<div class="price-multiplier"><span class="mult-label">' + mode.icon + ' ' + mode.label + '</span><span class="mult-val">×' + mult + '</span></div>');
   }
 
-  // Rabatt / Coupon / Gesamt
   if (businessDiscount && businessDiscount.has_discount) {
     var bizDisc = Math.round(total * businessDiscount.percent / 100 * 100) / 100;
     rows.push('<div class="price-row" style="color:#059669;"><span>🏢 Firmenrabatt (' + businessDiscount.percent + '%)</span><span>-€' + bizDisc.toFixed(2) + '</span></div>');
@@ -601,15 +749,16 @@ async function deleteArticle(articleId) {
   } catch (err) { alert('Fehler: ' + err.message); }
 }
 
-function triggerUpload(articleId, currentCount) {
-  var remaining = 4 - currentCount;
-  if (remaining <= 0) { alert('Maximal 4 Fotos pro Artikel erreicht.'); return; }
+// ── Einzelfoto Upload ────────────────────────────────────────
+function triggerUpload(articleId) {
   var inp = document.createElement('input');
-  inp.type = 'file'; inp.accept = 'image/*'; inp.multiple = true;
+  inp.type = 'file';
+  inp.accept = 'image/*';
+  // Sachbearbeiter: 1 Foto auf einmal | Abt/Experte: mehrere auf einmal
+  inp.multiple = isMassUploadMode();
   inp.onchange = async function() {
     if (!inp.files || inp.files.length === 0) return;
-    var files = Array.from(inp.files).slice(0, remaining);
-    if (inp.files.length > remaining) alert('Nur noch ' + remaining + ' Foto(s) möglich.');
+    var files = Array.from(inp.files);
     await uploadPhotos(articleId, files);
   };
   inp.click();
@@ -666,17 +815,10 @@ async function startPayment() {
   var btn = document.getElementById('btn-pay');
   if (btn) { btn.disabled = true; btn.textContent = 'Wird vorbereitet...'; }
   try {
-    // Tage pro Artikel zusammenstellen
     var articleDays = {};
     (sessionData.articles || []).forEach(function(a) { articleDays[a.id] = getArticleDays(a.id); });
-
-    var body = {
-      token: sessionToken,
-      ai_mode: selectedMode,
-      article_days: articleDays
-    };
+    var body = { token: sessionToken, ai_mode: selectedMode, article_days: articleDays };
     if (couponApplied) body.coupon_code = couponApplied.code;
-
     var res = await fetch(API + '/api/vk/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     var data = await res.json();
     if (!res.ok || !data.url) throw new Error(data.error || 'Checkout fehlgeschlagen');
@@ -702,8 +844,10 @@ async function redeemFree() {
   } catch (err) { alert('Fehler: ' + err.message); if (btn) { btn.disabled = false; btn.textContent = '🎉 Kostenlos einlösen'; } }
 }
 
+// ── LP Toggle (nur Abt/Experte) ───────────────────────────────
 function buildLPToggle(a) {
-  if (!businessDiscount || !businessDiscount.has_discount) return '';
+  // LP nur für Abteilungsleiter und Experte
+  if (!isMassUploadMode() && !(businessDiscount && businessDiscount.has_discount)) return '';
   if (!(a.vk_photos || []).length) return '';
   var booked = !!a.lp_booked, days = a.lp_days || 7, hasBot = !!a.lp_has_bot;
   var lpRate = hasBot ? 1.00 : 0.40, lpCost = Math.round(days * lpRate * 100) / 100;
@@ -744,10 +888,6 @@ function updateLPCost(articleId, days, hasBot) {
   var el = document.getElementById('lp-cost-' + articleId);
   if (el) el.textContent = '💰 Kosten: €' + cost.toFixed(2) + ' (' + days + ' Tage × €' + rate.toFixed(2) + '/Tag)';
   if (sessionData && sessionData.articles) sessionData.articles.forEach(function(a) { if (a.id === articleId) { a.lp_days = days; a.lp_has_bot = hasBot; } });
-}
-
-function updatePriceDisplay(price) {
-  render(); // Einfachste saubere Lösung
 }
 
 function escHtml(str) { if (!str) return ''; return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
