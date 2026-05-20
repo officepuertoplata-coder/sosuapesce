@@ -26,7 +26,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .hint-box strong { display: block; margin-bottom: 4px; }
 /* Article mode chips */
 .art-mode-row { display: flex; align-items: center; gap: 5px; margin-bottom: 10px; flex-wrap: wrap; }
-.art-mode-chip { padding: 3px 9px; border-radius: 20px; border: 1.5px solid #e5e7eb; background: #f9fafb; color: #6b7280; font-size: .68rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: all .15s; }
+.art-mode-chip { padding: 6px 14px; border-radius: 20px; border: 1.5px solid #e5e7eb; background: #f9fafb; color: #6b7280; font-size: .78rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: all .15s; }
 .art-mode-chip.ms { border-color: #86efac; background: #f0fdf4; color: #15803d; }
 .art-mode-chip.ma { border-color: #bfdbfe; background: #eff6ff; color: #1d4ed8; }
 .art-mode-chip.me { border-color: #e9d5ff; background: #faf5ff; color: #7c3aed; }
@@ -188,10 +188,6 @@ function render() {
 }
 
 // ── Preisberechnung (pro Artikel) ────────────────────────────
-// Fixkosten pro Artikel (NICHT multipliziert)
-function calcArticleFixed(a) {
-  return (a.vk_photos || []).length > 0 ? 1.00 : 0;
-}
 // Variable Kosten (werden mit KI-Modus multipliziert)
 function calcArticleVariable(a) {
   var photos = (a.vk_photos || []).length;
@@ -207,10 +203,10 @@ function calcArticleVariable(a) {
   }
   return Math.round(v * 100) / 100;
 }
-// Gesamt pro Artikel: €1 fix + variable × KI-Modus
-function calcArticleBase(a) { return calcArticleFixed(a) + calcArticleVariable(a); }
+// Gesamt pro Artikel: variable × KI-Modus (Auftragsgebühr gilt für den ganzen Auftrag)
+function calcArticleBase(a) { return calcArticleVariable(a); }
 function calcArticlePrice(a) {
-  return Math.round((calcArticleFixed(a) + calcArticleVariable(a) * getArticleModeMult(a.id)) * 100) / 100;
+  return Math.round(calcArticleVariable(a) * getArticleModeMult(a.id) * 100) / 100;
 }
 function calcPrice(articles) {
   var total = 1.00;
@@ -293,24 +289,16 @@ function buildModeSelector() {
 
 function buildArticleModeSelector(a) {
   var current = getArticleMode(a.id);
-  var mult = getArticleModeMult(a.id);
-  var html = '<div class="art-mode-row">';
-  html += '<span style="font-size:.7rem;font-weight:700;color:#9ca3af;">KI:</span>';
+  var html = '<div class="art-mode-row" style="flex-wrap:wrap;">';
   var defs = [
-    {key:'sachbearbeiter', label:'&#128100; Basis', cls:'ms'},
-    {key:'abteilungsleiter', label:'&#128202; Standard', cls:'ma'},
+    {key:'sachbearbeiter', label:'&#128100; Sachbearbeiter', cls:'ms'},
+    {key:'abteilungsleiter', label:'&#128202; Abteilungsleiter', cls:'ma'},
     {key:'experte', label:'&#127919; Experte', cls:'me'}
   ];
   defs.forEach(function(d) {
     var active = current === d.key;
     html += '<button class="art-mode-chip' + (active ? ' ' + d.cls : '') + '" onclick="setArticleMode(\'' + a.id + '\',\'' + d.key + '\')">' + d.label + (active ? ' &#10003;' : '') + '</button>';
   });
-  var aPrice = calcArticlePrice(a);
-  if (aPrice > 0) {
-    html += '<span style="margin-left:auto;font-size:.78rem;color:#2d7a4f;font-weight:800;">€' + aPrice.toFixed(2) + '</span>';
-  } else {
-    html += '<span style="margin-left:auto;font-size:.7rem;color:#9ca3af;font-weight:700;">&times;' + mult + '</span>';
-  }
   html += '</div>';
   return html;
 }
@@ -335,8 +323,9 @@ function buildArticleHTML(a, idx) {
   html += '<div id="progress-' + a.id + '"></div>';
   html += '<div class="info-fields"><div class="info-field-label">&#8505;&#65039; Zusatzinfos f&uuml;r die KI (optional)</div>';
   html += '<textarea class="info-field-textarea" id="notes-' + a.id + '" placeholder="z.B. Gr&ouml;&szlig;e M, Baujahr 2019..." onblur="saveNotes(\'' + a.id + '\', this.value)" oninput="notesCache[\'' + a.id + '\']=this.value">' + escHtml(notes) + '</textarea></div>';
-  html += '<div class="article-footer">' + buildDaySelector(a);
-  html += '<button class="btn-delete-article" onclick="deleteArticle(\'' + a.id + '\')">&#128465; L&ouml;schen</button></div>';
+    var artPrice = calcArticlePrice(a);
+  var priceLabel = (a.vk_photos||[]).length > 0 ? '<div style="font-size:.95rem;font-weight:800;color:#2d7a4f;text-align:right;">&euro;' + artPrice.toFixed(2) + '</div>' : '';
+  html += '<div class="article-footer">' + buildDaySelector(a) + '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">' + priceLabel + '<button class="btn-delete-article" onclick="deleteArticle(\\\'' + a.id + '\\\')">&#128465; L&ouml;schen</button></div></div>';
   html += buildLPToggle(a);
   html += '</div>';
   return html;
@@ -443,16 +432,10 @@ function buildPriceRows(articles, total) {
     if (photos > 0) {
       var aBase = calcArticleBase(a);
       var aPrice = calcArticlePrice(a);
-      var aFixed = calcArticleFixed(a);
       var aVar = calcArticleVariable(a);
       html += '<div class="price-row" style="color:#9ca3af;font-size:.78rem;"><span>' + escHtml(a.title||'Artikel') + modeTag + '</span><span></span></div>';
-      html += '<div class="price-row" style="color:#9ca3af;font-size:.75rem;"><span>&nbsp;&nbsp;Artikelgeb&uuml;hr (fix)</span><span>€' + aFixed.toFixed(2) + '</span></div>';
-      if (aVar > 0) {
-        if (aMult > 1) {
-          html += '<div class="price-row" style="color:#9ca3af;font-size:.75rem;"><span>&nbsp;&nbsp;Analyseleistung €' + aVar.toFixed(2) + ' &times; ' + aMult + '</span><span>€' + (aVar * aMult).toFixed(2) + '</span></div>';
-        } else {
-          html += '<div class="price-row" style="color:#9ca3af;font-size:.75rem;"><span>&nbsp;&nbsp;Analyseleistung</span><span>€' + aVar.toFixed(2) + '</span></div>';
-        }
+      if (aVar > 0 && aMult > 1) {
+        html += '<div class="price-row" style="color:#9ca3af;font-size:.75rem;"><span>&nbsp;&nbsp;€' + aVar.toFixed(2) + ' &times; ' + aMult + '</span><span>€' + (Math.round(aVar * aMult * 100)/100).toFixed(2) + '</span></div>';
       }
       html += '<div class="price-row"><span style="font-weight:700;">Gesamt f&uuml;r &bdquo;' + escHtml(a.title||'Artikel') + '&ldquo;</span><span style="font-weight:700;">€' + aPrice.toFixed(2) + '</span></div>';
     } else {
