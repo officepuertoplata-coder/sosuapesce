@@ -147,6 +147,10 @@
   .info-row { display: flex; justify-content: space-between; font-size: .88rem; color: #4b5563; padding: 4px 0; }
   .info-label { color: #9ca3af; }
 
+  .mode-chip { padding: 3px 8px; border-radius: 20px; border: 1.5px solid #e5e7eb; background: #f9fafb; color: #6b7280; font-size: .68rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: all .15s; }
+  .mode-chip.active-s { border-color: #86efac; background: #f0fdf4; color: #15803d; }
+  .mode-chip.active-a { border-color: #bfdbfe; background: #eff6ff; color: #1d4ed8; }
+  .mode-chip.active-e { border-color: #e9d5ff; background: #faf5ff; color: #7c3aed; }
   #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:20px;font-size:.85rem;font-weight:700;transition:all .3s;opacity:0;z-index:9998;}
   #toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
 </style>
@@ -177,6 +181,20 @@ let businessDiscount = null;
 const notesCache   = {};
 const daysCache    = {};
 let selectedMode   = 'sachbearbeiter';
+const articleModes = {}; // Modus pro Artikel-ID
+
+function getArticleMode(articleId) { return articleModes[articleId] || selectedMode; }
+function getArticleModeMult(articleId) { return MODES[getArticleMode(articleId)]?.mult || 1; }
+function setArticleMode(articleId, mode) {
+  articleModes[articleId] = mode;
+  // LP prüfen: Sachbearbeiter bekommt kein LP
+  if (mode === 'sachbearbeiter' && sessionData && sessionData.articles) {
+    sessionData.articles.forEach(function(a) {
+      if (a.id === articleId && a.lp_booked) { a.lp_booked = false; saveLPBooking(articleId, {lp_booked: false}); }
+    });
+  }
+  render();
+}
 
 // ── Modi ─────────────────────────────────────────────────────
 const MODES = {
@@ -408,7 +426,8 @@ function buildArticleHTML(a, idx, multiArticle) {
     '      placeholder="Artikelbezeichnung..." />',
     photoCountBadge,
     '  </div>',
-    '  <div class="photo-row" id="photos-' + a.id + '" data-zid="' + a.id + '">',
+    buildArticleModeSelector(a.id),
+    '  <div class="photo-row" id="photos-' + a.id + '" data-zid="' + a.id + '">'  ,
     photoHTML,
     addBtn,
     '  </div>',
@@ -428,6 +447,35 @@ function buildArticleHTML(a, idx, multiArticle) {
     buildLPToggle(a),
     '</div>',
   ].join('\n');
+}
+
+// ── Artikel-Modus Selektor ───────────────────────────────────
+function buildArticleModeSelector(articleId) {
+  var current = getArticleMode(articleId);
+  var chips = [
+    ['sachbearbeiter', '👤 Basis', 'active-s'],
+    ['abteilungsleiter', '📊 Standard', 'active-a'],
+    ['🎯 Experte', '🎯 Experte', 'active-e']
+  ];
+  // fix: correct key
+  var defs = [
+    {key:'sachbearbeiter', label:'👤 Basis', cls:'active-s'},
+    {key:'abteilungsleiter', label:'📊 Standard', cls:'active-a'},
+    {key:'experte', label:'🎯 Experte', cls:'active-e'}
+  ];
+  var html = '<div style="display:flex;align-items:center;gap:5px;margin-bottom:10px;">';
+  html += '<span style="font-size:.7rem;font-weight:700;color:#9ca3af;flex-shrink:0;">KI:</span>';
+  defs.forEach(function(d) {
+    var isActive = current === d.key;
+    html += '<button class="mode-chip' + (isActive ? ' ' + d.cls : '') + '"' +
+      ' onclick="setArticleMode('' + articleId + '','' + d.key + '')">' +
+      d.label + (isActive ? ' ✓' : '') + '</button>';
+  });
+  // Price indicator
+  var mult = getArticleModeMult(articleId);
+  html += '<span style="margin-left:auto;font-size:.68rem;color:#9ca3af;font-weight:700;">×' + mult + '</span>';
+  html += '</div>';
+  return html;
 }
 
 // ── Bulk Upload ───────────────────────────────────────────────
@@ -626,61 +674,52 @@ async function movePhoto(photoId, targetArticleId, sourceArticleId) {
   } catch(e) { showToast('❌ Fehler: ' + e.message); }
 }
 
-// ── Preisberechnung ───────────────────────────────────────────
+// ── Preisberechnung (pro Artikel mit eigenem Modus) ──────────
+function calcArticleBase(a) {
+  var photos = (a.vk_photos || []).length;
+  if (!photos) return 0;
+  var base = 1.00 + Math.max(0, photos - 1) * 0.25;
+  var days = getArticleDays(a.id);
+  base += Math.max(0, days - 3) * 1.00;
+  if (a.lp_booked && (a.lp_days || 0) > 0) {
+    var lpRate = a.lp_has_bot ? 1.00 : 0.40;
+    base += Math.round((a.lp_days || 7) * lpRate * 100) / 100;
+  }
+  return Math.round(base * 100) / 100;
+}
+function calcArticlePrice(a) {
+  return Math.round(calcArticleBase(a) * getArticleModeMult(a.id) * 100) / 100;
+}
 function calcSubtotal(articles) {
   var sub = 1.00;
-  articles.forEach(function(a) {
-    var photos = (a.vk_photos || []).length;
-    if (photos > 0) {
-      sub += 1.00;
-      sub += Math.max(0, photos - 1) * 0.25;
-    }
-    var days = getArticleDays(a.id);
-    sub += Math.max(0, days - 3) * 1.00;
-    if (a.lp_booked && (a.lp_days || 0) > 0) {
-      var lpRate = a.lp_has_bot ? 1.00 : 0.40;
-      sub += Math.round((a.lp_days || 7) * lpRate * 100) / 100;
-    }
-  });
+  articles.forEach(function(a) { sub += calcArticlePrice(a); });
   return Math.round(sub * 100) / 100;
 }
-
-function calcPrice(articles) {
-  var sub = calcSubtotal(articles);
-  var mult = getModeMultiplier();
-  return Math.round(sub * mult * 100) / 100;
-}
+function calcPrice(articles) { return calcSubtotal(articles); }
 
 function buildPriceRows(articles, total) {
   var sub = calcSubtotal(articles);
-  var mult = getModeMultiplier();
-  var mode = MODES[selectedMode];
-
   var rows = ['<div class="price-row"><span>Auftragsgebühr</span><span>€1.00</span></div>'];
 
   articles.forEach(function(a) {
     var photoCount = (a.vk_photos || []).length;
+    var aMode = getArticleMode(a.id);
+    var aMult = getArticleModeMult(a.id);
+    var modeInfo = MODES[aMode];
+    var modeLabel = modeInfo ? modeInfo.icon + ' ' + modeInfo.label : '';
     if (photoCount > 0) {
-      rows.push('<div class="price-row"><span>' + escHtml(a.title || 'Artikel') + ' – 1. Foto</span><span>€1.00</span></div>');
-      var extra = photoCount - 1;
-      if (extra > 0) rows.push('<div class="price-row"><span>&nbsp;&nbsp;+ ' + extra + ' weiteres Foto' + (extra>1?'s':'') + '</span><span>€' + (extra * 0.25).toFixed(2) + '</span></div>');
+      var aBase = calcArticleBase(a);
+      var aTotal = calcArticlePrice(a);
+      rows.push('<div class="price-row"><span style="font-weight:600;">' + escHtml(a.title || 'Artikel') +
+        ' <span style="font-size:.7rem;color:#9ca3af;">' + modeLabel + ' ×' + aMult + '</span></span>' +
+        '<span style="font-weight:700;">€' + aTotal.toFixed(2) + '</span></div>');
+      if (aMult > 1) {
+        rows.push('<div class="price-row" style="color:#9ca3af;font-size:.78rem;"><span>&nbsp;&nbsp;Basis €' + aBase.toFixed(2) + ' × ' + aMult + '</span><span></span></div>');
+      }
     } else {
       rows.push('<div class="price-row" style="color:#9ca3af;"><span>' + escHtml(a.title || 'Artikel') + ' – noch kein Foto</span><span>€0.00</span></div>');
     }
-    var days = getArticleDays(a.id);
-    var extraDays = Math.max(0, days - 3);
-    if (extraDays > 0) rows.push('<div class="price-row"><span>&nbsp;&nbsp;+ ' + extraDays + ' Zusatztag' + (extraDays>1?'e':'') + ' (' + days + ' Tage)</span><span>€' + (extraDays * 1.00).toFixed(2) + '</span></div>');
-    if (a.lp_booked && (a.lp_days || 0) > 0) {
-      var lpRate = a.lp_has_bot ? 1.00 : 0.40;
-      var lpCost = Math.round((a.lp_days || 7) * lpRate * 100) / 100;
-      rows.push('<div class="price-row" style="color:#15803d;"><span>🌐 LP' + (a.lp_has_bot ? ' + Bot' : '') + ' – ' + (a.lp_days||7) + ' Tage</span><span>+€' + lpCost.toFixed(2) + '</span></div>');
-    }
   });
-
-  if (mult > 1) {
-    rows.push('<div class="price-row" style="border-top:2px solid #e5e7eb;margin-top:4px;padding-top:12px;"><span style="color:#6b7280;">Zwischensumme</span><span style="color:#6b7280;">€' + sub.toFixed(2) + '</span></div>');
-    rows.push('<div class="price-multiplier"><span class="mult-label">' + mode.icon + ' ' + mode.label + '</span><span class="mult-val">×' + mult + '</span></div>');
-  }
 
   if (businessDiscount && businessDiscount.has_discount) {
     var bizDisc = Math.round(total * businessDiscount.percent / 100 * 100) / 100;
@@ -817,7 +856,9 @@ async function startPayment() {
   try {
     var articleDays = {};
     (sessionData.articles || []).forEach(function(a) { articleDays[a.id] = getArticleDays(a.id); });
-    var body = { token: sessionToken, ai_mode: selectedMode, article_days: articleDays };
+    var artModes = {};
+    (sessionData.articles || []).forEach(function(a) { artModes[a.id] = getArticleMode(a.id); });
+    var body = { token: sessionToken, ai_mode: selectedMode, article_days: articleDays, article_modes: artModes };
     if (couponApplied) body.coupon_code = couponApplied.code;
     var res = await fetch(API + '/api/vk/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     var data = await res.json();
@@ -829,7 +870,9 @@ async function startPayment() {
 async function redeemBusinessFree() {
   var btn = document.getElementById('btn-pay'); if (btn) { btn.disabled = true; btn.textContent = '⏳ Wird verarbeitet...'; }
   try {
-    var res = await fetch(API + '/api/vk/business-free', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: sessionToken, ai_mode: selectedMode }) });
+    var artModes2 = {};
+    (sessionData.articles || []).forEach(function(a) { artModes2[a.id] = getArticleMode(a.id); });
+    var res = await fetch(API + '/api/vk/business-free', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: sessionToken, ai_mode: selectedMode, article_modes: artModes2 }) });
     var data = await res.json(); if (!res.ok) throw new Error(data.error || 'Fehler');
     window.location.href = 'ergebnis.html?s=' + sessionToken;
   } catch (err) { alert('Fehler: ' + err.message); if (btn) { btn.disabled = false; btn.textContent = '🎉 Kostenlos einlösen (Firmenrabatt)'; } }
@@ -846,8 +889,9 @@ async function redeemFree() {
 
 // ── LP Toggle (nur Abt/Experte) ───────────────────────────────
 function buildLPToggle(a) {
-  // LP nur für Abteilungsleiter und Experte
-  if (!isMassUploadMode() && !(businessDiscount && businessDiscount.has_discount)) return '';
+  // LP nur wenn Artikel-Modus nicht Sachbearbeiter
+  var artMode = getArticleMode(a.id);
+  if (artMode === 'sachbearbeiter' && !(businessDiscount && businessDiscount.has_discount)) return '';
   if (!(a.vk_photos || []).length) return '';
   var booked = !!a.lp_booked, days = a.lp_days || 7, hasBot = !!a.lp_has_bot;
   var lpRate = hasBot ? 1.00 : 0.40, lpCost = Math.round(days * lpRate * 100) / 100;
