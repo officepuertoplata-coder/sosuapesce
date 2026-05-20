@@ -366,7 +366,9 @@ function buildLPToggle(a) {
   html += '<div style="display:flex;align-items:center;gap:8px;">';
   html += '<span style="font-size:1.1rem;">&#127760;</span>';
   html += '<span style="font-size:.88rem;font-weight:700;color:' + (booked?'#15803d':'#374151') + ';">Landingpage mitbuchen</span>';
-  if (booked) html += '<span style="background:#d1fae5;color:#065f46;font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:10px;">&euro;' + lpCost.toFixed(2) + '</span>';
+    var aMult = getArticleModeMult(a.id);
+  var lpCostMult = Math.round(lpCost * aMult * 100) / 100;
+  if (booked) html += '<span style="background:#d1fae5;color:#065f46;font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:10px;">&euro;' + lpCostMult.toFixed(2) + '</span>';
   html += '</div>';
   html += '<div style="width:42px;height:24px;border-radius:12px;background:' + (booked?'#25D366':'#d1d5db') + ';position:relative;transition:background .2s;flex-shrink:0;" onclick="event.stopPropagation();toggleLP(\'' + a.id + '\',' + booked + ')">';
   html += '<div style="width:20px;height:20px;border-radius:50%;background:white;position:absolute;top:2px;left:' + (booked?'20':'2') + 'px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.3);"></div>';
@@ -399,8 +401,9 @@ function buildLPToggle(a) {
     html += '</div>';
 
     // Price summary table
-    var lpOnly = Math.round(days * 0.40 * 100) / 100;
-    var botOnly = Math.round(days * 0.60 * 100) / 100;
+    var aMult2 = getArticleModeMult(a.id);
+    var lpOnly = Math.round(days * 0.40 * aMult2 * 100) / 100;
+    var botOnly = Math.round(days * 0.60 * aMult2 * 100) / 100;
     var row = 'display:flex;justify-content:space-between;padding:3px 0;font-size:.78rem;';
     var col1 = 'color:#6b7280;font-weight:600;flex:1;';
     var col2 = 'color:#9ca3af;font-weight:600;text-align:right;width:70px;';
