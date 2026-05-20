@@ -60,7 +60,7 @@ tr:hover td{background:#f9fafb;}
   <button class="tbtn" onclick="loadAll()">↺ Aktualisieren</button>
   <button class="tbtn active" onclick="showSection('orders')" id="btnOrders">📋 Aufträge</button>
   <button class="tbtn" onclick="showSection('verkaeufe')" id="btnVerkaeufe">💰 Verkäufe</button>
-  <button class="tbtn" onclick="showSection('botsandbox')" id="btnBotsandbox">🤖 Bot Sandbox</button>
+  <button class="tbtn" onclick="showSection('botsandbox')" id="btnBotsandbox">🧪 Sandbox</button>
   <button class="tbtn" onclick="showSection('coupons')" id="btnCoupons">🎟️ Gutscheine</button>
   <button class="tbtn" onclick="showSection('business')" id="btnBusiness">🏢 Business</button>
   <button class="tbtn" onclick="showSection('aiconfig')" id="btnAiconfig">⚙️ KI Config</button>
@@ -116,31 +116,100 @@ tr:hover td{background:#f9fafb;}
 </div>
 
 <div id="section-botsandbox" style="display:none;">
-  <div class="card" style="margin:16px 0;">
-    <div class="card-title" style="font-size:1rem;font-weight:800;margin-bottom:16px;">🤖 Bot Sandbox – LP Verkauf testen</div>
-    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
-      <div style="flex:1;min-width:200px;">
-        <label style="font-size:.72rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">LANDINGPAGE</label>
-        <select id="sandbox-slug" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.85rem;font-family:inherit;" onchange="resetSandbox()">
-          <option value="">-- LP laden...</option>
-        </select>
+  <!-- Sub-Tab Navigation -->
+  <div style="display:flex;gap:6px;margin-bottom:16px;">
+    <button id="stab-bot" onclick="switchSandboxTab('bot')"
+      style="padding:8px 18px;border-radius:8px;border:2px solid var(--wa);background:var(--wa);color:#fff;font-weight:800;font-size:.82rem;cursor:pointer;font-family:inherit;">
+      🤖 Bot Test
+    </button>
+    <button id="stab-report" onclick="switchSandboxTab('report')"
+      style="padding:8px 18px;border-radius:8px;border:2px solid var(--border);background:#f9fafb;color:var(--mu);font-weight:800;font-size:.82rem;cursor:pointer;font-family:inherit;">
+      📦 Report Test
+    </button>
+  </div>
+
+  <!-- BOT TEST -->
+  <div id="sandbox-bot-content">
+    <div class="table-box" style="padding:18px;">
+      <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:200px;">
+          <label style="font-size:.72rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">LANDINGPAGE</label>
+          <select id="sandbox-slug" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.85rem;font-family:inherit;" onchange="resetSandbox()">
+            <option value="">-- LP auswählen --</option>
+          </select>
+        </div>
+        <div style="flex:1;min-width:200px;">
+          <label style="font-size:.72rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">VERHANDLUNGS-LEVEL</label>
+          <select id="sandbox-level" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.85rem;font-family:inherit;">
+            <option value="friendly">😊 Freundlich</option>
+            <option value="professional" selected>💼 Professionell</option>
+            <option value="hard">🔥 Hart</option>
+          </select>
+        </div>
       </div>
-      <div style="flex:1;min-width:200px;">
-        <label style="font-size:.72rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">VERHANDLUNGS-LEVEL</label>
-        <select id="sandbox-level" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.85rem;font-family:inherit;">
-          <option value="friendly">😊 Freundlich – gibt leichter nach</option>
-          <option value="professional" selected>💼 Professionell – moderate Verhandlung</option>
-          <option value="hard">🔥 Hart – gibt kaum nach</option>
-        </select>
+      <div id="sandbox-chat" style="height:380px;overflow-y:auto;background:#f9fafb;border:1.5px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;display:flex;flex-direction:column;gap:10px;">
+        <div style="text-align:center;color:var(--mu);font-size:.82rem;padding:20px;">LP auswählen und Nachricht senden.</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <input id="sandbox-input" placeholder="Schreibe eine Nachricht als Käufer..." style="flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:.9rem;font-family:inherit;" onkeydown="if(event.keyCode===13)sendSandboxMsg()">
+        <button onclick="sendSandboxMsg()" style="padding:10px 20px;background:var(--wa);color:#fff;border:none;border-radius:8px;font-weight:800;cursor:pointer;font-family:inherit;">Senden</button>
+        <button onclick="resetSandbox()" style="padding:10px 14px;background:var(--border);color:var(--txt);border:none;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit;">Reset</button>
       </div>
     </div>
-    <div id="sandbox-chat" style="height:400px;overflow-y:auto;background:#f9fafb;border:1.5px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;display:flex;flex-direction:column;gap:10px;">
-      <div style="text-align:center;color:var(--mu);font-size:.82rem;padding:20px;">LP Slug eingeben und Nachricht senden um den Bot zu testen.</div>
-    </div>
-    <div style="display:flex;gap:8px;">
-      <input id="sandbox-input" placeholder="Schreibe eine Nachricht als Käufer..." style="flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:.9rem;font-family:inherit;" onkeydown="if(event.keyCode===13)sendSandboxMsg()">
-      <button onclick="sendSandboxMsg()" style="padding:10px 20px;background:var(--wa);color:#fff;border:none;border-radius:8px;font-weight:800;cursor:pointer;font-family:inherit;">Senden</button>
-      <button onclick="resetSandbox()" style="padding:10px 14px;background:var(--border);color:var(--txt);border:none;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit;">Reset</button>
+  </div>
+
+  <!-- REPORT TEST -->
+  <div id="sandbox-report-content" style="display:none;">
+    <div class="table-box" style="padding:20px;">
+      <div style="font-size:.82rem;color:var(--mu);margin-bottom:16px;">Vollständiger Test ohne WhatsApp — Business-Nummer mit 100% Rabatt.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+        <div>
+          <label style="font-size:.72rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">BUSINESS-TELEFON (100% Rabatt)</label>
+          <div style="display:flex;gap:8px;">
+            <input id="rt-biz-phone" placeholder="4367684949610" style="flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.85rem;font-family:inherit;">
+            <button onclick="rtSavePhone()" style="padding:9px 14px;background:#f0fdf4;border:1.5px solid #86efac;color:#15803d;border-radius:8px;font-weight:700;font-size:.78rem;cursor:pointer;font-family:inherit;">Merken</button>
+          </div>
+          <div id="rt-phone-status" style="font-size:.72rem;margin-top:4px;color:var(--mu);"></div>
+        </div>
+        <div>
+          <label style="font-size:.72rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">ANALYSEMODUS</label>
+          <select id="rt-mode" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.85rem;font-family:inherit;">
+            <option value="sachbearbeiter">👤 Sachbearbeiter ×1</option>
+            <option value="abteilungsleiter">📊 Abteilungsleiter ×2</option>
+            <option value="experte">🎯 Experte ×4</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label style="font-size:.72rem;font-weight:800;color:var(--mu);display:block;margin-bottom:8px;">PRODUKTFOTOS</label>
+        <div id="rt-dropzone"
+          style="border:2.5px dashed #86efac;border-radius:12px;background:#f0fdf4;padding:28px;text-align:center;cursor:pointer;margin-bottom:12px;"
+          onclick="rtTriggerUpload()"
+          ondragover="event.preventDefault();this.style.background='#dcfce7'"
+          ondragleave="this.style.background='#f0fdf4'"
+          ondrop="rtHandleDrop(event)">
+          <div style="font-size:2rem;margin-bottom:8px;">📸</div>
+          <div style="font-weight:800;color:#15803d;margin-bottom:4px;">Fotos hier ablegen oder klicken</div>
+          <div style="font-size:.78rem;color:var(--mu);">Beliebig viele Fotos — JPG, PNG</div>
+        </div>
+        <div id="rt-photo-preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;min-height:0;"></div>
+        <div id="rt-upload-progress" style="display:none;margin-bottom:12px;">
+          <div style="background:#e5e7eb;border-radius:6px;height:6px;overflow:hidden;">
+            <div id="rt-progress-bar" style="height:6px;background:var(--wa);border-radius:6px;transition:width .3s;width:0%"></div>
+          </div>
+          <div id="rt-progress-label" style="font-size:.75rem;color:var(--mu);margin-top:4px;"></div>
+        </div>
+      </div>
+      <button id="rt-analyze-btn" onclick="rtAnalyze()"
+        style="width:100%;padding:16px;background:#1b4332;color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:800;cursor:pointer;font-family:inherit;margin-bottom:12px;">
+        🚀 Jetzt analysieren
+      </button>
+      <div id="rt-result" style="display:none;background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:16px;text-align:center;">
+        <div style="font-size:1.1rem;font-weight:800;color:#15803d;margin-bottom:8px;">✅ Session erstellt!</div>
+        <div id="rt-result-link" style="margin-bottom:8px;"></div>
+        <div style="font-size:.78rem;color:var(--mu);">Kein WhatsApp nötig — direkt im Browser testen</div>
+      </div>
+      <div id="rt-error" style="display:none;background:#fef2f2;border:1.5px solid #fecaca;border-radius:10px;padding:14px;font-size:.82rem;color:#dc2626;margin-top:8px;"></div>
     </div>
   </div>
 </div>
@@ -497,7 +566,7 @@ function showSection(name) {
   if (name === 'coupons')        { document.getElementById('btnCoupons').classList.add('active');   loadCoupons(); }
   else if (name === 'business')  { document.getElementById('btnBusiness').classList.add('active');  loadBusinessDiscounts(); }
   else if (name === 'verkaeufe') { document.getElementById('btnVerkaeufe').classList.add('active'); loadVerkaeufe(); }
-  else if (name === 'botsandbox'){ document.getElementById('btnBotsandbox').classList.add('active');loadSandboxLPs(); }
+  else if (name === 'botsandbox'){ document.getElementById('btnBotsandbox').classList.add('active'); loadSandboxLPs(); switchSandboxTab('bot'); }
   else if (name === 'aiconfig')  { document.getElementById('btnAiconfig').classList.add('active');  loadAiConfig(); }
   else { document.getElementById('btnOrders').classList.add('active'); loadAll(); }
 }
@@ -884,6 +953,186 @@ async function saveAiRow(taskKey, id) {
     showToast('⚠️ Lokal gespeichert – API folgt in Kürze');
   }
 }
+
+
+// ── SANDBOX SUB-TAB SWITCH ────────────────────────────────────
+function switchSandboxTab(tab) {
+  var isBot = tab === 'bot';
+  document.getElementById('sandbox-bot-content').style.display = isBot ? 'block' : 'none';
+  document.getElementById('sandbox-report-content').style.display = isBot ? 'none' : 'block';
+  var btnBot = document.getElementById('stab-bot');
+  var btnReport = document.getElementById('stab-report');
+  if (btnBot) {
+    btnBot.style.background = isBot ? 'var(--wa)' : '#f9fafb';
+    btnBot.style.borderColor = isBot ? 'var(--wa)' : 'var(--border)';
+    btnBot.style.color = isBot ? '#fff' : 'var(--mu)';
+  }
+  if (btnReport) {
+    btnReport.style.background = isBot ? '#f9fafb' : 'var(--wa)';
+    btnReport.style.borderColor = isBot ? 'var(--border)' : 'var(--wa)';
+    btnReport.style.color = isBot ? 'var(--mu)' : '#fff';
+  }
+  if (!isBot) rtInit();
+}
+
+// ── REPORT TEST ───────────────────────────────────────────────
+var rtPhotos = [];
+
+function rtInit() {
+  // Business-Nummer aus localStorage laden
+  var saved = localStorage.getItem('rt_biz_phone');
+  if (saved) {
+    var el = document.getElementById('rt-biz-phone');
+    if (el) { el.value = saved; rtCheckPhone(saved); }
+  }
+}
+
+function rtSavePhone() {
+  var phone = (document.getElementById('rt-biz-phone').value || '').trim().replace(/[^0-9]/g, '');
+  if (!phone) { showToast('Bitte Telefonnummer eingeben'); return; }
+  localStorage.setItem('rt_biz_phone', phone);
+  document.getElementById('rt-biz-phone').value = phone;
+  document.getElementById('rt-phone-status').textContent = '✅ Gespeichert';
+  document.getElementById('rt-phone-status').style.color = '#15803d';
+  showToast('✅ Nummer gespeichert');
+}
+
+function rtCheckPhone(val) {
+  var status = document.getElementById('rt-phone-status');
+  if (!status) return;
+  var clean = (val || '').replace(/[^0-9]/g, '');
+  if (clean.length >= 10) {
+    status.textContent = 'Format OK';
+    status.style.color = '#15803d';
+  } else {
+    status.textContent = 'Ohne + und Leerzeichen eingeben (z.B. 4367684949610)';
+    status.style.color = 'var(--mu)';
+  }
+}
+
+function rtTriggerUpload() {
+  var inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*'; inp.multiple = true;
+  inp.onchange = function() { if (inp.files) rtAddPhotos(Array.from(inp.files)); };
+  inp.click();
+}
+
+function rtHandleDrop(e) {
+  e.preventDefault();
+  document.getElementById('rt-dropzone').style.background = '#f0fdf4';
+  var files = Array.from(e.dataTransfer.files).filter(function(f) { return f.type.startsWith('image/'); });
+  if (files.length) rtAddPhotos(files);
+}
+
+function rtAddPhotos(files) {
+  rtPhotos = rtPhotos.concat(files);
+  rtRenderPhotoPreview();
+  document.getElementById('rt-dropzone').querySelector('div:nth-child(2)').textContent = rtPhotos.length + ' Foto(s) bereit';
+}
+
+function rtRenderPhotoPreview() {
+  var preview = document.getElementById('rt-photo-preview');
+  if (!preview) return;
+  preview.innerHTML = rtPhotos.map(function(f, i) {
+    var url = URL.createObjectURL(f);
+    return '<div style="position:relative;">' +
+      '<img src="' + url + '" style="width:64px;height:64px;object-fit:cover;border-radius:8px;border:1.5px solid var(--border);">' +
+      '<div onclick="rtRemovePhoto(' + i + ')" style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;background:#ef4444;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;border:2px solid #fff;">✕</div>' +
+      '</div>';
+  }).join('');
+}
+
+function rtRemovePhoto(idx) {
+  rtPhotos.splice(idx, 1);
+  rtRenderPhotoPreview();
+}
+
+async function rtAnalyze() {
+  var phone = (document.getElementById('rt-biz-phone').value || '').trim().replace(/[^0-9]/g, '');
+  var mode = document.getElementById('rt-mode').value;
+  var btn = document.getElementById('rt-analyze-btn');
+  var errEl = document.getElementById('rt-error');
+  var resultEl = document.getElementById('rt-result');
+
+  errEl.style.display = 'none'; resultEl.style.display = 'none';
+
+  if (!phone) { errEl.textContent = 'Business-Telefon fehlt'; errEl.style.display = 'block'; return; }
+  if (!rtPhotos.length) { errEl.textContent = 'Mindestens 1 Foto hochladen'; errEl.style.display = 'block'; return; }
+
+  btn.disabled = true; btn.textContent = '⏳ Session wird erstellt...';
+
+  try {
+    // Session erstellen via Sandbox-Endpoint
+    var startRes = await fetch(API + '/api/vk/sandbox/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone: phone, ai_mode: mode })
+    });
+
+    var token, sessionId;
+
+    if (startRes.ok) {
+      var startData = await startRes.json();
+      token = startData.token;
+      sessionId = startData.session_id || startData.id;
+    } else {
+      // Fallback: direkte Session-Erstellung über bekannte Endpoints
+      throw new Error('Sandbox-Endpoint nicht verfügbar. Bitte server.js ergänzen.');
+    }
+
+    // Fotos hochladen
+    btn.textContent = '⏳ ' + rtPhotos.length + ' Fotos werden hochgeladen...';
+    var prog = document.getElementById('rt-upload-progress');
+    var bar = document.getElementById('rt-progress-bar');
+    var lbl = document.getElementById('rt-progress-label');
+    if (prog) prog.style.display = 'block';
+
+    // Ersten Artikel erstellen
+    var artRes = await fetch(API + '/api/vk/article', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: token, title: 'Artikel 1' })
+    });
+    var artData = await artRes.json();
+    var articleId = artData.article?.id;
+
+    if (!articleId) throw new Error('Artikel konnte nicht erstellt werden');
+
+    for (var i = 0; i < rtPhotos.length; i++) {
+      var base64 = await new Promise(function(res, rej) {
+        var reader = new FileReader();
+        reader.onload = function() { res(reader.result.split(',')[1]); };
+        reader.onerror = rej;
+        reader.readAsDataURL(rtPhotos[i]);
+      });
+      await fetch(API + '/api/vk/photo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ article_id: articleId, session_id: sessionId, image_base64: base64, content_type: rtPhotos[i].type || 'image/jpeg' })
+      });
+      var pct = Math.round(((i + 1) / rtPhotos.length) * 100);
+      if (bar) bar.style.width = pct + '%';
+      if (lbl) lbl.textContent = (i + 1) + ' / ' + rtPhotos.length + ' hochgeladen';
+    }
+
+    // Ergebnis anzeigen
+    var berichtUrl = 'https://converdino.com/bericht.html?s=' + token;
+    resultEl.style.display = 'block';
+    document.getElementById('rt-result-link').innerHTML =
+      '<a href="' + berichtUrl + '" target="_blank" style="color:#15803d;font-weight:800;word-break:break-all;">→ ' + berichtUrl + '</a>';
+
+    showToast('✅ Session bereit!');
+    rtPhotos = []; rtRenderPhotoPreview();
+    if (prog) prog.style.display = 'none';
+
+  } catch(e) {
+    errEl.textContent = '❌ ' + e.message;
+    errEl.style.display = 'block';
+  }
+
+  btn.disabled = false; btn.textContent = '🚀 Jetzt analysieren';
+}
+
 
 function showToast(msg) {
   const t = document.getElementById('toast');
