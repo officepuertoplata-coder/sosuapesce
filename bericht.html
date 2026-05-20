@@ -598,7 +598,7 @@ async function startPayment() {
   var btn=document.getElementById('btn-pay'); if(btn){btn.disabled=true;btn.textContent='Wird vorbereitet...';}
   try {
     var articleDays={}, artModes={};
-    (sessionData.articles||[]).forEach(function(a){ articleDays[a.id]=getArticleDays(a.id); artModes[a.id]=getArticleMode(a.id); });
+    (sessionData.articles||[]).forEach(function(a){ articleDays[a.id]=getArticleDays(a.id); articleModes[a.id]=getArticleMode(a.id); });
     var body={token:sessionToken, ai_mode:selectedMode, article_days:articleDays, article_modes:artModes};
     if(couponApplied) body.coupon_code=couponApplied.code;
     var res=await fetch(API+'/api/vk/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
@@ -611,7 +611,7 @@ async function redeemBusinessFree() {
   var btn=document.getElementById('btn-pay'); if(btn){btn.disabled=true;btn.textContent='⏳ Wird verarbeitet...';}
   try {
     var artModes={};
-    (sessionData.articles||[]).forEach(function(a){ artModes[a.id]=getArticleMode(a.id); });
+    (sessionData.articles||[]).forEach(function(a){ articleModes[a.id]=getArticleMode(a.id); });
     var res=await fetch(API+'/api/vk/business-free',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:sessionToken,ai_mode:selectedMode,article_modes:artModes})});
     var data=await res.json(); if(!res.ok) throw new Error(data.error||'Fehler');
     window.location.href='ergebnis.html?s='+sessionToken;
