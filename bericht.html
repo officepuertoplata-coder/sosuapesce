@@ -414,7 +414,7 @@ function buildLPToggle(a) {
       html += '<div style="' + row + '"><span style="' + col1 + '">Digitaler Kundenberater</span><span style="' + col2 + '">&euro;0.60&thinsp;/Tag</span><span style="' + col3 + '">&euro;' + botOnly.toFixed(2) + '</span></div>';
     }
     html += '<div style="border-top:1px solid #86efac;margin:5px 0;"></div>';
-    html += '<div style="' + row + '"><span style="' + col1 + ';color:#15803d;font-weight:800;">Gesamt</span><span style="' + col2 + ';color:#15803d;">&euro;' + lpRate.toFixed(2) + '&thinsp;/Tag</span><span style="' + col3 + ';font-size:.88rem;">&euro;' + lpCost.toFixed(2) + '</span></div>';
+    html += '<div style="' + row + '"><span style="' + col1 + ';color:#15803d;font-weight:800;">Gesamt</span><span style="' + col2 + ';color:#15803d;">&euro;' + (lpRate * aMult2).toFixed(2) + '&thinsp;/Tag</span><span style="' + col3 + ';font-size:.88rem;">&euro;' + (lpOnly + botOnly).toFixed(2) + '</span></div>';
     html += '<div style="font-size:.7rem;color:#9ca3af;margin-top:4px;">' + days + ' Tage Laufzeit</div>';
     html += '</div>';
   }
