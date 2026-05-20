@@ -321,14 +321,14 @@ function buildArticleHTML(a, idx) {
 function buildDaySelector(a) {
   // Wenn LP gebucht: Verfügbarkeit gratis inklusive
   if (a.lp_booked) {
-    return '<div><div class="article-meta">Ergebnis verf&uuml;gbar:</div>' +
+    return '<div><div class="article-meta">Bericht verf&uuml;gbar:</div>' +
       '<div style="font-size:.78rem;color:#15803d;font-weight:700;padding:5px 0;display:flex;align-items:center;gap:5px;">' +
       '&#10003; Gratis im LP-Preis enthalten</div></div>';
   }
   var current = getArticleDays(a.id);
-  var html = '<div><div class="article-meta">Ergebnis verf&uuml;gbar:</div><div class="day-selector">';
+  var html = '<div><div class="article-meta">Bericht verf&uuml;gbar:</div><div class="day-selector">';
   [3,7,14,21].forEach(function(d) {
-    var cost = d === 3 ? 'kostenlos' : '+&euro;' + Math.round((d-3)/7) + '.00';
+    var cost = d === 3 ? '3 Tage inkl.' : '+&euro;' + Math.round((d-3)/7) + '.00';
     html += '<button class="day-btn' + (current===d?' active':'') + '" onclick="setDays(\'' + a.id + '\',' + d + ')">' + d + ' Tage<span class="day-cost">' + cost + '</span></button>';
   });
   html += '</div></div>';
@@ -396,7 +396,7 @@ function buildLPToggle(a) {
     html += '<div style="margin-top:10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px 14px;">';
     html += '<div style="' + row + '"><span style="' + col1 + '">Landingpage</span><span style="' + col2 + '">&euro;0.40&thinsp;/Tag</span><span style="' + col3 + '">&euro;' + lpOnly.toFixed(2) + '</span></div>';
     if (hasBot) {
-      html += '<div style="' + row + '"><span style="' + col1 + '">Bot</span><span style="' + col2 + '">&euro;0.60&thinsp;/Tag</span><span style="' + col3 + '">&euro;' + botOnly.toFixed(2) + '</span></div>';
+      html += '<div style="' + row + '"><span style="' + col1 + '">Digitaler Kundenberater</span><span style="' + col2 + '">&euro;0.60&thinsp;/Tag</span><span style="' + col3 + '">&euro;' + botOnly.toFixed(2) + '</span></div>';
     }
     html += '<div style="border-top:1px solid #86efac;margin:5px 0;"></div>';
     html += '<div style="' + row + '"><span style="' + col1 + ';color:#15803d;font-weight:800;">Gesamt</span><span style="' + col2 + ';color:#15803d;">&euro;' + lpRate.toFixed(2) + '&thinsp;/Tag</span><span style="' + col3 + ';font-size:.88rem;">&euro;' + lpCost.toFixed(2) + '</span></div>';
@@ -419,8 +419,9 @@ function buildPriceRows(articles, total) {
     if (photos > 0) {
       var aBase = calcArticleBase(a);
       var aPrice = calcArticlePrice(a);
-      html += '<div class="price-row"><span style="font-weight:600;">' + escHtml(a.title||'Artikel') + modeTag + '</span><span style="font-weight:700;">€' + aPrice.toFixed(2) + '</span></div>';
+      html += '<div class="price-row" style="color:#9ca3af;font-size:.78rem;"><span>' + escHtml(a.title||'Artikel') + modeTag + '</span><span></span></div>';
       if (aMult > 1) html += '<div class="price-row" style="color:#9ca3af;font-size:.75rem;"><span>&nbsp;&nbsp;Basis €' + aBase.toFixed(2) + ' &times; ' + aMult + '</span><span></span></div>';
+      html += '<div class="price-row"><span style="font-weight:700;">Gesamt f&uuml;r &bdquo;' + escHtml(a.title||'Artikel') + '&ldquo;</span><span style="font-weight:700;">€' + aPrice.toFixed(2) + '</span></div>';
     } else {
       html += '<div class="price-row" style="color:#9ca3af;"><span>' + escHtml(a.title||'Artikel') + ' – noch kein Foto</span><span>€0.00</span></div>';
     }
