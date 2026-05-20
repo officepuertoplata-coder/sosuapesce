@@ -181,8 +181,11 @@ function calcArticleBase(a) {
   var photos = (a.vk_photos || []).length;
   if (!photos) return 0;
   var base = 1.00 + Math.max(0, photos - 1) * 0.25;
-  var days = getArticleDays(a.id);
-  base += Math.max(0, days - 3) * 1.00;
+  // Verfügbarkeit nur ohne LP berechnen — mit LP gratis inklusive
+  if (!a.lp_booked) {
+    var days = getArticleDays(a.id);
+    base += Math.max(0, days - 3) / 7 * 1.00;
+  }
   if (a.lp_booked && (a.lp_days || 0) > 0) {
     var lpRate = a.lp_has_bot ? 1.00 : 0.40;
     base += Math.round((a.lp_days || 7) * lpRate * 100) / 100;
@@ -308,19 +311,25 @@ function buildArticleHTML(a, idx) {
   html += '<div id="progress-' + a.id + '"></div>';
   html += '<div class="info-fields"><div class="info-field-label">&#8505;&#65039; Zusatzinfos f&uuml;r die KI (optional)</div>';
   html += '<textarea class="info-field-textarea" id="notes-' + a.id + '" placeholder="z.B. Gr&ouml;&szlig;e M, Baujahr 2019..." onblur="saveNotes(\'' + a.id + '\', this.value)" oninput="notesCache[\'' + a.id + '\']=this.value">' + escHtml(notes) + '</textarea></div>';
-  html += '<div class="article-footer">' + buildDaySelector(a.id);
+  html += '<div class="article-footer">' + buildDaySelector(a);
   html += '<button class="btn-delete-article" onclick="deleteArticle(\'' + a.id + '\')">&#128465; L&ouml;schen</button></div>';
   html += buildLPToggle(a);
   html += '</div>';
   return html;
 }
 
-function buildDaySelector(articleId) {
-  var current = getArticleDays(articleId);
+function buildDaySelector(a) {
+  // Wenn LP gebucht: Verfügbarkeit gratis inklusive
+  if (a.lp_booked) {
+    return '<div><div class="article-meta">Ergebnis verf&uuml;gbar:</div>' +
+      '<div style="font-size:.78rem;color:#15803d;font-weight:700;padding:5px 0;display:flex;align-items:center;gap:5px;">' +
+      '&#10003; Gratis im LP-Preis enthalten</div></div>';
+  }
+  var current = getArticleDays(a.id);
   var html = '<div><div class="article-meta">Ergebnis verf&uuml;gbar:</div><div class="day-selector">';
-  [3,4,5,6,7].forEach(function(d) {
-    var cost = d === 3 ? 'kostenlos' : '+&euro;' + (d-3) + '.00';
-    html += '<button class="day-btn' + (current===d?' active':'') + '" onclick="setDays(\'' + articleId + '\',' + d + ')">' + d + ' Tage<span class="day-cost">' + cost + '</span></button>';
+  [3,7,14,21].forEach(function(d) {
+    var cost = d === 3 ? 'kostenlos' : '+&euro;' + Math.round((d-3)/7) + '.00';
+    html += '<button class="day-btn' + (current===d?' active':'') + '" onclick="setDays(\'' + a.id + '\',' + d + ')">' + d + ' Tage<span class="day-cost">' + cost + '</span></button>';
   });
   html += '</div></div>';
   return html;
