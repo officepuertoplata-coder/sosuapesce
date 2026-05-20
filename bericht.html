@@ -370,19 +370,28 @@ function buildLPToggle(a) {
     html += '<span style="font-size:1.1rem;">&#129302;</span>';
     html += '<div><div style="font-size:.82rem;font-weight:700;color:' + (hasBot?'#6d28d9':'#374151') + ';">WhatsApp Bot</div>';
     html += '<div style="font-size:.72rem;color:#9ca3af;">Automatisch Angebote verhandeln</div></div></div>';
-    var botTotal = Math.round(days * 0.60 * 100) / 100;
     html += '<div style="display:flex;align-items:center;gap:8px;">';
-    html += '<div style="text-align:right;"><span style="font-size:.75rem;font-weight:700;color:' + (hasBot?'#7c3aed':'#9ca3af') + ';">+&euro;0.60/Tag</span><span style="display:block;font-size:.68rem;font-weight:800;color:' + (hasBot?'#6d28d9':'#d1d5db') + ';">&euro;' + botTotal.toFixed(2) + ' gesamt</span></div>';
+    html += '<span style="font-size:.75rem;font-weight:600;color:' + (hasBot?'#7c3aed':'#9ca3af') + ';">+&euro;0.60/Tag</span>';
     html += '<div style="width:38px;height:22px;border-radius:11px;background:' + (hasBot?'#7c3aed':'#d1d5db') + ';position:relative;transition:background .2s;">';
     html += '<div style="width:18px;height:18px;border-radius:50%;background:white;position:absolute;top:2px;left:' + (hasBot?'18':'2') + 'px;transition:left .2s;box-shadow:0 1px 2px rgba(0,0,0,.2);"></div>';
     html += '</div></div>';
     html += '</div>';
 
-    // Price summary
-    html += '<div style="margin-top:8px;background:#f0fdf4;border-radius:8px;padding:8px 12px;font-size:.78rem;color:#15803d;font-weight:600;">';
-    html += '&#128176; ' + days + ' Tage &times; &euro;' + lpRate.toFixed(2) + '/Tag';
-    if (hasBot) html += ' (LP &euro;0.40 + Bot &euro;0.60)';
-    html += ' = <strong>&euro;' + lpCost.toFixed(2) + '</strong>';
+    // Price summary table
+    var lpOnly = Math.round(days * 0.40 * 100) / 100;
+    var botOnly = Math.round(days * 0.60 * 100) / 100;
+    var row = 'display:flex;justify-content:space-between;padding:3px 0;font-size:.78rem;';
+    var col1 = 'color:#6b7280;font-weight:600;flex:1;';
+    var col2 = 'color:#9ca3af;font-weight:600;text-align:right;width:70px;';
+    var col3 = 'color:#15803d;font-weight:700;text-align:right;width:55px;';
+    html += '<div style="margin-top:10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px 14px;">';
+    html += '<div style="' + row + '"><span style="' + col1 + '">Landingpage</span><span style="' + col2 + '">&euro;0.40&thinsp;/Tag</span><span style="' + col3 + '">&euro;' + lpOnly.toFixed(2) + '</span></div>';
+    if (hasBot) {
+      html += '<div style="' + row + '"><span style="' + col1 + '">Bot</span><span style="' + col2 + '">&euro;0.60&thinsp;/Tag</span><span style="' + col3 + '">&euro;' + botOnly.toFixed(2) + '</span></div>';
+    }
+    html += '<div style="border-top:1px solid #86efac;margin:5px 0;"></div>';
+    html += '<div style="' + row + '"><span style="' + col1 + ';color:#15803d;font-weight:800;">Gesamt</span><span style="' + col2 + ';color:#15803d;">&euro;' + lpRate.toFixed(2) + '&thinsp;/Tag</span><span style="' + col3 + ';font-size:.88rem;">&euro;' + lpCost.toFixed(2) + '</span></div>';
+    html += '<div style="font-size:.7rem;color:#9ca3af;margin-top:4px;">' + days + ' Tage Laufzeit</div>';
     html += '</div>';
   }
   html += '</div>';
