@@ -204,6 +204,8 @@ function calcArticlePrice(a) {
   }
   return Math.round(total * getArticleModeMult(a.id) * 100) / 100;
 }
+// Alias für Kompatibilität
+function calcArticleBase(a) { return calcArticlePrice(a); }
 function calcPrice(articles) {
   var total = 1.00;
   articles.forEach(function(a) { total += calcArticlePrice(a); });
