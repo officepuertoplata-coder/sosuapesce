@@ -94,6 +94,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 #drag-ghost img { width: 100%; height: 100%; object-fit: cover; display: block; }
 #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #1a1a1a; color: #fff; padding: 10px 20px; border-radius: 20px; font-size: .85rem; font-weight: 700; transition: all .3s; opacity: 0; z-index: 9998; }
 #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+.photo-lp{position:absolute;bottom:3px;left:3px;width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.92);border:1.5px solid #e5e7eb;font-size:11px;cursor:pointer;z-index:11;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.photo-lp.off{background:rgba(254,226,226,.95);border-color:#fca5a5;}
+.photo-order{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:rgba(27,67,50,.85);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:11;pointer-events:none;}
 </style>
 </head>
 <body>
@@ -307,11 +311,16 @@ function buildArticleHTML(a, idx) {
   var sortedPhotos = photos.slice().sort(function(x,y){ return (x.sort_order||0)-(y.sort_order||0); });
   var photoHTML = sortedPhotos.map(function(p, pi) {
     var onLP = p.show_on_lp !== false;
-    return '<div class="photo-wrap" draggable="true" data-pid="' + p.id + '" data-sid="' + a.id + '" data-order="' + pi + '">' +
-      '<img class="photo-thumb" src="' + p.public_url + '" draggable="false" style="' + (onLP?'':'opacity:.35;filter:grayscale(1);') + '">' +
-      '<div class="photo-order">' + (pi+1) + '</div>' +
-      '<div class="photo-lp' + (onLP?'':' off') + '" onclick="togglePhotoLP(\'' + p.id + '\',' + onLP + ')" title="' + (onLP?'Auf LP sichtbar – klicken zum Ausblenden':'Nicht auf LP – klicken zum Einblenden') + '">' + (onLP?'&#128065;':'&#128683;') + '</div>' +
-      '<div class="photo-delete" onclick="deletePhoto(\'' + p.id + '\')">&#10005;</div></div>';
+    var imgStyle = onLP ? '' : 'opacity:.3;filter:grayscale(1);';
+    var lpClass = 'photo-lp' + (onLP ? '' : ' off');
+    var lpIcon = onLP ? '&#128065;' : '&#128683;';
+    var wrap = '<div class="photo-wrap" draggable="true" data-pid="' + p.id + '" data-sid="' + a.id + '">';
+    wrap += '<img class="photo-thumb" src="' + p.public_url + '" draggable="false" style="' + imgStyle + '">';
+    wrap += '<div class="photo-order">' + (pi + 1) + '</div>';
+    wrap += '<div class="' + lpClass + '" onclick="togglePhotoLP(\'' + p.id + '\',' + onLP + ')">' + lpIcon + '</div>';
+    wrap += '<div class="photo-delete" onclick="deletePhoto(\'' + p.id + '\')">&#10005;</div>';
+    wrap += '</div>';
+    return wrap;
   }).join('');
   var addBtn = '<div class="photo-add" onclick="triggerUpload(\'' + a.id + '\')"><span>+</span>' + (photos.length === 0 ? 'Fotos' : 'Mehr') + '</div>';
   var notes = notesCache[a.id] !== undefined ? notesCache[a.id] : (a.notes || '');
