@@ -341,7 +341,9 @@ function buildArticleHTML(a, idx) {
   html += '</div>';
   // KI chips
   html += buildArticleModeSelector(a);
-    html += '<div class="photo-row" id="photos-' + a.id + '" data-zid="' + a.id + '">' + photoHTML + addBtn + '</div>';
+  var addBtn = '<div class="photo-add" onclick="triggerUpload(\'' + a.id + '\')"><span>+</span>' + ((a.vk_photos||[]).length === 0 ? 'Fotos' : 'Mehr') + '</div>';
+  var notes = notesC[a.id] !== undefined ? notesC[a.id] : (a.notes || '');
+      html += '<div class="photo-row" id="photos-' + a.id + '" data-zid="' + a.id + '">' + photoHTML + addBtn + '</div>';
   if (sortedPhotos.length > 0) html += controlsHTML;
   html += '<div id="progress-' + a.id + '"></div>';
   html += '<div class="info-fields"><div class="info-field-label">&#8505;&#65039; Zusatzinfos f&uuml;r die KI (optional)</div>';
