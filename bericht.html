@@ -560,48 +560,74 @@ function setupDragDrop() {
 }
 
 async function togglePhotoLP(photoId, currentState) {
+  var _t = new URLSearchParams(location.search).get('s');
   try {
-    await fetch(API + '/api/vk/photo/' + photoId + '/lp', {
+    var upd = await fetch(API + '/api/vk/photo/' + photoId + '/lp', {
       method: 'PUT', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({show_on_lp: !currentState})
     });
-    var r = await fetch(API + '/api/vk/session/' + tok);
-    sd = await r.json(); render();
+    if (!upd.ok) throw new Error('Server-Fehler');
+    // Toggle lokal sofort (ohne Server-Reload)
+    if (sd && sd.articles) {
+      sd.articles.forEach(function(a) {
+        (a.vk_photos||[]).forEach(function(p) {
+          if (p.id === photoId) p.show_on_lp = !currentState;
+        });
+      });
+    }
+    render();
     showToast(!currentState ? '&#128065; Auf LP sichtbar' : '&#128683; Nicht auf LP');
-  } catch(e) { showToast('Fehler: ' + e.message); }
+  } catch(e) {
+    // Fallback: toggle nur lokal wenn Server noch nicht bereit
+    if (sd && sd.articles) {
+      sd.articles.forEach(function(a) {
+        (a.vk_photos||[]).forEach(function(p) {
+          if (p.id === photoId) p.show_on_lp = !currentState;
+        });
+      });
+    }
+    render();
+    showToast(!currentState ? '&#128065; Auf LP sichtbar (lokal)' : '&#128683; Nicht auf LP (lokal)');
+  }
 }
 
 async function reorderPhoto(photoId, articleId, dropEvent) {
-  // Find drop position among photo-wraps
   var zone = document.getElementById('photos-' + articleId);
   if (!zone) return;
   var wraps = Array.from(zone.querySelectorAll('.photo-wrap'));
   var dropX = dropEvent.clientX;
-  var targetIdx = wraps.length; // default: end
+  var targetIdx = wraps.length;
   for (var i = 0; i < wraps.length; i++) {
     var rect = wraps[i].getBoundingClientRect();
     if (dropX < rect.left + rect.width / 2) { targetIdx = i; break; }
   }
-  // Get current order of photo IDs from DOM
   var orderedIds = wraps.map(function(w){ return w.getAttribute('data-pid'); });
-  // Move dragged photo to new position
   var fromIdx = orderedIds.indexOf(photoId);
   if (fromIdx === -1 || fromIdx === targetIdx) return;
   orderedIds.splice(fromIdx, 1);
   if (targetIdx > fromIdx) targetIdx--;
   orderedIds.splice(targetIdx, 0, photoId);
-  // Save new order
+  // Update local sort_order immediately
+  if (sd && sd.articles) {
+    sd.articles.forEach(function(a) {
+      if (a.id === articleId) {
+        orderedIds.forEach(function(pid, j) {
+          (a.vk_photos||[]).forEach(function(p) { if (p.id === pid) p.sort_order = j; });
+        });
+      }
+    });
+  }
+  render();
+  showToast('&#8646; Reihenfolge aktualisiert');
+  // Save to server async (non-blocking)
   try {
     for (var j = 0; j < orderedIds.length; j++) {
-      await fetch(API + '/api/vk/photo/' + orderedIds[j] + '/order', {
+      fetch(API + '/api/vk/photo/' + orderedIds[j] + '/order', {
         method: 'PUT', headers: {'Content-Type':'application/json'},
         body: JSON.stringify({sort_order: j})
       });
     }
-    var r2 = await fetch(API + '/api/vk/session/' + tok);
-    sd = await r2.json(); render();
-    showToast('&#8646; Reihenfolge gespeichert');
-  } catch(e) { showToast('Fehler: ' + e.message); }
+  } catch(e) {}
 }
 
 async function movePhoto(photoId, targetId, srcId) {
