@@ -189,27 +189,20 @@ function render() {
 
 // ── Preisberechnung (pro Artikel) ────────────────────────────
 // Analysekosten (werden mit KI-Modus multipliziert - nur Analyse, nicht LP!)
-function calcAnalysisVar(a) {
+function calcArticlePrice(a) {
   var photos = (a.vk_photos || []).length;
   if (!photos) return 0;
-  var v = Math.max(0, photos - 1) * 0.25;
+  // Alle Kosten × KI-Modus (ganz simpel)
+  var total = 1.00 + Math.max(0, photos - 1) * 0.25; // €1 erstes Foto + €0.25 weitere
   if (!a.lp_booked) {
     var days = getArticleDays(a.id);
-    if (days > 3) v += Math.floor(days / 7) * 1.00;
+    if (days > 3) total += Math.floor(days / 7) * 1.00; // Tage-Verlängerung
   }
-  return Math.round(v * 100) / 100;
-}
-// LP-Kosten (NICHT multipliziert - eigener Dienst)
-function calcLPCost(a) {
-  if (!a.lp_booked || !(a.lp_days || 0)) return 0;
-  var lpRate = a.lp_has_bot ? 1.00 : 0.40;
-  return Math.round((a.lp_days || 7) * lpRate * 100) / 100;
-}
-function calcArticleVariable(a) { return calcAnalysisVar(a); }
-function calcArticleBase(a) { return calcAnalysisVar(a) + calcLPCost(a); }
-function calcArticlePrice(a) {
-  if (!(a.vk_photos || []).length) return 0;
-  return Math.round(calcAnalysisVar(a) * getArticleModeMult(a.id) * 100) / 100 + calcLPCost(a);
+  if (a.lp_booked && (a.lp_days || 0) > 0) {
+    var lpRate = a.lp_has_bot ? 1.00 : 0.40;
+    total += (a.lp_days || 7) * lpRate; // LP + Bot
+  }
+  return Math.round(total * getArticleModeMult(a.id) * 100) / 100;
 }
 function calcPrice(articles) {
   var total = 1.00;
@@ -321,8 +314,7 @@ function buildArticleHTML(a, idx) {
   html += '<input class="article-title-input" type="text" value="' + escAttr(a.title || 'Artikel ' + (idx + 1)) + '" onblur="saveTitle(\'' + a.id + '\', this.value)" onkeydown="if(event.key===\'Enter\')this.blur()">';
   if (photos.length > 0) {
     html += '<span style="background:#f0fdf4;border:1px solid #86efac;color:#15803d;font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:10px;">' + photos.length + ' Foto' + (photos.length !== 1 ? 's' : '') + '</span>';
-    var artTitlePrice = calcArticlePrice(a);
-    if (artTitlePrice > 0) html += '<span style="font-size:.9rem;font-weight:800;color:#2d7a4f;margin-left:4px;">&euro;' + artTitlePrice.toFixed(2) + '</span>';
+    // Preis wird nur in der Zusammenfassung angezeigt
   }
   html += '</div>';
   html += buildArticleModeSelector(a);
@@ -341,7 +333,7 @@ function buildDaySelector(a) {
   if (a.lp_booked) {
     return '<div><div class="article-meta">Bericht verf&uuml;gbar:</div>' +
       '<div style="font-size:.78rem;color:#15803d;font-weight:700;padding:5px 0;display:flex;align-items:center;gap:5px;">' +
-      '&#10003; Gratis im LP-Preis enthalten</div></div>';
+      'In Landingpage enthalten</div></div>';
   }
   var current = getArticleDays(a.id);
   var html = '<div><div class="article-meta">Bericht verf&uuml;gbar:</div><div class="day-selector">';
@@ -437,16 +429,10 @@ function buildPriceRows(articles, total) {
     if (photos > 0) {
       var aBase = calcArticleBase(a);
       var aPrice = calcArticlePrice(a);
-      var aAn = calcAnalysisVar(a);
-      var aLP = calcLPCost(a);
+            var aBase = Math.round(calcArticlePrice(a) / aMult * 100) / 100;
       html += '<div class="price-row" style="color:#9ca3af;font-size:.78rem;"><span>' + escHtml(a.title||'Artikel') + modeTag + '</span><span></span></div>';
-      if (aAn > 0 && aMult > 1) {
-        html += '<div class="price-row" style="color:#9ca3af;font-size:.75rem;"><span>&nbsp;&nbsp;Analyse €' + aAn.toFixed(2) + ' &times; ' + aMult + '</span><span>€' + (Math.round(aAn * aMult * 100)/100).toFixed(2) + '</span></div>';
-      } else if (aAn > 0) {
-        html += '<div class="price-row" style="color:#9ca3af;font-size:.75rem;"><span>&nbsp;&nbsp;Analyse</span><span>€' + aAn.toFixed(2) + '</span></div>';
-      }
-      if (aLP > 0) {
-        html += '<div class="price-row" style="color:#9ca3af;font-size:.75rem;"><span>&nbsp;&nbsp;Landingpage</span><span>€' + aLP.toFixed(2) + '</span></div>';
+      if (aMult > 1) {
+        html += '<div class="price-row" style="color:#9ca3af;font-size:.75rem;"><span>&nbsp;&nbsp;&euro;' + aBase.toFixed(2) + ' &times; ' + aMult + '</span><span>&euro;' + aPrice.toFixed(2) + '</span></div>';
       }
       html += '<div class="price-row"><span style="font-weight:700;">Gesamt f&uuml;r &bdquo;' + escHtml(a.title||'Artikel') + '&ldquo;</span><span style="font-weight:700;">€' + aPrice.toFixed(2) + '</span></div>';
     } else {
