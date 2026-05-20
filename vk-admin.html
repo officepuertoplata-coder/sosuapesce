@@ -15,16 +15,12 @@ nav{background:var(--g2);color:#fff;display:flex;align-items:center;gap:6px;padd
 .tbtn:hover,.tbtn.active{background:rgba(255,255,255,.15);color:#fff;}
 .nav-right{margin-left:auto;}
 .main{max-width:1100px;margin:0 auto;padding:20px;}
-
-/* STATS – 5 Karten, neue Metriken */
 .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px;}
 .stat{background:var(--card);border-radius:var(--r);padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.07);border-top:3px solid var(--wa);}
 .stat.gold{border-top-color:var(--gold);}
 .stat.blue{border-top-color:#3b82f6;}
 .stat-val{font-size:1.6rem;font-weight:900;color:var(--g2);}
 .stat-lbl{font-size:.72rem;color:var(--mu);margin-top:3px;line-height:1.3;}
-
-/* TABLE */
 .table-box{background:var(--card);border-radius:var(--r);box-shadow:0 1px 4px rgba(0,0,0,.08);overflow:hidden;margin-bottom:20px;}
 .table-hd{background:var(--g2);color:#fff;padding:13px 18px;display:flex;align-items:center;justify-content:space-between;}
 .table-hd h2{font-size:.92rem;font-weight:800;}
@@ -67,42 +63,24 @@ tr:hover td{background:#f9fafb;}
   <button class="tbtn" onclick="showSection('botsandbox')" id="btnBotsandbox">🤖 Bot Sandbox</button>
   <button class="tbtn" onclick="showSection('coupons')" id="btnCoupons">🎟️ Gutscheine</button>
   <button class="tbtn" onclick="showSection('business')" id="btnBusiness">🏢 Business</button>
+  <button class="tbtn" onclick="showSection('aiconfig')" id="btnAiconfig">⚙️ KI Config</button>
   <div class="nav-right"><button class="tbtn" onclick="doLogout()">Ausloggen</button></div>
 </nav>
 
 <div class="main">
 
   <div id="section-orders">
-
-    <!-- STATS: 5 neue Karten -->
     <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
       <button class="btn btn-sm" id="btnCleanup" onclick="runCleanup()" style="background:#f0fdf4;color:#15803d;border:1px solid #86efac;">🧹 Cleanup jetzt ausführen</button>
       <span id="cleanupStatus" style="font-size:.75rem;color:var(--mu);margin-left:10px;line-height:28px;"></span>
     </div>
     <div class="stats">
-      <div class="stat">
-        <div class="stat-val" id="s-valid">—</div>
-        <div class="stat-lbl">Derzeit gültige Aufträge</div>
-      </div>
-      <div class="stat blue">
-        <div class="stat-val" id="s-24h">—</div>
-        <div class="stat-lbl">Aufträge letzte 24 Std.</div>
-      </div>
-      <div class="stat gold">
-        <div class="stat-val" id="s-rev-24h">—</div>
-        <div class="stat-lbl">Umsatz letzte 24 Std.</div>
-      </div>
-      <div class="stat gold">
-        <div class="stat-val" id="s-rev-30d">—</div>
-        <div class="stat-lbl">Umsatz letzter Monat<br><span style="font-size:.65rem;opacity:.7;">rollierend 30 Tage</span></div>
-      </div>
-      <div class="stat gold">
-        <div class="stat-val" id="s-rev-365d">—</div>
-        <div class="stat-lbl">Umsatz letztes Jahr<br><span style="font-size:.65rem;opacity:.7;">rollierend 365 Tage</span></div>
-      </div>
+      <div class="stat"><div class="stat-val" id="s-valid">—</div><div class="stat-lbl">Derzeit gültige Aufträge</div></div>
+      <div class="stat blue"><div class="stat-val" id="s-24h">—</div><div class="stat-lbl">Aufträge letzte 24 Std.</div></div>
+      <div class="stat gold"><div class="stat-val" id="s-rev-24h">—</div><div class="stat-lbl">Umsatz letzte 24 Std.</div></div>
+      <div class="stat gold"><div class="stat-val" id="s-rev-30d">—</div><div class="stat-lbl">Umsatz letzter Monat<br><span style="font-size:.65rem;opacity:.7;">rollierend 30 Tage</span></div></div>
+      <div class="stat gold"><div class="stat-val" id="s-rev-365d">—</div><div class="stat-lbl">Umsatz letztes Jahr<br><span style="font-size:.65rem;opacity:.7;">rollierend 365 Tage</span></div></div>
     </div>
-
-    <!-- AUFTRÄGE -->
     <div class="table-box">
       <div class="table-hd">
         <h2>📋 Alle Aufträge</h2>
@@ -123,7 +101,6 @@ tr:hover td{background:#f9fafb;}
         <tbody id="sessionsTable"><tr><td colspan="7" class="msg">Lade...</td></tr></tbody>
       </table>
     </div>
-
   </div>
 
   <!-- VERKÄUFE -->
@@ -208,7 +185,7 @@ tr:hover td{background:#f9fafb;}
 
     <!-- Edit Modal -->
     <div id="editBusinessModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;">
-      <div style="background:#fff;border-radius:12px;padding:24px;width:90%;max-width:540px;box-shadow:0 8px 32px rgba(0,0,0,.2);">
+      <div style="background:#fff;border-radius:12px;padding:24px;width:90%;max-width:540px;box-shadow:0 8px 32px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto;">
         <h3 style="margin-bottom:16px;font-size:.95rem;">✏️ Firmenrabatt bearbeiten</h3>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
           <div><label style="font-size:.7rem;font-weight:800;color:var(--mu);display:block;margin-bottom:4px;">FIRMENNAME</label>
@@ -315,6 +292,36 @@ tr:hover td{background:#f9fafb;}
     </div>
   </div>
 
+  <!-- ── KI KONFIGURATION ── -->
+  <div id="section-aiconfig" style="display:none;">
+    <div class="table-box">
+      <div class="table-hd">
+        <h2>⚙️ KI Konfiguration</h2>
+        <span id="aiconfig-status" style="font-size:.75rem;color:rgba(255,255,255,.7);"></span>
+      </div>
+      <div style="padding:14px 18px;background:#f9fafb;border-bottom:1px solid var(--border);">
+        <div style="font-size:.82rem;color:var(--mu);margin-bottom:6px;">Wähle das KI-Modell pro Aufgabe und Rolle. Jede Zeile einzeln speichern.</div>
+        <div style="display:flex;gap:20px;font-size:.78rem;font-weight:700;">
+          <span>⚡ <strong>Haiku</strong> — schnell, günstig</span>
+          <span>💡 <strong>Sonnet</strong> — ausgewogen</span>
+          <span>🏆 <strong>Opus</strong> — premium, teuer</span>
+        </div>
+      </div>
+      <table>
+        <thead><tr>
+          <th style="width:220px;">Aufgabe</th>
+          <th style="background:#f0fdf4;color:#15803d;">👤 Sachbearbeiter<br><span style="font-size:.65rem;font-weight:600;">×1 Preis</span></th>
+          <th style="background:#eff6ff;color:#1d4ed8;">📊 Abteilungsleiter<br><span style="font-size:.65rem;font-weight:600;">×2 Preis</span></th>
+          <th style="background:#fef9c3;color:#a16207;">🎯 Experte<br><span style="font-size:.65rem;font-weight:600;">×4 Preis</span></th>
+          <th style="width:60px;"></th>
+        </tr></thead>
+        <tbody id="aiconfig-tbody">
+          <tr><td colspan="5" class="msg">Lade...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
 
 <div id="toast"></div>
@@ -325,7 +332,6 @@ const KEY = 'converto_auth_v2';
 let sessions = [];
 let currentFilter = 'all';
 
-// ✅ FIX: Globale esc() Funktion – war vorher nur lokal definiert
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 (function() {
@@ -357,13 +363,9 @@ async function runCleanup(silent) {
       var msg = '✅ ' + d.deleted + ' gelöscht, ' + d.fixed + ' repariert';
       if (status) status.textContent = msg;
       if (!silent) showToast(msg);
-      if (d.deleted > 0 || d.fixed > 0) {
-        await Promise.all([loadStats(), loadSessions()]);
-      }
+      if (d.deleted > 0 || d.fixed > 0) { await Promise.all([loadStats(), loadSessions()]); }
     }
-  } catch(e) {
-    if (!silent) showToast('❌ Cleanup Fehler: ' + e.message);
-  }
+  } catch(e) { if (!silent) showToast('❌ Cleanup Fehler: ' + e.message); }
   if (btn) btn.textContent = '🧹 Cleanup jetzt ausführen';
 }
 
@@ -400,21 +402,16 @@ function renderSessions() {
   const list = currentFilter === 'all' ? sessions : sessions.filter(s => s.status === currentFilter);
   const tbody = document.getElementById('sessionsTable');
   if (!list.length) { tbody.innerHTML = '<tr><td colspan="7" class="msg">Keine Aufträge</td></tr>'; return; }
-
   const statusLabels = {open:'Offen',paid:'Bezahlt',analyzing:'Analyse',done:'Fertig',expired:'Abgelaufen',deleted:'Gelöscht',error:'Fehler'};
-
   tbody.innerHTML = list.map(function(s) {
     const articles = s.vk_articles || [];
     const created = new Date(s.created_at).toLocaleString('de-AT', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
     const deleteAt = s.delete_at ? new Date(s.delete_at).toLocaleDateString('de-AT') : '—';
     const daysLeft = s.delete_at ? Math.ceil((new Date(s.delete_at)-Date.now())/(1000*60*60*24)) : null;
     const deleteDisplay = daysLeft !== null
-      ? (daysLeft <= 1
-          ? '<span style="color:var(--red);font-weight:800;">'+deleteAt+' ('+daysLeft+'d)</span>'
-          : deleteAt + ' (' + daysLeft + 'd)')
+      ? (daysLeft <= 1 ? '<span style="color:var(--red);font-weight:800;">'+deleteAt+' ('+daysLeft+'d)</span>' : deleteAt + ' (' + daysLeft + 'd)')
       : '—';
     const badge = '<span class="badge s-'+s.status+'">'+(statusLabels[s.status]||s.status)+'</span>';
-
     return '<tr>' +
       '<td style="font-size:.78rem;">' + created + '</td>' +
       '<td><span class="phone">' + s.phone + '</span></td>' +
@@ -429,7 +426,6 @@ function renderSessions() {
         '<button class="btn btn-sm" style="background:#eff6ff;color:#1d4ed8;" onclick="extendSession(\''+s.id+'\')">+7d</button>' +
         '<button class="btn btn-sm btn-red" onclick="deleteSession(\''+s.id+'\',\''+s.phone+'\')">🗑️</button>' +
       '</td></tr>' +
-      // ✅ FIX: Compliance Sub-Rows – Quotes korrekt escaped mit \'
       articles.filter(function(a) { return a.compliance_status === 'blocked' || a.compliance_status === 'needs_review'; }).map(function(a) {
         var compColor = a.compliance_status === 'blocked' ? '#fef2f2' : '#fefce8';
         var compIcon = a.compliance_status === 'blocked' ? '🔒' : '⚠️';
@@ -448,10 +444,7 @@ function renderSessions() {
 
 async function complianceAction(articleId, action) {
   try {
-    await fetch(API + '/api/vk/admin/compliance/' + articleId, {
-      method: 'PUT', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ action })
-    });
+    await fetch(API + '/api/vk/admin/compliance/' + articleId, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ action }) });
     showToast(action === 'approve' ? '✅ Freigegeben' : '❌ Abgelehnt');
     loadSessions();
   } catch(e) { alert('Fehler: ' + e.message); }
@@ -460,21 +453,14 @@ async function complianceAction(articleId, action) {
 function complianceReject(articleId) {
   var reason = prompt('Begründung für Ablehnung (wird an Verkäufer gesendet):');
   if (!reason) return;
-  fetch(API + '/api/vk/admin/compliance/' + articleId, {
-    method: 'PUT', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ action: 'reject', reason })
-  }).then(function() {
-    showToast('❌ Abgelehnt – Verkäufer wird informiert');
-    loadSessions();
-  }).catch(function(e) { alert('Fehler: ' + e.message); });
+  fetch(API + '/api/vk/admin/compliance/' + articleId, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ action: 'reject', reason }) })
+    .then(function() { showToast('❌ Abgelehnt – Verkäufer wird informiert'); loadSessions(); })
+    .catch(function(e) { alert('Fehler: ' + e.message); });
 }
 
 async function verifyAuth(articleId) {
-  try {
-    await fetch(API + '/api/vk/admin/verify/' + articleId, { method: 'PUT' });
-    showToast('🏆 Authentizität verifiziert');
-    loadSessions();
-  } catch(e) { alert('Fehler: ' + e.message); }
+  try { await fetch(API + '/api/vk/admin/verify/' + articleId, { method: 'PUT' }); showToast('🏆 Authentizität verifiziert'); loadSessions(); }
+  catch(e) { alert('Fehler: ' + e.message); }
 }
 
 async function analyzeSession(id) {
@@ -486,10 +472,7 @@ async function analyzeSession(id) {
 }
 
 async function extendSession(id) {
-  await fetch(API + '/api/vk/admin/session/' + id + '/extend', {
-    method:'PUT', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ days: 7 })
-  });
+  await fetch(API + '/api/vk/admin/session/' + id + '/extend', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ days: 7 }) });
   showToast('✅ Session um 7 Tage verlängert');
   loadSessions();
 }
@@ -502,18 +485,20 @@ async function deleteSession(id, phone) {
 }
 
 function showSection(name) {
-  document.getElementById('section-coupons').style.display   = name === 'coupons'   ? 'block' : 'none';
-  document.getElementById('section-business').style.display  = name === 'business'  ? 'block' : 'none';
-  document.getElementById('section-orders').style.display    = name === 'orders'    ? 'block' : 'none';
+  document.getElementById('section-coupons').style.display  = name === 'coupons'   ? 'block' : 'none';
+  document.getElementById('section-business').style.display = name === 'business'  ? 'block' : 'none';
+  document.getElementById('section-orders').style.display   = name === 'orders'    ? 'block' : 'none';
+  document.getElementById('section-aiconfig').style.display = name === 'aiconfig'  ? 'block' : 'none';
   var ve = document.getElementById('section-verkaeufe');
   if (ve) ve.style.display = name === 'verkaeufe' ? 'block' : 'none';
   var bs = document.getElementById('section-botsandbox');
   if (bs) bs.style.display = name === 'botsandbox' ? 'block' : 'none';
   document.querySelectorAll('.tbtn').forEach(b => b.classList.remove('active'));
-  if (name === 'coupons')     { document.getElementById('btnCoupons').classList.add('active');    loadCoupons(); }
-  else if (name === 'business')    { document.getElementById('btnBusiness').classList.add('active');   loadBusinessDiscounts(); }
-  else if (name === 'verkaeufe')   { document.getElementById('btnVerkaeufe').classList.add('active');  loadVerkaeufe(); }
-  else if (name === 'botsandbox')  { document.getElementById('btnBotsandbox').classList.add('active'); loadSandboxLPs(); }
+  if (name === 'coupons')        { document.getElementById('btnCoupons').classList.add('active');   loadCoupons(); }
+  else if (name === 'business')  { document.getElementById('btnBusiness').classList.add('active');  loadBusinessDiscounts(); }
+  else if (name === 'verkaeufe') { document.getElementById('btnVerkaeufe').classList.add('active'); loadVerkaeufe(); }
+  else if (name === 'botsandbox'){ document.getElementById('btnBotsandbox').classList.add('active');loadSandboxLPs(); }
+  else if (name === 'aiconfig')  { document.getElementById('btnAiconfig').classList.add('active');  loadAiConfig(); }
   else { document.getElementById('btnOrders').classList.add('active'); loadAll(); }
 }
 
@@ -559,10 +544,7 @@ async function createCoupon() {
   var desc = document.getElementById('nc-desc').value.trim()||null;
   document.getElementById('nc-err').textContent = '';
   try {
-    var r = await fetch(API + '/api/vk/admin/coupons', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ code, type, value, max_uses: maxUses, expires_at: expires, description: desc })
-    });
+    var r = await fetch(API + '/api/vk/admin/coupons', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ code, type, value, max_uses: maxUses, expires_at: expires, description: desc }) });
     var d = await r.json();
     if (!d.success) { document.getElementById('nc-err').textContent = d.error; return; }
     showToast('✅ Code "' + d.coupon.code + '" erstellt!');
@@ -572,10 +554,7 @@ async function createCoupon() {
 }
 
 async function toggleCoupon(id, active) {
-  await fetch(API + '/api/vk/admin/coupons/' + id, {
-    method:'PUT', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ active: !active })
-  });
+  await fetch(API + '/api/vk/admin/coupons/' + id, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ active: !active }) });
   showToast(!active ? '▶ Aktiv' : '⏸ Pausiert');
   loadCoupons();
 }
@@ -597,159 +576,83 @@ async function loadVerkaeufe() {
     const r = await fetch(API + '/api/vk/admin/verkaeufe');
     const data = await r.json();
     if (!Array.isArray(data)) throw new Error(data.error || 'Server Fehler');
-
     const totalOffen    = data.filter(v => v.payout_status === 'open').reduce((s,v) => s + (v.commission_amount||0), 0);
     const totalErledigt = data.filter(v => v.payout_status === 'done').reduce((s,v) => s + (v.commission_amount||0), 0);
     const totalSusp     = data.filter(v => v.payout_status === 'suspended').reduce((s,v) => s + (v.commission_amount||0), 0);
-
     document.getElementById('verkaeufe-summary').innerHTML = [
       '<div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:14px;text-align:center;"><div style="font-size:1.3rem;font-weight:900;color:#15803d;">€' + totalOffen.toFixed(2) + '</div><div style="font-size:.72rem;color:var(--mu);font-weight:700;margin-top:2px;">OFFEN</div></div>',
       '<div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:14px;text-align:center;"><div style="font-size:1.3rem;font-weight:900;color:#059669;">€' + totalErledigt.toFixed(2) + '</div><div style="font-size:.72rem;color:var(--mu);font-weight:700;margin-top:2px;">AUSBEZAHLT</div></div>',
       '<div style="background:#fef2f2;border:1.5px solid #fecaca;border-radius:10px;padding:14px;text-align:center;"><div style="font-size:1.3rem;font-weight:900;color:#ef4444;">€' + totalSusp.toFixed(2) + '</div><div style="font-size:.72rem;color:var(--mu);font-weight:700;margin-top:2px;">SUSPENDIERT</div></div>'
     ].join('');
-
-    if (!data.length) {
-      document.getElementById('verkaeufe-list').innerHTML = '<div style="text-align:center;padding:40px;color:var(--mu);">Noch keine Verkäufe</div>';
-      return;
-    }
-
+    if (!data.length) { document.getElementById('verkaeufe-list').innerHTML = '<div style="text-align:center;padding:40px;color:var(--mu);">Noch keine Verkäufe</div>'; return; }
     const now = new Date();
-    let html = '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:.82rem;">';
-    html += '<thead><tr style="border-bottom:2px solid var(--border);text-align:left;">';
-    html += '<th style="padding:8px 10px;color:var(--mu);font-size:.7rem;">VERKÄUFER</th>';
-    html += '<th style="padding:8px 10px;color:var(--mu);font-size:.7rem;">PRODUKT</th>';
-    html += '<th style="padding:8px 10px;color:var(--mu);font-size:.7rem;">VK-WERT</th>';
-    html += '<th style="padding:8px 10px;color:var(--mu);font-size:.7rem;">PROVISION</th>';
-    html += '<th style="padding:8px 10px;color:var(--mu);font-size:.7rem;">AUSZAHLUNG</th>';
-    html += '<th style="padding:8px 10px;color:var(--mu);font-size:.7rem;">STATUS</th>';
-    html += '<th style="padding:8px 10px;color:var(--mu);font-size:.7rem;">FÄLLIGKEIT</th>';
-    html += '<th style="padding:8px 10px;color:var(--mu);font-size:.7rem;">AKTION</th>';
-    html += '</tr></thead><tbody>';
-
+    let html = '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:.82rem;"><thead><tr style="border-bottom:2px solid var(--border);text-align:left;"><th style="padding:8px 10px;color:var(--mu);font-size:.7rem;">VERKÄUFER</th><th style="padding:8px 10px;color:var(--mu);font-size:.7rem;">PRODUKT</th><th style="padding:8px 10px;color:var(--mu);font-size:.7rem;">VK-WERT</th><th style="padding:8px 10px;color:var(--mu);font-size:.7rem;">PROVISION</th><th style="padding:8px 10px;color:var(--mu);font-size:.7rem;">AUSZAHLUNG</th><th style="padding:8px 10px;color:var(--mu);font-size:.7rem;">STATUS</th><th style="padding:8px 10px;color:var(--mu);font-size:.7rem;">FÄLLIGKEIT</th><th style="padding:8px 10px;color:var(--mu);font-size:.7rem;">AKTION</th></tr></thead><tbody>';
     data.forEach(function(v) {
-      const saleAmt   = parseFloat(v.sale_amount || 0);
-      const commAmt   = parseFloat(v.commission_amount || 0);
-      const payoutAmt = saleAmt - commAmt;
-      const dueAt     = v.payout_due_at ? new Date(v.payout_due_at) : null;
+      const saleAmt = parseFloat(v.sale_amount||0), commAmt = parseFloat(v.commission_amount||0), payoutAmt = saleAmt - commAmt;
+      const dueAt = v.payout_due_at ? new Date(v.payout_due_at) : null;
       const isOverdue = dueAt && dueAt < now && v.payout_status === 'open';
-      const daysDue   = dueAt ? Math.ceil((now - dueAt) / (1000*60*60*24)) : 0;
-
-      const statusBadge = {
-        'open':      '<span style="background:#fef9c3;color:#a16207;padding:3px 8px;border-radius:12px;font-weight:700;font-size:.7rem;">Offen</span>',
-        'suspended': '<span style="background:#fee2e2;color:#dc2626;padding:3px 8px;border-radius:12px;font-weight:700;font-size:.7rem;">Suspendiert</span>',
-        'done':      '<span style="background:#dcfce7;color:#15803d;padding:3px 8px;border-radius:12px;font-weight:700;font-size:.7rem;">Erledigt</span>'
-      }[v.payout_status] || '';
-
-      const payoutColor = isOverdue ? 'color:#dc2626;font-weight:800;' : 'font-weight:700;';
-      const rowBg = isOverdue ? 'background:#fff7f7;' : '';
-
-      html += '<tr style="border-bottom:1px solid var(--border);' + rowBg + '">';
-      html += '<td style="padding:10px;">' + esc(v.seller_name || v.company_name || '-') + '</td>';
-      html += '<td style="padding:10px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(v.product_title || '-') + '</td>';
-      html += '<td style="padding:10px;font-weight:700;">€' + saleAmt.toFixed(2) + '</td>';
-      html += '<td style="padding:10px;font-weight:700;color:#15803d;">€' + commAmt.toFixed(2) + '</td>';
-      html += '<td style="padding:10px;' + payoutColor + '">€' + payoutAmt.toFixed(2) + (isOverdue ? ' ⚠️ ' + daysDue + 'd' : '') + '</td>';
-      html += '<td style="padding:10px;">' + statusBadge + '</td>';
-      html += '<td style="padding:10px;font-size:.75rem;color:var(--mu);">' + (dueAt ? dueAt.toLocaleDateString('de-AT') : '-') + '</td>';
+      const daysDue = dueAt ? Math.ceil((now - dueAt)/(1000*60*60*24)) : 0;
+      const statusBadge = {'open':'<span style="background:#fef9c3;color:#a16207;padding:3px 8px;border-radius:12px;font-weight:700;font-size:.7rem;">Offen</span>','suspended':'<span style="background:#fee2e2;color:#dc2626;padding:3px 8px;border-radius:12px;font-weight:700;font-size:.7rem;">Suspendiert</span>','done':'<span style="background:#dcfce7;color:#15803d;padding:3px 8px;border-radius:12px;font-weight:700;font-size:.7rem;">Erledigt</span>'}[v.payout_status]||'';
+      html += '<tr style="border-bottom:1px solid var(--border);'+(isOverdue?'background:#fff7f7;':'')+'">';
+      html += '<td style="padding:10px;">'+esc(v.seller_name||v.company_name||'-')+'</td>';
+      html += '<td style="padding:10px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(v.product_title||'-')+'</td>';
+      html += '<td style="padding:10px;font-weight:700;">€'+saleAmt.toFixed(2)+'</td>';
+      html += '<td style="padding:10px;font-weight:700;color:#15803d;">€'+commAmt.toFixed(2)+'</td>';
+      html += '<td style="padding:10px;'+(isOverdue?'color:#dc2626;font-weight:800;':'font-weight:700;')+'">€'+payoutAmt.toFixed(2)+(isOverdue?' ⚠️ '+daysDue+'d':'')+'</td>';
+      html += '<td style="padding:10px;">'+statusBadge+'</td>';
+      html += '<td style="padding:10px;font-size:.75rem;color:var(--mu);">'+(dueAt?dueAt.toLocaleDateString('de-AT'):'-')+'</td>';
       html += '<td style="padding:10px;">';
-      if (v.payout_status === 'open') {
-        html += '<button data-lpid="' + v.id + '" data-status="done" data-action="payout" style="padding:4px 8px;background:#15803d;color:#fff;border:none;border-radius:5px;font-size:.72rem;cursor:pointer;margin-right:4px;">Erledigt</button>';
-        html += '<button data-lpid="' + v.id + '" data-status="suspended" data-action="payout" style="padding:4px 8px;background:#dc2626;color:#fff;border:none;border-radius:5px;font-size:.72rem;cursor:pointer;">Suspendieren</button>';
-      } else if (v.payout_status !== 'done') {
-        html += '<button data-lpid="' + v.id + '" data-status="open" data-action="payout" style="padding:4px 8px;background:var(--wa);color:#fff;border:none;border-radius:5px;font-size:.72rem;cursor:pointer;">Reaktivieren</button>';
-      }
-      html += '</td>';
-      html += '</tr>';
+      if (v.payout_status==='open') { html += '<button data-lpid="'+v.id+'" data-status="done" data-action="payout" style="padding:4px 8px;background:#15803d;color:#fff;border:none;border-radius:5px;font-size:.72rem;cursor:pointer;margin-right:4px;">Erledigt</button><button data-lpid="'+v.id+'" data-status="suspended" data-action="payout" style="padding:4px 8px;background:#dc2626;color:#fff;border:none;border-radius:5px;font-size:.72rem;cursor:pointer;">Suspendieren</button>'; }
+      else if (v.payout_status!=='done') { html += '<button data-lpid="'+v.id+'" data-status="open" data-action="payout" style="padding:4px 8px;background:var(--wa);color:#fff;border:none;border-radius:5px;font-size:.72rem;cursor:pointer;">Reaktivieren</button>'; }
+      html += '</td></tr>';
     });
-
     html += '</tbody></table></div>';
     document.getElementById('verkaeufe-list').innerHTML = html;
-
-    // Event delegation für Payout-Buttons
     document.getElementById('verkaeufe-list').addEventListener('click', function(e) {
       var btn = e.target.closest('[data-action="payout"]');
       if (btn) setPayoutStatus(btn.dataset.lpid, btn.dataset.status);
     });
-  } catch(e) {
-    document.getElementById('verkaeufe-list').innerHTML = '<div style="color:red;">Fehler: ' + e.message + '</div>';
-  }
+  } catch(e) { document.getElementById('verkaeufe-list').innerHTML = '<div style="color:red;">Fehler: '+e.message+'</div>'; }
 }
 
 async function setPayoutStatus(lpId, status) {
-  try {
-    await fetch(API + '/api/vk/admin/verkaeufe/' + lpId + '/payout', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ payout_status: status })
-    });
-    loadVerkaeufe();
-  } catch(e) { alert('Fehler: ' + e.message); }
+  try { await fetch(API+'/api/vk/admin/verkaeufe/'+lpId+'/payout',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({payout_status:status})}); loadVerkaeufe(); }
+  catch(e) { alert('Fehler: '+e.message); }
 }
 
 var sandboxMessages = [];
-var sandboxSlug = '';
 
 async function sendSandboxMsg() {
   var input = document.getElementById('sandbox-input');
   var slug = document.getElementById('sandbox-slug').value.trim();
   var msg = input.value.trim();
   if (!msg || !slug) { alert('Bitte LP Slug und Nachricht eingeben'); return; }
-
-  sandboxSlug = slug;
   input.value = '';
-
   appendSandboxMsg(msg, 'buyer');
   sandboxMessages.push({ role: 'user', content: msg });
-
   var typingId = 'typing-' + Date.now();
   var chat = document.getElementById('sandbox-chat');
   chat.innerHTML += '<div id="' + typingId + '" style="align-self:flex-start;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:8px 12px;font-size:.82rem;color:var(--mu);">⏳ Bot tippt...</div>';
   chat.scrollTop = chat.scrollHeight;
-
   try {
-    var r = await fetch(API + '/api/vk/admin/bot-sandbox', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        lp_slug: slug,
-        messages: sandboxMessages,
-        negotiation_level: document.getElementById('sandbox-level').value
-      })
-    });
+    var r = await fetch(API + '/api/vk/admin/bot-sandbox', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ lp_slug: slug, messages: sandboxMessages, negotiation_level: document.getElementById('sandbox-level').value }) });
     var data = await r.json();
     document.getElementById(typingId)?.remove();
-
     if (!r.ok) { appendSandboxMsg('Fehler: ' + (data.error || 'Unbekannt'), 'error'); return; }
-
     var reply = data.reply;
     sandboxMessages.push({ role: 'assistant', content: reply });
-
     var typingDelay = Math.min(4000, Math.max(1000, reply.length * 40));
     await new Promise(function(r) { setTimeout(r, typingDelay); });
-
-    if (data.payment_link) {
-      appendSandboxMsg(reply.replace(/ZAHLUNG_LINK:\d+(\.\d+)?/, '').trim(), 'bot');
-      appendSandboxMsg('EINIGUNG - Bot würde Payment Link senden: EUR ' + data.payment_link.amount.toFixed(2), 'system');
-    } else {
-      appendSandboxMsg(reply, 'bot');
-    }
-
+    if (data.payment_link) { appendSandboxMsg(reply.replace(/ZAHLUNG_LINK:\d+(\.\d+)?/, '').trim(), 'bot'); appendSandboxMsg('EINIGUNG – Bot würde Payment Link senden: EUR ' + data.payment_link.amount.toFixed(2), 'system'); }
+    else { appendSandboxMsg(reply, 'bot'); }
     var modelBadge = data.model && data.model.includes('opus') ? 'Opus (Preisverhandlung)' : 'Haiku (Produktfrage)';
     chat.innerHTML += '<div style="text-align:center;font-size:.68rem;color:var(--mu);margin-top:-4px;">' + modelBadge + '</div>';
-  } catch(e) {
-    document.getElementById(typingId)?.remove();
-    appendSandboxMsg('Fehler: ' + e.message, 'error');
-  }
+  } catch(e) { document.getElementById(typingId)?.remove(); appendSandboxMsg('Fehler: ' + e.message, 'error'); }
 }
 
 function appendSandboxMsg(text, type) {
   var chat = document.getElementById('sandbox-chat');
-  var styles = {
-    buyer:  'align-self:flex-end;background:var(--wa);color:#fff;',
-    bot:    'align-self:flex-start;background:#fff;border:1.5px solid var(--border);color:var(--txt);',
-    system: 'align-self:center;background:#fef9c3;border:1px solid #fef08a;color:#a16207;font-size:.78rem;',
-    error:  'align-self:center;background:#fef2f2;border:1px solid #fecaca;color:#dc2626;font-size:.78rem;'
-  };
+  var styles = { buyer:'align-self:flex-end;background:var(--wa);color:#fff;', bot:'align-self:flex-start;background:#fff;border:1.5px solid var(--border);color:var(--txt);', system:'align-self:center;background:#fef9c3;border:1px solid #fef08a;color:#a16207;font-size:.78rem;', error:'align-self:center;background:#fef2f2;border:1px solid #fecaca;color:#dc2626;font-size:.78rem;' };
   chat.innerHTML += '<div style="' + (styles[type]||styles.bot) + 'border-radius:10px;padding:9px 13px;font-size:.85rem;max-width:85%;white-space:pre-wrap;">' + esc(text) + '</div>';
   chat.scrollTop = chat.scrollHeight;
 }
@@ -813,27 +716,24 @@ async function loadBusinessDiscounts() {
 }
 
 async function createBusinessDiscount() {
-  var company    = document.getElementById('nb-company').value.trim();
-  var phone      = document.getElementById('nb-phone').value.trim().replace(/[^0-9+]/g,'');
-  var discount   = parseInt(document.getElementById('nb-discount').value)||20;
-  var until      = document.getElementById('nb-until').value||null;
-  var maxUses    = parseInt(document.getElementById('nb-maxuses').value)||null;
-  var notes      = document.getElementById('nb-notes').value.trim()||null;
-  var commission   = parseInt(document.getElementById('nb-commission').value)||0;
-  var wiseEmail    = document.getElementById('nb-wise').value.trim()||null;
-  var lpEnabled    = document.getElementById('nb-lp-enabled').checked;
-  var sellerEmail  = document.getElementById('nb-seller-email').value.trim()||null;
-  var sellerAddr   = document.getElementById('nb-seller-address').value.trim()||null;
-  var sellerZip    = document.getElementById('nb-seller-zip').value.trim()||null;
-  var sellerCity   = document.getElementById('nb-seller-city').value.trim()||null;
-  var sellerUid    = document.getElementById('nb-seller-uid').value.trim()||null;
+  var company = document.getElementById('nb-company').value.trim();
+  var phone = document.getElementById('nb-phone').value.trim().replace(/[^0-9+]/g,'');
+  var discount = parseInt(document.getElementById('nb-discount').value)||20;
+  var until = document.getElementById('nb-until').value||null;
+  var maxUses = parseInt(document.getElementById('nb-maxuses').value)||null;
+  var notes = document.getElementById('nb-notes').value.trim()||null;
+  var commission = parseInt(document.getElementById('nb-commission').value)||0;
+  var wiseEmail = document.getElementById('nb-wise').value.trim()||null;
+  var lpEnabled = document.getElementById('nb-lp-enabled').checked;
+  var sellerEmail = document.getElementById('nb-seller-email').value.trim()||null;
+  var sellerAddr = document.getElementById('nb-seller-address').value.trim()||null;
+  var sellerZip = document.getElementById('nb-seller-zip').value.trim()||null;
+  var sellerCity = document.getElementById('nb-seller-city').value.trim()||null;
+  var sellerUid = document.getElementById('nb-seller-uid').value.trim()||null;
   document.getElementById('nb-err').textContent = '';
   if (!company || !phone) { document.getElementById('nb-err').textContent = 'Firma und Telefon erforderlich'; return; }
   try {
-    var r = await fetch(API + '/api/vk/admin/business-discounts', {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ company_name: company, phone, discount_percent: discount, valid_until: until, max_uses: maxUses, notes, sales_commission_percent: commission, wise_email: wiseEmail, landingpage_enabled: lpEnabled, seller_email: sellerEmail, seller_address: sellerAddr, seller_zip: sellerZip, seller_city: sellerCity, seller_uid: sellerUid, upload_mode: document.getElementById('nb-upload-mode').value || 'standard' })
-    });
+    var r = await fetch(API + '/api/vk/admin/business-discounts', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ company_name: company, phone, discount_percent: discount, valid_until: until, max_uses: maxUses, notes, sales_commission_percent: commission, wise_email: wiseEmail, landingpage_enabled: lpEnabled, seller_email: sellerEmail, seller_address: sellerAddr, seller_zip: sellerZip, seller_city: sellerCity, seller_uid: sellerUid, upload_mode: document.getElementById('nb-upload-mode').value || 'standard' }) });
     var d = await r.json();
     if (!d.success) { document.getElementById('nb-err').textContent = d.error; return; }
     showToast('✅ Firmenrabatt für "' + company + '" erstellt!');
@@ -843,10 +743,7 @@ async function createBusinessDiscount() {
 }
 
 async function toggleBusinessDiscount(id, active) {
-  await fetch(API + '/api/vk/admin/business-discounts/' + id, {
-    method:'PUT', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ active: !active })
-  });
+  await fetch(API + '/api/vk/admin/business-discounts/' + id, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ active: !active }) });
   showToast(!active ? '▶ Aktiv' : '⏸ Pausiert');
   loadBusinessDiscounts();
 }
@@ -878,8 +775,7 @@ function editBusinessDiscount(b) {
   document.getElementById('eb-seller-city').value    = b.seller_city || '';
   document.getElementById('eb-seller-uid').value     = b.seller_uid || '';
   document.getElementById('eb-err').textContent = '';
-  var modal = document.getElementById('editBusinessModal');
-  modal.style.display = 'flex';
+  document.getElementById('editBusinessModal').style.display = 'flex';
 }
 
 function closeEditModal() {
@@ -889,32 +785,104 @@ function closeEditModal() {
 
 async function saveBusinessDiscount() {
   if (!_editingBusinessId) return;
-  var company    = document.getElementById('eb-company').value.trim();
-  var phone      = document.getElementById('eb-phone').value.trim().replace(/[^0-9+]/g,'');
-  var discount   = parseInt(document.getElementById('eb-discount').value)||20;
-  var until      = document.getElementById('eb-until').value || null;
-  var maxUses    = parseInt(document.getElementById('eb-maxuses').value)||null;
-  var notes      = document.getElementById('eb-notes').value.trim()||null;
-  var commission   = parseInt(document.getElementById('eb-commission').value)||0;
-  var wiseEmail    = document.getElementById('eb-wise').value.trim()||null;
-  var lpEnabled    = document.getElementById('eb-lp-enabled').checked;
-  var sellerEmail  = document.getElementById('eb-seller-email').value.trim()||null;
-  var sellerAddr   = document.getElementById('eb-seller-address').value.trim()||null;
-  var sellerZip    = document.getElementById('eb-seller-zip').value.trim()||null;
-  var sellerCity   = document.getElementById('eb-seller-city').value.trim()||null;
-  var sellerUid    = document.getElementById('eb-seller-uid').value.trim()||null;
+  var company = document.getElementById('eb-company').value.trim();
+  var phone = document.getElementById('eb-phone').value.trim().replace(/[^0-9+]/g,'');
+  var discount = parseInt(document.getElementById('eb-discount').value)||20;
+  var until = document.getElementById('eb-until').value || null;
+  var maxUses = parseInt(document.getElementById('eb-maxuses').value)||null;
+  var notes = document.getElementById('eb-notes').value.trim()||null;
+  var commission = parseInt(document.getElementById('eb-commission').value)||0;
+  var wiseEmail = document.getElementById('eb-wise').value.trim()||null;
+  var lpEnabled = document.getElementById('eb-lp-enabled').checked;
+  var sellerEmail = document.getElementById('eb-seller-email').value.trim()||null;
+  var sellerAddr = document.getElementById('eb-seller-address').value.trim()||null;
+  var sellerZip = document.getElementById('eb-seller-zip').value.trim()||null;
+  var sellerCity = document.getElementById('eb-seller-city').value.trim()||null;
+  var sellerUid = document.getElementById('eb-seller-uid').value.trim()||null;
   document.getElementById('eb-err').textContent = '';
   try {
-    var r = await fetch(API + '/api/vk/admin/business-discounts/' + _editingBusinessId, {
-      method: 'PUT', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ company_name: company, phone, discount_percent: discount, valid_until: until, max_uses: maxUses, notes, sales_commission_percent: commission, wise_email: wiseEmail, landingpage_enabled: lpEnabled, seller_email: sellerEmail, seller_address: sellerAddr, seller_zip: sellerZip, seller_city: sellerCity, seller_uid: sellerUid })
-    });
+    var r = await fetch(API + '/api/vk/admin/business-discounts/' + _editingBusinessId, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ company_name: company, phone, discount_percent: discount, valid_until: until, max_uses: maxUses, notes, sales_commission_percent: commission, wise_email: wiseEmail, landingpage_enabled: lpEnabled, seller_email: sellerEmail, seller_address: sellerAddr, seller_zip: sellerZip, seller_city: sellerCity, seller_uid: sellerUid }) });
     var d = await r.json();
     if (!d.success) { document.getElementById('eb-err').textContent = d.error; return; }
     showToast('✅ Gespeichert');
     closeEditModal();
     loadBusinessDiscounts();
   } catch(e) { document.getElementById('eb-err').textContent = e.message; }
+}
+
+// ── KI KONFIGURATION ─────────────────────────────────────────
+var _aiConfig = [];
+var AI_DEFAULTS = [
+  {id:'',task_key:'photo_grouping',         task_label:'Foto-Gruppierung',          sachbearbeiter_model:'claude-haiku-4-5', abteilungsleiter_model:'claude-haiku-4-5',  experte_model:'claude-sonnet-4-6'},
+  {id:'',task_key:'sales_analysis_basic',   task_label:'Verkaufsanalyse Basis',     sachbearbeiter_model:'claude-haiku-4-5', abteilungsleiter_model:'claude-haiku-4-5',  experte_model:'claude-sonnet-4-6'},
+  {id:'',task_key:'sales_analysis_complex', task_label:'Verkaufsanalyse Komplex',   sachbearbeiter_model:'claude-haiku-4-5', abteilungsleiter_model:'claude-sonnet-4-6', experte_model:'claude-opus-4-6'},
+  {id:'',task_key:'whatsapp_bot_l1',        task_label:'WhatsApp Bot Ebene 1',      sachbearbeiter_model:'claude-haiku-4-5', abteilungsleiter_model:'claude-haiku-4-5',  experte_model:'claude-sonnet-4-6'},
+  {id:'',task_key:'whatsapp_bot_l2',        task_label:'WhatsApp Bot Ebene 2',      sachbearbeiter_model:'claude-haiku-4-5', abteilungsleiter_model:'claude-sonnet-4-6', experte_model:'claude-opus-4-6'}
+];
+
+async function loadAiConfig() {
+  var status = document.getElementById('aiconfig-status');
+  try {
+    var r = await fetch(API + '/api/vk/admin/ai-config');
+    if (r.ok) {
+      var data = await r.json();
+      _aiConfig = data.length ? data : AI_DEFAULTS;
+      status.textContent = data.length ? '✅ Live' : '📋 Standardwerte';
+    } else { throw new Error(); }
+  } catch(e) {
+    _aiConfig = AI_DEFAULTS;
+    status.textContent = '📋 Vorschau (API folgt)';
+  }
+  renderAiConfig();
+}
+
+function modelOptions(selected) {
+  return [
+    ['claude-haiku-4-5',  '⚡ Haiku (schnell)'],
+    ['claude-sonnet-4-6', '💡 Sonnet (standard)'],
+    ['claude-opus-4-6',   '🏆 Opus (premium)']
+  ].map(function(o) {
+    return '<option value="' + o[0] + '"' + (selected === o[0] ? ' selected' : '') + '>' + o[1] + '</option>';
+  }).join('');
+}
+
+function renderAiConfig() {
+  var tbody = document.getElementById('aiconfig-tbody');
+  if (!_aiConfig.length) { tbody.innerHTML = '<tr><td colspan="5" class="msg">Keine Daten</td></tr>'; return; }
+  tbody.innerHTML = _aiConfig.map(function(c) {
+    return '<tr id="airow-' + c.task_key + '">' +
+      '<td style="font-weight:700;font-size:.85rem;">' + esc(c.task_label) + '</td>' +
+      '<td style="background:#f0fdf4;">' +
+        '<select data-key="' + c.task_key + '" data-role="sachbearbeiter_model" style="width:100%;padding:6px 8px;border:1.5px solid #86efac;border-radius:6px;font-size:.78rem;font-family:inherit;background:#f0fdf4;cursor:pointer;">' +
+        modelOptions(c.sachbearbeiter_model) + '</select></td>' +
+      '<td style="background:#eff6ff;">' +
+        '<select data-key="' + c.task_key + '" data-role="abteilungsleiter_model" style="width:100%;padding:6px 8px;border:1.5px solid #bfdbfe;border-radius:6px;font-size:.78rem;font-family:inherit;background:#eff6ff;cursor:pointer;">' +
+        modelOptions(c.abteilungsleiter_model) + '</select></td>' +
+      '<td style="background:#fef9c3;">' +
+        '<select data-key="' + c.task_key + '" data-role="experte_model" style="width:100%;padding:6px 8px;border:1.5px solid #fde68a;border-radius:6px;font-size:.78rem;font-family:inherit;background:#fef9c3;cursor:pointer;">' +
+        modelOptions(c.experte_model) + '</select></td>' +
+      '<td><button onclick="saveAiRow(\'' + c.task_key + '\',\'' + (c.id || '') + '\')" class="btn btn-g btn-sm" title="Speichern">💾</button></td>' +
+    '</tr>';
+  }).join('');
+}
+
+async function saveAiRow(taskKey, id) {
+  var row = document.getElementById('airow-' + taskKey);
+  var updates = {};
+  row.querySelectorAll('select').forEach(function(s) { updates[s.getAttribute('data-role')] = s.value; });
+  updates.updated_at = new Date().toISOString();
+  try {
+    var url = id
+      ? API + '/api/vk/admin/ai-config/' + id
+      : API + '/api/vk/admin/ai-config/key/' + taskKey;
+    var r = await fetch(url, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(updates) });
+    if (r.ok) {
+      showToast('✅ ' + taskKey + ' gespeichert');
+    } else { throw new Error(); }
+  } catch(e) {
+    _aiConfig.forEach(function(c) { if (c.task_key === taskKey) Object.assign(c, updates); });
+    showToast('⚠️ Lokal gespeichert – API folgt in Kürze');
+  }
 }
 
 function showToast(msg) {
